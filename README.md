@@ -83,7 +83,7 @@ A run's behavior is not in one file; each decision has one owner. To predict or 
 
 ## When a run halts
 
-Silence is never success: every run ends in a named stop condition, and each maps to one operator action. Resuming is `harnessie run <same workflow> --goal ...` with the same run id — resume re-runs only phases that did not pass, so fixing the cause and re-running is safe.
+Silence is never success: every run ends in a named stop condition, and each maps to one operator action. Resuming is `harnessie run <same workflow> --goal ...` with the same run id: resume re-runs only phases that did not pass, so fixing the cause and re-running is safe.
 
 | Stop condition | What it means | What to do |
 |---|---|---|
@@ -96,3 +96,11 @@ Silence is never success: every run ends in a named stop condition, and each map
 | `max_steps` | the loop hit its step ceiling without completing | raise `max_steps` for the phase or simplify the task |
 | `model_error` | the provider errored twice in a row | check the endpoint and API key; re-run |
 | `no_action` | the model produced no tool call even after a nudge | usually a role-prompt or model-fit issue; check the role prompt in `agents/` |
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, the eval-first change discipline, and how consequential decisions are recorded. Bug and feature templates live under [.github/](.github/).
+
+## License
+
+MIT. See [LICENSE](LICENSE).
