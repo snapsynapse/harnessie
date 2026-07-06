@@ -33,3 +33,7 @@ workspace/
 
 # Session-local research scratch (lej-pp-search)
 .perplexity-research/
+
+# Local agent-runtime wrappers: never staged without an explicit operator decision
+.agents/
+.codex/

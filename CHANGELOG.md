@@ -36,7 +36,7 @@ The governance release: adversarial collaboration and evals promoted to foundati
 - Ownership lanes (`harness/ownership.py` + root `OWNERSHIP.yaml`): agents own the files they create; cross-agent writes are refused at dispatch with a `request_change` remedy; operator lanes are locked to all agents; collaborative lanes are shared. The ledger lives outside the workspace jail so no agent can edit its own permissions.
 - Adversarial contested phases (`harness/adversarial.py`, workflow `mode: adversarial`): independent read-only positions across configurable brains, bounded objection rounds, harness-assembled AIDR-shaped decision records under `runs/<id>/decisions/` with structurally earned claims (`independent-positions`, `dissent-preserved`, `human-arbitrated`). Contested outcomes halt as `needs_arbitration`; the operator arbitrates by editing the record in their own words and resuming. No agent and no harness code path writes the Arbitration section.
 - Tamper-evident audit (`harness/audit.py`): events.jsonl is hash-chained (`seq`/`prev` per event, chain survives resume); `harnessie audit <run_id>` verifies the chain and renders the governance timeline (exit 1 on a broken chain).
-- Governance eval suite (`evals/governance.yaml`, 12 scenarios) plus new eval kinds (`ownership`, `adversarial`, `audit`, consent-flagged `loop`), written red before the implementation per the eval-first change discipline.
+- Governance eval suite (`evals/governance.yaml`, 11 scenarios as shipped in 0.2.0) plus new eval kinds (`ownership`, `adversarial`, `audit`, consent-flagged `loop`), written red before the implementation per the eval-first change discipline.
 - Shipped `workflows/contested-decision.yaml`: a two-brain adversarial panel whose record can earn `independent-positions` across providers.
 - `harnessie eval` deterministic scorecard runner plus `evals/baseline.yaml` mock-brain scenarios: golden passes, risky fail-closed verdicts, and recovery/gate retries.
 - `harnessie init` scaffold command for installed CLI usage; now also scaffolds `OWNERSHIP.yaml`.
@@ -82,4 +82,4 @@ Initial build: a brain-agnostic multi-agent harness (orchestrator / workers / ve
 
 ### Not yet implemented (see `IMPLEMENTATION_PLAN.md` and `ROADMAP.md`)
 
-- Live-endpoint smoke tests, golden-task eval scorecard, interactive approval handler, parallel workers, a Linux sandbox backend, tool plugins. Sequenced into 0.2.0 / 0.3.0 / 1.0.0 milestones in the roadmap; Linux support is the 0.2.0 headline.
+- Live-endpoint smoke tests, golden-task eval scorecard, interactive approval handler, parallel workers, a Linux sandbox backend, tool plugins. Sequenced into 0.2.0 / 0.3.0 / 1.0.0 milestones in the roadmap; Linux support is the 0.2.0 headline. [Historical note: portability was later displaced to 0.4.0 by the governance (0.2.0) and aggregated-intelligence (0.3.0) releases.]

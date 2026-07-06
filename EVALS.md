@@ -7,7 +7,7 @@ Harnessie evals are YAML scorecards under `evals/`. They are deliberately small,
 ## Scenario contract
 Every scenario has:
 - `id`: stable snake-case identifier, unique within the suite.
-- `kind`: one of `verdict`, `loop`, `workflow`, or `resume`.
+- `kind`: one of `verdict`, `loop`, `workflow`, `resume`, `ownership`, `adversarial`, `audit`, or `triage`.
 - Expected result fields, which depend on `kind`.
 ## Suites
 - `evals/baseline.yaml`: core harness guarantees (verdicts, stop conditions, gates, resume).
@@ -68,7 +68,7 @@ Add cases in this order:
 - Recovery cases: a first failure should reformulate, retry, escalate, or halt as specified.
 Prefer narrow scenarios. A scenario should explain one harness guarantee. If it needs many unrelated turns, split it.
 ## Live eval path
-The mock-brain baseline proves harness mechanics. The 0.2 live scorecard should reuse the same categories against configured real endpoints:
+The mock-brain baseline proves harness mechanics. The 0.4 live scorecard should reuse the same categories — including the governance and triage suites, so consent, ownership, and disposal behavior is measured per brain — against configured real endpoints:
 - Anthropic smoke: one golden workflow and one verifier verdict.
 - Local OpenAI-compatible smoke: one golden workflow and one risky fail-closed case.
 - Brain-swap report: same task set, same acceptance criteria, comparable pass/fail and cost output.

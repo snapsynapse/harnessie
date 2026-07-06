@@ -48,7 +48,7 @@ The gate's verifier agent runs in a fresh context, sees only artifacts and crite
 
 ### 7. Human review (structural)
 
-`needs_human` halts the workflow; irreversible actions require approval (fail closed under the default handler). The repo ships un-git-initialized so the first diff review is a deliberate gate before anything runs with real credentials.
+`needs_human` halts the workflow; irreversible actions require approval (fail closed under the default handler). Review the diff of any release before running it with real credentials; the audit chain and journal make every run's actions reviewable after the fact.
 
 ## What each layer catches, and its blind spot
 

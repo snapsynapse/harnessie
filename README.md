@@ -33,7 +33,8 @@ workflows/          declared phase sequences (YAML) with per-phase gates, task c
                     adversarial contested phases (mode: adversarial)
 config/models.yaml  model tiers, routing table, budgets: the ONLY file to edit to swap brains
 OWNERSHIP.yaml      ownership lanes + first-writer auto-claims; operator-owned, agents cannot reach it
-decisions/          the repo's own AIDR decision records (AIDR-0001 = the v0.2 direction)
+decisions/          the repo's own AIDR decision records (AIDR-0001 = v0.2 direction,
+                    AIDR-0002 = v0.3 direction; both open awaiting arbitration)
 memory/             project memory: MEMORY.md index + facts/ (stamped provenance, verify_by
                     expiry) + archive/ (expired facts; nothing deletes) — maintained by
                     workflows/memory-triage.yaml under approval gates
@@ -43,7 +44,7 @@ runs/               per-run journal.jsonl (resume ledger) + events.jsonl (hash-c
 evals/              deterministic scorecards over mock-brain golden/risky/recovery scenarios
 tests/              the done-tests for every subsystem
 docs/               reserved for the canonical web page (GitHub Pages publish source once public)
-*.md at root        ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP, IMPLEMENTATION_PLAN, PROMPTS,
+*.md at root        ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP, IMPLEMENTATION_PLAN, PROMPTS, EVALS, NEXT,
                     session-url-log, plus INTENT (9-section standard), CHANGELOG, README,
                     LICENSE (MIT); source-verification.json is the build provenance data
 ```

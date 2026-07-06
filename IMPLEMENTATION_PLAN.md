@@ -68,7 +68,7 @@ The injection-defense layer (harness/quarantine.py; SECURITY.md) is implemented:
 15. OS sandbox for shell execution (implemented)
 - run_shell and gate checks run inside an OS confinement (harness/sandbox.py; macOS Seatbelt via sandbox-exec) that limits writes to the workspace and denies network by default, closing the interpreter escape that per-role allowlists and the argument jail only narrow. Policy: fail closed everywhere (no backend means shell/checks are blocked, not run unconfined); network is per-phase opt-in via allow_network.
 - Done test: a worker's `python3 -c "open('~/x','w')"` is blocked by the sandbox and the file is never created; the same write into the workspace succeeds; network is denied by default; run_shell and gate checks fail closed when the backend is monkeypatched absent. (tests/test_sandbox.py, 7 tests.)
-- Follow-up: a Linux backend (bubblewrap / firejail / docker); until one is wired, Linux fails closed by design. Scoped as a 0.2.0 milestone in [ROADMAP.md](ROADMAP.md) under Platform support.
+- Follow-up: a Linux backend (bubblewrap / firejail / docker); until one is wired, Linux fails closed by design. Scoped as a 0.4.0 milestone (displaced twice from 0.2.0) in [ROADMAP.md](ROADMAP.md) under Platform support.
 
 ## Phase 3, extensibility (later, only when earned)
 
