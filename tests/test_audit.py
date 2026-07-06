@@ -71,6 +71,20 @@ def test_governance_timeline_selects_governance_events(tmp_path):
     assert "model_turn" not in kinds
 
 
+def test_governance_timeline_includes_operator_and_memory_events(tmp_path):
+    # v0.3 claim: operator actions and memory maintenance are IN the rendered
+    # audit timeline, same stream as agent actions — not just in the raw log.
+    log = EventLog(tmp_path / "run", echo=False)
+    for kind in ("approval_granted", "approval_denied", "operator_action",
+                 "fact_saved", "fact_expired"):
+        log.emit(kind, detail=f"x-{kind}")
+    log.close()
+    kinds = [e["kind"] for e in governance_timeline(tmp_path / "run")]
+    for kind in ("approval_granted", "approval_denied", "operator_action",
+                 "fact_saved", "fact_expired"):
+        assert kind in kinds, f"{kind} missing from governance timeline"
+
+
 def test_audit_cli_exit_codes(tmp_path):
     run_dir = tmp_path / "runs" / "r1"
     _emit_run(run_dir)

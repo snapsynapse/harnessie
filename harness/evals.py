@@ -272,16 +272,22 @@ def _run_triage_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
 
 
 def _run_audit_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
-    from .audit import verify_chain
+    from .audit import governance_timeline, verify_chain
 
     problems: list[str] = []
     with tempfile.TemporaryDirectory(prefix="harnessie-eval-") as d:
         run_dir = Path(d) / "run"
         log = EventLog(run_dir, echo=False)
+        expect_kinds = scenario.get("expect_timeline_kinds", [])
         for kind in ("workflow_start", "consent_granted", "gate_verdict",
-                     "workflow_done"):
+                     *expect_kinds, "workflow_done"):
             log.emit(kind, detail=f"eval-{kind}")
         log.close()
+        if expect_kinds:
+            rendered = {e["kind"] for e in governance_timeline(run_dir)}
+            for kind in expect_kinds:
+                if kind not in rendered:
+                    problems.append(f"{kind} missing from governance timeline")
         before = verify_chain(run_dir)["ok"]
         if before != bool(scenario.get("expect_before", True)):
             problems.append(f"chain before tamper: ok={before}")

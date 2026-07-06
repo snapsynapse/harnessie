@@ -5,7 +5,9 @@ verify_chain() walks the file and reports every broken link; a clean report
 means the log was appended in order and never edited in place. The governance
 timeline filters the log down to the events a human auditor cares about:
 consent, ownership, change requests, injection flags, gate verdicts, decisions,
-and arbitration.
+arbitration, operator actions (approval grants/denials, arbitration detected on
+resume), and memory maintenance (facts saved and expired) — one composite
+timeline of agent and human actions.
 """
 
 from __future__ import annotations
@@ -24,6 +26,10 @@ GOVERNANCE_KINDS = frozenset({
     "position_recorded", "objection_recorded",
     "decision_assembled", "decision_converged", "needs_arbitration",
     "decision_arbitrated",
+    # operator actions: the human is IN the composite timeline (v0.3)
+    "approval_granted", "approval_denied", "operator_action",
+    # memory maintenance (v0.3)
+    "fact_saved", "fact_expired",
     "phase_done", "workflow_start", "workflow_done",
 })
 

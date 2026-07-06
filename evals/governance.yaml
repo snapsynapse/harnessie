@@ -123,3 +123,14 @@ scenarios:
     tamper: true
     expect_before: true
     expect_after: false
+
+  # -- audit: golden (operator + memory events render in the timeline) -------------
+  - id: audit_timeline_shows_operator_and_memory_events
+    kind: audit
+    expect_before: true
+    expect_timeline_kinds:
+      - approval_granted
+      - approval_denied
+      - operator_action
+      - fact_saved
+      - fact_expired
