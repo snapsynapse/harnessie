@@ -1,0 +1,78 @@
+# Policy analysis and compliance assessment, the end-to-end example workflow.
+# All paths given to agents are relative to the workspace root (tools resolve
+# them there). Place source documents in workspace/policies/ and the
+# obligations list at workspace/obligations.md, then:
+#   harnessie run workflows/policy-compliance.yaml --goal "Assess ACME's AI usage
+#   policy in policies/ against the obligations in obligations.md"
+name: policy-compliance
+description: Analyze policy documents against a set of obligations; produce a verified compliance assessment with per-claim provenance.
+
+phases:
+  - name: plan
+    agent: orchestrator
+    task_class: plan
+    max_steps: 15
+    task: |
+      Goal from operator: {goal}
+
+      All paths are relative to your workspace root. Inspect policies/ and the
+      obligations file with your read tools. Produce as your task_complete
+      report: (1) the exact obligation list to assess against, (2) research
+      subtasks (one per obligation cluster) each with goal, acceptance
+      criteria, inputs (which documents), out-of-scope fences, and (3) the
+      required structure of the final assessment (one finding per obligation:
+      met / not-met / partially-met / no-evidence, each with quoted evidence
+      and document+section provenance).
+
+  - name: assess
+    agent: researcher
+    task_class: research
+    max_steps: 40
+    # quarantine posture: this phase reads third-party documents, so it gets
+    # no shell; reading and writing findings is all the task needs
+    deny_tools: [run_shell]
+    task: |
+      Execute this assessment plan. Plan:
+
+      {plan}
+
+      All paths are relative to your workspace root. Write findings to
+      assessment/findings.md following the structure the plan requires. Every
+      finding carries provenance (document, section, quote). Mark obligations
+      with no evidence as no-evidence rather than guessing.
+    verify:
+      max_attempts: 3
+      checks:
+        - name: findings-exist
+          command: >-
+            python3 -c "import pathlib,sys;
+            p=pathlib.Path('assessment/findings.md');
+            ok=p.exists() and p.stat().st_size>200;
+            print('ok' if ok else 'missing or too small; files present '
+            + ', '.join(sorted(str(x) for x in pathlib.Path('.').rglob('*') if x.is_file())[:40]));
+            sys.exit(0 if ok else 1)"
+      verifier: claims-verifier
+      task_class: verify
+      criteria: |
+        Every obligation from the plan has exactly one finding with a verdict in
+        {met, not-met, partially-met, no-evidence}. Every met/not-met/partial
+        finding quotes the policy text and names document + section. Quotes
+        spot-checked against the actual documents are accurate. Inference is
+        labeled as inference.
+
+  - name: integrate
+    agent: orchestrator
+    task_class: integrate
+    max_steps: 10
+    task: |
+      Original goal: {goal}
+
+      Gated assessment report:
+
+      {assess}
+
+      Produce the executive compliance summary for the operator: overall
+      posture, the top risks (not-met obligations first), the no-evidence gaps
+      that need human follow-up, and pointers into assessment/ for detail.
+      State explicitly that findings passed the claims-verifier gate, and flag
+      anything that only partially satisfied it.

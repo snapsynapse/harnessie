@@ -1,0 +1,46 @@
+import pytest
+
+from harness.cli import main
+from harness.roles import RoleDef, RoleLibrary
+from test_runner import scaffold_project
+
+
+def test_boundaries_are_machine_appended():
+    role = RoleDef(name="implementer", kind="worker", prompt="# Worker\nDo things.")
+    system = role.system_prompt(extra_context="Goal: x")
+    assert "Boundaries (harness-enforced)" in system
+    assert "Never fabricate command output" in system     # from DEFAULT_BOUNDARIES
+    # stable prefix first, volatile context after (prompt caching order)
+    assert system.index("Boundaries (harness-enforced)") < system.index("Run context")
+
+
+def test_unknown_agent_name_lists_known(tmp_path):
+    (tmp_path / "orchestrator.md").write_text("# O")
+    lib = RoleLibrary.load(tmp_path)
+    with pytest.raises(KeyError) as exc:
+        lib.get("nonexistent")
+    assert "known:" in str(exc.value)
+
+
+def test_cli_report_missing_run(tmp_path):
+    assert main(["--root", str(tmp_path), "report", "no-such-run"]) == 1
+
+
+def test_cli_run_exits_2_on_needs_human(tmp_path, capsys):
+    # unscripted mock brain never calls tools -> plan phase ends no_action ->
+    # needs_human -> CI-gateable exit code 2
+    scaffold_project(tmp_path)
+    code = main(["--root", str(tmp_path), "run", "workflows/mini.yaml",
+                 "--goal", "g"])
+    assert code == 2
+    assert "needs_human" in capsys.readouterr().out
+
+
+def test_cli_report_renders_finished_run(tmp_path, capsys):
+    scaffold_project(tmp_path)
+    main(["--root", str(tmp_path), "run", "workflows/mini.yaml", "--goal", "g"])
+    capsys.readouterr()
+    assert main(["--root", str(tmp_path), "report",
+                 next((tmp_path / "runs").iterdir()).name]) == 0
+    out = capsys.readouterr().out
+    assert "step_done" in out and "events" in out

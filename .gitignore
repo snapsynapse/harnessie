@@ -1,0 +1,35 @@
+# Baseline (portfolio Repo Standards, all-tier)
+.DS_Store
+.env
+.env.*
+.vercel
+node_modules/
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+dist/
+build/
+.venv/
+venv/
+.claude/
+handoffs/
+working/
+
+# Python caches (additive to baseline)
+*.py[cod]
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Harnessie run output: per-run journals, proofs, workspaces (never committed)
+runs/
+workspace/
+
+# Secrets: keys live in env vars, never in the repo
+*.key
+
+# Session-local research scratch (lej-pp-search)
+.perplexity-research/

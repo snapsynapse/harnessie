@@ -1,0 +1,55 @@
+# Build-and-verify: the plan -> build -> verify -> gate pattern for code work.
+# Invoke: harnessie run workflows/build-and-verify.yaml --goal "<what to build>"
+name: build-and-verify
+description: Plan a code change, implement it, and gate it on tests plus an independent code verifier.
+
+phases:
+  - name: plan
+    agent: orchestrator
+    task_class: plan
+    max_steps: 15
+    task: |
+      Goal from operator: {goal}
+
+      Produce an implementation plan for this goal as your task_complete report:
+      subtasks with goal, acceptance criteria, inputs, and out-of-scope fences,
+      plus the deterministic check for each. Inspect the workspace first with
+      your read tools. Do not write any files.
+
+  - name: implement
+    agent: implementer
+    task_class: implement
+    max_steps: 40
+    task: |
+      Implement the following plan in the workspace. Plan:
+
+      {plan}
+
+      Acceptance criteria: all criteria named in the plan, plus: `pytest -q`
+      exits 0 in the workspace (write tests if the plan lacks them).
+    verify:
+      max_attempts: 3
+      checks:
+        - name: tests
+          command: pytest -q
+      verifier: code-verifier
+      task_class: verify
+      criteria: |
+        Every criterion in the plan is met by an artifact in the workspace.
+        Tests exist, are meaningful (assert behavior, not tautologies), and pass.
+        Nothing outside the plan's scope was modified.
+
+  - name: integrate
+    agent: orchestrator
+    task_class: integrate
+    max_steps: 10
+    task: |
+      Original goal: {goal}
+
+      The implement phase finished with this gated report:
+
+      {implement}
+
+      Write the final run summary for the operator: what was built, evidence it
+      works (cite the gate verdicts and proofs), known limitations, and any
+      follow-ups worth scheduling. Deliver it via task_complete.

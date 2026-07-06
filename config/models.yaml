@@ -1,0 +1,67 @@
+# Model tiers and routing policy — the ONLY file you edit to swap brains.
+#
+# Tiers are ordered cheap -> capable: local, cheap, mid, frontier.
+# The escalation ladder walks that order (see harness/routing.py).
+# API keys come from env vars, never from this file.
+
+tiers:
+  frontier:
+    provider: anthropic
+    model_id: claude-fable-5
+    api_key_env: ANTHROPIC_API_KEY
+    max_tokens: 16384
+    supports_effort: true
+    cost_per_mtok_in: 5.0        # placeholder — set from current price sheet
+    cost_per_mtok_out: 25.0
+
+  mid:
+    provider: anthropic
+    model_id: claude-sonnet-5
+    api_key_env: ANTHROPIC_API_KEY
+    max_tokens: 8192
+    supports_effort: true
+    cost_per_mtok_in: 3.0
+    cost_per_mtok_out: 15.0
+
+  cheap:
+    provider: anthropic
+    model_id: claude-haiku-4-5-20251001
+    api_key_env: ANTHROPIC_API_KEY
+    max_tokens: 8192
+    supports_effort: false
+    cost_per_mtok_in: 1.0
+    cost_per_mtok_out: 5.0
+
+  # Open-source brain via any OpenAI-compatible endpoint (vLLM, Ollama,
+  # llama.cpp server, Together, DeepSeek, GLM, Qwen...). Swap model_id and
+  # base_url; the harness does not change.
+  # Installed on this machine (ollama list, 2026-07-06):
+  #   qwen3.6:35b-mlx   strongest local generalist (default below)
+  #   gemma4:31b-mlx    alternative large local
+  #   gemma4:latest     smaller/faster gemma
+  #   gpt-oss:20b       accepts reasoning_effort; set supports_effort: true with it
+  local:
+    provider: openai-compat
+    model_id: qwen3.6:35b-mlx
+    base_url: http://localhost:11434/v1
+    api_key_env: ""              # local endpoints usually need no key
+    max_tokens: 8192
+    supports_effort: false
+    cost_per_mtok_in: 0.0
+    cost_per_mtok_out: 0.0
+
+# task_class -> {tier, effort}. Workflow phases declare their task_class;
+# routing is config, not model self-assessment.
+routing:
+  plan:        { tier: frontier, effort: high }     # decomposition quality compounds
+  integrate:   { tier: frontier, effort: high }     # synthesis and final review
+  implement:   { tier: mid,      effort: medium }   # bulk execution
+  research:    { tier: cheap,    effort: low }      # fetch/extract/summarize
+  mechanical:  { tier: local,    effort: low }      # rename/reformat/boilerplate
+  verify:      { tier: mid,      effort: high }     # verifiers think hard, cheaply-ish
+  verify_final: { tier: frontier, effort: xhigh }   # last gate before human
+  default:     { tier: mid,      effort: medium }
+
+budget:
+  max_usd: 10.0
+  max_tokens: 2000000

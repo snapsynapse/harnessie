@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "harnessie"
+version = "0.1.0"
+description = "Harnessie: a brain-agnostic multi-agent harness (orchestrator / workers / verifiers) with verification gates, routing policy, and file-based project memory."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Sam Rogers", email = "subscriptions@snapsynapse.com" }]
+dependencies = [
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+harnessie = "harness.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.setuptools.packages.find]
+include = ["harness*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
