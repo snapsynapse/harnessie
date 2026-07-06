@@ -113,7 +113,20 @@ Imported from Turnfile PRD-006's eight-step loop (proposer authors red evals; im
 
 ## 7. Aggregated-intelligence tenets (v0.3)
 
-Harnessie's operator runs on a standing frame: the unit of value is Aggregated Intelligence — humans, agents, and organizations as one composite, never human-versus-AI. v0.3 encodes that frame's tenets as mechanics rather than slogans:
+Harnessie's operator runs on a standing frame: the unit of value is Aggregated Intelligence — humans, agents, and organizations as one composite, never human-versus-AI. The canonical statement is a privately maintained Aggregated Intelligence Tenets document (drafted 2026-07-04, ratified by the operator 2026-07-06 after independent multi-provider peer review; two of its claims remain explicitly provisional). Its eight tenets, against what this harness enforces:
+
+1. Intelligence lives in the arrangement, not the node → the founding v0.1 thesis: the harness structure carries the quality floor, the model only raises the ceiling.
+2. Disagreement is the engine, not the exhaust → contested phases; objections are appended, never deleted; a decline is signal.
+3. Independence before influence → the position round runs in isolated contexts BEFORE the objection round; the `independent-positions` claim requires distinct providers, because a monoculture can only echo with variance.
+4. Consensus is evidence, never authority → design invariant 10; convergence is recorded, arbitration is not inferred from agreement.
+5. Authority is human because accountability is human → arbitration is human-only, mechanically; `needs_arbitration` halts the run.
+6. The record is the relationship → decision records plus the hash-chained events log: who proposed, who objected, who decided, by what right.
+7. The standard is a commons or it is a leash → the brain is a config seam; no code names a required provider; records are plain markdown readable without this harness.
+8. Rules are earned, not decreed → the eval-first discipline plus an AIDR record per direction change; a mechanic without a red-then-green scenario pair does not merge.
+
+The tenets document also names a dual failure mode (a provisional claim, deliberately not ratified as canon): hallucinated completion — the agent confidently reporting done — and premature convergence — the group agreeing before dissent surfaced. Harnessie is deliberately the composition that covers both: mechanical verification below (gates), structured dissent above (contested phases), one accountable human on top (arbitration).
+
+The operational mapping:
 
 | Tenet | Mechanic |
 |---|---|
@@ -122,6 +135,7 @@ Harnessie's operator runs on a standing frame: the unit of value is Aggregated I
 | Drift is the primary failure mode | Staleness is detected, not assumed away: facts past `verify_by` are surfaced by the memory-triage workflow every cadence, and the fix is re-verification or archival — never silently trusting old context. |
 | Nothing is deleted, authority is explicit | `expire_fact` archives (moves to `memory/archive/`, index updated); deletion does not exist as an agent capability. Expiry requires approval — headless runs propose, the operator disposes, and a workflow's `approve_tools:` key is the operator's recorded, journaled pre-approval. |
 | Traction is verified change, not activity | The eval scorecards are the measure: a mechanic exists when its red-then-green scenarios exist, and a brain earns a tier by passing the same scorecard (0.4). |
+| The Constraint Rule: a composite is bounded by its weakest vector — minimum, never average | A run's assurance is the minimum of its control surfaces, and reporting must name the constraining control. This already holds mechanically (one `needs_human`/`needs_arbitration` halts the workflow; a missing sandbox fails shell closed regardless of every other control being green; a broken audit chain fails the audit regardless of clean gate verdicts); 0.4's live scorecard should surface it explicitly — per-run assurance = min(consent, ownership, verification, audit), constraining control named. |
 
 The memory-triage workflow (`workflows/memory-triage.yaml`) is the working expression: a scheduled maintenance agent — the same job as the operator's vault triage agent — running under these controls, so "should not delete without approval" becomes "cannot."
 

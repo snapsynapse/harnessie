@@ -34,7 +34,8 @@ workflows/          declared phase sequences (YAML) with per-phase gates, task c
 config/models.yaml  model tiers, routing table, budgets: the ONLY file to edit to swap brains
 OWNERSHIP.yaml      ownership lanes + first-writer auto-claims; operator-owned, agents cannot reach it
 decisions/          the repo's own AIDR decision records (AIDR-0001 = v0.2 direction,
-                    AIDR-0002 = v0.3 direction; both open awaiting arbitration)
+                    AIDR-0002 = v0.3 direction; both human-arbitrated 2026-07-06
+                    with independent positions from four providers)
 memory/             project memory: MEMORY.md index + facts/ (stamped provenance, verify_by
                     expiry) + archive/ (expired facts; nothing deletes) — maintained by
                     workflows/memory-triage.yaml under approval gates

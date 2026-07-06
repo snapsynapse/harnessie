@@ -6,11 +6,11 @@ Roadmap items are intent, not commitments. Dates are omitted deliberately; miles
 
 ## Current release: 0.3.0 (2026-07-06)
 
-The aggregated-intelligence release: operator actions (approvals, arbitrations) journaled into the same hash-chained audit stream as agent actions; project memory as provenance-and-expiry-bearing substrate maintained through `save_fact`/`expire_fact` (approval-gated, archival-only); `workflows/memory-triage.yaml` as the scheduled maintenance-agent pattern under enforcement. Tenets mapping: [GOVERNANCE.md](GOVERNANCE.md) §7; direction record `decisions/AIDR-0002` (open, awaiting arbitration).
+The aggregated-intelligence release: operator actions (approvals, arbitrations) journaled into the same hash-chained audit stream as agent actions; project memory as provenance-and-expiry-bearing substrate maintained through `save_fact`/`expire_fact` (approval-gated, archival-only); `workflows/memory-triage.yaml` as the scheduled maintenance-agent pattern under enforcement. Tenets mapping: [GOVERNANCE.md](GOVERNANCE.md) §7; direction record `decisions/AIDR-0002` (human-arbitrated 2026-07-06; v0.3.2 patch approved under a one-day cap).
 
 ## Prior release: 0.2.0 (2026-07-06)
 
-The governance release: consent-based orchestration (task packets are offers; accept/decline enforced at dispatch), ownership lanes (agents own their files, never each other's; operator lanes locked), adversarial contested phases emitting AIDR-shaped decision records with human-only arbitration and structurally earned claims, a hash-chained events log with `harnessie audit`, and the eval-first change discipline with an 11-scenario governance suite (12 as of v0.3.1). Direction recorded in `decisions/AIDR-0001` (open, awaiting arbitration); design in [GOVERNANCE.md](GOVERNANCE.md). This displaced the previously planned portability theme, which moves to 0.3.0.
+The governance release: consent-based orchestration (task packets are offers; accept/decline enforced at dispatch), ownership lanes (agents own their files, never each other's; operator lanes locked), adversarial contested phases emitting AIDR-shaped decision records with human-only arbitration and structurally earned claims, a hash-chained events log with `harnessie audit`, and the eval-first change discipline with an 11-scenario governance suite (12 as of v0.3.1). Direction recorded in `decisions/AIDR-0001` (human-arbitrated 2026-07-06); design in [GOVERNANCE.md](GOVERNANCE.md). This displaced the previously planned portability theme, which moves to 0.3.0.
 
 ## Prior release: 0.1.0 (2026-07-06)
 

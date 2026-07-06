@@ -1,21 +1,19 @@
 # Next session handoff
 ## Current state
-Harnessie is at v0.3.1 on `main` — a fix-first coherence patch (stance-vocabulary blocker, NEXT.md relocation, audit-timeline defect, doc-drift sweep) following an adversarially verified impact sweep. Working tree clean except a PARKED, deliberately uncommitted diff: `handoffs/parked-governance-s7-tenets-realignment.patch` (GOVERNANCE.md §7 realigned to a privately maintained tenets draft, ratification pending). It stays parked until the operator decides.
-## Holding pattern
-An operator decision packet with six open items (two AIDR arbitrations, tenets ratification, repo-standards tier, one adoption row, scrub timing) was delivered out-of-band; each item carries a default-on-silence. **Harnessie feature work holds until the packet returns.** Executed fix-first commits are listed in the packet for retroactive veto.
+Harnessie is at v0.3.1 on `main`, post-arbitration. Both decision records are **human-arbitrated (2026-07-06)** with independent positions from four providers (anthropic, alibaba, google, openai — local qwen/gemma/gpt-oss runs; protocol and briefs preserved at `handoffs/position-sweep/`). The operator ratified: v0.2 governance direction; v0.3 direction; the v0.3.2 patch under a one-day hard cap; the Aggregated Intelligence tenets (eight canon, two claims provisional — GOVERNANCE §7 committed accordingly). Repo-standards tier and Turnfile adoption resolved as recorded INTENT §8 exceptions; soft-reference scrub deferred to the pre-promotion pass.
+## Unblocked next work: v0.3.2 (approved, 1-day hard cap)
+1. Structured refusal grammar `{error, boundary, detail, why}` across the 16 enumerated denial sites (inventory in the impact-sweep findings): atomic per-surface migration, ToolRefusal threading, new `refusal` event kind, red-first eval scenarios, migrate the ~11 substring assertions. Named exclusions hold: no `run_shell` ok-flip, no DR filename change, no JSON in operator-facing prose.
+2. Human-readable checksummed IDs: vendor ~55-line `harness/ids.py` (25-char alphabet + Mod-25 check digit), swap only the uuid suffix of run ids (timestamp prefix is load-bearing for recency ordering), mint refs for `request_change` and decision-record frontmatter.
+3. Overflow at the cap drops to backlog — never to 0.4. Portability remains the undiluted 0.4 headline (arbitrated).
 ## Verification status
-- `python3 -m pytest -q`: 115 passed.
-- `python3 -m harness.cli eval`: 25/25 across baseline, governance, triage.
-- AIDR lint: both records in `decisions/` PASS.
-## Gated next steps (in packet order)
-1. If approved: v0.3.2 low-cost adoptions — structured refusal grammar (`{error, boundary, detail, why}`) across the 16 enumerated denial sites with atomic per-surface migration + red-first refusal scenarios; human-readable IDs (check-digit alphabet) for run/record/change-request refs, keeping the timestamp run-id prefix. 1-day hard cap; overflow drops to backlog, never to 0.4.
-2. 0.4 = portability, undiluted (Linux sandbox backend + parity tests; live-endpoint scorecards incl. governance + triage suites; live contested-phase run across two real providers), with trust-bundle MANIFEST integrity as its companion.
-3. Post-0.4: triage-label profile, dogfooded by pointer to its canonical concept note (re-review the note first; its own review date is 2026-08-05).
+- `python3 -m pytest -q`: 115 passed; `python3 -m harness.cli eval`: 25/25.
+- `node <aidr>/tools/aidr-lint.mjs decisions/`: both records PASS `[independent-positions, human-arbitrated]`.
+## After v0.3.2
+0.4 portability (Linux backend + parity tests, live scorecards incl. governance/triage suites, live contested phase across two real providers, trust-bundle MANIFEST integrity). Post-0.4: triage-label profile by pointer to its canonical concept note (re-review it first; its review date is 2026-08-05).
 ## Non-goals (standing)
-- No public promotion work; no treating unratified tenets as canon; no gated third-party names on any surface.
-- No `run_shell` ok-semantics flip, no decision-record filename randomization, no replacing the timestamp run-id prefix.
-- Do not resolve the operator's open decisions on their behalf; do not commit the parked §7 diff without instruction.
+- No public promotion work; no gated third-party names on any surface (grep staged diffs before every commit).
+- Provisional tenets claims (facilitation isomorphism, two-failure-modes dual) stay marked provisional wherever cited.
 ## First commands for the next agent
-- `git status --short --branch && git log --oneline -6`
+- `git status --short --branch && git log --oneline -8`
 - `python3 -m pytest -q`
 - `python3 -m harness.cli eval`
