@@ -5,10 +5,12 @@ unparseable config/models.yaml from the operator quick start."""
 from pathlib import Path
 
 import yaml
+import pytest
 
 from harness.models.base import EFFORT_LEVELS
 from harness.roles import RoleLibrary
 from harness.routing import TIER_ORDER
+from harness.runner import load_models_config
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -17,9 +19,27 @@ def test_models_yaml_parses_and_routing_is_valid():
     cfg = yaml.safe_load((ROOT / "config" / "models.yaml").read_text())
     assert set(cfg["tiers"]) <= set(TIER_ORDER)
     for task_class, row in cfg["routing"].items():
-        assert row["tier"] in TIER_ORDER, task_class
+        assert row["tier"] in cfg["tiers"], task_class
         assert row["effort"] in EFFORT_LEVELS, task_class
     assert cfg["budget"]["max_usd"] > 0
+    load_models_config(ROOT / "config" / "models.yaml")
+
+
+def test_bad_routing_tier_fails_config_load(tmp_path):
+    path = tmp_path / "models.yaml"
+    path.write_text("""
+tiers:
+  mid:
+    provider: mock
+    model_id: mock
+routing:
+  plan: { tier: frontier, effort: high }
+budget:
+  max_usd: 1.0
+  max_tokens: 1000
+""")
+    with pytest.raises(ValueError, match="not configured"):
+        load_models_config(path)
 
 
 def test_workflows_parse_and_reference_real_agents():
@@ -36,3 +56,13 @@ def test_workflows_parse_and_reference_real_agents():
             # touch "workspace/..." double-prefixes and fails its own gate
             assert "workspace/" not in phase["task"], \
                 f"{wf_path.name}:{phase['name']} uses project-relative paths"
+
+
+def test_eval_suites_parse():
+    suites = sorted((ROOT / "evals").glob("*.yaml"))
+    assert suites, "no eval suites shipped"
+    for suite_path in suites:
+        suite = yaml.safe_load(suite_path.read_text())
+        assert suite.get("scenarios"), suite_path.name
+        ids = [s["id"] for s in suite["scenarios"]]
+        assert len(ids) == len(set(ids)), suite_path.name

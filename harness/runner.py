@@ -21,9 +21,9 @@ from .events import EventLog
 from .loop import AgentLoop, LoopResult
 from .memory import ProjectMemory, ProofStore
 from .models import build_model
-from .models.base import ModelSpec
+from .models.base import EFFORT_LEVELS, ModelSpec
 from .roles import RoleLibrary
-from .routing import Budget, Route, Router
+from .routing import Budget, Route, Router, TIER_ORDER
 from .state import RunState, new_run_id
 from .tools.builtin import register_builtin
 from .tools.registry import ToolRegistry
@@ -36,7 +36,34 @@ def load_models_config(path: Path) -> tuple[dict[str, ModelSpec], dict, dict]:
         name: ModelSpec(name=name, **{k: v for k, v in spec.items()})
         for name, spec in cfg.get("tiers", {}).items()
     }
-    return tiers, cfg.get("routing", {}), cfg.get("budget", {})
+    routing = cfg.get("routing", {})
+    _validate_models_config(path, tiers, routing, cfg.get("budget", {}))
+    return tiers, routing, cfg.get("budget", {})
+
+
+def _validate_models_config(
+    path: Path,
+    tiers: dict[str, ModelSpec],
+    routing: dict,
+    budget_cfg: dict,
+) -> None:
+    if not tiers:
+        raise ValueError(f"{path}: at least one model tier is required")
+    bad_tiers = set(tiers) - set(TIER_ORDER)
+    if bad_tiers:
+        raise ValueError(f"{path}: unknown tier names: {sorted(bad_tiers)}")
+    for task_class, row in routing.items():
+        tier = row.get("tier")
+        effort = row.get("effort")
+        if tier not in tiers:
+            raise ValueError(
+                f"{path}: routing.{task_class}.tier={tier!r} is not configured")
+        if effort not in EFFORT_LEVELS:
+            raise ValueError(
+                f"{path}: routing.{task_class}.effort={effort!r} is invalid")
+    if budget_cfg and (budget_cfg.get("max_usd", 0) <= 0
+                       or budget_cfg.get("max_tokens", 0) <= 0):
+        raise ValueError(f"{path}: budget ceilings must be positive")
 
 
 @dataclass

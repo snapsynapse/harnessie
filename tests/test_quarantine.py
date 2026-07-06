@@ -5,6 +5,7 @@ from harness.events import EventLog
 from harness.loop import AgentLoop
 from harness.models.base import AssistantTurn, MockModel, ModelSpec, ToolCall
 from harness.quarantine import guard_result, scan_text
+import harness.tools.builtin as builtin
 from harness.tools.builtin import register_builtin
 from harness.tools.registry import ToolRegistry
 
@@ -76,7 +77,9 @@ def test_write_file_blocks_credential_shaped_content(tmp_path):
     assert not (ws / "notes.md").exists()
 
 
-def test_run_shell_env_is_scrubbed(tmp_path):
+def test_run_shell_env_is_scrubbed(tmp_path, monkeypatch):
+    monkeypatch.setattr(builtin, "sandbox_wrap",
+                        lambda argv, workspace, allow_network=False: argv)
     reg, ws = make_env(tmp_path)
     os.environ["HARNESSIE_FAKE_SECRET"] = "topsecret-value"
     try:
@@ -88,7 +91,9 @@ def test_run_shell_env_is_scrubbed(tmp_path):
         del os.environ["HARNESSIE_FAKE_SECRET"]
 
 
-def test_run_shell_output_redacts_secrets(tmp_path):
+def test_run_shell_output_redacts_secrets(tmp_path, monkeypatch):
+    monkeypatch.setattr(builtin, "sandbox_wrap",
+                        lambda argv, workspace, allow_network=False: argv)
     reg, ws = make_env(tmp_path)
     res = reg.dispatch("worker", "run_shell",
                        {"command": "python3 -c \"print('pplx-' + 'b' * 40)\""})

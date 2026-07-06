@@ -2,6 +2,22 @@
 
 All notable changes to Harnessie are recorded here. Format loosely follows Keep a Changelog; versions follow semver.
 
+## Unreleased
+
+### Added
+
+- `harnessie eval` deterministic scorecard runner plus `evals/baseline.yaml` with 10 mock-brain scenarios: golden passes, risky fail-closed verdicts, and recovery/gate retries.
+- `harnessie init` scaffold command for installed CLI usage; creates minimal agents, config, workflow, memory, workspace, and eval files without relying on repo-root assets being packaged.
+
+### Changed
+
+- Sandbox availability now requires a real `sandbox-exec` profile-application smoke test. Hosts that expose the binary but reject `sandbox_apply` are treated as sandbox-unavailable and fail closed.
+- Routing config now fails early when a workflow route references an unconfigured tier or invalid effort, instead of silently falling back to another tier.
+
+### Tests
+
+- Added eval runner, CLI eval, init scaffolding, and bad-routing-config regression coverage. The suite now passes with unusable real sandbox backends by skipping only the backend-dependent confinement tests.
+
 ## 0.1.0 (2026-07-06)
 
 Initial build: a brain-agnostic multi-agent harness (orchestrator / workers / verifiers) with verification gates, cost routing, file-based memory, and a layered prompt-injection defense.

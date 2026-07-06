@@ -69,7 +69,12 @@ def run_checks(checks: list[Check], workspace: Path, proofs: ProofStore,
             proc = subprocess.run(sandboxed, cwd=workspace,
                                   capture_output=True, text=True,
                                   timeout=check.timeout, env=scrubbed_env())
-            passed, output = proc.returncode == 0, (proc.stdout + proc.stderr)[:50_000]
+            output = (proc.stdout + proc.stderr)[:50_000]
+            if proc.returncode == 71 and "sandbox_apply" in output:
+                passed = False
+                output = f"sandbox unavailable, check blocked (fail-closed): {output.strip()}"
+            else:
+                passed = proc.returncode == 0
         except SandboxUnavailable as e:
             passed, output = False, f"sandbox unavailable, check blocked (fail-closed): {e}"
         except (subprocess.TimeoutExpired, FileNotFoundError, ValueError) as e:

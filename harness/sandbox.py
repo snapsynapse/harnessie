@@ -24,6 +24,9 @@ from __future__ import annotations
 
 import platform
 import shutil
+import subprocess
+import tempfile
+from functools import lru_cache
 from pathlib import Path
 
 
@@ -32,7 +35,7 @@ class SandboxUnavailable(Exception):
 
 
 def backend_name() -> str | None:
-    if platform.system() == "Darwin" and shutil.which("sandbox-exec"):
+    if platform.system() == "Darwin" and shutil.which("sandbox-exec") and _seatbelt_usable():
         return "seatbelt"
     return None
 
@@ -55,6 +58,31 @@ def _seatbelt_profile(workspace: Path, allow_network: bool) -> str:
     if not allow_network:
         lines.append("(deny network*)")
     return "\n".join(lines)
+
+
+@lru_cache(maxsize=1)
+def _seatbelt_usable() -> bool:
+    """True only when sandbox-exec can actually apply a profile.
+
+    Some managed macOS hosts expose the binary but deny applying Seatbelt
+    profiles (`sandbox_apply: Operation not permitted`). Treat that exactly
+    like a missing backend so callers fail closed instead of believing the
+    child process was confined.
+    """
+    if platform.system() != "Darwin" or not shutil.which("sandbox-exec"):
+        return False
+    try:
+        with tempfile.TemporaryDirectory(prefix="harnessie-sandbox-") as d:
+            profile = _seatbelt_profile(Path(d), allow_network=False)
+            proc = subprocess.run(
+                ["sandbox-exec", "-p", profile, "true"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return proc.returncode == 0
 
 
 def wrap(argv: list[str], workspace: Path, allow_network: bool = False) -> list[str]:

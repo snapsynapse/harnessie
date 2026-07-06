@@ -3,6 +3,7 @@ integrate workflow, then the run resumes from its journal without re-running."""
 
 import textwrap
 
+from harness import sandbox
 from harness.models.base import AssistantTurn, MockModel, ModelSpec, ToolCall
 from harness.runner import WorkflowRunner
 
@@ -67,7 +68,9 @@ SCRIPT = [
 ]
 
 
-def test_full_workflow_then_resume(tmp_path):
+def test_full_workflow_then_resume(tmp_path, monkeypatch):
+    monkeypatch.setattr(sandbox, "wrap",
+                        lambda argv, workspace, allow_network=False: argv)
     scaffold_project(tmp_path)
     runner = WorkflowRunner(project_root=tmp_path, run_id="testrun", echo=False)
     brain = MockModel(ModelSpec(name="mid", provider="mock", model_id="mock"),
@@ -96,7 +99,9 @@ def test_full_workflow_then_resume(tmp_path):
     assert dead_brain.calls == []
 
 
-def test_gate_failure_stops_workflow(tmp_path):
+def test_gate_failure_stops_workflow(tmp_path, monkeypatch):
+    monkeypatch.setattr(sandbox, "wrap",
+                        lambda argv, workspace, allow_network=False: argv)
     scaffold_project(tmp_path)
     runner = WorkflowRunner(project_root=tmp_path, run_id="failrun", echo=False)
     # worker never creates greeting.txt -> deterministic check fails on both
@@ -113,9 +118,11 @@ def test_gate_failure_stops_workflow(tmp_path):
     assert "FAILED" in brain.calls[2]["messages"][1].content
 
 
-def test_resume_reruns_needs_human_phase(tmp_path):
+def test_resume_reruns_needs_human_phase(tmp_path, monkeypatch):
     """A journaled needs_human phase must NOT be skipped on resume: that would
     let downstream phases build on unverified work."""
+    monkeypatch.setattr(sandbox, "wrap",
+                        lambda argv, workspace, allow_network=False: argv)
     scaffold_project(tmp_path)
     runner = WorkflowRunner(project_root=tmp_path, run_id="haltrun", echo=False)
     runner._models["mid"] = MockModel(

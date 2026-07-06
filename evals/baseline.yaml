@@ -1,0 +1,110 @@
+name: baseline
+description: Network-free mock-brain scorecard for core harness guarantees.
+
+scenarios:
+  - id: golden_verdict_plain_json_passes
+    kind: verdict
+    report: '{"passed": true, "reasons": "all criteria reproduced"}'
+    expect_passed: true
+
+  - id: golden_verdict_wrapped_json_passes
+    kind: verdict
+    report: |
+      I checked the artifact.
+      {"passed": true, "reasons": "file exists and content matches"}
+    expect_passed: true
+
+  - id: golden_string_true_tolerated
+    kind: verdict
+    report: '{"passed": "true", "reasons": "weak model emitted string boolean"}'
+    expect_passed: true
+
+  - id: golden_workflow_all_phases_pass
+    kind: workflow
+    expect_statuses: [passed, passed, passed]
+    script:
+      - tool: task_complete
+        args: { report: "PLAN: create greeting.txt containing hello" }
+      - tool: write_file
+        args: { path: "greeting.txt", content: "hello" }
+      - tool: task_complete
+        args: { report: "wrote greeting.txt with hello" }
+      - tool: read_file
+        args: { path: "greeting.txt" }
+      - tool: task_complete
+        args: { report: '{"passed": true, "reasons": "greeting.txt contains hello"}' }
+      - tool: task_complete
+        args: { report: "FINAL: goal met" }
+
+  - id: golden_resume_skips_verified_successes
+    kind: resume
+    expect_first_statuses: [passed, passed, passed]
+    expect_second_statuses: [skipped_resume, skipped_resume, skipped_resume]
+    first_script:
+      - tool: task_complete
+        args: { report: "PLAN: create greeting.txt containing hello" }
+      - tool: write_file
+        args: { path: "greeting.txt", content: "hello" }
+      - tool: task_complete
+        args: { report: "wrote greeting.txt" }
+      - tool: task_complete
+        args: { report: '{"passed": true, "reasons": "artifact checked"}' }
+      - tool: task_complete
+        args: { report: "FINAL: done" }
+    second_script: []
+
+  - id: risky_prose_pass_fails_closed
+    kind: verdict
+    report: "Everything looks good, verdict PASS."
+    expect_passed: false
+
+  - id: risky_string_false_fails_closed
+    kind: verdict
+    report: '{"passed": "false", "reasons": "missing evidence"}'
+    expect_passed: false
+
+  - id: risky_worker_silence_needs_human
+    kind: loop
+    role: worker
+    max_steps: 4
+    task: "complete the task"
+    script:
+      - content: "I think this is done."
+      - content: "Still no tool call."
+    expect_stop: no_action
+
+  - id: recovery_verifier_rejects_sabotage
+    kind: workflow
+    max_attempts: 2
+    expect_statuses: [passed, needs_human]
+    script:
+      - tool: task_complete
+        args: { report: "PLAN: create greeting.txt" }
+      - tool: task_complete
+        args: { report: "claimed done without artifact" }
+      - tool: task_complete
+        args: { report: '{"passed": false, "reasons": "greeting.txt missing"}' }
+      - tool: task_complete
+        args: { report: "still no artifact" }
+      - tool: task_complete
+        args: { report: '{"passed": false, "reasons": "greeting.txt still missing"}' }
+
+  - id: recovery_second_attempt_passes
+    kind: workflow
+    max_attempts: 2
+    expect_statuses: [passed, passed, passed]
+    script:
+      - tool: task_complete
+        args: { report: "PLAN: create greeting.txt" }
+      - tool: task_complete
+        args: { report: "claimed done without artifact" }
+      - tool: task_complete
+        args: { report: '{"passed": false, "reasons": "greeting.txt missing"}' }
+      - tool: write_file
+        args: { path: "greeting.txt", content: "hello" }
+      - tool: task_complete
+        args: { report: "wrote greeting.txt after verifier failure" }
+      - tool: task_complete
+        args: { report: '{"passed": true, "reasons": "artifact present after retry"}' }
+      - tool: task_complete
+        args: { report: "FINAL: recovered" }

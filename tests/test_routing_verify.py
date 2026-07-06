@@ -5,6 +5,7 @@ from harness.loop import LoopResult
 from harness.memory import ProofStore
 from harness.models.base import ModelSpec
 from harness.routing import Budget, Route, Router
+from harness import sandbox
 from harness.verify import Check, VerificationGate, parse_verdict
 
 
@@ -29,7 +30,12 @@ def test_escalation_ladder_effort_then_tier_then_none():
 
 def test_spec_fallback_to_most_capable():
     router = Router(tiers={"cheap": ModelSpec("cheap", "mock", "m")})
-    assert router.spec_for(Route("frontier", "high")).name == "cheap"
+    try:
+        router.spec_for(Route("frontier", "high"))
+    except ValueError as exc:
+        assert "not configured" in str(exc)
+    else:
+        raise AssertionError("missing tier should fail early")
 
 
 def test_budget_accounting():
@@ -72,7 +78,9 @@ def ok_loop(report="did it"):
     return LoopResult(stop="complete", report=report, steps=1)
 
 
-def test_gate_passes_on_green_checks_and_verifier(tmp_path):
+def test_gate_passes_on_green_checks_and_verifier(tmp_path, monkeypatch):
+    monkeypatch.setattr(sandbox, "wrap",
+                        lambda argv, workspace, allow_network=False: argv)
     gate = make_gate(tmp_path)
     res = gate.run(
         task="do the thing",

@@ -97,6 +97,8 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
         proc = subprocess.run(sandboxed, cwd=ws, capture_output=True, text=True,
                               timeout=300, env=scrubbed_env())
         out, n_redacted = redact_secrets((proc.stdout + proc.stderr)[:20_000])
+        if proc.returncode == 71 and "sandbox_apply" in out:
+            return f"sandbox unavailable, shell blocked (fail-closed): {out.strip()}"
         suffix = f"\n[{n_redacted} credential-shaped string(s) redacted]" if n_redacted else ""
         return f"exit={proc.returncode}\n{out}{suffix}"
 

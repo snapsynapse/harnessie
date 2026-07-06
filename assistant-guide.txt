@@ -1,0 +1,28 @@
+# Harnessie assistant guide
+Read these first:
+- `INTENT.md`
+- `README.md`
+- `IMPLEMENTATION_PLAN.md`
+- `SECURITY.md`
+- `EVALS.md`
+- `docs/NEXT.md`
+Before making claims about project health, run:
+- `python3 -m pytest -q`
+- `python3 -m harness.cli eval`
+Expected current result:
+- Tests: 56 passed, 3 skipped on this managed host.
+- Evals: 10/10 passed.
+The skipped tests are backend-dependent Seatbelt confinement tests. This host has `sandbox-exec` but cannot apply profiles, so Harnessie correctly treats the sandbox as unavailable and fails closed.
+Key invariants:
+- Routing is config, not model self-assessment.
+- Missing routing tiers fail early.
+- Shell and deterministic checks require a usable OS sandbox.
+- Verifier verdict parsing fails closed.
+- Resume skips only verified successes.
+- Workers never self-certify gated completion.
+Working rules:
+- Use `rg` for search.
+- Keep changes scoped to the harness invariant being improved.
+- Update docs and tests in the same change when behavior changes.
+- Add eval scenarios for new guarantees, especially risky and recovery behavior.
+- Do not stage `.agents/`, `.codex/`, `runs/`, `workspace/`, `.pytest_cache/`, or local scratch unless explicitly requested.

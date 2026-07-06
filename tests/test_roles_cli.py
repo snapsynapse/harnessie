@@ -44,3 +44,21 @@ def test_cli_report_renders_finished_run(tmp_path, capsys):
                  next((tmp_path / "runs").iterdir()).name]) == 0
     out = capsys.readouterr().out
     assert "step_done" in out and "events" in out
+
+
+def test_cli_init_scaffolds_project(tmp_path, capsys):
+    assert main(["--root", str(tmp_path), "init"]) == 0
+    out = capsys.readouterr().out
+    assert "initialized Harnessie project" in out
+    assert (tmp_path / "agents" / "orchestrator.md").exists()
+    assert (tmp_path / "config" / "models.yaml").exists()
+    assert (tmp_path / "evals" / "baseline.yaml").exists()
+
+
+def test_cli_init_does_not_overwrite_by_default(tmp_path, capsys):
+    (tmp_path / "config").mkdir()
+    target = tmp_path / "config" / "models.yaml"
+    target.write_text("custom")
+    assert main(["--root", str(tmp_path), "init"]) == 0
+    capsys.readouterr()
+    assert target.read_text() == "custom"

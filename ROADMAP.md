@@ -6,7 +6,7 @@ Roadmap items are intent, not commitments. Dates are omitted deliberately; miles
 
 ## Current release: 0.1.0 (2026-07-06)
 
-Shipped: brain-agnostic model interface with hot-swappable tiers, tool registry with per-role policy, bounded agent loop, verification gate with reformulate-and-escalate ladder, cost routing and budgets, file-based memory and resumable journal, the workflow runner, and a seven-layer prompt-injection defense including an OS sandbox on macOS. Full detail in [CHANGELOG.md](CHANGELOG.md). 53 tests, mock brain, no network.
+Shipped: brain-agnostic model interface with hot-swappable tiers, tool registry with per-role policy, bounded agent loop, verification gate with reformulate-and-escalate ladder, cost routing and budgets, file-based memory and resumable journal, the workflow runner, a deterministic mock-brain eval scorecard, and a seven-layer prompt-injection defense including an OS sandbox on macOS when Seatbelt profiles can be applied. Full detail in [CHANGELOG.md](CHANGELOG.md). The suite is mock-brain and no-network; real sandbox tests skip on hosts where `sandbox-exec` exists but cannot apply profiles.
 
 ## Guiding priorities
 
@@ -23,7 +23,7 @@ Theme: make the harness runnable and measurable beyond a single Mac.
 
 - Linux sandbox backend, so shell-using workflows run confined on Linux instead of failing closed (detail in Platform support below). Implementation step 15 follow-up.
 - Live-endpoint smoke tests: one loop turn against a real Anthropic endpoint and one against a local OpenAI-compatible endpoint, opt-in by env var. Implementation step 11.
-- Golden-task evaluation scorecard: golden, risky, and failure-recovery tasks scored into a comparable report, so a brain swap reruns the identical suite. Implementation step 12.
+- Expand the golden-task evaluation scorecard beyond the current mock-brain baseline: golden, risky, and failure-recovery tasks scored into a comparable report against real Anthropic and local OpenAI-compatible endpoints. Implementation steps 11 and 12.
 
 Acceptance: the full suite is green on Linux with a backend present and fails closed on a runner with none; a brain swap (config edit) produces a comparable scorecard.
 

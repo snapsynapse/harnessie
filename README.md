@@ -8,10 +8,16 @@ The operating thesis: the harness structure carries the quality floor, the model
 
 ```bash
 pip install -e ".[dev]"
-python3 -m pytest -q                 # 53 tests, mock brain, no network
+python3 -m pytest -q                 # mock brain, no network
+python3 -m harness.cli eval          # deterministic eval scorecard
 export ANTHROPIC_API_KEY=sk-ant-...  # or point tiers at a local endpoint
 python3 -m harness.cli run workflows/build-and-verify.yaml --goal "a CLI todo app with tests"
 python3 -m harness.cli report <run_id>
+```
+
+Installed CLI usage can scaffold a fresh project layout:
+```bash
+harnessie init my-harnessie-project
 ```
 
 Worked end-to-end example with sample data: [examples/policy-compliance/README.md](examples/policy-compliance/README.md).
@@ -26,7 +32,8 @@ config/models.yaml  model tiers, routing table, budgets: the ONLY file to edit t
 memory/             project memory: MEMORY.md index + facts/ with provenance frontmatter
 examples/           worked end-to-end example (policy-compliance) with sample data
 runs/               per-run journal.jsonl (resume ledger) + events.jsonl (audit) + proofs/ (gitignored)
-tests/              the done-tests for every subsystem (53 tests)
+evals/              deterministic scorecards over mock-brain golden/risky/recovery scenarios
+tests/              the done-tests for every subsystem
 docs/               reserved for the canonical web page (GitHub Pages publish source once public)
 *.md at root        ARCHITECTURE, SECURITY, ROADMAP, IMPLEMENTATION_PLAN, PROMPTS, session-url-log,
                     plus INTENT (9-section standard), CHANGELOG, README, LICENSE (MIT);
@@ -37,7 +44,7 @@ Dogfooding this repo under Claude Code uses a local `.claude/` (subagent defs, a
 
 ## Requirements
 
-Python 3.11+ and PyYAML (installed by `pip install -e .`). The stdlib-only model adapters need no vendor SDK. The OS sandbox uses native macOS `sandbox-exec`; on other platforms, shell-using workflows fail closed until a Linux backend is wired (see [SECURITY.md](SECURITY.md)).
+Python 3.11+ and PyYAML (installed by `pip install -e .`). The stdlib-only model adapters need no vendor SDK. The OS sandbox uses native macOS `sandbox-exec` when it can actually apply a Seatbelt profile; managed hosts that expose the binary but reject `sandbox_apply` are treated as sandbox-unavailable and shell-using workflows fail closed. On other platforms, shell-using workflows fail closed until a Linux backend is wired (see [SECURITY.md](SECURITY.md)).
 
 ## Design in one breath
 

@@ -82,10 +82,7 @@ class Router:
     def spec_for(self, route: Route) -> ModelSpec:
         spec = self.tiers.get(route.tier)
         if spec is None:
-            # Fall back to the most capable configured tier rather than dying
-            # mid-run; the gap is logged by the caller.
-            for tier in reversed(TIER_ORDER):
-                if tier in self.tiers:
-                    return self.tiers[tier]
-            raise ValueError("no model tiers configured")
+            raise ValueError(
+                f"route tier {route.tier!r} is not configured "
+                f"(configured: {sorted(self.tiers)})")
         return spec

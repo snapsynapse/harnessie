@@ -30,6 +30,14 @@ def main(argv: list[str] | None = None) -> int:
     p_report = sub.add_parser("report", help="print a run's journal and proofs")
     p_report.add_argument("run_id")
 
+    p_eval = sub.add_parser("eval", help="run deterministic eval scorecards")
+    p_eval.add_argument("suite", nargs="?", help="optional eval suite YAML path")
+
+    p_init = sub.add_parser("init", help="create a minimal Harnessie project layout")
+    p_init.add_argument("path", nargs="?", default=".", help="target directory")
+    p_init.add_argument("--force", action="store_true",
+                        help="overwrite existing scaffold files")
+
     args = parser.parse_args(argv)
     root = Path(args.root).resolve()
 
@@ -58,6 +66,23 @@ def main(argv: list[str] | None = None) -> int:
             print("\nproofs:")
             for p in sorted(proofs.iterdir()):
                 print(f"  {p.name}")
+        return 0
+
+    if args.cmd == "eval":
+        from .evals import format_scorecard, run_eval_suite
+
+        suite = (root / args.suite).resolve() if args.suite else None
+        scorecard = run_eval_suite(root, suite_path=suite)
+        print(format_scorecard(scorecard))
+        return 0 if scorecard["passed"] == scorecard["total"] else 2
+
+    if args.cmd == "init":
+        from .init_project import init_project
+
+        target = (root / args.path).resolve()
+        written = init_project(target, force=args.force)
+        print(f"initialized Harnessie project at {target}")
+        print(f"wrote {len(written)} file(s)")
         return 0
 
     from .runner import WorkflowRunner  # deferred: import cost + optional deps

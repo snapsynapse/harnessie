@@ -1,6 +1,6 @@
 # Harnessie implementation plan
 
-Ordered build steps. Each step has a done test: a check an operator can run that either passes or fails, in the spirit of "define evaluation before scale". Steps 1 through 10 plus the injection-defense layer and the OS sandbox (step 15) are implemented in this repo; their done tests are encoded in tests/ and pass (53 tests). Remaining steps are the hardening path.
+Ordered build steps. Each step has a done test: a check an operator can run that either passes or fails, in the spirit of "define evaluation before scale". Steps 1 through 10 plus the injection-defense layer, OS sandbox (step 15), and the first deterministic eval scorecard (step 12 foundation) are implemented in this repo; their done tests are encoded in tests/. Remaining steps are the hardening path.
 
 The injection-defense layer (harness/quarantine.py; SECURITY.md) is implemented: ingress filter on quarantine=True tools, loop tripwire, per-phase deny_tools, scrubbed child-process env, shell-output secret redaction, and write-time credential refusal. Done test: tests/test_quarantine.py (8 tests) proves poisoned file content is fenced not obeyed, the tripwire re-asserts the boundary, denied tools are hidden and blocked, child env carries no secrets, and credential-shaped strings are redacted from output and refused on write. The unclosed gap is an OS sandbox (step 15) for full containment of allowlisted interpreters.
 
@@ -53,8 +53,9 @@ The injection-defense layer (harness/quarantine.py; SECURITY.md) is implemented:
 - Done test: HARNESSIE_LIVE=1 pytest tests/live passes with keys configured; suite skips cleanly without them.
 
 12. Golden-task evaluation suite
-- Add evals/: 5 golden tasks (must pass), 3 risky tasks (must be refused or gated to needs_human), 2 failure-recovery tasks (worker sabotaged; gate must catch it, the mock-driven version exists in test_runner.py::test_gate_failure_stops_workflow).
-- Done test: `harnessie eval` produces a scorecard; a brain swap (config edit) reruns the identical suite so brains are comparable on evidence.
+- Implemented foundation: `evals/baseline.yaml` plus `harnessie eval` runs 10 network-free mock-brain scenarios: 5 golden, 3 risky fail-closed, and 2 recovery/gate scenarios.
+- Done test now: `python3 -m harness.cli eval evals/baseline.yaml` produces a 10/10 scorecard; `tests/test_evals.py` gates it.
+- Remaining 0.2 work: add live-brain golden/risky/recovery scenarios that run the identical task suite against configured Anthropic and local OpenAI-compatible endpoints, then compare scorecards across brains.
 
 13. Interactive approval handler and operator UX
 - Wire ToolRegistry.approval_handler to a real prompt (TTY) and a policy file for headless allow/deny lists; add cost display per phase.

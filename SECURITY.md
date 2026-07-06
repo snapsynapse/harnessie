@@ -32,7 +32,7 @@ Clean content passes through byte-for-byte, so the filter is free on the common 
 - network is denied by default; a workflow phase opts in with `allow_network: true`, and verifiers never get it.
 - reads still work, so interpreters run normally.
 
-Backend today is macOS Seatbelt via `sandbox-exec -p` (native, no dependencies). Policy is fail closed everywhere: on a platform with no sandbox backend (Linux without bubblewrap/firejail/docker wired), `run_shell` and gate checks are blocked rather than run unconfined. Deliberate boundary: temp dirs outside home stay writable so interpreters function, because the protected assets are the user's files and the exfil channel, not scratch space.
+Backend today is macOS Seatbelt via `sandbox-exec -p` (native, no dependencies) only when a startup smoke test proves profiles can actually be applied. Some managed hosts expose `sandbox-exec` but return `sandbox_apply: Operation not permitted`; Harnessie treats that as sandbox-unavailable. Policy is fail closed everywhere: on a platform with no usable sandbox backend (Linux without bubblewrap/firejail/docker wired, or macOS with unusable Seatbelt), `run_shell` and gate checks are blocked rather than run unconfined. Deliberate boundary: temp dirs outside home stay writable so interpreters function, because the protected assets are the user's files and the exfil channel, not scratch space.
 
 ### 5. Secret-handling guards (mechanical, harness-enforced)
 
@@ -69,7 +69,7 @@ The honest residual: a well-crafted injection written as ordinary-looking advice
 - Mark any tool that returns third-party content `quarantine=True`.
 - Give content-reading phases the narrowest `deny_tools` that still lets the task run.
 - Leave `allow_network` off unless a phase genuinely needs the network; verifiers never get it.
-- On a non-macOS host, wire a sandbox backend (bubblewrap / firejail / docker) before running shell-using workflows; until then they fail closed.
+- On a host without a usable sandbox backend, wire one before running shell-using workflows; until then they fail closed.
 - Keep secrets in environment variables; never write a prompt that reads a key into a command string.
 - Verify sources exist before trusting them (the verification-workflow pattern; see [source-verification.json](source-verification.json)).
 - Review the first git diff before running with real credentials.
