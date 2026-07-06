@@ -93,7 +93,7 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
             raise ToolRefusal(
                 "secret_write_refused", "secrets",
                 "Content contains credential-shaped strings "
-                f"({', '.join(secrets[:3])}). Remove them and retry.",
+                f"(kinds: {', '.join(secrets[:3])}). Remove them and retry.",
                 "Secrets must not be copied into workspace artifacts.")
         target = _jail(ws, path)
         rel = target.relative_to(ws).as_posix()

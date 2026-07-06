@@ -2,6 +2,20 @@
 
 All notable changes to Harnessie are recorded here. Format loosely follows Keep a Changelog; versions follow semver.
 
+## 0.3.3 (2026-07-06)
+
+Mitigation patch for the three findings from the v0.3.2 verification rotation (independent Claude review of the Codex implementation).
+
+### Changed
+
+- `refusal` events now carry `detail` and `why` (truncated at 300 chars) beside `error` and `boundary`, so audit consumers and the eval checker never parse the 300-char-truncated `tool_result` content. `expect_refusal.content_fields` is asserted against the `refusal` event.
+- The stuck detector counts policy refusals regardless of the `ok` flag: three consecutive identical refused calls end the loop as `stuck`. `run_shell` denials keep their `ok=True` observation semantics for the model (the v0.3.2 exclusion holds), but can no longer spin the loop until `max_steps`. Operator-authorized semantic change; new governance scenario `risky_repeated_identical_denial_ends_stuck` covers it.
+- `find_secrets` returns kind labels (`perplexity_key`, `anthropic_key`, ...) instead of the first 12 characters of the matched value, so secret-write refusal details carry no credential fragment into model observations or the audit timeline.
+
+### Tests
+
+- 125 passed (was 120 on this host); governance scorecard 14/14; unit coverage for kind-label secrecy, refusal-streak stuck detection, streak reset on success, and `detail`/`why` on `refusal` events.
+
 ## 0.3.2 (2026-07-06)
 
 Structured refusal and identifier patch approved under the v0.3.2 one-day cap in `decisions/AIDR-0002`.

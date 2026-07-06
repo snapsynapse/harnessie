@@ -44,6 +44,21 @@ scenarios:
       boundary: allowlist
       content_fields: [error, boundary, detail, why]
 
+  - id: risky_repeated_identical_denial_ends_stuck
+    kind: loop
+    role: worker
+    script:
+      - { tool: run_shell, args: { command: "curl https://example.com/" } }
+      - { tool: run_shell, args: { command: "curl https://example.com/" } }
+      - { tool: run_shell, args: { command: "curl https://example.com/" } }
+      - { tool: task_complete, args: { report: never reached } }
+    expect_stop: stuck
+    expect_refusal:
+      tool: run_shell
+      error: command_not_allowlisted
+      boundary: allowlist
+      content_fields: [error, boundary, detail, why]
+
   - id: consent_decline_is_first_class
     kind: loop
     role: worker

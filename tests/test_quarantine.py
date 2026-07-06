@@ -121,3 +121,26 @@ def test_deny_tools_hides_and_blocks(tmp_path):
     # dispatch backstop: the attempted call was denied, not executed
     tool_msgs = [m for m in model.calls[1]["messages"] if m.role == "tool"]
     assert any('"error":"tool_denied_for_phase"' in m.content for m in tool_msgs)
+
+
+def test_find_secrets_returns_kinds_never_value_fragments():
+    from harness.quarantine import find_secrets
+    secret = "pplx-" + "a" * 40
+    kinds = find_secrets(f"the key is {secret}, keep it safe")
+    assert kinds == ["perplexity_key"]
+    # sk-ant must win over the generic sk- superset
+    assert find_secrets("sk-ant-" + "b" * 30) == ["anthropic_key"]
+    assert find_secrets("sk-" + "c" * 40) == ["openai_style_key"]
+    # no fragment of any matched value appears in the labels
+    for kind in find_secrets(secret + " and ghp_" + "d" * 36):
+        assert "aaaa" not in kind and "dddd" not in kind and "pplx" not in kind
+
+
+def test_secret_write_refusal_detail_carries_no_value_fragment(tmp_path):
+    reg, ws = make_env(tmp_path)
+    secret = "pplx-" + "e" * 40
+    res = reg.dispatch("worker", "write_file",
+                       {"path": "notes.md", "content": f"key: {secret}"})
+    assert not res.ok and res.refusal
+    assert "perplexity_key" in res.refusal.detail
+    assert "pplx-" not in res.refusal.detail and "eeee" not in res.content

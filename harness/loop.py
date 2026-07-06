@@ -10,7 +10,7 @@ Stop conditions are explicit and enumerated — silence is never success:
                    operator; it never escalates the route on a decline)
   - "max_steps":   step ceiling hit
   - "budget":      run budget exhausted
-  - "stuck":       repeated identical failing tool call (loop detector)
+  - "stuck":       repeated identical failing or refused tool call (loop detector)
   - "model_error": provider returned an error turn twice in a row
   - "no_action":   model produced text with no tool call twice in a row
   - "refusal":     provider safety pipeline refused; surfaced to the gate so
@@ -150,16 +150,24 @@ class AgentLoop:
                 self.events.emit("tool_result", role=self.role, tool=tc.name,
                                  ok=ok, content=content[:300])
                 if res.refusal is not None:
+                    # detail/why ride here in full so audit consumers never
+                    # parse the truncated tool_result content.
                     self.events.emit("refusal", role=self.role,
                                      agent=self.agent_name, tool=tc.name,
                                      error=res.refusal.error,
-                                     boundary=res.refusal.boundary)
-                if not ok:
+                                     boundary=res.refusal.boundary,
+                                     detail=res.refusal.detail[:300],
+                                     why=res.refusal.why[:300])
+                # Refusals count toward the stuck streak regardless of the ok
+                # flag: run_shell denials stay ok=True observations, but a
+                # model repeating the same refused call is not making progress.
+                if not ok or res.refusal is not None:
                     recent_failures.append((tc.name, content[:120]))
                     if len(recent_failures) >= 3 and len(set(recent_failures[-3:])) == 1:
                         return self._finish(
                             "stuck",
-                            f"repeated identical failure on {tc.name}: {content[:200]}",
+                            f"repeated identical failure or refusal on {tc.name}: "
+                            f"{content[:200]}",
                             step, messages)
                 else:
                     recent_failures.clear()

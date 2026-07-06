@@ -22,7 +22,7 @@ Exercises verifier verdict parsing only.
 ### loop
 Exercises the inner `AgentLoop`.
 - Input: `role`, `task`, `max_steps`, `script`, optional `consent` (bool), optional `agent`
-- Expected: `expect_stop`, optional `expect_file` (`{path, contains}`), optional `expect_file_absent`, optional `expect_refusal` (`{tool, error, boundary, content_fields}`)
+- Expected: `expect_stop`, optional `expect_file` (`{path, contains}`), optional `expect_file_absent`, optional `expect_refusal` (`{tool, error, boundary, content_fields}`). `content_fields` is asserted against the `refusal` event, which carries the full `{error, boundary, detail, why}` grammar; `tool_result` content is truncated at 300 chars and is never parsed by the checker.
 - Use for stop conditions such as `no_action`, `refusal`, `model_error`, `budget`, `stuck`, and `declined`, and for consent-lock behavior (side effect before accept_task must leave no artifact).
 ### workflow
 Exercises plan, gated implement, and integrate over a scaffolded temporary project.

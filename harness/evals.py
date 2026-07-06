@@ -160,23 +160,19 @@ def _check_refusal_expectations(scenario: dict[str, Any], run_dir: Path,
         problems.append("expected refusal event, observed none")
         return
     expected_event = {k: v for k, v in expected.items() if k != "content_fields"}
-    if expected_event and not any(
-        all(e.get(key) == value for key, value in expected_event.items())
-        for e in refusals
-    ):
+    matching = [e for e in refusals
+                if all(e.get(key) == value
+                       for key, value in expected_event.items())]
+    if expected_event and not matching:
         problems.append(f"no refusal event matching {expected_event!r}")
+    # Field presence is asserted on the refusal event, which carries the full
+    # grammar; tool_result content is truncated at 300 chars and is not a
+    # stable surface to parse.
     fields = expected.get("content_fields") or []
-    if fields:
-        tool_results = [e for e in events if e.get("kind") == "tool_result"]
-        decoded = []
-        for event in tool_results:
-            try:
-                decoded.append(json.loads(event.get("content", "")))
-            except json.JSONDecodeError:
-                continue
-        for field in fields:
-            if not any(field in obj for obj in decoded):
-                problems.append(f"tool_result content lacks refusal field {field!r}")
+    targets = matching or refusals
+    for field in fields:
+        if not any(e.get(field) for e in targets):
+            problems.append(f"refusal event lacks field {field!r}")
 
 
 def _run_ownership_scenario(scenario: dict[str, Any]) -> EvalCaseResult:

@@ -91,3 +91,37 @@ def test_max_steps(tmp_path):
     loop, _ = make_loop(tmp_path, "worker", [chatter] * 20, max_steps=5)
     res = loop.run("system", "task")
     assert res.stop == "max_steps"
+
+
+def test_stuck_detector_counts_ok_true_refusals(tmp_path):
+    # run_shell denials keep ok=True, but three identical ones are not progress
+    deny = turn_tool("run_shell", {"command": "curl https://example.com/"})
+    loop, _ = make_loop(tmp_path, "worker", [deny, deny, deny, deny])
+    res = loop.run("system", "fetch the page")
+    assert res.stop == "stuck"
+
+
+def test_refusal_streak_broken_by_successful_call(tmp_path):
+    deny = turn_tool("run_shell", {"command": "curl https://example.com/"})
+    loop, _ = make_loop(tmp_path, "worker", [
+        deny, deny, turn_tool("list_files", {}), deny,
+        turn_tool("task_complete", {"report": "listed instead"}),
+    ])
+    res = loop.run("system", "task")
+    assert res.stop == "complete"
+
+
+def test_refusal_event_carries_detail_and_why(tmp_path):
+    import json
+    deny = turn_tool("run_shell", {"command": "curl https://example.com/"})
+    loop, _ = make_loop(tmp_path, "worker", [
+        deny, turn_tool("task_complete", {"report": "gave up"}),
+    ])
+    res = loop.run("system", "task")
+    assert res.ok
+    events = [json.loads(line) for line in
+              (tmp_path / "run" / "events.jsonl").read_text().splitlines()]
+    refusals = [e for e in events if e.get("kind") == "refusal"]
+    assert refusals
+    assert refusals[0]["error"] == "command_not_allowlisted"
+    assert refusals[0]["detail"] and refusals[0]["why"]

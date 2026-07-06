@@ -53,7 +53,7 @@ assemble context (role prompt + boundary block + memory index + task)
    complete | declined | max_steps | budget | stuck | model_error | no_action | refusal
 ```
 
-Silence is never success: `task_complete(report)` is the only success path, and every other exit is a named diagnosis the gate can act on. Tool errors return to the model as observations so it can self-correct; identical repeated failures trip the stuck detector; provider refusals surface as `refusal` and go to the gate's ladder or the operator, never a silent same-prompt retry (aligned with the documented two-stage safety pipeline and fallback behavior of the Claude 5 family).
+Silence is never success: `task_complete(report)` is the only success path, and every other exit is a named diagnosis the gate can act on. Tool errors return to the model as observations so it can self-correct; identical repeated failures or policy refusals trip the stuck detector (refusals count regardless of the `ok` flag, so `run_shell` denials cannot spin the loop); provider refusals surface as `refusal` and go to the gate's ladder or the operator, never a silent same-prompt retry (aligned with the documented two-stage safety pipeline and fallback behavior of the Claude 5 family).
 
 Gate loop (`VerificationGate.run`), wrapping every worker phase:
 
