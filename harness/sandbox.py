@@ -15,13 +15,16 @@ Policy (operator-chosen, 2026-07-06):
     so interpreters function; that is a deliberate boundary (the protected
     asset is the user's files and the exfil channel, not scratch space).
 
-Backend today: macOS Seatbelt via `sandbox-exec -p <profile>` (native, no deps).
-Linux backends (bubblewrap, firejail, docker) are a documented follow-up; until
-one is wired, Linux fails closed.
+Backends: macOS Seatbelt via `sandbox-exec -p <profile>` (native, no deps);
+on Linux, in order of preference, bubblewrap (rootless, no daemon), firejail,
+then docker as a heavyweight fallback. Every backend is admitted only after a
+startup smoke test proves it can actually confine; a present-but-unusable
+backend is treated exactly like a missing one, and the platform fails closed.
 """
 
 from __future__ import annotations
 
+import os
 import platform
 import shutil
 import subprocess
@@ -29,14 +32,25 @@ import tempfile
 from functools import lru_cache
 from pathlib import Path
 
+# Overridable because image choice is deployment policy, not harness policy.
+DEFAULT_DOCKER_IMAGE = "python:3.12-slim"
+
 
 class SandboxUnavailable(Exception):
     """Raised when no OS sandbox backend exists. Callers must fail closed."""
 
 
 def backend_name() -> str | None:
-    if platform.system() == "Darwin" and shutil.which("sandbox-exec") and _seatbelt_usable():
+    system = platform.system()
+    if system == "Darwin" and shutil.which("sandbox-exec") and _seatbelt_usable():
         return "seatbelt"
+    if system == "Linux":
+        if shutil.which("bwrap") and _bwrap_usable():
+            return "bwrap"
+        if shutil.which("firejail") and _firejail_usable():
+            return "firejail"
+        if shutil.which("docker") and _docker_usable():
+            return "docker"
     return None
 
 
@@ -85,15 +99,100 @@ def _seatbelt_usable() -> bool:
     return proc.returncode == 0
 
 
+def _bwrap_argv(argv: list[str], ws: Path, allow_network: bool) -> list[str]:
+    # Read-only root, minimal /dev, private /tmp, the workspace as the only
+    # writable subtree. Stricter than Seatbelt's deny-home policy (all of the
+    # filesystem is read-only, not just home), which satisfies the same
+    # guarantee. --new-session blocks TIOCSTI terminal injection.
+    wrapped = ["bwrap",
+               "--ro-bind", "/", "/",
+               "--dev", "/dev",
+               "--proc", "/proc",
+               "--tmpfs", "/tmp",
+               "--bind", str(ws), str(ws),
+               "--die-with-parent", "--new-session"]
+    if not allow_network:
+        wrapped.append("--unshare-net")
+    return [*wrapped, "--", *argv]
+
+
+def _firejail_argv(argv: list[str], ws: Path, allow_network: bool) -> list[str]:
+    # Mirrors the Seatbelt policy shape: home read-only except the workspace,
+    # private /dev and /tmp.
+    wrapped = ["firejail", "--quiet", "--noprofile",
+               "--private-dev", "--private-tmp",
+               f"--read-only={Path.home()}",
+               f"--read-write={ws}"]
+    if not allow_network:
+        wrapped.append("--net=none")
+    return [*wrapped, "--", *argv]
+
+
+def _docker_argv(argv: list[str], ws: Path, allow_network: bool) -> list[str]:
+    image = os.environ.get("HARNESSIE_SANDBOX_IMAGE", DEFAULT_DOCKER_IMAGE)
+    wrapped = ["docker", "run", "--rm",
+               "--user", f"{os.getuid()}:{os.getgid()}",
+               "-v", f"{ws}:{ws}",
+               "-w", str(ws)]
+    if not allow_network:
+        wrapped += ["--network", "none"]
+    return [*wrapped, image, *argv]
+
+
+@lru_cache(maxsize=1)
+def _bwrap_usable() -> bool:
+    """True only when bubblewrap can create its namespaces here (some hosts
+    ship the binary but restrict unprivileged user namespaces)."""
+    try:
+        proc = subprocess.run(
+            ["bwrap", "--ro-bind", "/", "/", "--unshare-net",
+             "--die-with-parent", "true"],
+            capture_output=True, text=True, timeout=5)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return proc.returncode == 0
+
+
+@lru_cache(maxsize=1)
+def _firejail_usable() -> bool:
+    try:
+        proc = subprocess.run(
+            ["firejail", "--quiet", "--noprofile", "true"],
+            capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return proc.returncode == 0
+
+
+@lru_cache(maxsize=1)
+def _docker_usable() -> bool:
+    """Requires a reachable daemon, not just the CLI. Image availability is
+    not probed; a missing image surfaces as a nonzero exit at run time."""
+    try:
+        proc = subprocess.run(
+            ["docker", "info", "--format", "{{.ServerVersion}}"],
+            capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return proc.returncode == 0 and bool(proc.stdout.strip())
+
+
 def wrap(argv: list[str], workspace: Path, allow_network: bool = False) -> list[str]:
     """Return a sandboxed argv for `argv`, or raise SandboxUnavailable.
 
     The returned list is passed straight to subprocess.run (no shell), so the
     profile string travels as one argv element and needs no escaping."""
     name = backend_name()
+    ws = Path(workspace).resolve()
     if name == "seatbelt":
-        profile = _seatbelt_profile(Path(workspace), allow_network)
+        profile = _seatbelt_profile(ws, allow_network)
         return ["sandbox-exec", "-p", profile, *argv]
+    if name == "bwrap":
+        return _bwrap_argv(argv, ws, allow_network)
+    if name == "firejail":
+        return _firejail_argv(argv, ws, allow_network)
+    if name == "docker":
+        return _docker_argv(argv, ws, allow_network)
     raise SandboxUnavailable(
         f"no OS sandbox backend on {platform.system()}; child-process "
         "execution is blocked (fail-closed policy). Wire a backend "

@@ -37,7 +37,7 @@ Acceptance met: triage runs headless as propose-only and applies only under reco
 
 Theme: make the harness runnable and measurable beyond a single Mac.
 
-- Linux sandbox backend, so shell-using workflows run confined on Linux instead of failing closed (detail in Platform support below). Implementation step 15 follow-up.
+- Linux sandbox backend, so shell-using workflows run confined on Linux instead of failing closed (detail in Platform support below). Implementation step 15 follow-up. LANDED 2026-07-06: bwrap/firejail/docker backends with startup smoke tests, policy-construction unit tests, and CI jobs (Linux bubblewrap parity, macOS, no-backend fail-closed). Remains open until the CI matrix is green on a real run.
 - Live-endpoint smoke tests: one loop turn against a real Anthropic endpoint and one against a local OpenAI-compatible endpoint, opt-in by env var. Implementation step 11.
 - Expand the golden-task evaluation scorecard beyond the current mock-brain baseline: golden, risky, and failure-recovery tasks scored into a comparable report against real Anthropic and local OpenAI-compatible endpoints — including the governance scorecard, so consent and ownership behavior is measured per brain, not assumed. Implementation steps 11 and 12.
 - Live contested-phase run: `workflows/contested-decision.yaml` across two real providers, earning `independent-positions` on a real record.
@@ -78,7 +78,7 @@ Gate: no 1.0 while any 0.3, 0.4, or 0.5 acceptance criterion is red.
 
 ### Supported today
 
-macOS is fully supported: the OS sandbox uses native `sandbox-exec` (Seatbelt), confining child-command writes to the workspace and denying network by default. On Linux and Windows the harness logic (pure Python) runs, but shell-using workflows fail closed because no sandbox backend is wired. This is the fail-closed-everywhere policy working as designed, not a bug: a control that cannot be enforced is refused rather than skipped.
+macOS is fully supported: the OS sandbox uses native `sandbox-exec` (Seatbelt), confining child-command writes to the workspace and denying network by default. Linux backends (bubblewrap preferred, firejail alternate, docker fallback) are implemented as of the 0.4 line, each admitted only after a startup smoke test; CI proves the suite green under bubblewrap and proves fail-closed with every backend removed. On Windows, and on any host where no backend passes its smoke test, shell-using workflows fail closed. This is the fail-closed-everywhere policy working as designed, not a bug: a control that cannot be enforced is refused rather than skipped.
 
 ### Linux support (0.4.0 target)
 

@@ -2,6 +2,15 @@
 
 All notable changes to Harnessie are recorded here. Format loosely follows Keep a Changelog; versions follow semver.
 
+## Unreleased (0.4 line)
+
+### Added
+
+- Linux sandbox backends in `harness/sandbox.py`: bubblewrap (preferred: read-only root, workspace-only writes, private `/tmp`, `--unshare-net`, `--die-with-parent`, `--new-session`), firejail (alternate), docker (fallback, non-root, `--network none`, image override via `HARNESSIE_SANDBOX_IMAGE`). Each admitted only after a startup smoke test; present-but-unusable backends fail closed.
+- Policy-construction unit tests for backend preference order, per-backend confinement flags, network opt-in, and Linux fail-closed; the escape parity tests accept the bwrap read-only-root kernel phrasing.
+- GitHub Actions CI: Linux bubblewrap parity job (asserts the backend is admitted, not silently skipped), macOS job, and a no-backend job asserting fail-closed.
+- SECURITY.md backend table: platform, backend, confinement primitive, known gaps.
+
 ## 0.3.3 (2026-07-06)
 
 Mitigation patch for the three findings from the v0.3.2 verification rotation (independent Claude review of the Codex implementation).

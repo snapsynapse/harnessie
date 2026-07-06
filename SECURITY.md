@@ -32,7 +32,17 @@ Clean content passes through byte-for-byte, so the filter is free on the common 
 - network is denied by default; a workflow phase opts in with `allow_network: true`, and verifiers never get it.
 - reads still work, so interpreters run normally.
 
-Backend today is macOS Seatbelt via `sandbox-exec -p` (native, no dependencies) only when a startup smoke test proves profiles can actually be applied. Some managed hosts expose `sandbox-exec` but return `sandbox_apply: Operation not permitted`; Harnessie treats that as sandbox-unavailable. Policy is fail closed everywhere: on a platform with no usable sandbox backend (Linux without bubblewrap/firejail/docker wired, or macOS with unusable Seatbelt), `run_shell` and gate checks are blocked rather than run unconfined. Deliberate boundary: temp dirs outside home stay writable so interpreters function, because the protected assets are the user's files and the exfil channel, not scratch space.
+Every backend is admitted only after a startup smoke test proves it can actually confine on this host; a present-but-unusable backend (managed macOS returning `sandbox_apply: Operation not permitted`, Linux with unprivileged user namespaces restricted) is treated exactly like a missing one. Policy is fail closed everywhere: on a platform with no usable backend, `run_shell` and gate checks are blocked rather than run unconfined. Deliberate boundary: scratch space stays writable so interpreters function, because the protected assets are the user's files and the exfil channel, not scratch space.
+
+| Platform | Backend | Confinement primitive | Known gaps |
+|---|---|---|---|
+| macOS | `seatbelt` (`sandbox-exec -p`, native) | SBPL profile: deny `file-write*` under home, allow under workspace; `deny network*` unless opted in | temp dirs outside home writable (deliberate); Apple marks `sandbox-exec` deprecated but it remains functional |
+| Linux (preferred) | `bwrap` (bubblewrap, rootless, no daemon) | read-only bind of `/`, rw bind of workspace only, private `/tmp`, minimal `/dev`, `--unshare-net` unless opted in, `--die-with-parent`, `--new-session` | needs unprivileged userns (smoke-tested; fails closed when restricted); no seccomp filtering beyond bwrap defaults |
+| Linux (alternate) | `firejail` | home read-only except workspace, `--private-dev`, `--private-tmp`, `--net=none` unless opted in | setuid-root binary (larger TCB than bwrap); paths outside home follow firejail defaults, not the read-only-root guarantee |
+| Linux (fallback) | `docker` | workspace bind-mounted as the only host path, `--network none` unless opted in, non-root `--user uid:gid` | requires a daemon (root or rootless); image (`python:3.12-slim`, override `HARNESSIE_SANDBOX_IMAGE`) must provide the tools the allowlist names; missing image surfaces at run time, not probe time |
+| Windows | none | — | fails closed; use WSL2 (presents as Linux) |
+
+Backend order on Linux is bwrap, then firejail, then docker — smallest trusted computing base first.
 
 ### 5. Secret-handling guards (mechanical, harness-enforced)
 

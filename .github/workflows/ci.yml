@@ -1,0 +1,62 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # Portability proof (ROADMAP 0.4): the same suite, same assertions, must be
+  # green under the Linux bubblewrap backend as under macOS Seatbelt.
+  linux-bwrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install bubblewrap and allow unprivileged user namespaces
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bubblewrap
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+      - run: python -m pip install -e ".[dev]"
+      - name: Assert the bwrap backend is admitted (not silently skipped)
+        run: python -c "from harness import sandbox; b = sandbox.backend_name(); assert b == 'bwrap', b"
+      - run: python -m pytest -q
+      - run: python -m harness.cli eval
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e ".[dev]"
+      - name: Report sandbox backend (managed runners may deny Seatbelt; suite skips escape tests then)
+        run: python -c "from harness import sandbox; print('backend:', sandbox.backend_name())"
+      - run: python -m pytest -q
+      - run: python -m harness.cli eval
+
+  # Fail-closed proof: with every backend removed, shell-using paths must be
+  # blocked, and the suite must still be green (escape tests skip, the
+  # fail-closed tests are the ones that matter here).
+  linux-no-backend-fails-closed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Remove every sandbox backend
+        run: |
+          sudo systemctl stop docker docker.socket 2>/dev/null || true
+          for b in docker bwrap firejail; do
+            p="$(command -v "$b" || true)"
+            if [ -n "$p" ]; then sudo rm -f "$p"; fi
+          done
+      - run: python -m pip install -e ".[dev]"
+      - name: Assert no backend is admitted
+        run: python -c "from harness import sandbox; b = sandbox.backend_name(); assert b is None, b"
+      - run: python -m pytest -q
