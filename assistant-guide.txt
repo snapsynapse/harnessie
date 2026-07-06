@@ -5,7 +5,7 @@ Read these first:
 - `IMPLEMENTATION_PLAN.md`
 - `SECURITY.md`
 - `EVALS.md`
-- `docs/NEXT.md`
+- `NEXT.md`
 Before making claims about project health, run:
 - `python3 -m pytest -q`
 - `python3 -m harness.cli eval`

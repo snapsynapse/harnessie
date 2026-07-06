@@ -77,16 +77,16 @@ Workflow surface:
 
 Protocol, executed by the runner:
 
-1. Position round. Each position agent receives the identical brief in an isolated context with read-only grants (side effects denied at schema and dispatch — a stance needs no hands). Its `task_complete` report must end with a JSON stance object `{"stance": "support|oppose|alternative", "summary": "..."}`, parsed with the same last-object-wins, fail-closed discipline as verifier verdicts. An unparseable stance is recorded as dissent, not dropped: fail closed means uncertainty forces arbitration rather than silently converging.
+1. Position round. Each position agent receives the identical brief in an isolated context with read-only grants (side effects denied at schema and dispatch — a stance needs no hands). Its `task_complete` report must end with a JSON stance object `{"stance": "recommend|oppose|alternative|abstain", "summary": "..."}`, parsed with the same last-object-wins, fail-closed discipline as verifier verdicts. An unparseable stance is recorded as dissent, not dropped: fail closed means uncertainty forces arbitration rather than silently converging.
 2. Objection round(s). Each agent sees the other positions and returns objections or an explicit no-new-objection marker (Turnfile convergence rule). Bounded by `rebuttal_rounds` (default 1). Objections are never deleted; every round is appended to the record.
 3. Assembly. The harness (never an agent) assembles a decision record at `runs/<run_id>/decisions/DR-<n>-<slug>.md`, AIDR-shaped: frontmatter (id, title, status, date, arbiter = operator), Context, Question, Positions with per-position metadata (agent, model_id, tier, stance, summary), Objections, empty Arbitration section.
 4. Structural lint + earned claims, computed by the harness and stamped into the record:
-   - `independent-positions`: two or more positions with distinct `model_id`s recorded before arbitration.
+   - `independent-positions`: two or more positions with distinct providers recorded before arbitration (a monoculture can only echo with variance; same-provider model variants do not earn the claim).
    - `dissent-preserved`: an oppose/alternative stance or objection exists and the Arbitration section is complete.
    - `human-arbitrated`: status `arbitrated`, arbitration metadata complete.
    Claims are structural only; whether the arbitration prose genuinely answers each objection is the human's responsibility, exactly as in AIDR — lint checks form, never judgment.
 5. Outcome:
-   - Converged (`arbitration: convergence`, all stances `support`, zero open objections): the phase passes; the record ships with status `open` and the convergence noted. Audit trail exists even for uncontested decisions.
+   - Converged (`arbitration: convergence`, all stances `recommend`, zero open objections): the phase passes; the record ships with status `open` and the convergence noted. Audit trail exists even for uncontested decisions.
    - Contested, or `arbitration: human`: the phase halts with the new status `needs_arbitration` (a `needs_human` variant carrying the record path). No later phase runs on an unarbitrated contested decision.
 
 Arbitration is human-only, mechanically: no harness code path writes the Arbitration section, and no agent can reach the record (it lives under `runs/`, outside the workspace). The operator edits the record in their own words, flips `status: arbitrated`, and re-runs. On resume the runner re-lints the record instead of re-running the phase: `human-arbitrated` earned → the phase passes and the arbitration decision text flows to later phases as the phase report. Anything else stays halted.
