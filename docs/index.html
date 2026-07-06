@@ -512,7 +512,7 @@
     <p class="hook">New to this? That is exactly who it is for. You do not have to trust the AI; you trust the harness around it. And when you want more, the same setup runs a small model on your laptop or the most capable one available, by changing a single line.</p>
 
     <div class="hero-video">
-      <video class="hero-clip" autoplay muted loop playsinline preload="auto" poster="/imgs/og.png"
+      <video class="hero-clip" autoplay muted playsinline preload="auto" poster="/imgs/og.png"
              aria-label="Animated Harnessie mascot: a green Loch Ness monster wearing a harness, rising from the loch.">
         <source src="/imgs/harnessie-hero.mp4" type="video/mp4">
         <img src="/imgs/og.png" alt="The Harnessie mascot: a green Loch Ness monster wearing a harness, rising from a line-art loch, beside the wordmark Harnessie.">
@@ -706,6 +706,7 @@ routing:
     });
     v.addEventListener('play', reflect);
     v.addEventListener('pause', reflect);
+    v.addEventListener('ended', reflect);
     reflect();
   })();
 </script>
