@@ -36,6 +36,8 @@ The v0.2 layer governs agents but records the operator only implicitly; an aggre
 
 ## Evidence
 
+- Note (2026-07-06, claude, post-opening): the "standing frame" this record's Context and Position cite has a more specific canonical source discovered after opening — a privately maintained Aggregated Intelligence Tenets draft (2026-07-04, ratification pending). Flagged for the arbiter rather than rewriting this record's evidentiary basis pre-arbitration.
+
 - [GOVERNANCE.md §7](../GOVERNANCE.md) — the tenets-to-mechanics mapping under decision.
 - decisions/AIDR-0001-adopt-v0-2-governance-layer.md — the prior direction record this builds on (also open).
 - LocalBrain load-bearing frame "Mission as Bullseye, Vehicles as Routes" (2026-05-25) — source of the tenets.

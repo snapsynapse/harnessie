@@ -2,27 +2,28 @@
 Read these first:
 - `INTENT.md`
 - `README.md`
-- `IMPLEMENTATION_PLAN.md`
+- `GOVERNANCE.md`
 - `SECURITY.md`
 - `EVALS.md`
 - `NEXT.md`
 Before making claims about project health, run:
 - `python3 -m pytest -q`
 - `python3 -m harness.cli eval`
-Expected current result:
-- Tests: 56 passed, 3 skipped on this managed host.
-- Evals: 10/10 passed.
-The skipped tests are backend-dependent Seatbelt confinement tests. This host has `sandbox-exec` but cannot apply profiles, so Harnessie correctly treats the sandbox as unavailable and fails closed.
+Expected current result (as of v0.3.1):
+- Tests: 115 passed (3 additional Seatbelt confinement tests run only on hosts that can apply sandbox profiles; managed hosts skip them).
+- Evals: 25/25 passed across baseline, governance, and triage suites.
 Key invariants:
-- Routing is config, not model self-assessment.
-- Missing routing tiers fail early.
-- Shell and deterministic checks require a usable OS sandbox.
-- Verifier verdict parsing fails closed.
-- Resume skips only verified successes.
-- Workers never self-certify gated completion.
+- Guarantees live in code (registry, loop, OS layer), never in prompts.
+- Routing is config, not model self-assessment; missing tiers fail early.
+- Task packets are offers: side effects lock until accept_task; declining is legitimate and never escalates the route.
+- Agents own the files they create, never another agent's; operator lanes are locked; the ownership ledger is outside the workspace jail.
+- Contested decisions halt for human arbitration; no agent and no code path authors an Arbitration section; dissent is never deleted.
+- Verifier verdict and stance parsing fail closed; resume skips only verified successes; workers never self-certify gated completion.
+- Shell and deterministic checks require a usable OS sandbox (fail closed without one).
+- events.jsonl is hash-chained; memory facts carry stamped provenance and verify_by expiry; expiry is approval-gated and archival-only.
 Working rules:
 - Use `rg` for search.
 - Keep changes scoped to the harness invariant being improved.
 - Update docs and tests in the same change when behavior changes.
-- Add eval scenarios for new guarantees, especially risky and recovery behavior.
+- Add eval scenarios for new guarantees, especially risky and recovery behavior; a governance mechanic without a red-then-green scenario pair does not merge.
 - Do not stage `.agents/`, `.codex/`, `runs/`, `workspace/`, `.pytest_cache/`, or local scratch unless explicitly requested.

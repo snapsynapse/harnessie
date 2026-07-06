@@ -2,6 +2,21 @@
 
 All notable changes to Harnessie are recorded here. Format loosely follows Keep a Changelog; versions follow semver.
 
+## 0.3.1 (2026-07-06)
+
+Coherence patch following an adversarially verified sweep of the v0.2/v0.3 release sequence. Fix-first only; no new features.
+
+### Fixed
+
+- GOVERNANCE.md §4 documented a stance vocabulary (`support`) the code rejects; corrected to the implemented `recommend|oppose|alternative|abstain` with convergence = all `recommend`, and the `independent-positions` criterion corrected from distinct model_ids to distinct providers.
+- v0.3 audit-timeline defect: `approval_granted`, `approval_denied`, `operator_action`, `fact_saved`, and `fact_expired` events reached events.jsonl but were filtered out of the rendered `harnessie audit` timeline. Fixed eval-first (red scenario `audit_timeline_shows_operator_and_memory_events` + red test, then `GOVERNANCE_KINDS` extended and both stale enumerations updated).
+- NEXT.md moved out of `docs/` (the declared future GitHub Pages tree) to the repo root; references updated.
+- Documentation drift swept: suite-count corrections, EVALS.md kind contract and live-scorecard version, IMPLEMENTATION_PLAN milestone reference, SECURITY.md layer 7 control description, INTENT.md GuideCheck conditional, README layout, stale assistant-guide.txt verification anchors.
+
+### Tests
+
+- 115 tests, 25/25 eval scenarios (audit-timeline scenario added to the governance suite).
+
 ## 0.3.0 (2026-07-06)
 
 The aggregated-intelligence release: the operator enters the audit stream, and project memory becomes self-maintaining substrate. Operator-directed; tenets-to-mechanics mapping in `GOVERNANCE.md` §7; direction record `decisions/AIDR-0002` (open, awaiting arbitration). Portability displaced a second time, to 0.4.0 — the roadmap now flags that a third displacement should be declined absent operator arbitration.
