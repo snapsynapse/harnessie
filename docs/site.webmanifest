@@ -1,0 +1,12 @@
+{
+  "name": "Harnessie",
+  "short_name": "Harnessie",
+  "description": "A brain-agnostic multi-agent harness with a verification gate between every phase.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#2dd4bf",
+  "background_color": "#0f1117",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any" }
+  ]
+}

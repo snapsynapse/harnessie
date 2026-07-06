@@ -1,0 +1,34 @@
+# Harnessie
+
+A brain-agnostic multi-agent harness. The harness structure carries the quality floor; the model carries the ceiling.
+
+## What it is
+
+An orchestrator decomposes a goal into task packets with acceptance criteria and out-of-scope fences. Cheap workers execute those packets inside a jailed workspace with allowlisted tools, owning the files they create. Every worker phase exits through a gate that runs deterministic checks first, then an independent fresh-context verifier that never sees the worker's reasoning and fails closed. Contested decisions fan out to an adversarial panel whose positions and objections land in a decision record only a human may arbitrate. Everything is journaled, budgeted, resumable, and hash-chain audited. Models are swapped by editing one YAML file; the gates, jails, budgets, ownership rules, and audit log are the same underneath any brain.
+
+## Key concepts
+
+- Roles: orchestrator (decompose and integrate), worker (execute, own files), verifier (judge in fresh context, fail closed).
+- Consent: task packets are offers; side-effecting tools unlock only after a worker accepts.
+- Gates: deterministic checks plus an independent verifier between every phase.
+- Ownership lanes: agents own the files they create; operator lanes are locked.
+- Brain-agnostic routing: task classes map to model tiers in config/models.yaml.
+- Governance: contested decisions produce AIDR-style records with human-only arbitration.
+- Audit: a hash-chained event log; harnessie audit re-verifies it and renders one timeline.
+- Security: role permissions, consent lock, workspace jail, OS sandbox (Seatbelt/bubblewrap/firejail/docker), injection quarantine, secret scrubbing, structured refusals.
+
+## Key files
+
+- Landing page: https://harnessie.com/
+- Repository: https://github.com/snapsynapse/harnessie
+- Getting started: https://github.com/snapsynapse/harnessie/blob/main/docs/getting-started.md
+- User guide: https://github.com/snapsynapse/harnessie/blob/main/docs/GUIDE.md
+- Architecture: https://github.com/snapsynapse/harnessie/blob/main/ARCHITECTURE.md
+- Governance: https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md
+- Security model: https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md
+
+## Related
+
+- HardGuard25 (human-safe identifiers): https://hardguard25.com/
+- Graceful Boundaries (refusal grammar): https://gracefulboundaries.dev/
+- AI Decision Records (AIDR): https://aidr.work/

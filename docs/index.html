@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>Harnessie &mdash; A brain-agnostic multi-agent harness</title>
+  <meta name="description" content="A brain-agnostic multi-agent harness: an orchestrator, swappable workers, and independent verifiers with a gate between every phase. Swap models in one file.">
+  <meta name="keywords" content="harnessie, multi-agent harness, agent orchestration, verification gate, brain-agnostic, model-agnostic agents, agent sandbox, prompt injection defense, agent ownership, audit log, consent-based orchestration, local LLM agents">
+  <meta name="author" content="Sam Rogers">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <meta name="theme-color" content="#2dd4bf">
+  <link rel="canonical" href="https://harnessie.com/">
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="mask-icon" href="/favicon.svg" color="#5eead4">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/plain" href="https://harnessie.com/llms.txt" title="LLM-readable summary">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Harnessie">
+  <meta property="og:title" content="Harnessie">
+  <meta property="og:description" content="A brain-agnostic multi-agent harness. The harness carries the quality floor; the model carries the ceiling.">
+  <meta property="og:url" content="https://harnessie.com/">
+  <meta property="og:locale" content="en_US">
+  <meta property="article:published_time" content="2026-07-06T00:00:00Z">
+  <meta property="article:modified_time" content="2026-07-06T00:00:00Z">
+  <meta property="article:author" content="Sam Rogers">
+  <meta property="article:publisher" content="https://snapsynapse.com/">
+  <meta property="article:section" content="Developer Tools">
+  <meta property="article:tag" content="harnessie">
+  <meta property="article:tag" content="multi-agent-harness">
+  <meta property="article:tag" content="agent-orchestration">
+  <meta property="article:tag" content="verification-gate">
+  <meta property="article:tag" content="brain-agnostic">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Harnessie">
+  <meta name="twitter:description" content="A brain-agnostic multi-agent harness. The harness carries the quality floor; the model carries the ceiling.">
+  <meta name="twitter:site" content="@snapsynapse">
+  <meta name="twitter:creator" content="@snapsynapse">
+
+  <!-- Identity verification (IndieWeb rel=me) -->
+  <link rel="me" href="https://github.com/snapsynapse">
+  <link rel="me" href="https://www.linkedin.com/in/samrogers">
+
+  <!-- JSON-LD: TechArticle -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Harnessie",
+    "alternativeHeadline": "A brain-agnostic multi-agent harness",
+    "description": "Harnessie is a multi-agent harness for reliable work from language models. An orchestrator decomposes a goal into task packets, cheap workers execute them inside a jailed workspace, and an independent verifier gates every phase before the next begins. Models are swapped by editing one YAML file; the gates, jails, budgets, ownership rules, and audit log are the same underneath any brain.",
+    "inLanguage": "en",
+    "url": "https://harnessie.com/",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://harnessie.com/" },
+    "datePublished": "2026-07-06",
+    "dateModified": "2026-07-06",
+    "author": {
+      "@type": "Person",
+      "name": "Sam Rogers",
+      "url": "https://snapsynapse.com/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Snap Synapse",
+      "url": "https://snapsynapse.com/"
+    },
+    "keywords": ["harnessie", "multi-agent harness", "agent orchestration", "verification gate", "brain-agnostic", "agent sandbox", "prompt-injection defense", "audit log"],
+    "license": "https://github.com/snapsynapse/harnessie/blob/main/LICENSE",
+    "copyrightHolder": { "@type": "Organization", "name": "Snap Synapse" },
+    "copyrightYear": 2026,
+    "citation": [
+      { "@type": "WebPage", "name": "HardGuard25", "url": "https://hardguard25.com/" },
+      { "@type": "WebPage", "name": "Graceful Boundaries", "url": "https://gracefulboundaries.dev/" },
+      { "@type": "WebPage", "name": "AI Decision Records", "url": "https://aidr.work/" }
+    ]
+  }
+  </script>
+
+  <!-- JSON-LD: DefinedTerm (stake the term) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "DefinedTerm",
+    "name": "Harnessie",
+    "alternateName": ["harnessie"],
+    "description": "A brain-agnostic multi-agent harness: an orchestrator decomposes a goal, swappable workers execute inside a jailed workspace, and an independent verifier gates every phase before the next begins. The harness structure carries the quality floor; the model carries the ceiling.",
+    "url": "https://harnessie.com/",
+    "inDefinedTermSet": {
+      "@type": "DefinedTermSet",
+      "name": "Snap Synapse Developer Tools",
+      "url": "https://snapsynapse.com/"
+    },
+    "sameAs": [
+      "https://github.com/snapsynapse/harnessie"
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --bg-alt: #1a1d27;
+      --surface2: #242836;
+      --text: #e1e4ed;
+      --text-muted: #8b90a0;
+      --accent: #2dd4bf;
+      --accent-hover: #5eead4;
+      --border: #2e3345;
+      --green: #4ecb71;
+      --red: #ff6b6b;
+      --code-bg: #0b0d13;
+      --code-text: #e1e4ed;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+      --max-width: 960px;
+      --radius: 10px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+    /* Skip link (a11y) */
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      background: var(--accent);
+      color: var(--bg);
+      padding: 0.5rem 1rem;
+      z-index: 100;
+    }
+    .skip-link:focus { left: 0; }
+
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 1.5rem; }
+
+    /* Nav */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 10;
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    nav .logo {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+    nav .logo svg { color: var(--accent-hover); flex: 0 0 auto; }
+    nav .logo:hover svg { color: var(--accent); }
+    nav .links { display: flex; align-items: center; gap: 1.5rem; font-size: 0.9rem; }
+    nav .links a { color: var(--text-muted); }
+    nav .links a:hover { color: var(--text); text-decoration: none; }
+
+    /* GitHub star button */
+    .gh-star {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-alt);
+      color: var(--text) !important;
+      font-weight: 600;
+      font-size: 0.8rem;
+      transition: border-color 0.1s ease, transform 0.05s ease;
+    }
+    .gh-star:hover {
+      border-color: var(--accent);
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+    .gh-star svg { flex: 0 0 auto; color: #eab308; }
+    .gh-star span { white-space: nowrap; }
+
+    /* Byline */
+    .byline {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 0.75rem 0 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 0.9rem;
+      align-items: center;
+      justify-content: center;
+    }
+    .byline .sep { color: var(--border); }
+    .byline .sep::before { content: "\00B7"; }
+    .byline a { color: var(--text); text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 2px; }
+    .byline a:hover { color: var(--accent-hover); text-decoration-color: var(--accent-hover); }
+    .byline .version {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      background: var(--bg-alt);
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+
+    /* Canonical note */
+    .canonical-note {
+      margin-top: 2.5rem;
+      padding: 1rem 1.25rem;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .canonical-note strong { color: var(--text); }
+    .canonical-note a { text-decoration: underline; text-underline-offset: 2px; }
+
+    /* Sections */
+    section { padding: 4rem 0; }
+    section.alt { background: var(--bg-alt); }
+
+    h1 { font-size: 2.75rem; line-height: 1.15; letter-spacing: -0.02em; font-weight: 800; }
+    h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; letter-spacing: -0.01em; }
+    h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+    p { margin-bottom: 1rem; }
+    p:last-child { margin-bottom: 0; }
+
+    /* Hero */
+    .hero { padding: 5rem 0 4rem; text-align: center; }
+    .hero h1 { margin-bottom: 1rem; }
+    .hero .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 1.5rem;
+    }
+    .hero .hook {
+      font-size: 1rem;
+      color: var(--text-muted);
+      max-width: 640px;
+      margin: 0 auto 2.5rem;
+    }
+
+    /* Hero terminal */
+    .terminal {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      text-align: left;
+      padding: 1.25rem 1.5rem;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--code-text);
+      max-width: 640px;
+      margin: 0 auto 2.5rem;
+      overflow-x: auto;
+      line-height: 1.7;
+    }
+    .terminal .c { color: var(--text-muted); }
+    .terminal .p { color: var(--accent); }
+
+    /* Pillars */
+    .pillars {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+      text-align: left;
+    }
+    .pillar {
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-alt);
+    }
+    .pillar h3 { color: var(--accent); font-size: 1rem; }
+    .pillar p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0; }
+    section.alt .pillar { background: var(--bg); }
+
+    /* Pipeline strip */
+    .pipeline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      gap: 0.5rem;
+      margin: 1.5rem 0 0;
+      font-size: 0.85rem;
+    }
+    .pipeline .stage {
+      flex: 1 1 0;
+      min-width: 120px;
+      padding: 0.9rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .pipeline .stage strong { display: block; color: var(--accent); font-size: 0.9rem; margin-bottom: 0.2rem; }
+    .pipeline .stage span { color: var(--text-muted); }
+
+    /* Buttons */
+    .cta-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: background 0.15s, color 0.15s;
+    }
+    /* Dark text on the light accent gives strong contrast; light text on accent fails AA */
+    .btn-primary { background: var(--accent); color: var(--bg); }
+    .btn-primary:hover { background: var(--accent-hover); text-decoration: none; color: var(--bg); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--accent-hover);
+      border: 1px solid var(--accent);
+    }
+    .btn-secondary:hover { background: var(--accent); color: var(--bg); text-decoration: none; }
+    .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .btn-primary:focus-visible { outline: 3px solid var(--text); outline-offset: 3px; }
+
+    /* Code blocks */
+    .code-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .code-block { text-align: left; }
+    .code-block h3 { font-size: 0.95rem; margin-bottom: 0.75rem; }
+    .code-block .annotation {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+      font-style: italic;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1.5;
+      border: 1px solid var(--border);
+    }
+    code { font-family: var(--mono); font-size: 0.88em; color: var(--accent); }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+    th, td {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    th { font-weight: 600; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    td.k { font-family: var(--mono); color: var(--accent); white-space: nowrap; font-size: 0.85rem; }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .footer-meta p { margin-bottom: 0.25rem; }
+    .footer-meta a { text-decoration: underline; text-underline-offset: 2px; }
+    .footer-links a { text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--border); }
+    .footer-links a:hover { text-decoration-color: var(--accent-hover); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; }
+      .hero { padding: 3rem 0 2.5rem; }
+      .pillars { grid-template-columns: 1fr; }
+      .code-grid { grid-template-columns: 1fr; }
+      nav .links { display: none; }
+      nav .links.mobile-compact { display: flex; gap: 0.75rem; }
+      .footer-grid { flex-direction: column; }
+      pre { font-size: 0.75rem; }
+    }
+    @media (max-width: 520px) {
+      nav .links.mobile-compact a:not(.gh-star) { display: none; }
+      nav .container { gap: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<nav aria-label="Main navigation">
+  <div class="container">
+    <a href="/" class="logo" aria-label="Harnessie home">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+        <line x1="8" y1="6" x2="8" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <line x1="24" y1="6" x2="24" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <line x1="8" y1="16" x2="24" y2="16" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="3.6" fill="currentColor"/>
+      </svg>
+      <span>Harnessie</span>
+    </a>
+    <div class="links mobile-compact">
+      <a href="#how">How it works</a>
+      <a href="#start">Quick start</a>
+      <a href="https://github.com/snapsynapse/harnessie" class="gh-star" target="_blank" rel="noopener" aria-label="Star snapsynapse/harnessie on GitHub">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
+        </svg>
+        <span>Star on GitHub</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<main id="main-content">
+<section class="hero">
+  <div class="container">
+    <h1>The harness carries the floor. The model carries the ceiling.</h1>
+    <p class="subtitle">Harnessie is a brain-agnostic multi-agent harness: an orchestrator decomposes the goal, cheap workers execute it inside a jailed workspace, and an independent verifier gates every phase before the next begins.</p>
+    <p class="byline">
+      By <a href="https://www.linkedin.com/in/samrogers" target="_blank" rel="noopener author">Sam Rogers</a>, <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a>
+      <span class="sep" aria-hidden="true"></span>
+      Published <time datetime="2026-07-06">July 6, 2026</time>
+      <span class="sep" aria-hidden="true"></span>
+      <span class="version">v0.3.3</span>
+      <span class="sep" aria-hidden="true"></span>
+      <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener license">MIT</a>
+    </p>
+    <p class="hook">Swap the model, or every model, by editing one YAML file. The gates, jails, budgets, ownership rules, and retry ladders keep output honest no matter what runs underneath.</p>
+
+    <div class="terminal" role="img" aria-label="Terminal: pip install harnessie in editable mode, run pytest against the mock brain with no network, run the eval scorecard, then run a build-and-verify workflow with a goal.">
+      <span class="c"># prove it works offline first, then point it at a brain</span><br>
+      <span class="p">$</span> pip install -e ".[dev]"<br>
+      <span class="p">$</span> python3 -m pytest -q            <span class="c"># mock brain, no network</span><br>
+      <span class="p">$</span> python3 -m harness.cli eval     <span class="c"># deterministic scorecard</span><br>
+      <span class="p">$</span> python3 -m harness.cli run workflows/build-and-verify.yaml \<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;--goal <span class="p">"a CLI todo app with tests"</span>
+    </div>
+
+    <div class="cta-row">
+      <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/getting-started.md" class="btn btn-primary" target="_blank" rel="noopener">Get started</a>
+      <a href="https://github.com/snapsynapse/harnessie" class="btn btn-secondary" target="_blank" rel="noopener">View on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="how">
+  <div class="container">
+    <h2>How it works</h2>
+    <p>A goal enters. An orchestrator (a capable model at high effort) decomposes it into task packets with acceptance criteria and out-of-scope fences. Task packets are offers: a worker consents, or declines with a counter-proposal, before any side-effecting tool unlocks. Workers (cheaper models) execute inside a jailed workspace with allowlisted tools, owning the files they create and never each other's. Every worker phase exits through a gate that runs deterministic checks first, then an independent fresh-context verifier that never sees the worker's reasoning and fails closed. Contested decisions fan out to an adversarial panel whose positions and objections land in a decision record only a human may arbitrate.</p>
+
+    <div class="pipeline" role="list" aria-label="The run pipeline: goal, orchestrate, execute, gate, audit">
+      <div class="stage" role="listitem"><strong>Goal</strong><span>from the operator</span></div>
+      <div class="stage" role="listitem"><strong>Orchestrate</strong><span>decompose into task packets</span></div>
+      <div class="stage" role="listitem"><strong>Execute</strong><span>consented workers, jailed workspace</span></div>
+      <div class="stage" role="listitem"><strong>Gate</strong><span>checks + independent verifier</span></div>
+      <div class="stage" role="listitem"><strong>Audit</strong><span>journaled, hash-chained</span></div>
+    </div>
+
+    <div class="pillars" style="margin-top: 2.5rem;">
+      <div class="pillar">
+        <h3>Structured by default</h3>
+        <p>Consent before side effects, a deterministic-checks-plus-verifier gate that fails closed, and per-agent file ownership. The structure holds the quality floor no matter which model runs underneath it.</p>
+      </div>
+      <div class="pillar">
+        <h3>Brain-agnostic</h3>
+        <p>A frontier orchestrator, cheap workers, and local open-source models via any OpenAI-compatible endpoint. Swap any tier by editing one YAML file; the gates, jails, and budgets never change.</p>
+      </div>
+      <div class="pillar">
+        <h3>Auditable</h3>
+        <p>Every run is journaled, budgeted, resumable, and hash-chain audited. One composite timeline records agent and operator actions; tampering breaks the chain.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="container">
+    <h2>Quick start</h2>
+    <p>Requires Python 3.11 or newer and PyYAML. The model adapters are standard-library, so no vendor SDK is needed. The test suite and the eval scorecard run against a deterministic mock brain with no network, so you can prove the harness works before any API key is involved.</p>
+
+    <div class="code-grid">
+      <div class="code-block">
+        <h3>Install and run</h3>
+<pre>git clone https://github.com/snapsynapse/harnessie.git
+cd harnessie
+pip install -e ".[dev]"
+
+python3 -m pytest -q          # mock brain, offline
+python3 -m harness.cli eval   # deterministic scorecard
+
+export ANTHROPIC_API_KEY=...  # or a local endpoint
+python3 -m harness.cli run \
+  workflows/build-and-verify.yaml \
+  --goal "a CLI todo app with tests"</pre>
+      </div>
+
+      <div class="code-block">
+        <h3>Swap the brain</h3>
+<pre># config/models.yaml is the ONLY file
+# you edit to change models.
+
+tiers:
+  frontier:
+    provider: anthropic
+    model_id: claude-fable-5
+  local:                 # open-source, offline
+    provider: openai-compat
+    model_id: qwen3.6:35b-mlx
+    base_url: http://localhost:11434/v1
+
+routing:
+  plan:      { tier: frontier, effort: high }
+  implement: { tier: local,    effort: low }</pre>
+        <p class="annotation">Point task classes at any tier. The harness does not change.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="trust">
+  <div class="container">
+    <h2>Built to be trusted, not just run</h2>
+    <p>Harnessie's guarantees live in code at the tool and registry layer, so no role prompt can opt out of them. The mechanisms are the product, not a wrapper around it.</p>
+
+    <table>
+      <tbody>
+        <tr><td class="k">consent</td><td>Task packets are offers. Side-effecting tools stay locked until a worker accepts; declining is first-class and never punished.</td></tr>
+        <tr><td class="k">ownership</td><td>Agents own the files they create and cannot write each other's; operator lanes are locked to every agent.</td></tr>
+        <tr><td class="k">sandbox</td><td>Every child command runs in an OS confinement (Seatbelt on macOS; bubblewrap, firejail, or docker on Linux) that denies writes outside the workspace and denies network by default. No usable backend means shell fails closed.</td></tr>
+        <tr><td class="k">quarantine</td><td>Tool results and inter-phase reports are scanned for injection and invisible characters, then fenced as data-not-instructions before a model sees them.</td></tr>
+        <tr><td class="k">refusals</td><td>Every denial is a machine-readable refusal and a logged audit event: actionable for the model, legible for the operator.</td></tr>
+        <tr><td class="k">contests</td><td>Decisions fan out to an adversarial panel; dissent halts the run and writes a decision record only a human may arbitrate.</td></tr>
+      </tbody>
+    </table>
+
+    <aside class="canonical-note" role="note">
+      <strong>Canonical reference.</strong> This page is the authoritative home for Harnessie. Documentation, the architecture and governance rationale, and the security model live in the
+      <a href="https://github.com/snapsynapse/harnessie" target="_blank" rel="noopener">GitHub repository</a>; any cross-posts elsewhere are derived from this source and should cite
+      <a href="https://harnessie.com/">harnessie.com</a> as canonical.
+      Last substantive revision: <time datetime="2026-07-06">2026-07-06</time>.
+      <a href="https://github.com/snapsynapse/harnessie/commits/main" target="_blank" rel="noopener">Revision history &rarr;</a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-meta">
+        <p>Harnessie v0.3.3 &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a></p>
+        <p>A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project by <a href="https://www.linkedin.com/in/samrogers" target="_blank" rel="noopener author">Sam Rogers</a>.</p>
+        <p style="margin-top: 0.5rem;">Builds on: <a href="https://hardguard25.com/" target="_blank" rel="noopener">HardGuard25</a> &middot; <a href="https://gracefulboundaries.dev/" target="_blank" rel="noopener">Graceful Boundaries</a> &middot; <a href="https://aidr.work/" target="_blank" rel="noopener">AI Decision Records</a></p>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/snapsynapse/harnessie" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/getting-started.md" target="_blank" rel="noopener">Getting started</a>
+        <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/GUIDE.md" target="_blank" rel="noopener">User guide</a>
+        <a href="https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+        <a href="https://github.com/snapsynapse/harnessie/commits/main" target="_blank" rel="noopener">Revisions</a>
+        <a href="/llms.txt">llms.txt</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

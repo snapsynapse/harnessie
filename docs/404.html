@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Not found &mdash; Harnessie</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1117;
+      --text: #e1e4ed;
+      --text-muted: #8b90a0;
+      --accent: #2dd4bf;
+      --accent-hover: #5eead4;
+      --border: #2e3345;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+    }
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 520px; }
+    svg { margin-bottom: 1.5rem; }
+    h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+    p { color: var(--text-muted); margin-bottom: 1.5rem; }
+    code { font-family: var(--mono); color: var(--accent); font-size: 0.9em; }
+    a.home {
+      display: inline-block;
+      padding: 0.7rem 1.4rem;
+      border-radius: 6px;
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    a.home:hover { background: var(--accent-hover); }
+    a.home:focus-visible { outline: 3px solid var(--text); outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <svg width="72" height="72" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <line x1="8" y1="6" x2="8" y2="26" stroke="#5eead4" stroke-width="3" stroke-linecap="round"/>
+      <line x1="24" y1="6" x2="24" y2="26" stroke="#5eead4" stroke-width="3" stroke-linecap="round"/>
+      <line x1="8" y1="16" x2="24" y2="16" stroke="#5eead4" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="16" cy="16" r="3.6" fill="#5eead4"/>
+    </svg>
+    <h1>This path did not pass the gate</h1>
+    <p>There is no page at <code>this URL</code>. Like a phase that fails its check, it stops here rather than pretending to succeed.</p>
+    <a class="home" href="https://harnessie.com/">Return home</a>
+  </div>
+</body>
+</html>
