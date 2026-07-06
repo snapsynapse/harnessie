@@ -1,8 +1,10 @@
 # Getting started with Harnessie
 
-This is the five-minute path: install, prove the harness works offline, point it at a brain, run a real workflow, and read the evidence it leaves behind. The full reference is [GUIDE.md](GUIDE.md).
+This is the five-minute path: install, prove the harness works offline, point it at a model, run a real job, and read the record it leaves behind. The full reference is [GUIDE.md](GUIDE.md).
 
-Harnessie is a brain-agnostic multi-agent harness. An orchestrator decomposes a goal into task packets, cheap workers execute them inside a jailed workspace, and an independent verifier gates every phase before the next one starts. The structure carries the quality floor; the model carries the ceiling. You swap models by editing one YAML file.
+New to this? You are welcome here. A harness is the structure you put around an AI model so it can do real work while you stay in control: it sets what the AI may do, checks the work before moving on, and writes down what happened. Harnessie is built to be a safe first one. This guide uses a terminal, but every command below is safe to run, and nothing reaches the network until you choose to add a key.
+
+In more technical terms: Harnessie is a brain-agnostic multi-agent harness. An orchestrator decomposes a goal into task packets, cheap workers execute them inside a jailed workspace, and an independent verifier gates every phase before the next one starts. The structure carries the quality floor; the model carries the ceiling. You swap models by editing one YAML file.
 
 ## 1. Install
 

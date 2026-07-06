@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  <title>Harnessie &mdash; A brain-agnostic multi-agent harness</title>
-  <meta name="description" content="A brain-agnostic multi-agent harness: an orchestrator, swappable workers, and independent verifiers with a gate between every phase. Swap models in one file.">
+  <title>Harnessie &mdash; a safe harness for working with AI</title>
+  <meta name="description" content="The safe way to put an AI to work: a harness that keeps you in control. Nothing runs unless you allow it, and nothing is done until it is checked.">
   <meta name="keywords" content="harnessie, multi-agent harness, agent orchestration, verification gate, brain-agnostic, model-agnostic agents, agent sandbox, prompt injection defense, agent ownership, audit log, consent-based orchestration, local LLM agents">
   <meta name="author" content="Sam Rogers">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -23,7 +23,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Harnessie">
   <meta property="og:title" content="Harnessie">
-  <meta property="og:description" content="A brain-agnostic multi-agent harness. The harness carries the quality floor; the model carries the ceiling.">
+  <meta property="og:description" content="The safe way to put an AI to work: guardrails that let a model do real work while you stay in control.">
   <meta property="og:url" content="https://harnessie.com/">
   <meta property="og:locale" content="en_US">
   <meta property="article:published_time" content="2026-07-06T00:00:00Z">
@@ -40,7 +40,7 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Harnessie">
-  <meta name="twitter:description" content="A brain-agnostic multi-agent harness. The harness carries the quality floor; the model carries the ceiling.">
+  <meta name="twitter:description" content="The safe way to put an AI to work: guardrails that let a model do real work while you stay in control.">
   <meta name="twitter:site" content="@snapsynapse">
   <meta name="twitter:creator" content="@snapsynapse">
 
@@ -437,6 +437,7 @@
       <span>Harnessie</span>
     </a>
     <div class="links mobile-compact">
+      <a href="#what">What's a harness?</a>
       <a href="#how">How it works</a>
       <a href="#start">Quick start</a>
       <a href="https://github.com/snapsynapse/harnessie" class="gh-star" target="_blank" rel="noopener" aria-label="Star snapsynapse/harnessie on GitHub">
@@ -452,8 +453,8 @@
 <main id="main-content">
 <section class="hero">
   <div class="container">
-    <h1>The harness carries the floor. The model carries the ceiling.</h1>
-    <p class="subtitle">Harnessie is a brain-agnostic multi-agent harness: an orchestrator decomposes the goal, cheap workers execute it inside a jailed workspace, and an independent verifier gates every phase before the next begins.</p>
+    <h1>Put AI to work without giving up control.</h1>
+    <p class="subtitle">Harnessie is an AI harness: the layer of guardrails between you and a language model. It lets the model do real, multi-step work while keeping you in charge, so nothing runs that you did not allow and nothing is called done until it has been checked.</p>
     <p class="byline">
       By <a href="https://www.linkedin.com/in/samrogers" target="_blank" rel="noopener author">Sam Rogers</a>, <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a>
       <span class="sep" aria-hidden="true"></span>
@@ -463,7 +464,7 @@
       <span class="sep" aria-hidden="true"></span>
       <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener license">MIT</a>
     </p>
-    <p class="hook">Swap the model, or every model, by editing one YAML file. The gates, jails, budgets, ownership rules, and retry ladders keep output honest no matter what runs underneath.</p>
+    <p class="hook">New to this? That is exactly who it is for. You do not have to trust the AI; you trust the harness around it. And when you want more, the same setup runs a small model on your laptop or the most capable one available, by changing a single line.</p>
 
     <img class="hero-mark" src="/imgs/harnessie-mark.png" width="512" height="502" alt="The Harnessie mascot: a green Loch Ness monster wearing a buckled harness, rising from the loch in front of a line-art Scottish castle, hills, and pine trees.">
 
@@ -475,10 +476,40 @@
   </div>
 </section>
 
+<section id="what">
+  <div class="container">
+    <h2>What a harness is, and why you want one</h2>
+    <p>An AI model on its own is capable but unsupervised. It can act before you approve, report a task finished when it is not, or reach for things it was never meant to touch. A harness is the structure you put around it. It sets what the AI is allowed to do, checks the work before moving on, and records everything that happened. You get the model's ability without handing over the keys.</p>
+    <p>That is the idea in the name: you do not tame something powerful, you harness it, so its strength goes where you point it and stops where you say.</p>
+    <p>Harnessie is built to be the first harness you reach for, and safe enough to stay your default: honest about what it did, easy to inspect, and the same whether a small local model or a frontier one is doing the work.</p>
+
+    <h3 style="margin-top: 2.5rem; color: var(--text);">What you can count on, every run</h3>
+    <div class="pillars" style="grid-template-columns: repeat(2, 1fr); margin-top: 1.25rem;">
+      <div class="pillar">
+        <h3>It asks first</h3>
+        <p>The AI cannot change a file or run a command until you have allowed it. An offer it declines is recorded, not overridden.</p>
+      </div>
+      <div class="pillar">
+        <h3>It checks its work</h3>
+        <p>Nothing counts as done until a separate, independent step confirms it against clear criteria. "It said it worked" is never enough.</p>
+      </div>
+      <div class="pillar">
+        <h3>You have the final say</h3>
+        <p>When there is a real judgment call, the run stops and waits for a person. The machine never makes that decision for you.</p>
+      </div>
+      <div class="pillar">
+        <h3>It keeps the receipts</h3>
+        <p>Every action, by the AI or by you, is written to a record you can read back and cannot quietly alter.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="alt" id="how">
   <div class="container">
     <h2>How it works</h2>
-    <p>A goal enters. An orchestrator (a capable model at high effort) decomposes it into task packets with acceptance criteria and out-of-scope fences. Task packets are offers: a worker consents, or declines with a counter-proposal, before any side-effecting tool unlocks. Workers (cheaper models) execute inside a jailed workspace with allowlisted tools, owning the files they create and never each other's. Every worker phase exits through a gate that runs deterministic checks first, then an independent fresh-context verifier that never sees the worker's reasoning and fails closed. Contested decisions fan out to an adversarial panel whose positions and objections land in a decision record only a human may arbitrate.</p>
+    <p>Harnessie splits a job across three kinds of agent and puts a checkpoint between every step. An orchestrator plans, breaking your goal into small tasks with clear success criteria. Workers do the tasks, one at a time, inside a sealed workspace where they can only touch what they created. A verifier checks each result on its own, without seeing how the worker got there, and can only pass or fail it, never wave it through.</p>
+    <p>In precise terms: the orchestrator runs at high effort and emits task packets with out-of-scope fences; workers consent before any side-effecting tool unlocks; every worker phase exits through a gate that runs deterministic checks first, then an independent fresh-context verifier that fails closed; contested decisions fan out to an adversarial panel whose objections land in a decision record only a human may arbitrate.</p>
 
     <div class="pipeline" role="list" aria-label="The run pipeline: goal, orchestrate, execute, gate, audit">
       <div class="stage" role="listitem"><strong>Goal</strong><span>from the operator</span></div>
@@ -508,6 +539,7 @@
 <section id="start">
   <div class="container">
     <h2>Quick start</h2>
+    <p>This part uses a terminal. If that is new to you, it is a friendly place to start: every command below is safe to run, and nothing reaches the network until you choose to add a key.</p>
     <p>Requires Python 3.11 or newer and PyYAML. The model adapters are standard-library, so no vendor SDK is needed. The test suite and the eval scorecard run against a deterministic mock brain with no network, so you can prove the harness works before any API key is involved.</p>
 
     <div class="code-grid">
@@ -551,8 +583,8 @@ routing:
 
 <section class="alt" id="trust">
   <div class="container">
-    <h2>Built to be trusted, not just run</h2>
-    <p>Harnessie's guarantees live in code at the tool and registry layer, so no role prompt can opt out of them. The mechanisms are the product, not a wrapper around it.</p>
+    <h2>How those guarantees are enforced</h2>
+    <p>The promises above are not policy or good intentions. They live in code at the tool layer, where no prompt can switch them off. The mechanisms are the product, not a wrapper around it.</p>
 
     <table>
       <tbody>
