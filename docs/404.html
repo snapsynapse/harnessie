@@ -9,12 +9,12 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #0f1117;
-      --text: #e1e4ed;
-      --text-muted: #8b90a0;
-      --accent: #2dd4bf;
-      --accent-hover: #5eead4;
-      --border: #2e3345;
+      --bg: #f7f8fc;
+      --text: #17281a;
+      --text-muted: #566458;
+      --accent: #2f6b28;
+      --accent-hover: #24571f;
+      --border: #d6dce2;
       --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --mono: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
     }
@@ -32,7 +32,15 @@
       -webkit-font-smoothing: antialiased;
     }
     .wrap { max-width: 520px; }
-    svg { margin-bottom: 1.5rem; }
+    img.mark {
+      width: 150px; height: 150px;
+      object-fit: cover;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid var(--border);
+      margin: 0 auto 1.5rem;
+      display: block;
+    }
     h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
     p { color: var(--text-muted); margin-bottom: 1.5rem; }
     code { font-family: var(--mono); color: var(--accent); font-size: 0.9em; }
@@ -51,12 +59,7 @@
 </head>
 <body>
   <div class="wrap">
-    <svg width="72" height="72" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <line x1="8" y1="6" x2="8" y2="26" stroke="#5eead4" stroke-width="3" stroke-linecap="round"/>
-      <line x1="24" y1="6" x2="24" y2="26" stroke="#5eead4" stroke-width="3" stroke-linecap="round"/>
-      <line x1="8" y1="16" x2="24" y2="16" stroke="#5eead4" stroke-width="3" stroke-linecap="round"/>
-      <circle cx="16" cy="16" r="3.6" fill="#5eead4"/>
-    </svg>
+    <img class="mark" src="/imgs/harnessie-mark.png" alt="" width="150" height="150">
     <h1>This path did not pass the gate</h1>
     <p>There is no page at <code>this URL</code>. Like a phase that fails its check, it stops here rather than pretending to succeed.</p>
     <a class="home" href="https://harnessie.com/">Return home</a>

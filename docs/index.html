@@ -9,11 +9,11 @@
   <meta name="keywords" content="harnessie, multi-agent harness, agent orchestration, verification gate, brain-agnostic, model-agnostic agents, agent sandbox, prompt injection defense, agent ownership, audit log, consent-based orchestration, local LLM agents">
   <meta name="author" content="Sam Rogers">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
-  <meta name="theme-color" content="#2dd4bf">
+  <meta name="theme-color" content="#2f6b28">
   <link rel="canonical" href="https://harnessie.com/">
 
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="mask-icon" href="/favicon.svg" color="#5eead4">
+  <link rel="mask-icon" href="/favicon.svg" color="#2f6b28">
   <link rel="apple-touch-icon" href="/favicon.svg">
   <link rel="manifest" href="/site.webmanifest">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
@@ -107,18 +107,18 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0f1117;
-      --bg-alt: #1a1d27;
-      --surface2: #242836;
-      --text: #e1e4ed;
-      --text-muted: #8b90a0;
-      --accent: #2dd4bf;
-      --accent-hover: #5eead4;
-      --border: #2e3345;
-      --green: #4ecb71;
-      --red: #ff6b6b;
-      --code-bg: #0b0d13;
-      --code-text: #e1e4ed;
+      --bg: #f7f8fc;
+      --bg-alt: #eceff4;
+      --surface2: #e2e7ee;
+      --text: #17281a;
+      --text-muted: #566458;
+      --accent: #2f6b28;
+      --accent-hover: #24571f;
+      --border: #d6dce2;
+      --green: #2f6b28;
+      --red: #c0392b;
+      --code-bg: #16261a;
+      --code-text: #e8ece4;
       --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
       --max-width: 960px;
@@ -176,8 +176,14 @@
       align-items: center;
       gap: 0.55rem;
     }
-    nav .logo svg { color: var(--accent-hover); flex: 0 0 auto; }
-    nav .logo:hover svg { color: var(--accent); }
+    nav .logo .logo-mark {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #fff;
+      border: 1px solid var(--border);
+      flex: 0 0 auto;
+    }
     nav .links { display: flex; align-items: center; gap: 1.5rem; font-size: 0.9rem; }
     nav .links a { color: var(--text-muted); }
     nav .links a:hover { color: var(--text); text-decoration: none; }
@@ -270,23 +276,18 @@
       margin: 0 auto 2.5rem;
     }
 
-    /* Hero terminal */
-    .terminal {
-      font-family: var(--mono);
-      font-size: 0.82rem;
-      text-align: left;
-      padding: 1.25rem 1.5rem;
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--code-text);
-      max-width: 640px;
+    /* Hero mascot mark */
+    .hero-mark {
+      display: block;
+      width: 250px;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 50%;
       margin: 0 auto 2.5rem;
-      overflow-x: auto;
-      line-height: 1.7;
+      background: #fff;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 30px rgba(23, 40, 26, 0.10);
     }
-    .terminal .c { color: var(--text-muted); }
-    .terminal .p { color: var(--accent); }
 
     /* Pillars */
     .pillars {
@@ -336,7 +337,7 @@
       font-size: 0.95rem;
       transition: background 0.15s, color 0.15s;
     }
-    /* Dark text on the light accent gives strong contrast; light text on accent fails AA */
+    /* Light text on the deep-green accent clears AA (~5.3:1) */
     .btn-primary { background: var(--accent); color: var(--bg); }
     .btn-primary:hover { background: var(--accent-hover); text-decoration: none; color: var(--bg); }
     .btn-secondary {
@@ -432,12 +433,7 @@
 <nav aria-label="Main navigation">
   <div class="container">
     <a href="/" class="logo" aria-label="Harnessie home">
-      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
-        <line x1="8" y1="6" x2="8" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-        <line x1="24" y1="6" x2="24" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-        <line x1="8" y1="16" x2="24" y2="16" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-        <circle cx="16" cy="16" r="3.6" fill="currentColor"/>
-      </svg>
+      <img src="/imgs/harnessie-mark.png" width="30" height="30" alt="" class="logo-mark">
       <span>Harnessie</span>
     </a>
     <div class="links mobile-compact">
@@ -469,14 +465,8 @@
     </p>
     <p class="hook">Swap the model, or every model, by editing one YAML file. The gates, jails, budgets, ownership rules, and retry ladders keep output honest no matter what runs underneath.</p>
 
-    <div class="terminal" role="img" aria-label="Terminal: pip install harnessie in editable mode, run pytest against the mock brain with no network, run the eval scorecard, then run a build-and-verify workflow with a goal.">
-      <span class="c"># prove it works offline first, then point it at a brain</span><br>
-      <span class="p">$</span> pip install -e ".[dev]"<br>
-      <span class="p">$</span> python3 -m pytest -q            <span class="c"># mock brain, no network</span><br>
-      <span class="p">$</span> python3 -m harness.cli eval     <span class="c"># deterministic scorecard</span><br>
-      <span class="p">$</span> python3 -m harness.cli run workflows/build-and-verify.yaml \<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;--goal <span class="p">"a CLI todo app with tests"</span>
-    </div>
+    <img class="hero-mark" src="/imgs/harnessie-mark.png" width="512" height="502" alt="The Harnessie mascot: a green Loch Ness monster wearing a buckled harness, rising from the loch in front of a line-art Scottish castle, hills, and pine trees.">
+
 
     <div class="cta-row">
       <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/getting-started.md" class="btn btn-primary" target="_blank" rel="noopener">Get started</a>
