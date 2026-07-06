@@ -74,6 +74,8 @@ Three further code-enforced controls, specified in [GOVERNANCE.md](GOVERNANCE.md
 
 Decision records for contested phases live under `runs/<id>/decisions/` — also outside the workspace jail — and only a human may author their Arbitration sections; the harness lints structure and earned claims but never judgment.
 
+v0.3 additions on the same principles: memory-fact provenance is stamped by the harness from run + agent (an agent-claimed source is ignored, so memory cannot launder its origins); `expire_fact` is approval-gated and archival-only (deletion is not a capability); every approval grant or denial — including the operator's recorded `approve_tools:` pre-approvals — is an event in the hash-chained stream, so the composite timeline shows what the human authorized alongside what the agents did. Memory and prior-run state reach agents only through a harness-prepared digest (`inject_memory_status`), never a widened read surface.
+
 ## Operator checklist for a new workflow
 
 - Mark any tool that returns third-party content `quarantine=True`.

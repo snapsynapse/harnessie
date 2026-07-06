@@ -1,0 +1,58 @@
+# Memory-triage: the scheduled maintenance-agent pattern under enforcement.
+# Harvest recent run outcomes into provenance-stamped facts, surface facts
+# past verify_by, and dispose of stale ones ONLY under recorded approval —
+# a headless run without the grant proposes instead of disposing.
+#
+# Invoke:  harnessie run workflows/memory-triage.yaml
+# Cadence: schedule via cron/launchd, e.g.
+#          0 7,19 * * *  cd <project> && harnessie run workflows/memory-triage.yaml
+# The triage brain routes to the local tier by design (task_class: mechanical):
+# maintenance is mechanical work, and a local model inside these gates cannot
+# delete anything regardless of what it decides.
+name: memory-triage
+description: Harvest run lessons into facts, surface stale facts, archive only under recorded approval.
+
+phases:
+  - name: triage
+    agent: implementer
+    task_class: mechanical
+    max_steps: 30
+    inject_memory_status: true
+    # approve_tools is the operator's RECORDED pre-approval for this phase,
+    # journaled as approval_granted events. Delete the next line to run
+    # propose-only: expiry attempts will be refused and stand as proposals.
+    approve_tools: [expire_fact]
+    task: |
+      Maintain this project's memory. The harness has injected the current
+      memory status below: the fact index, facts past their verify_by date,
+      and recent run outcomes.
+
+      Do exactly three things, then report:
+      1. For each recent run outcome that teaches something durable (a gate
+         catching a failure mode, a decision arbitrated, a constraint
+         discovered), save_fact — one lesson per fact, concise body, correct
+         fact_type. Skip outcomes that teach nothing durable.
+      2. For each stale fact: if the recent outcomes re-confirm it, save_fact
+         again with the same title to refresh its verified date. If it is
+         obsolete, expire_fact with the reason. If you cannot tell, leave it
+         and list it in your report for the operator.
+      3. Never invent facts. Every fact body must trace to an injected
+         outcome; provenance is stamped by the harness.
+
+      Report: facts saved, facts refreshed, facts expired (or proposed for
+      expiry if approval was refused), and anything left for the operator.
+    verify:
+      max_attempts: 2
+      memory_lint: true
+
+  - name: summary
+    agent: orchestrator
+    task_class: integrate
+    task: |
+      Triage phase report:
+
+      {triage}
+
+      Write the operator digest: what entered memory, what was archived or
+      proposed for archival, what needs the operator's judgment, and whether
+      the memory index passed lint. Deliver via task_complete.

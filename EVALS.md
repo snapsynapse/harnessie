@@ -12,6 +12,7 @@ Every scenario has:
 ## Suites
 - `evals/baseline.yaml`: core harness guarantees (verdicts, stop conditions, gates, resume).
 - `evals/governance.yaml`: the v0.2 governance layer (consent, ownership, adversarial contest, audit). Written red before the implementation per the eval-first change discipline (GOVERNANCE.md §6); a governance feature without a red-then-green scenario pair does not merge.
+- `evals/triage.yaml`: the v0.3 memory-triage layer (approval-gated expiry, headless propose-only, memory lint halting). Same red-first discipline.
 ## Scenario kinds
 ### verdict
 Exercises verifier verdict parsing only.
@@ -48,6 +49,11 @@ Emits a small event log, verifies the hash chain, optionally tampers a line.
 - Input: `tamper` (bool)
 - Expected: `expect_before`, `expect_after`
 - Use for proving the chain detects edits.
+### triage
+A memory-triage workflow over seeded facts (one fresh, one stale).
+- Input: `script`, `approve_expiry` (bool), optional `corrupt_index` (bool)
+- Expected: `expect_statuses`, optional `expect_fact`, `expect_archived`, `expect_fact_kept`
+- Use for recorded-approval expiry, headless propose-only fail-closed behavior, and memory-lint halting.
 ## Script turns
 Mock-brain script entries can be tool calls:
 - `tool`: tool name such as `task_complete`, `write_file`, or `read_file`

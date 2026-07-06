@@ -1,6 +1,6 @@
 # Harnessie
 
-A brain-agnostic multi-agent harness: orchestrator, swappable workers, independent verifiers, verification gates between every phase, consent-based orchestration, per-agent file ownership, adversarial decision records with human-only arbitration, file-based memory with provenance, cost routing as declared config, and a tamper-evident audit log.
+A brain-agnostic multi-agent harness: orchestrator, swappable workers, independent verifiers, verification gates between every phase, consent-based orchestration, per-agent file ownership, adversarial decision records with human-only arbitration, self-maintaining project memory with stamped provenance and dated expiry, cost routing as declared config, and a tamper-evident audit log that records operator and agent actions in one composite timeline.
 
 The operating thesis: the harness structure carries the quality floor, the model carries the ceiling. Run it with Claude Fable 5 as the orchestrator and it exploits effort dials, long autonomous turns, and verifier subagents. Swap the workers (or everything) for Haiku, GLM, Qwen, or any OpenAI-compatible local endpoint by editing one YAML file, and the gates, jails, budgets, and retry ladders keep output honest.
 
@@ -34,7 +34,9 @@ workflows/          declared phase sequences (YAML) with per-phase gates, task c
 config/models.yaml  model tiers, routing table, budgets: the ONLY file to edit to swap brains
 OWNERSHIP.yaml      ownership lanes + first-writer auto-claims; operator-owned, agents cannot reach it
 decisions/          the repo's own AIDR decision records (AIDR-0001 = the v0.2 direction)
-memory/             project memory: MEMORY.md index + facts/ with provenance frontmatter
+memory/             project memory: MEMORY.md index + facts/ (stamped provenance, verify_by
+                    expiry) + archive/ (expired facts; nothing deletes) — maintained by
+                    workflows/memory-triage.yaml under approval gates
 examples/           worked end-to-end example (policy-compliance) with sample data
 runs/               per-run journal.jsonl (resume ledger) + events.jsonl (hash-chained audit)
                     + proofs/ + decisions/ (contested-phase records) (gitignored)

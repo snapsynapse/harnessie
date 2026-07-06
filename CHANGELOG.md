@@ -2,6 +2,30 @@
 
 All notable changes to Harnessie are recorded here. Format loosely follows Keep a Changelog; versions follow semver.
 
+## 0.3.0 (2026-07-06)
+
+The aggregated-intelligence release: the operator enters the audit stream, and project memory becomes self-maintaining substrate. Operator-directed; tenets-to-mechanics mapping in `GOVERNANCE.md` §7; direction record `decisions/AIDR-0002` (open, awaiting arbitration). Portability displaced a second time, to 0.4.0 — the roadmap now flags that a third displacement should be declined absent operator arbitration.
+
+### Added
+
+- Operator actions in the audit stream: per-phase approval handling emits `approval_granted` / `approval_denied` events (with their source), and a resume that detects human arbitration emits `operator_action`. The audit timeline is one composite record of agents and human, not an agent log with invisible human edits.
+- `approve_tools:` workflow phase key — the operator's recorded pre-approval for approval-gated tools, granted through the operator-owned workflow file, journaled, and restored to default-deny the moment the phase ends.
+- Memory as substrate (`harness/memory.py`): facts carry `verified` / `verify_by` freshness dates (default 30 days) plus stamped provenance; `stale_facts()` surfaces expiry by date; `archive_fact()` moves to `memory/archive/` with a dated reason — deletion does not exist at this layer; `lint()` checks index/fact/provenance consistency.
+- Memory tools: `save_fact` (provenance stamped by the harness from run + agent — any agent-claimed source is ignored) and `expire_fact` (requires approval; archival-only). Both side-effecting, so consent-gated like every write.
+- `inject_memory_status:` phase key — a deterministic, harness-prepared digest (index, stale facts, recent run outcomes) injected into the task, keeping memory and `runs/` outside every agent's read surface.
+- `memory_lint:` verify key — an in-process deterministic gate check, proofed and evented like shell checks.
+- `workflows/memory-triage.yaml`: the scheduled maintenance-agent pattern under enforcement — harvest run lessons into facts, refresh or archive stale facts, propose-only when approval is absent; routed to the local tier by design.
+- Eval kind `triage` + `evals/triage.yaml` (golden: recorded approval applies expiry; risky: headless is propose-only; recovery: lint failure halts), written red first.
+
+### Changed
+
+- Gate `needs_human` reports now carry the last verdict's evidence instead of a generic message.
+- `GOVERNANCE.md` gains §7 (aggregated-intelligence tenets mapped to mechanics); `ROADMAP.md` re-themed: 0.3 tenets+triage, 0.4 portability, 0.5 operability.
+
+### Tests
+
+- 14 new tests across `test_memory_tools.py` and `test_triage.py`; suite at 114 passing, eval scorecard at 24 scenarios (all mock-brain, no network).
+
 ## 0.2.0 (2026-07-06)
 
 The governance release: adversarial collaboration and evals promoted to foundational principles, importing the shipped lessons of Turnfile (consent-based coordination, ownership lanes, maintainer authority) and AIDR (independent positions, preserved dissent, human-only arbitration, earned claims) as harness-enforced mechanics. Design rationale: `GOVERNANCE.md`; direction record: `decisions/AIDR-0001` (open, awaiting arbitration). Displaces the previously roadmapped portability theme to 0.3.0.

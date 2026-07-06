@@ -26,6 +26,7 @@ Most AI products fail at the harness layer, not the model: unclear tool boundari
 9. Agents own their files, never each other's; the ownership ledger lives outside any agent's reach, and the operator is root owner of everything.
 10. Disagreement is evidence, never authority: contested decisions are preserved as records and arbitrated only by a human; nothing synthesizes dissent away.
 11. Eval-first change discipline: a governance mechanic without a red-then-green scenario pair does not merge.
+12. The composite includes the human: operator actions (approvals, arbitrations) are journaled into the same tamper-evident audit stream as agent actions, and memory provenance is stamped by the harness, never claimed by an agent.
 
 ## 4. Scope boundaries
 
@@ -54,5 +55,6 @@ Harnessie is not currently a PAICE portfolio component (private, personal-utilit
 
 ## 9. Changelog
 
+- 2026-07-06 - v0.3.0 aggregated-intelligence release (operator direction): operator actions enter the hash-chained audit stream (approval events, arbitration as operator_action, `approve_tools:` recorded pre-approval); memory becomes substrate (verified/verify_by provenance, save_fact/expire_fact tools, archival-only disposal); `workflows/memory-triage.yaml` ships the maintenance-agent pattern under enforcement. Invariant 12 added. Direction record `decisions/AIDR-0002` (open). Portability displaced a second time to 0.4.0; roadmap flags a third displacement for operator arbitration.
 - 2026-07-06 - v0.2.0 governance layer: adversarial collaboration and evals promoted to foundational principles (operator direction). Consent-based orchestration, ownership lanes, contested phases with human-only arbitration, hash-chained audit; design in `GOVERNANCE.md`, direction record `decisions/AIDR-0001` (open, awaiting arbitration by Sam). Design invariants 8-11 added; §7 updated to record the Turnfile/AIDR lesson imports. Portability milestone displaced to 0.3.0.
 - 2026-07-06 - Initial INTENT. Repo-standards conformance pass before the first commit: baseline `.gitignore`, `.claude/` untracked per the all-tier rule, `INTENT.md` added. Harness at v0.1.0 (see `CHANGELOG.md`).

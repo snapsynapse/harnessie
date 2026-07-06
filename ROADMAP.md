@@ -4,7 +4,11 @@ This is the forward view: versioned milestones, their themes, and platform suppo
 
 Roadmap items are intent, not commitments. Dates are omitted deliberately; milestones ship when their acceptance criteria are green, not on a calendar.
 
-## Current release: 0.2.0 (2026-07-06)
+## Current release: 0.3.0 (2026-07-06)
+
+The aggregated-intelligence release: operator actions (approvals, arbitrations) journaled into the same hash-chained audit stream as agent actions; project memory as provenance-and-expiry-bearing substrate maintained through `save_fact`/`expire_fact` (approval-gated, archival-only); `workflows/memory-triage.yaml` as the scheduled maintenance-agent pattern under enforcement. Tenets mapping: [GOVERNANCE.md](GOVERNANCE.md) §7; direction record `decisions/AIDR-0002` (open, awaiting arbitration).
+
+## Prior release: 0.2.0 (2026-07-06)
 
 The governance release: consent-based orchestration (task packets are offers; accept/decline enforced at dispatch), ownership lanes (agents own their files, never each other's; operator lanes locked), adversarial contested phases emitting AIDR-shaped decision records with human-only arbitration and structurally earned claims, a hash-chained events log with `harnessie audit`, and the eval-first change discipline with a 12-scenario governance suite. Direction recorded in `decisions/AIDR-0001` (open, awaiting arbitration); design in [GOVERNANCE.md](GOVERNANCE.md). This displaced the previously planned portability theme, which moves to 0.3.0.
 
@@ -21,7 +25,11 @@ Shipped: brain-agnostic model interface with hot-swappable tiers, tool registry 
 
 ## Milestones
 
-### 0.3.0: Portability and proof (was 0.2.0; displaced by the governance release)
+### 0.3.0: Aggregated-intelligence tenets and agent triage — SHIPPED (current release above)
+
+Acceptance met: triage runs headless as propose-only and applies only under recorded approval; a stale fact is surfaced by date, archived never deleted; the audit timeline shows agent and operator actions interleaved (114 tests, 24 eval scenarios green).
+
+### 0.4.0: Portability and proof (was 0.2.0, then 0.3.0; displaced twice — a third displacement should be declined absent operator arbitration)
 
 Theme: make the harness runnable and measurable beyond a single Mac.
 
@@ -32,7 +40,7 @@ Theme: make the harness runnable and measurable beyond a single Mac.
 
 Acceptance: the full suite is green on Linux with a backend present and fails closed on a runner with none; a brain swap (config edit) produces a comparable scorecard.
 
-### 0.4.0: Operability
+### 0.5.0: Operability
 
 Theme: put a human comfortably in the loop for long autonomous runs.
 
@@ -50,7 +58,7 @@ Theme: stable surfaces and pluggability, only after the core is proven.
 - Per-lane sandbox profiles, closing the ownership layer's honest limit (interpreter writes bypass the per-file check today).
 - Frozen config and workflow schema with a written deprecation policy.
 
-Gate: no 1.0 while any 0.3 or 0.4 acceptance criterion is red.
+Gate: no 1.0 while any 0.3, 0.4, or 0.5 acceptance criterion is red.
 
 ## Platform support
 
@@ -58,7 +66,7 @@ Gate: no 1.0 while any 0.3 or 0.4 acceptance criterion is red.
 
 macOS is fully supported: the OS sandbox uses native `sandbox-exec` (Seatbelt), confining child-command writes to the workspace and denying network by default. On Linux and Windows the harness logic (pure Python) runs, but shell-using workflows fail closed because no sandbox backend is wired. This is the fail-closed-everywhere policy working as designed, not a bug: a control that cannot be enforced is refused rather than skipped.
 
-### Linux support (0.3.0 target)
+### Linux support (0.4.0 target)
 
 This is the headline portability need. The same security policy the macOS backend enforces (writes confined to the workspace, network denied by default, per-phase `allow_network` opt-in) must be expressed with Linux primitives.
 

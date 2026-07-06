@@ -81,6 +81,8 @@ def run_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
         return _run_adversarial_scenario(scenario)
     if kind == "audit":
         return _run_audit_scenario(scenario)
+    if kind == "triage":
+        return _run_triage_scenario(scenario)
     return EvalCaseResult(
         id=scenario.get("id", "(missing-id)"),
         passed=False,
@@ -224,6 +226,51 @@ def _run_adversarial_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
     )
 
 
+def _run_triage_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
+    """Memory-triage workflow over seeded facts: approval-gated expiry applies
+    or fails closed to propose-only; memory_lint gates the phase."""
+    from .memory import ProjectMemory
+
+    problems: list[str] = []
+    with tempfile.TemporaryDirectory(prefix="harnessie-eval-") as d:
+        root = Path(d)
+        _scaffold_eval_project(root, max_attempts=1, triage=True,
+                               approve_expiry=bool(scenario.get("approve_expiry")))
+        mem = ProjectMemory(root / "memory")
+        mem.save_fact("Fresh fact", "still good", source="seed",
+                      verify_by="2099-01-01")
+        mem.save_fact("Stale fact", "past due", source="seed",
+                      verify_by="2020-01-01")
+        if scenario.get("corrupt_index"):
+            mem.index_path.write_text(mem.index_path.read_text()
+                                      + "- [Ghost](facts/ghost.md) `lesson`\n")
+        statuses = _run_scripted_workflow(root, "evalrun",
+                                          scenario.get("script", []),
+                                          scenario.get("goal", ""),
+                                          workflow="triage.yaml")
+        expected = scenario["expect_statuses"]
+        if statuses != expected:
+            problems.append(f"statuses={statuses}, expected {expected}")
+        if scenario.get("expect_fact") and not \
+                (root / "memory" / "facts" / f"{scenario['expect_fact']}.md").exists():
+            problems.append(f"expected fact missing: {scenario['expect_fact']}")
+        if scenario.get("expect_archived"):
+            slug = scenario["expect_archived"]
+            if (root / "memory" / "facts" / f"{slug}.md").exists() or not \
+                    (root / "memory" / "archive" / f"{slug}.md").exists():
+                problems.append(f"fact not archived: {slug}")
+        if scenario.get("expect_fact_kept"):
+            slug = scenario["expect_fact_kept"]
+            if not (root / "memory" / "facts" / f"{slug}.md").exists():
+                problems.append(f"fact should have been kept: {slug}")
+    return EvalCaseResult(
+        id=scenario["id"],
+        passed=not problems,
+        expected=expected,
+        observed=problems or "ok",
+    )
+
+
 def _run_audit_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
     from .audit import verify_chain
 
@@ -326,7 +373,9 @@ def _turn(spec: dict[str, Any], idx: int) -> AssistantTurn:
 
 
 def _scaffold_eval_project(root: Path, max_attempts: int,
-                           adversarial: bool = False) -> None:
+                           adversarial: bool = False,
+                           triage: bool = False,
+                           approve_expiry: bool = False) -> None:
     (root / "agents" / "workers").mkdir(parents=True)
     (root / "agents" / "verifiers").mkdir(parents=True)
     (root / "agents" / "orchestrator.md").write_text("# Orchestrator\nPlan and integrate.")
@@ -373,6 +422,23 @@ def _scaffold_eval_project(root: Path, max_attempts: int,
                   - { agent: implementer }
                   - { agent: implementer }
         """))
+    if triage:
+        approve_line = ("    approve_tools: [expire_fact]\n"
+                        if approve_expiry else "")
+        (root / "workflows" / "triage.yaml").write_text(
+            'name: memory-triage\n'
+            'phases:\n'
+            '  - name: triage\n'
+            '    agent: implementer\n'
+            '    task: "Maintain project memory."\n'
+            '    inject_memory_status: true\n'
+            + approve_line +
+            '    verify:\n'
+            '      max_attempts: 1\n'
+            '      memory_lint: true\n'
+            '  - name: summary\n'
+            '    agent: orchestrator\n'
+            '    task: "Summarize: {triage}"\n')
 
 
 def format_scorecard(scorecard: dict[str, Any]) -> str:

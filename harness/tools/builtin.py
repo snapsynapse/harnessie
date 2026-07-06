@@ -32,6 +32,7 @@ import subprocess
 from pathlib import Path
 
 from ..events import EventLog
+from ..memory import FACT_TYPES, ProjectMemory
 from ..ownership import OwnershipLedger
 from ..quarantine import find_secrets, redact_secrets
 from ..sandbox import SandboxUnavailable, wrap as sandbox_wrap
@@ -64,7 +65,9 @@ def _jail(root: Path, rel: str) -> Path:
 def register_builtin(reg: ToolRegistry, workspace: Path,
                      shell_allowlists: dict[str, tuple[str, ...]] | None = None,
                      ledger: OwnershipLedger | None = None,
-                     events: EventLog | None = None) -> None:
+                     events: EventLog | None = None,
+                     memory: ProjectMemory | None = None,
+                     provenance: str = "") -> None:
     ws = workspace.resolve()
     allowlists = shell_allowlists or DEFAULT_SHELL_ALLOWLISTS
 
@@ -137,6 +140,37 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
 
     def decline_task(reason: str, counter_proposal: str = "") -> str:
         return f"declined: {reason}"
+
+    def save_fact(title: str, body: str, fact_type: str = "lesson",
+                  source: str = "", verify_by: str = "",
+                  _role: str = "worker", _agent: str = "",
+                  _allow_network: bool = False) -> str:
+        if memory is None:
+            return "no project memory configured for this run"
+        if fact_type not in FACT_TYPES:
+            return f"fact_type must be one of {FACT_TYPES}"
+        # Provenance is STAMPED by the harness, never claimed by the agent:
+        # a fact's source must be auditable back to the run and agent that
+        # wrote it (any agent-supplied source is ignored by design).
+        stamped = f"{provenance or 'run unknown'}, agent {_agent or _role}"
+        path = memory.save_fact(title, body, fact_type=fact_type,
+                                source=stamped, verify_by=verify_by or None)
+        _emit("fact_saved", agent=_agent or _role, slug=path.stem,
+              fact_type=fact_type)
+        return f"saved fact {path.stem!r} (source stamped: {stamped})"
+
+    def expire_fact(slug: str, reason: str, _role: str = "worker",
+                    _agent: str = "", _allow_network: bool = False) -> str:
+        if memory is None:
+            return "no project memory configured for this run"
+        # Archival-only: the fact moves to memory/archive/ with a stamp.
+        # Deletion does not exist as a capability. This tool additionally
+        # requires approval (registry-enforced), so a headless run without a
+        # recorded grant proposes instead of disposing.
+        dest = memory.archive_fact(slug, reason=reason)
+        _emit("fact_expired", agent=_agent or _role, slug=slug,
+              reason=reason[:200])
+        return f"archived fact {slug!r} to {dest.name} (never deleted)"
 
     def request_change(path: str, description: str, _role: str = "worker",
                        _agent: str = "", _allow_network: bool = False) -> str:
@@ -212,6 +246,33 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
                                    "counter_proposal": {"type": "string"}},
                     "required": ["reason"]},
         fn=decline_task, effects="read", allowed_roles=WRITE_ROLES))
+    reg.register(ToolSpec(
+        name="save_fact",
+        description=("Save one durable project-memory fact (one lesson, decision, "
+                     "constraint, or reference per fact). Provenance (run + agent) is "
+                     "stamped by the harness. verify_by (YYYY-MM-DD) sets when the fact "
+                     "goes stale; default is 30 days out."),
+        parameters={"type": "object",
+                    "properties": {"title": {"type": "string"},
+                                   "body": {"type": "string"},
+                                   "fact_type": {"type": "string",
+                                                 "enum": list(FACT_TYPES)},
+                                   "verify_by": {"type": "string"}},
+                    "required": ["title", "body"]},
+        fn=save_fact, effects="write", role_aware=True,
+        allowed_roles=WRITE_ROLES))
+    reg.register(ToolSpec(
+        name="expire_fact",
+        description=("Archive a stale project-memory fact (moves it to memory/archive/; "
+                     "nothing is ever deleted). Requires operator approval: without a "
+                     "recorded grant this call is refused and stands as a proposal."),
+        parameters={"type": "object",
+                    "properties": {"slug": {"type": "string"},
+                                   "reason": {"type": "string"}},
+                    "required": ["slug", "reason"]},
+        fn=expire_fact, effects="write", role_aware=True,
+        requires_approval=True,
+        allowed_roles=WRITE_ROLES))
     reg.register(ToolSpec(
         name="request_change",
         description=("Record a change request for a file owned by another agent or lane. "

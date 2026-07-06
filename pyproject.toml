@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "harnessie"
-version = "0.2.0"
+version = "0.3.0"
 description = "Harnessie: a brain-agnostic multi-agent harness (orchestrator / workers / verifiers) with verification gates, consent-based orchestration, ownership lanes, adversarial decision records, routing policy, and a tamper-evident audit log."
 readme = "README.md"
 requires-python = ">=3.11"

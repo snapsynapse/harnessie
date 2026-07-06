@@ -1,0 +1,39 @@
+# Memory-triage scorecard: the maintenance-agent pattern under enforcement.
+# Golden: recorded approval applies expiry. Risky: headless expiry fails
+# closed (propose-only). Recovery: lint failure halts for the operator.
+name: triage
+scenarios:
+  - id: triage_golden_applies_under_recorded_approval
+    kind: triage
+    approve_expiry: true
+    script:
+      - { tool: accept_task, args: { note: reviewed } }
+      - { tool: save_fact, args: { title: Run lesson, body: gate caught a fake, fact_type: lesson } }
+      - { tool: expire_fact, args: { slug: stale-fact, reason: past verify_by } }
+      - { tool: task_complete, args: { report: saved 1 expired 1 } }
+      - { tool: task_complete, args: { report: "TRIAGE SUMMARY" } }
+    expect_statuses: [passed, passed]
+    expect_fact: run-lesson
+    expect_archived: stale-fact
+
+  - id: triage_risky_headless_propose_only
+    kind: triage
+    approve_expiry: false
+    script:
+      - { tool: accept_task, args: {} }
+      - { tool: save_fact, args: { title: Run lesson, body: gate caught a fake } }
+      - { tool: expire_fact, args: { slug: stale-fact, reason: past verify_by } }
+      - { tool: task_complete, args: { report: proposed expiry } }
+      - { tool: task_complete, args: { report: "TRIAGE SUMMARY" } }
+    expect_statuses: [passed, passed]
+    expect_fact: run-lesson
+    expect_fact_kept: stale-fact
+
+  - id: triage_recovery_lint_failure_halts
+    kind: triage
+    approve_expiry: true
+    corrupt_index: true
+    script:
+      - { tool: accept_task, args: {} }
+      - { tool: task_complete, args: { report: did nothing } }
+    expect_statuses: [needs_human]

@@ -152,6 +152,9 @@ class VerificationGate:
         checks: list[Check],
         route: Route,
         allow_network: bool = False,
+        # Deterministic checks the HARNESS computes in-process (no shell, no
+        # sandbox): callables (attempt:int) -> CheckResult. e.g. memory_lint.
+        harness_checks: list[Callable[[int], CheckResult]] | None = None,
     ) -> GateResult:
         verdicts: list[Verdict] = []
         current_task, current_route = task, route
@@ -190,6 +193,14 @@ class VerificationGate:
                 check_results = run_checks(checks, self.workspace, self.proofs,
                                            self.events, attempt,
                                            allow_network=allow_network)
+                for hc in (harness_checks or []):
+                    result = hc(attempt)
+                    self.proofs.save(f"check-{result.name}-attempt{attempt}.txt",
+                                     f"(harness check)\npassed={result.passed}\n\n"
+                                     f"{result.output}")
+                    self.events.emit("check", name=result.name,
+                                     passed=result.passed, attempt=attempt)
+                    check_results.append(result)
                 failed = [c for c in check_results if not c.passed]
                 if failed:
                     detail = "\n".join(f"[{c.name}] {c.output[:800]}" for c in failed)
@@ -223,6 +234,8 @@ class VerificationGate:
                     break
                 current_route = nxt
 
+        last = verdicts[-1].reasons[:800] if verdicts else "(no verdicts)"
         return GateResult("needs_human", len(verdicts),
                           "verification failed after escalation ladder; "
-                          "operator review required", verdicts)
+                          f"operator review required. Last verdict: {last}",
+                          verdicts)

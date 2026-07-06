@@ -12,6 +12,7 @@ completed phases. Prior phase reports are available to later phases via
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -98,7 +99,9 @@ class WorkflowRunner:
         # workspace jail — so no agent can edit its own permissions.
         self.ledger = OwnershipLedger.load(self.root / "OWNERSHIP.yaml")
         register_builtin(self.registry, workspace=self.root / "workspace",
-                         ledger=self.ledger, events=self.events)
+                         ledger=self.ledger, events=self.events,
+                         memory=self.memory,
+                         provenance=f"run {self.run_id}")
         (self.root / "workspace").mkdir(exist_ok=True)
         self._models: dict[str, object] = {}   # tier name -> ModelInterface cache
 
@@ -165,6 +168,11 @@ class WorkflowRunner:
             task = phase["task"]
             for key, value in reports.items():
                 task = task.replace("{" + key + "}", str(value))
+            if phase.get("inject_memory_status"):
+                # Harness-prepared digest: memory and prior-run state live
+                # outside the workspace jail, so the harness injects a
+                # deterministic snapshot instead of widening any read surface.
+                task = task.rstrip() + "\n\n" + self._memory_status_block()
 
             if phase.get("mode") == "adversarial":
                 outcome = self._run_adversarial_phase(name, phase, task)
@@ -204,24 +212,35 @@ class WorkflowRunner:
                     workspace=self.root / "workspace", proofs=self.proofs,
                     events=self.events,
                     max_attempts=int(phase.get("verify", {}).get("max_attempts", 3)))
-                gres: GateResult = gate.run(
-                    task=task,
-                    attempt_fn=lambda t, r: self._run_role(agent_name, t, r,
-                                                           max_steps=max_steps,
-                                                           deny_tools=deny_tools,
-                                                           allow_network=allow_network,
-                                                           consent_required=consent_required),
-                    verify_fn=(
-                        (lambda worker_report: self._run_role(
-                            verifier_name,
-                            self._verifier_task(task, phase, worker_report),
-                            self.router.route(
-                                phase.get("verify", {}).get("task_class", "verify")),
-                            max_steps=20))    # verifier stays network-denied
-                        if verifier_name else None),
-                    checks=checks,
-                    route=route,
-                    allow_network=allow_network)
+                # approve_tools is the operator's RECORDED pre-approval,
+                # scoped to this phase: granted through the workflow file the
+                # operator owns, journaled as approval events, and restored to
+                # default-deny the moment the phase ends.
+                prev_handler = self.registry.approval_handler
+                self.registry.approval_handler = self._approval_handler_for(
+                    name, frozenset(phase.get("approve_tools", [])))
+                try:
+                    gres: GateResult = gate.run(
+                        task=task,
+                        attempt_fn=lambda t, r: self._run_role(agent_name, t, r,
+                                                               max_steps=max_steps,
+                                                               deny_tools=deny_tools,
+                                                               allow_network=allow_network,
+                                                               consent_required=consent_required),
+                        verify_fn=(
+                            (lambda worker_report: self._run_role(
+                                verifier_name,
+                                self._verifier_task(task, phase, worker_report),
+                                self.router.route(
+                                    phase.get("verify", {}).get("task_class", "verify")),
+                                max_steps=20))    # verifier stays network-denied
+                            if verifier_name else None),
+                        checks=checks,
+                        route=route,
+                        allow_network=allow_network,
+                        harness_checks=self._harness_checks(phase))
+                finally:
+                    self.registry.approval_handler = prev_handler
                 outcome = PhaseOutcome(name, gres.status, gres.final_report)
 
             self.state.record(f"phase:{name}",
@@ -239,6 +258,75 @@ class WorkflowRunner:
                          proofs=self.proofs.listing())
         return outcomes
 
+    # -- governance helpers ----------------------------------------------------
+
+    def _approval_handler_for(self, phase_name: str,
+                              approve_tools: frozenset[str]):
+        """Per-phase approval handler. Operator actions enter the SAME audit
+        stream as agent actions: every grant and every denial is an event."""
+        def handler(tool: str, args: dict) -> bool:
+            if tool in approve_tools:
+                self.events.emit("approval_granted", tool=tool,
+                                 phase=phase_name, source="workflow-config")
+                return True
+            self.events.emit("approval_denied", tool=tool,
+                             phase=phase_name, source="default-deny")
+            return False
+        return handler
+
+    def _harness_checks(self, phase: dict) -> list:
+        """Deterministic checks the harness runs itself (no shell, no sandbox
+        needed) — currently memory_lint: index/provenance consistency."""
+        from .verify import CheckResult
+        checks = []
+        if phase.get("verify", {}).get("memory_lint"):
+            def memory_lint(attempt: int) -> CheckResult:
+                problems = self.memory.lint()
+                return CheckResult(
+                    "memory-lint", not problems,
+                    "\n".join(problems) if problems
+                    else "memory index and provenance consistent")
+            checks.append(memory_lint)
+        return checks
+
+    def _memory_status_block(self) -> str:
+        """Deterministic memory digest injected into triage-style phases."""
+        lines = ["## Memory status (harness-injected)", "", "### Index",
+                 self.memory.context_block(), "",
+                 "### Stale facts (past verify_by)"]
+        stale = self.memory.stale_facts()
+        if stale:
+            lines += [f"- {f['slug']} (verify_by {f['verify_by']}): {f['title']}"
+                      for f in stale]
+        else:
+            lines.append("(none)")
+        lines += ["", "### Recent run outcomes"]
+        runs_dir = self.root / "runs"
+        listed = 0
+        if runs_dir.exists():
+            for run_dir in sorted(runs_dir.iterdir(), reverse=True):
+                if run_dir.name == self.run_id or listed >= 5:
+                    continue
+                journal = run_dir / "journal.jsonl"
+                if not journal.exists():
+                    continue
+                phases = []
+                for line in journal.read_text(encoding="utf-8").splitlines():
+                    try:
+                        rec = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    if rec.get("kind") == "step_done":
+                        key = rec.get("step_key", "")
+                        status = (rec.get("result") or {}).get("status", "?")
+                        phases.append(f"{key.removeprefix('phase:')}={status}")
+                lines.append(f"- run {run_dir.name}: "
+                             + (", ".join(phases) or "(no phases journaled)"))
+                listed += 1
+        if listed == 0:
+            lines.append("(no prior runs)")
+        return "\n".join(lines)
+
     # -- adversarial contested phases -----------------------------------------
 
     def _run_adversarial_phase(self, name: str, phase: dict,
@@ -255,6 +343,10 @@ class WorkflowRunner:
         if record_path.exists():
             lint = lint_record(record_path.read_text(encoding="utf-8"))
             if "human-arbitrated" in lint["claims"]:
+                # The operator's arbitration is itself an audited action in
+                # the composite timeline, same stream as agent actions.
+                self.events.emit("operator_action", action="arbitration",
+                                 phase=name, record=str(record_path))
                 self.events.emit("decision_arbitrated", phase=name,
                                  record=str(record_path),
                                  decision=lint["decision"][:300])

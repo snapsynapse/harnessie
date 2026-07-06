@@ -111,7 +111,21 @@ Imported from Turnfile PRD-006's eight-step loop (proposer authors red evals; im
   - recovery: decline with counter → one re-offer → accept → proceed; decline twice → needs_human with no route escalation; contested record → needs_arbitration → human arbitrates → resume passes phase.
 - A governance feature without a red-then-green scenario pair does not merge. The eval suite is the conformance surface: like Turnfile's no-oracle principle, anyone can verify the claims by running the validators against plain files — `python3 -m harness.cli eval`, no hosted service, no trust in the author.
 
-## 7. What this is not
+## 7. Aggregated-intelligence tenets (v0.3)
+
+Harnessie's operator runs on a standing frame: the unit of value is Aggregated Intelligence — humans, agents, and organizations as one composite, never human-versus-AI. v0.3 encodes that frame's tenets as mechanics rather than slogans:
+
+| Tenet | Mechanic |
+|---|---|
+| The composite includes the human — the operator is a participant, not an external reviewer | Operator actions enter the SAME hash-chained audit stream as agent actions: `approval_granted`/`approval_denied` events (with their source), and `operator_action` when a resume detects human arbitration. An audit renders one composite timeline, not an agent log with invisible human edits. |
+| Substrate compounds — durable, provenance-bearing artifacts are the highest-leverage asset | Project memory becomes first-class substrate: facts carry `verified` and `verify_by` dates plus source-run provenance, and agents maintain them through `save_fact`/`expire_fact` tools instead of ad-hoc writes. |
+| Drift is the primary failure mode | Staleness is detected, not assumed away: facts past `verify_by` are surfaced by the memory-triage workflow every cadence, and the fix is re-verification or archival — never silently trusting old context. |
+| Nothing is deleted, authority is explicit | `expire_fact` archives (moves to `memory/archive/`, index updated); deletion does not exist as an agent capability. Expiry requires approval — headless runs propose, the operator disposes, and a workflow's `approve_tools:` key is the operator's recorded, journaled pre-approval. |
+| Traction is verified change, not activity | The eval scorecards are the measure: a mechanic exists when its red-then-green scenarios exist, and a brain earns a tier by passing the same scorecard (0.4). |
+
+The memory-triage workflow (`workflows/memory-triage.yaml`) is the working expression: a scheduled maintenance agent — the same job as the operator's vault triage agent — running under these controls, so "should not delete without approval" becomes "cannot."
+
+## 8. What this is not
 
 - Not a peer-to-peer protocol: Harnessie remains one orchestrator, one process. Turnfile's multi-runtime mailbox/worklog machinery is out of scope; if Harnessie sessions ever need to interoperate with other runtimes, that is a Turnfile adoption decision, not a reimplementation.
 - Not synthesis: contested decisions are never merged into a compromise by a model. The record preserves the disagreement; the human resolves it (AIDR WHY.md).
