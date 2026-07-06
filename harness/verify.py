@@ -51,7 +51,7 @@ class CheckResult:
 class Verdict:
     passed: bool
     reasons: str
-    source: str             # "checks" | "verifier" | "gate"
+    source: str             # "checks" | "verifier" | "gate" | "consent"
 
 
 def run_checks(checks: list[Check], workspace: Path, proofs: ProofStore,
@@ -155,9 +155,34 @@ class VerificationGate:
     ) -> GateResult:
         verdicts: list[Verdict] = []
         current_task, current_route = task, route
+        counter_used = False
 
         for attempt in range(1, self.max_attempts + 1):
             work = attempt_fn(current_task, current_route)
+            if work.stop == "declined":
+                # Consent withheld — a disagreement, not a capability failure.
+                # One re-offer on a counter-proposal (Turnfile's bounded
+                # rebuttal), then the operator. The route is NEVER escalated
+                # on a decline: punishing refusal with a bigger model teaches
+                # the system to steamroll objections.
+                reason = str(work.detail.get("reason", work.report))
+                counter = str(work.detail.get("counter_proposal", ""))
+                verdicts.append(Verdict(False, f"consent declined: {reason}",
+                                        "consent"))
+                self.events.emit("gate_verdict", attempt=attempt, passed=False,
+                                 source="consent", route=vars(current_route))
+                if counter and not counter_used:
+                    counter_used = True
+                    current_task = (
+                        f"{task}\n\n## Re-offer after decline\n"
+                        f"The previously assigned agent declined this task: {reason}\n"
+                        f"Its counter-proposal:\n{counter}\n\n"
+                        "The task is re-offered incorporating that counter-proposal. "
+                        "Accept it only if you judge it achievable as specified; "
+                        "declining again hands the decision to the operator.")
+                    continue
+                return GateResult("needs_human", len(verdicts),
+                                  f"task declined by agent: {reason}", verdicts)
             if not work.ok:
                 verdict = Verdict(False, f"worker loop stopped: {work.stop}: "
                                          f"{work.report[:500]}", "gate")

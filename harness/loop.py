@@ -5,6 +5,9 @@
 
 Stop conditions are explicit and enumerated — silence is never success:
   - "complete":    agent called task_complete (the only success path)
+  - "declined":    agent called decline_task — consent withheld, first-class
+                   (the gate re-offers on a counter-proposal or hands to the
+                   operator; it never escalates the route on a decline)
   - "max_steps":   step ceiling hit
   - "budget":      run budget exhausted
   - "stuck":       repeated identical failing tool call (loop detector)
@@ -13,6 +16,12 @@ Stop conditions are explicit and enumerated — silence is never success:
   - "refusal":     provider safety pipeline refused; surfaced to the gate so
                    its reformulate-and-escalate ladder (or the operator)
                    decides what happens next — never silently retried
+
+Consent (v0.2): when consent_required is set, side-effecting tools are locked
+at dispatch until the agent calls accept_task. Read tools stay live — informed
+consent requires the agent can inspect the workspace before agreeing. The lock
+is enforced in the registry, not here, so no prompt can opt out; this loop
+just tracks the grant and emits the consent events.
 """
 
 from __future__ import annotations
@@ -32,6 +41,7 @@ class LoopResult:
     report: str                     # final report (from task_complete) or diagnostic
     steps: int
     transcript: list[Message] = field(default_factory=list)
+    detail: dict = field(default_factory=dict)   # structured extras (e.g. decline)
 
     @property
     def ok(self) -> bool:
@@ -52,6 +62,12 @@ class AgentLoop:
     deny_tools: frozenset[str] = frozenset()
     # Network is denied in the sandbox unless the phase opts in (allow_network).
     allow_network: bool = False
+    # Agent identity (prompt-file name, e.g. "implementer"): distinct from the
+    # role kind; ownership checks tell agents apart by this name.
+    agent_name: str = ""
+    # Consent gate: the task packet is an offer. Side effects stay locked until
+    # accept_task; decline_task ends the loop with stop="declined".
+    consent_required: bool = False
 
     def run(self, system_prompt: str, task: str, effort: str = "medium") -> LoopResult:
         messages: list[Message] = [
@@ -63,6 +79,7 @@ class AgentLoop:
         errors_in_a_row = 0
         idle_in_a_row = 0
         recent_failures: list[tuple[str, str]] = []
+        consented = not self.consent_required
 
         for step in range(1, self.max_steps + 1):
             if self.budget and self.budget.exhausted:
@@ -109,7 +126,27 @@ class AgentLoop:
                     report = str(tc.arguments.get("report", ""))
                     self.events.emit("task_complete", role=self.role, step=step)
                     return self._finish("complete", report, step, messages)
-                ok, content, flags = self._dispatch(tc.name, tc.arguments)
+                if tc.name == "accept_task":
+                    consented = True
+                    note = str(tc.arguments.get("note", ""))
+                    self.events.emit("consent_granted", role=self.role,
+                                     agent=self.agent_name, step=step, note=note)
+                    messages.append(Message(
+                        role="tool", tool_call_id=tc.id, name=tc.name,
+                        content="Consent recorded. Side-effecting tools are now "
+                                "available for this task."))
+                    continue
+                if tc.name == "decline_task":
+                    reason = str(tc.arguments.get("reason", ""))
+                    counter = str(tc.arguments.get("counter_proposal", ""))
+                    self.events.emit("consent_declined", role=self.role,
+                                     agent=self.agent_name, step=step,
+                                     reason=reason[:500], counter=counter[:500])
+                    return self._finish(
+                        "declined", f"declined: {reason}", step, messages,
+                        detail={"reason": reason, "counter_proposal": counter})
+                ok, content, flags = self._dispatch(tc.name, tc.arguments,
+                                                    consented=consented)
                 self.events.emit("tool_result", role=self.role, tool=tc.name,
                                  ok=ok, content=content[:300])
                 if not ok:
@@ -140,12 +177,15 @@ class AgentLoop:
         return self._finish("max_steps", "step ceiling reached without task_complete",
                             self.max_steps, messages)
 
-    def _dispatch(self, name: str, args: dict) -> tuple[bool, str, list[str]]:
+    def _dispatch(self, name: str, args: dict,
+                  consented: bool = True) -> tuple[bool, str, list[str]]:
         if name in self.deny_tools:
             return False, f"PERMISSION DENIED: {name!r} is denied for this phase", []
         try:
             res = self.registry.dispatch(self.role, name, args,
-                                         allow_network=self.allow_network)
+                                         allow_network=self.allow_network,
+                                         agent=self.agent_name,
+                                         side_effects_locked=not consented)
         except PermissionDenied as e:
             # Permission violations are hard evidence of a mis-scoped role or a
             # confused model; they surface as failures, never silent no-ops.
@@ -153,6 +193,7 @@ class AgentLoop:
         return res.ok, res.content, res.flags
 
     def _finish(self, stop: str, report: str, steps: int,
-                messages: list[Message]) -> LoopResult:
+                messages: list[Message], detail: dict | None = None) -> LoopResult:
         self.events.emit("loop_finished", role=self.role, stop=stop, steps=steps)
-        return LoopResult(stop=stop, report=report, steps=steps, transcript=messages)
+        return LoopResult(stop=stop, report=report, steps=steps,
+                          transcript=messages, detail=detail or {})

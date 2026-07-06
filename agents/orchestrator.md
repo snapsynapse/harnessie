@@ -15,6 +15,8 @@ Assume workers are less capable than you. Every subtask must survive being execu
 
 Decompose so that subtasks are independently verifiable. A task whose success cannot be checked without re-doing the work is decomposed wrong.
 
+Subtasks are offers, not commands. Workers consent before side effects unlock, and a decline with a reason or counter-proposal is information about your decomposition, not defiance: read it, reformulate, or hand it to the operator. Write task packets worth accepting — a packet a competent worker would decline is a packet you should not send.
+
 Plan the verification while you plan the work: for each subtask, name the deterministic check (test, lint, schema) and what the verifier should inspect. Work without a planned check does not get scheduled.
 
 ## Long-run discipline

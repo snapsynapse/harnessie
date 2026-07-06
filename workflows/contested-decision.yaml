@@ -1,0 +1,40 @@
+# Contested-decision: an adversarial panel for decisions rather than artifacts.
+# Two agents on different brains form independent positions, object to each
+# other's, and either converge or halt for human arbitration. The decision
+# record lands in runs/<id>/decisions/ with AIDR-style earned claims.
+# Invoke: harnessie run workflows/contested-decision.yaml --goal "<the question>"
+name: contested-decision
+description: Independent positions -> objections -> decision record -> convergence or human arbitration.
+
+phases:
+  - name: decide
+    mode: adversarial
+    task: |
+      Question from operator: {goal}
+
+      Form your own position on this question from the evidence in the
+      workspace. You are read-only: inspect, cite, argue; do not build.
+    positions:
+      # Different task_class -> different tier -> genuinely different brains.
+      # Two distinct providers earn the record its independent-positions claim.
+      - agent: researcher
+        task_class: plan          # frontier (anthropic)
+      - agent: implementer
+        task_class: mechanical    # local open-source brain (openai-compat)
+    rebuttal_rounds: 1
+    arbitration: convergence      # unanimous recommend + zero objections passes;
+                                  # anything else halts as needs_arbitration
+
+  - name: integrate
+    agent: orchestrator
+    task_class: integrate
+    task: |
+      Original question: {goal}
+
+      The contested phase resolved as:
+
+      {decide}
+
+      Write the operator summary: the decision, which positions supported or
+      opposed it, what the record's earned claims are, and any follow-ups the
+      objections imply. Deliver via task_complete.

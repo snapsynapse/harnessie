@@ -58,6 +58,15 @@ scenarios:
     expect_passed: false
 """,
     "memory/MEMORY.md": "# Project memory index\n",
+    "OWNERSHIP.yaml": """# Ownership ledger — operator-owned; agents cannot reach this file.
+# lanes: are declared by you and always win; files: are first-writer
+# auto-claims maintained by the harness. Edit lanes to reassign ownership.
+lanes:
+  agent: {}
+  collaborative: []
+  operator: []
+files: {}
+""",
 }
 
 

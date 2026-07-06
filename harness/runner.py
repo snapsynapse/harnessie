@@ -17,11 +17,14 @@ from pathlib import Path
 
 import yaml
 
+from .adversarial import (PositionRecord, assemble_record, converged,
+                          lint_record, parse_objection_response, parse_stance)
 from .events import EventLog
 from .loop import AgentLoop, LoopResult
 from .memory import ProjectMemory, ProofStore
 from .models import build_model
 from .models.base import EFFORT_LEVELS, ModelSpec
+from .ownership import OwnershipLedger
 from .roles import RoleLibrary
 from .routing import Budget, Route, Router, TIER_ORDER
 from .state import RunState, new_run_id
@@ -69,8 +72,10 @@ def _validate_models_config(
 @dataclass
 class PhaseOutcome:
     phase: str
-    status: str          # "passed" | "needs_human" | "skipped_resume"
+    status: str  # "passed" | "needs_human" | "needs_arbitration" | "skipped_resume"
     report: str
+
+HALT_STATUSES = ("needs_human", "needs_arbitration")
 
 
 class WorkflowRunner:
@@ -89,7 +94,11 @@ class WorkflowRunner:
         self.proofs = ProofStore(self.run_dir)
         self.roles = RoleLibrary.load(self.root / "agents")
         self.registry = ToolRegistry()
-        register_builtin(self.registry, workspace=self.root / "workspace")
+        # The ownership ledger lives at the project root — outside the
+        # workspace jail — so no agent can edit its own permissions.
+        self.ledger = OwnershipLedger.load(self.root / "OWNERSHIP.yaml")
+        register_builtin(self.registry, workspace=self.root / "workspace",
+                         ledger=self.ledger, events=self.events)
         (self.root / "workspace").mkdir(exist_ok=True)
         self._models: dict[str, object] = {}   # tier name -> ModelInterface cache
 
@@ -97,22 +106,27 @@ class WorkflowRunner:
 
     def _loop_for(self, role_kind: str, route: Route, max_steps: int = 40,
                   deny_tools: frozenset[str] = frozenset(),
-                  allow_network: bool = False) -> AgentLoop:
+                  allow_network: bool = False, agent_name: str = "",
+                  consent_required: bool = False) -> AgentLoop:
         spec = self.router.spec_for(route)
         if spec.name not in self._models:
             self._models[spec.name] = build_model(spec)
         return AgentLoop(role=role_kind, model=self._models[spec.name],
                          registry=self.registry, events=self.events,
                          budget=self.budget, max_steps=max_steps,
-                         deny_tools=deny_tools, allow_network=allow_network)
+                         deny_tools=deny_tools, allow_network=allow_network,
+                         agent_name=agent_name, consent_required=consent_required)
 
     def _run_role(self, agent_name: str, task: str, route: Route,
                   extra_context: str = "", max_steps: int = 40,
                   deny_tools: frozenset[str] = frozenset(),
-                  allow_network: bool = False) -> LoopResult:
+                  allow_network: bool = False,
+                  consent_required: bool = False) -> LoopResult:
         role = self.roles.get(agent_name)
         loop = self._loop_for(role.kind, route, max_steps=max_steps,
-                              deny_tools=deny_tools, allow_network=allow_network)
+                              deny_tools=deny_tools, allow_network=allow_network,
+                              agent_name=agent_name,
+                              consent_required=consent_required)
         # Memory index goes to orchestrator phases only; workers and verifiers
         # get exactly what their task packet names (context hygiene).
         memory_index = (self.memory.context_block()
@@ -151,6 +165,19 @@ class WorkflowRunner:
             task = phase["task"]
             for key, value in reports.items():
                 task = task.replace("{" + key + "}", str(value))
+
+            if phase.get("mode") == "adversarial":
+                outcome = self._run_adversarial_phase(name, phase, task)
+                self.state.record(f"phase:{name}",
+                                  {"status": outcome.status, "report": outcome.report})
+                reports[name] = outcome.report
+                outcomes.append(outcome)
+                self.events.emit("phase_done", phase=name, status=outcome.status,
+                                 spent_usd=round(self.budget.spent_usd, 4))
+                if outcome.status in HALT_STATUSES:
+                    break
+                continue
+
             task_class = phase.get("task_class", "default")
             route = self.router.route(task_class)
             checks = [Check(**c) for c in phase.get("verify", {}).get("checks", [])]
@@ -169,6 +196,10 @@ class WorkflowRunner:
                 outcome = PhaseOutcome(
                     name, "passed" if result.ok else "needs_human", result.report)
             else:
+                # Consent is the default for worker phases (task packets are
+                # offers, not commands); a phase opts out explicitly for the
+                # degenerate single-agent case.
+                consent_required = bool(phase.get("consent", True))
                 gate = VerificationGate(
                     workspace=self.root / "workspace", proofs=self.proofs,
                     events=self.events,
@@ -178,7 +209,8 @@ class WorkflowRunner:
                     attempt_fn=lambda t, r: self._run_role(agent_name, t, r,
                                                            max_steps=max_steps,
                                                            deny_tools=deny_tools,
-                                                           allow_network=allow_network),
+                                                           allow_network=allow_network,
+                                                           consent_required=consent_required),
                     verify_fn=(
                         (lambda worker_report: self._run_role(
                             verifier_name,
@@ -198,7 +230,7 @@ class WorkflowRunner:
             outcomes.append(outcome)
             self.events.emit("phase_done", phase=name, status=outcome.status,
                              spent_usd=round(self.budget.spent_usd, 4))
-            if outcome.status == "needs_human":
+            if outcome.status in HALT_STATUSES:
                 break   # fail closed: later phases would build on unverified work
 
         self.events.emit("workflow_done", run_id=self.run_id,
@@ -206,6 +238,159 @@ class WorkflowRunner:
                          spent_usd=round(self.budget.spent_usd, 4),
                          proofs=self.proofs.listing())
         return outcomes
+
+    # -- adversarial contested phases -----------------------------------------
+
+    def _run_adversarial_phase(self, name: str, phase: dict,
+                               task: str) -> PhaseOutcome:
+        """Positions -> objections -> record -> convergence or human.
+
+        The record lives under runs/<id>/decisions/ — outside the workspace
+        jail, unreachable by agents. Arbitration is human-only: on resume this
+        method re-lints the record instead of re-running positions (re-running
+        would overwrite recorded dissent, which is never done)."""
+        decisions_dir = self.run_dir / "decisions"
+        record_path = decisions_dir / f"DR-{name}.md"
+
+        if record_path.exists():
+            lint = lint_record(record_path.read_text(encoding="utf-8"))
+            if "human-arbitrated" in lint["claims"]:
+                self.events.emit("decision_arbitrated", phase=name,
+                                 record=str(record_path),
+                                 decision=lint["decision"][:300])
+                return PhaseOutcome(
+                    name, "passed",
+                    f"Arbitrated decision: {lint['decision']}\n"
+                    f"(record: {record_path}, claims: {lint['claims']})")
+            self.events.emit("needs_arbitration", phase=name,
+                             record=str(record_path), errors=lint["errors"])
+            return PhaseOutcome(
+                name, "needs_arbitration",
+                f"decision record awaits human arbitration: {record_path}\n"
+                "Edit the Arbitration section in your own words, set "
+                "status: arbitrated and a decided: date, then resume the run."
+                + (f"\nlint errors to fix: {lint['errors']}" if lint["errors"] else ""))
+
+        # Position round: identical brief, isolated contexts, read-only grants.
+        deny = self.registry.side_effect_tools()
+        specs = phase.get("positions", []) or []
+        positions: list[PositionRecord] = []
+        routes: list[Route] = []
+        seen_labels: dict[str, int] = {}
+        for pos_spec in specs:
+            agent = pos_spec.get("agent", "implementer")
+            n = seen_labels.get(agent, 0) + 1
+            seen_labels[agent] = n
+            label = agent if n == 1 else f"{agent}-{n}"
+            route = self.router.route(
+                pos_spec.get("task_class", phase.get("task_class", "default")))
+            spec = self.router.spec_for(route)
+            pos_task = (
+                f"{task}\n\n## Position protocol\n"
+                "You are one of several agents forming INDEPENDENT positions on "
+                "this question. You have read-only access: inspect, do not build. "
+                "You have not been shown the other positions; do not speculate "
+                "about them. End your task_complete report with exactly one JSON "
+                'object: {"stance": "recommend|oppose|alternative|abstain", '
+                '"summary": "<one sentence>"} — your prose argument goes before it.')
+            result = self._run_role(agent, pos_task, route,
+                                    max_steps=int(phase.get("max_steps", 20)),
+                                    deny_tools=deny)
+            parsed = parse_stance(result.report) if result.ok else None
+            if parsed is None:
+                # fail closed: an unparseable stance is dissent, not silence
+                stance, summary = "abstain", (
+                    f"(stance unparseable; loop stop: {result.stop} — treated "
+                    "as dissent, forcing arbitration)")
+            else:
+                stance, summary = parsed["stance"], parsed["summary"]
+            positions.append(PositionRecord(
+                label=label, agent=agent, model_id=spec.model_id,
+                provider=spec.provider, stance=stance, summary=summary,
+                prose=result.report))
+            routes.append(route)
+            self.events.emit("position_recorded", phase=name, label=label,
+                             model=spec.model_id, stance=stance)
+
+        # Objection rounds (bounded): every agent sees the other positions and
+        # returns objections or an explicit no-new-objection marker.
+        objections: list[dict[str, str]] = []
+        forced_dissent = any(p.summary.startswith("(stance unparseable") for p in positions)
+        for _ in range(max(1, int(phase.get("rebuttal_rounds", 1)))):
+            new_in_round: list[dict[str, str]] = []
+            for pos, route in zip(positions, routes):
+                others = "\n\n".join(
+                    f"### {p.label} — stance: {p.stance}\nsummary: {p.summary}\n"
+                    f"{p.prose[:2000]}"
+                    for p in positions if p.label is not pos.label)
+                standing = "\n".join(f"- {o['by']}: {o['text']}" for o in objections)
+                obj_task = (
+                    f"{task}\n\n## Objection round\n"
+                    f"Your recorded position ({pos.label}): stance {pos.stance} — "
+                    f"{pos.summary}\n\n## Other positions\n{others}\n\n"
+                    + (f"## Standing objections\n{standing}\n\n" if standing else "")
+                    + "Review the other positions for concrete failure modes, "
+                    "contradictions, or risks. End your task_complete report with "
+                    'exactly one JSON object: {"objections": ["<concrete objection>", '
+                    '...], "no_new_objection": true|false}. An empty list with '
+                    "no_new_objection true means you stand down.")
+                result = self._run_role(pos.agent, obj_task, route,
+                                        max_steps=int(phase.get("max_steps", 20)),
+                                        deny_tools=deny)
+                parsed = parse_objection_response(result.report) if result.ok else None
+                if parsed is None:
+                    new_in_round.append({
+                        "by": pos.label, "to": "the record",
+                        "text": f"(unparseable objection response; loop stop: "
+                                f"{result.stop} — treated as dissent, fail closed)"})
+                else:
+                    for objection in parsed["objections"]:
+                        new_in_round.append({"by": pos.label, "to": "the record",
+                                             "text": objection})
+            for o in new_in_round:
+                self.events.emit("objection_recorded", phase=name, by=o["by"],
+                                 text=o["text"][:200])
+            objections.extend(new_in_round)
+            if not new_in_round:
+                break   # Turnfile convergence: a full quiet round ends the loop
+
+        # Assembly — by the harness, never an agent. Dissent is never deleted.
+        record_text = assemble_record(
+            record_id=f"DR-{name}", title=f"Contested phase: {name}",
+            question=task, context=(
+                f"Contested decision raised by workflow phase {name!r} in run "
+                f"{self.run_id}. Assembled by the harness from "
+                f"{len(positions)} independent position(s)."),
+            arbiter=str(phase.get("arbiter", "operator")),
+            positions=positions, objections=objections,
+            evidence=[f"runs/{self.run_id}/events.jsonl — hash-chained event "
+                      "log evidencing isolated position generation"])
+        decisions_dir.mkdir(parents=True, exist_ok=True)
+        record_path.write_text(record_text, encoding="utf-8")
+        lint = lint_record(record_text)
+        self.events.emit("decision_assembled", phase=name,
+                         record=str(record_path), claims=lint["claims"],
+                         errors=lint["errors"])
+
+        mode = phase.get("arbitration", "convergence")
+        if (mode == "convergence" and not forced_dissent
+                and converged(positions, objections) and not lint["errors"]):
+            self.events.emit("decision_converged", phase=name,
+                             record=str(record_path))
+            summary = "; ".join(f"{p.label}: {p.summary}" for p in positions)
+            return PhaseOutcome(
+                name, "passed",
+                f"Converged without arbitration — all positions recommend. "
+                f"{summary}\n(record: {record_path}, claims: {lint['claims']})")
+
+        self.events.emit("needs_arbitration", phase=name,
+                         record=str(record_path))
+        return PhaseOutcome(
+            name, "needs_arbitration",
+            f"contested decision awaits human arbitration: {record_path}\n"
+            "Edit the Arbitration section in your own words (address every "
+            "objection), set status: arbitrated and a decided: date, then "
+            "resume the run.")
 
     @staticmethod
     def _verifier_task(task: str, phase: dict, worker_report: str) -> str:

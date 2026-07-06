@@ -57,7 +57,8 @@ def scaffold_project(root):
 SCRIPT = [
     # plan (orchestrator)
     turn_tool("task_complete", {"report": "PLAN: create greeting.txt containing hello"}),
-    # implement (worker): write, then done
+    # implement (worker): consent to the offer, write, then done
+    turn_tool("accept_task", {"note": "plan is checkable"}),
     turn_tool("write_file", {"path": "greeting.txt", "content": "hello"}),
     turn_tool("task_complete", {"report": "wrote greeting.txt with hello"}),
     # code-verifier: reads, then verdict
@@ -138,6 +139,7 @@ def test_resume_reruns_needs_human_phase(tmp_path, monkeypatch):
     runner2 = WorkflowRunner(project_root=tmp_path, run_id="haltrun", echo=False)
     runner2._models["mid"] = MockModel(
         ModelSpec(name="mid", provider="mock", model_id="mock"), script=[
+            turn_tool("accept_task", {}),
             turn_tool("write_file", {"path": "greeting.txt", "content": "hello"}),
             turn_tool("task_complete", {"report": "wrote greeting.txt"}),
             turn_tool("read_file", {"path": "greeting.txt"}),

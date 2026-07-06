@@ -2,21 +2,33 @@
 
 All notable changes to Harnessie are recorded here. Format loosely follows Keep a Changelog; versions follow semver.
 
-## Unreleased
+## 0.2.0 (2026-07-06)
+
+The governance release: adversarial collaboration and evals promoted to foundational principles, importing the shipped lessons of Turnfile (consent-based coordination, ownership lanes, maintainer authority) and AIDR (independent positions, preserved dissent, human-only arbitration, earned claims) as harness-enforced mechanics. Design rationale: `GOVERNANCE.md`; direction record: `decisions/AIDR-0001` (open, awaiting arbitration). Displaces the previously roadmapped portability theme to 0.3.0.
 
 ### Added
 
-- `harnessie eval` deterministic scorecard runner plus `evals/baseline.yaml` with 10 mock-brain scenarios: golden passes, risky fail-closed verdicts, and recovery/gate retries.
-- `harnessie init` scaffold command for installed CLI usage; creates minimal agents, config, workflow, memory, workspace, and eval files without relying on repo-root assets being packaged.
+- Consent-based orchestration: worker task packets are offers. Side-effecting tools stay locked until `accept_task`; `decline_task(reason, counter_proposal?)` is a first-class `declined` stop. The gate re-offers once on a counter-proposal and never escalates the route on a decline. Enforced at registry dispatch; worker phases default `consent: true` (opt out per phase).
+- Ownership lanes (`harness/ownership.py` + root `OWNERSHIP.yaml`): agents own the files they create; cross-agent writes are refused at dispatch with a `request_change` remedy; operator lanes are locked to all agents; collaborative lanes are shared. The ledger lives outside the workspace jail so no agent can edit its own permissions.
+- Adversarial contested phases (`harness/adversarial.py`, workflow `mode: adversarial`): independent read-only positions across configurable brains, bounded objection rounds, harness-assembled AIDR-shaped decision records under `runs/<id>/decisions/` with structurally earned claims (`independent-positions`, `dissent-preserved`, `human-arbitrated`). Contested outcomes halt as `needs_arbitration`; the operator arbitrates by editing the record in their own words and resuming. No agent and no harness code path writes the Arbitration section.
+- Tamper-evident audit (`harness/audit.py`): events.jsonl is hash-chained (`seq`/`prev` per event, chain survives resume); `harnessie audit <run_id>` verifies the chain and renders the governance timeline (exit 1 on a broken chain).
+- Governance eval suite (`evals/governance.yaml`, 12 scenarios) plus new eval kinds (`ownership`, `adversarial`, `audit`, consent-flagged `loop`), written red before the implementation per the eval-first change discipline.
+- Shipped `workflows/contested-decision.yaml`: a two-brain adversarial panel whose record can earn `independent-positions` across providers.
+- `harnessie eval` deterministic scorecard runner plus `evals/baseline.yaml` mock-brain scenarios: golden passes, risky fail-closed verdicts, and recovery/gate retries.
+- `harnessie init` scaffold command for installed CLI usage; now also scaffolds `OWNERSHIP.yaml`.
+- `decisions/` directory with the repo's own AIDR records; `templates/AIDR-0000-template.md`.
 
 ### Changed
 
+- Workflow phase statuses gain `needs_arbitration` (halts the run exactly like `needs_human`).
+- Role boundary blocks now state the consent contract, ownership rule, and agreement-is-evidence-not-authority posture; `agents/orchestrator.md` gains the offers-not-commands section.
 - Sandbox availability now requires a real `sandbox-exec` profile-application smoke test. Hosts that expose the binary but reject `sandbox_apply` are treated as sandbox-unavailable and fail closed.
 - Routing config now fails early when a workflow route references an unconfigured tier or invalid effort, instead of silently falling back to another tier.
 
 ### Tests
 
-- Added eval runner, CLI eval, init scaffolding, and bad-routing-config regression coverage. The suite now passes with unusable real sandbox backends by skipping only the backend-dependent confinement tests.
+- 44 new tests across `test_consent.py`, `test_ownership.py`, `test_adversarial.py`, `test_audit.py`; suite at 100 passing (mock brain, no network). Eval scorecard at 21 scenarios. Repo-config smoke tests now validate adversarial phases in shipped workflows.
+- Added eval runner, CLI eval, init scaffolding, and bad-routing-config regression coverage. The suite passes with unusable real sandbox backends by skipping only the backend-dependent confinement tests.
 
 ## 0.1.0 (2026-07-06)
 

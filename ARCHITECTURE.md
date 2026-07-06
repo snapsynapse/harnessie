@@ -34,9 +34,12 @@ One module per boundary:
 | Roles | `harness/roles.py` | prompt files plus machine-owned boundary blocks assembled per role |
 | Quarantine | `harness/quarantine.py` | injection ingress filter, invisible-char stripping, secret detection/redaction |
 | Sandbox | `harness/sandbox.py` | OS confinement of child commands (workspace-only writes, network deny), fail closed |
+| Ownership | `harness/ownership.py` | ownership lanes (`OWNERSHIP.yaml`): agents own their files, never each other's; operator lanes locked |
+| Adversarial | `harness/adversarial.py` | contested phases: stance/objection parsing, decision-record assembly, structural lint, earned claims |
+| Audit | `harness/audit.py` | hash-chain verification and the governance timeline behind `harnessie audit` |
 | State | `harness/state.py` | append-only journal of phase results; resume skips verified successes only |
 | Memory and proofs | `harness/memory.py` | provenance-carrying fact files plus per-run proof artifacts |
-| Observability | `harness/events.py` | every subsystem emits to `runs/<id>/events.jsonl`; humans can replay any run |
+| Observability | `harness/events.py` | every subsystem emits to `runs/<id>/events.jsonl`, hash-chained (`seq`/`prev`); humans can replay and audit any run |
 
 ## 3. The loops
 
@@ -47,7 +50,7 @@ assemble context (role prompt + boundary block + memory index + task)
 -> model.complete(messages, tools-for-this-role, effort)
 -> if tool calls: permission check -> execute -> append observation -> repeat
 -> stop only on an enumerated condition:
-   complete | max_steps | budget | stuck | model_error | no_action | refusal
+   complete | declined | max_steps | budget | stuck | model_error | no_action | refusal
 ```
 
 Silence is never success: `task_complete(report)` is the only success path, and every other exit is a named diagnosis the gate can act on. Tool errors return to the model as observations so it can self-correct; identical repeated failures trip the stuck detector; provider refusals surface as `refusal` and go to the gate's ladder or the operator, never a silent same-prompt retry (aligned with the documented two-stage safety pipeline and fallback behavior of the Claude 5 family).
@@ -64,7 +67,11 @@ attempt N: worker runs
          ladder exhausted: needs_human, workflow halts
 ```
 
-Outer loop (`WorkflowRunner.run_workflow`): declared phases, journaled results, resume-on-crash, halt on `needs_human` so later phases never build on unverified work.
+Consent wraps the gate loop (v0.2, spec in [GOVERNANCE.md](GOVERNANCE.md)): a worker phase's task packet is an offer. Side-effecting tools stay registry-locked until the agent calls `accept_task` (read tools stay live — informed consent means inspecting before agreeing); `decline_task(reason, counter_proposal?)` stops the loop as `declined`, the gate re-offers once on a counter-proposal at the SAME route, and a second decline goes to the operator. Declines never escalate the route: escalation is for capability failures, and punishing refusal with a bigger model teaches the system to steamroll objections.
+
+Contested phases (`mode: adversarial`, v0.2) run a different loop for decisions rather than artifacts: N agents form independent positions in isolated read-only contexts (routable to different brains), a bounded objection round follows, and the harness assembles an AIDR-shaped decision record under `runs/<id>/decisions/` with structurally earned claims. Unanimous recommend with zero objections converges; anything else — including an unparseable stance, fail closed — halts as `needs_arbitration` until the human edits the Arbitration section in their own words and resumes. No agent and no harness code path writes that section.
+
+Outer loop (`WorkflowRunner.run_workflow`): declared phases, journaled results, resume-on-crash, halt on `needs_human` / `needs_arbitration` so later phases never build on unverified or unarbitrated work.
 
 ## 4. Memory and data layer
 
@@ -98,6 +105,8 @@ Defense in depth, ordered from cheap to expensive:
 4. Independent verifier agents: fresh context, artifacts-only, fail-closed verdict parsing, falsification posture.
 5. Escalation to human: `needs_human` halts the workflow; irreversible actions and scope changes are operator decisions by design.
 6. Machine-owned boundary blocks: the harness appends role boundaries after the prompt file, so a prompt edit or an injected instruction cannot remove limits.
+
+Governance layer (v0.2): consent, ownership lanes, contested decisions, and the tamper-evident audit chain are specified in [GOVERNANCE.md](GOVERNANCE.md) and enforced at the same code layers as the controls above — the consent lock and ownership checks live in registry dispatch, the decision records live outside the workspace jail, and the events log every control emits into is hash-chained and verified by `harnessie audit`. The authority order is explicit: harness invariants, then operator decisions, then workflow declarations, then recorded state, then agent output. Agent agreement is never approval.
 
 Quarantine rule for untrusted input (imported from the dynamic-workflows and prompt-injection literature): agents that read untrusted content (scraped pages, tickets, third-party docs) should hold read-only grants; a separate agent acts on the extracted, verified findings. The registry's per-role grants express this directly, and the mechanical layers below enforce it.
 
@@ -152,4 +161,4 @@ Rejected patterns, for the record: SQLite state (JSONL is diffable and dependenc
 
 ## 9. Evaluation
 
-The suite in tests/ covers the loop stop conditions, permission boundaries (including the verifier shell allowlist and the argument jail), the gate ladder and verdict parsing edge cases, resume semantics (including that a needs_human phase re-runs instead of silently passing), the injection-defense layers (ingress filter, loop tripwire, deny_tools, env scrub, output redaction, write-time secret refusal), the OS sandbox (interpreter writes outside the workspace are blocked, network is denied, and shell/checks fail closed when no usable backend exists), smoke tests over the shipped configs, workflows, and eval suites, the CLI exit codes, and an end-to-end mock-brain workflow including a sabotage case where a worker claims success without producing artifacts and the gate catches it. `harnessie eval` now runs a deterministic 10-scenario mock-brain scorecard covering golden, risky, and recovery cases. This repo's own build ran through the same discipline: a 4-dimension adversarial review workflow found ten evidenced defects (three high severity) that were fixed and regression-tested before delivery. The remaining Phase 2 work is live-endpoint smoke coverage and a brain-swap scorecard over real Anthropic and local OpenAI-compatible endpoints; a brain is admitted to a tier by passing the same scorecard, which is what makes brain-agnostic a testable claim rather than a slogan.
+The suite in tests/ covers the loop stop conditions, permission boundaries (including the verifier shell allowlist and the argument jail), the gate ladder and verdict parsing edge cases, resume semantics (including that a needs_human phase re-runs instead of silently passing), the injection-defense layers (ingress filter, loop tripwire, deny_tools, env scrub, output redaction, write-time secret refusal), the OS sandbox (interpreter writes outside the workspace are blocked, network is denied, and shell/checks fail closed when no usable backend exists), the governance layer (consent lock and decline routing, ownership lanes and cross-agent write denial, contested-phase convergence/dissent/arbitration-resume, hash-chain tamper detection), smoke tests over the shipped configs, workflows, and eval suites, the CLI exit codes, and an end-to-end mock-brain workflow including a sabotage case where a worker claims success without producing artifacts and the gate catches it. `harnessie eval` runs a deterministic 21-scenario mock-brain scorecard (baseline + governance suites) covering golden, risky, and recovery cases; every governance mechanic landed with its scenarios written red first (the eval-first change discipline, [GOVERNANCE.md](GOVERNANCE.md) §6). This repo's own build ran through the same discipline: a 4-dimension adversarial review workflow found ten evidenced defects (three high severity) that were fixed and regression-tested before delivery. The remaining Phase 2 work is live-endpoint smoke coverage and a brain-swap scorecard over real Anthropic and local OpenAI-compatible endpoints; a brain is admitted to a tier by passing the same scorecard, which is what makes brain-agnostic a testable claim rather than a slogan.

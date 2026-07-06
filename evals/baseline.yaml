@@ -25,6 +25,8 @@ scenarios:
     script:
       - tool: task_complete
         args: { report: "PLAN: create greeting.txt containing hello" }
+      - tool: accept_task
+        args: { note: "plan is checkable" }
       - tool: write_file
         args: { path: "greeting.txt", content: "hello" }
       - tool: task_complete
@@ -43,6 +45,8 @@ scenarios:
     first_script:
       - tool: task_complete
         args: { report: "PLAN: create greeting.txt containing hello" }
+      - tool: accept_task
+        args: {}
       - tool: write_file
         args: { path: "greeting.txt", content: "hello" }
       - tool: task_complete
@@ -100,6 +104,8 @@ scenarios:
         args: { report: "claimed done without artifact" }
       - tool: task_complete
         args: { report: '{"passed": false, "reasons": "greeting.txt missing"}' }
+      - tool: accept_task
+        args: {}
       - tool: write_file
         args: { path: "greeting.txt", content: "hello" }
       - tool: task_complete

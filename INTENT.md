@@ -7,7 +7,7 @@ This document follows the portfolio Repo Standards INTENT.md section template. H
 
 ## 1. What this is
 
-Harnessie is a brain-agnostic multi-agent harness: an orchestrator that decomposes goals, cheap swappable worker models that execute, and independent verifiers that gate every result. It ships as a Python library and CLI with verification gates, cost routing, file-based memory, a resumable run journal, and a layered prompt-injection defense. The model is a configuration seam, not a code dependency.
+Harnessie is a brain-agnostic multi-agent harness: an orchestrator that decomposes goals, cheap swappable worker models that execute, and independent verifiers that gate every result. It ships as a Python library and CLI with verification gates, consent-based orchestration (task packets are offers), per-agent file ownership lanes, adversarial contested phases with human-only arbitration, cost routing, file-based memory, a resumable run journal, a hash-chained audit log, and a layered prompt-injection defense. The model is a configuration seam, not a code dependency.
 
 ## 2. Why it exists
 
@@ -22,6 +22,10 @@ Most AI products fail at the harness layer, not the model: unclear tool boundari
 5. Silence is never success: every loop ends in an enumerated stop condition.
 6. Routing is config, not model self-assessment; escalation is earned by gate failures, not predicted.
 7. Memory is small, scoped, and provenance-bearing.
+8. Task packets are offers: consent precedes side effects, a decline is signal not insubordination, and declines never escalate the route.
+9. Agents own their files, never each other's; the ownership ledger lives outside any agent's reach, and the operator is root owner of everything.
+10. Disagreement is evidence, never authority: contested decisions are preserved as records and arbitrated only by a human; nothing synthesizes dissent away.
+11. Eval-first change discipline: a governance mechanic without a red-then-green scenario pair does not merge.
 
 ## 4. Scope boundaries
 
@@ -39,7 +43,7 @@ N/A as a formal open-spec gate. The working change discipline is: the full test 
 
 ## 7. Relationships to other PAICE standards
 
-Harnessie is not currently a PAICE portfolio component (private, personal-utility). Its multi-agent structure is modeled on the Safe Agentic Workflow (SAW) patterns. Non-binding future integrations, if promoted: AIDR for decision records, Turnfile for a multi-agent session format, Graceful Boundaries for agent refusal surfaces, GuideCheck if it ever ships an `assistant-guide.txt`. None are adopted today.
+Harnessie is not currently a PAICE portfolio component (private, personal-utility). Its multi-agent structure is modeled on the Safe Agentic Workflow (SAW) patterns. As of v0.2 it deliberately imports, as harness-enforced mechanics, the shipped lessons of two portfolio standards: Turnfile (consent-based coordination, ownership lanes, authority order, bounded rebuttal, eval-first change loop) and AIDR (record lifecycle, preserved dissent, human-only arbitration, structurally earned claims; the repo dogfoods AIDR in `decisions/`). These are lesson imports and format alignments, not conformance claims — Harnessie asserts no Turnfile or AIDR conformance. Remaining non-binding future integrations if promoted: Graceful Boundaries for agent refusal surfaces, GuideCheck if it ever ships an `assistant-guide.txt`.
 
 ## 8. Exceptions to Repo Standards
 
@@ -50,4 +54,5 @@ Harnessie is not currently a PAICE portfolio component (private, personal-utilit
 
 ## 9. Changelog
 
+- 2026-07-06 - v0.2.0 governance layer: adversarial collaboration and evals promoted to foundational principles (operator direction). Consent-based orchestration, ownership lanes, contested phases with human-only arbitration, hash-chained audit; design in `GOVERNANCE.md`, direction record `decisions/AIDR-0001` (open, awaiting arbitration by Sam). Design invariants 8-11 added; §7 updated to record the Turnfile/AIDR lesson imports. Portability milestone displaced to 0.3.0.
 - 2026-07-06 - Initial INTENT. Repo-standards conformance pass before the first commit: baseline `.gitignore`, `.claude/` untracked per the all-tier rule, `INTENT.md` added. Harness at v0.1.0 (see `CHANGELOG.md`).

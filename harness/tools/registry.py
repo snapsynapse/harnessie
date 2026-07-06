@@ -9,6 +9,15 @@ Every tool declares:
 The registry enforces policy at dispatch time. An agent cannot call a tool it
 was never granted, no matter what its prompt says — permissioning lives in the
 harness, not in prompt cleverness.
+
+v0.2 additions, both enforced here so no role prompt can opt out:
+  - consent lock: when a dispatch arrives with side_effects_locked=True (a
+    consent-gated phase before accept_task), write/execute tools are refused
+    with an explanatory observation. Read tools still run: informed consent
+    requires the agent can inspect the workspace before agreeing.
+  - agent identity: dispatch carries the agent NAME (e.g. "implementer")
+    alongside the role KIND, so ownership checks in tools can tell agents
+    apart. role_aware tools receive _role, _agent, and _allow_network.
 """
 
 from __future__ import annotations
@@ -32,7 +41,7 @@ class ToolSpec:
     effects: str = "read"                  # "read" | "write" | "execute"
     allowed_roles: frozenset[str] = frozenset({"orchestrator", "worker", "verifier"})
     requires_approval: bool = False
-    role_aware: bool = False               # fn also receives _role=<calling role>
+    role_aware: bool = False               # fn also receives _role/_agent/_allow_network
     quarantine: bool = False               # result runs the injection filter
 
 
@@ -71,14 +80,28 @@ class ToolRegistry:
             for t in self.for_role(role)
         ]
 
+    def side_effect_tools(self) -> frozenset[str]:
+        return frozenset(t.name for t in self.tools.values()
+                         if t.effects in ("write", "execute"))
+
     def dispatch(self, role: str, name: str, args: dict,
-                 allow_network: bool = False) -> ToolResult:
+                 allow_network: bool = False, agent: str = "",
+                 side_effects_locked: bool = False) -> ToolResult:
         spec = self.tools.get(name)
         if spec is None:
             return ToolResult(ok=False, tool_name=name,
                               content=f"unknown tool {name!r}")
         if role not in spec.allowed_roles:
             raise PermissionDenied(f"role {role!r} may not call {name!r}")
+        if side_effects_locked and spec.effects in ("write", "execute"):
+            # Consent lock: the task packet is an offer, not a command. Side
+            # effects unlock only after accept_task; declining is decline_task.
+            return ToolResult(ok=False, tool_name=name,
+                              content=(f"CONSENT REQUIRED: {name!r} has side effects and "
+                                       "this task has not been accepted. Inspect the "
+                                       "workspace with read tools if needed, then call "
+                                       "accept_task to proceed or decline_task with your "
+                                       "reason (and optionally a counter_proposal)."))
         if "_malformed" in args:
             return ToolResult(ok=False, tool_name=name,
                               content=f"malformed tool arguments: {args['_malformed']!r}. "
@@ -87,7 +110,8 @@ class ToolRegistry:
             return ToolResult(ok=False, tool_name=name,
                               content="approval denied by operator policy")
         try:
-            out = (spec.fn(**args, _role=role, _allow_network=allow_network)
+            out = (spec.fn(**args, _role=role, _agent=agent,
+                           _allow_network=allow_network)
                    if spec.role_aware else spec.fn(**args))
         except TypeError as e:
             return ToolResult(ok=False, tool_name=name,

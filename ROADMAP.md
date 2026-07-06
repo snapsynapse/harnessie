@@ -4,7 +4,11 @@ This is the forward view: versioned milestones, their themes, and platform suppo
 
 Roadmap items are intent, not commitments. Dates are omitted deliberately; milestones ship when their acceptance criteria are green, not on a calendar.
 
-## Current release: 0.1.0 (2026-07-06)
+## Current release: 0.2.0 (2026-07-06)
+
+The governance release: consent-based orchestration (task packets are offers; accept/decline enforced at dispatch), ownership lanes (agents own their files, never each other's; operator lanes locked), adversarial contested phases emitting AIDR-shaped decision records with human-only arbitration and structurally earned claims, a hash-chained events log with `harnessie audit`, and the eval-first change discipline with a 12-scenario governance suite. Direction recorded in `decisions/AIDR-0001` (open, awaiting arbitration); design in [GOVERNANCE.md](GOVERNANCE.md). This displaced the previously planned portability theme, which moves to 0.3.0.
+
+## Prior release: 0.1.0 (2026-07-06)
 
 Shipped: brain-agnostic model interface with hot-swappable tiers, tool registry with per-role policy, bounded agent loop, verification gate with reformulate-and-escalate ladder, cost routing and budgets, file-based memory and resumable journal, the workflow runner, a deterministic mock-brain eval scorecard, and a seven-layer prompt-injection defense including an OS sandbox on macOS when Seatbelt profiles can be applied. Full detail in [CHANGELOG.md](CHANGELOG.md). The suite is mock-brain and no-network; real sandbox tests skip on hosts where `sandbox-exec` exists but cannot apply profiles.
 
@@ -17,17 +21,18 @@ Shipped: brain-agnostic model interface with hot-swappable tiers, tool registry 
 
 ## Milestones
 
-### 0.2.0: Portability and proof
+### 0.3.0: Portability and proof (was 0.2.0; displaced by the governance release)
 
 Theme: make the harness runnable and measurable beyond a single Mac.
 
 - Linux sandbox backend, so shell-using workflows run confined on Linux instead of failing closed (detail in Platform support below). Implementation step 15 follow-up.
 - Live-endpoint smoke tests: one loop turn against a real Anthropic endpoint and one against a local OpenAI-compatible endpoint, opt-in by env var. Implementation step 11.
-- Expand the golden-task evaluation scorecard beyond the current mock-brain baseline: golden, risky, and failure-recovery tasks scored into a comparable report against real Anthropic and local OpenAI-compatible endpoints. Implementation steps 11 and 12.
+- Expand the golden-task evaluation scorecard beyond the current mock-brain baseline: golden, risky, and failure-recovery tasks scored into a comparable report against real Anthropic and local OpenAI-compatible endpoints — including the governance scorecard, so consent and ownership behavior is measured per brain, not assumed. Implementation steps 11 and 12.
+- Live contested-phase run: `workflows/contested-decision.yaml` across two real providers, earning `independent-positions` on a real record.
 
 Acceptance: the full suite is green on Linux with a backend present and fails closed on a runner with none; a brain swap (config edit) produces a comparable scorecard.
 
-### 0.3.0: Operability
+### 0.4.0: Operability
 
 Theme: put a human comfortably in the loop for long autonomous runs.
 
@@ -42,9 +47,10 @@ Theme: stable surfaces and pluggability, only after the core is proven.
 
 - Tool plugins loaded from entry points with declared effects and roles; a plugin can never bypass registry dispatch. Implementation step 16.
 - Multi-orchestrator handoffs, only if a single orchestrator is demonstrably unable to hold a job. Implementation step 17.
+- Per-lane sandbox profiles, closing the ownership layer's honest limit (interpreter writes bypass the per-file check today).
 - Frozen config and workflow schema with a written deprecation policy.
 
-Gate: no 1.0 while any 0.2 or 0.3 acceptance criterion is red.
+Gate: no 1.0 while any 0.3 or 0.4 acceptance criterion is red.
 
 ## Platform support
 
@@ -52,7 +58,7 @@ Gate: no 1.0 while any 0.2 or 0.3 acceptance criterion is red.
 
 macOS is fully supported: the OS sandbox uses native `sandbox-exec` (Seatbelt), confining child-command writes to the workspace and denying network by default. On Linux and Windows the harness logic (pure Python) runs, but shell-using workflows fail closed because no sandbox backend is wired. This is the fail-closed-everywhere policy working as designed, not a bug: a control that cannot be enforced is refused rather than skipped.
 
-### Linux support (0.2.0 target)
+### Linux support (0.3.0 target)
 
 This is the headline portability need. The same security policy the macOS backend enforces (writes confined to the workspace, network denied by default, per-phase `allow_network` opt-in) must be expressed with Linux primitives.
 

@@ -12,10 +12,14 @@ Subsystem map (each module is one explicit boundary):
     roles.py      Role definitions (orchestrator / worker / verifier) loaded from agents/
     quarantine.py Prompt-injection ingress filter + secret detection/redaction
     sandbox.py    OS confinement of child commands (workspace-only writes, network deny)
+    ownership.py  Ownership lanes: agents own their files, never each other's
+    adversarial.py Contested phases: positions, objections, decision records, lint
+    audit.py      Hash-chain verification + governance timeline for any run
     runner.py     WorkflowRunner: executes workflows/*.yaml phase by phase through gates
-    events.py     Structured event log shared by everything above
+    events.py     Structured, hash-chained event log shared by everything above
 
 Security model: SECURITY.md. Architecture and source map: ARCHITECTURE.md.
+Governance layer (consent, ownership, contest, audit): GOVERNANCE.md.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

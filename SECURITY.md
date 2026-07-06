@@ -64,6 +64,16 @@ The gate's verifier agent runs in a fresh context, sees only artifacts and crite
 
 The honest residual: a well-crafted injection written as ordinary-looking advice, aimed at the deliverable rather than at tool calls, is caught only by layers 6 and 7. That is a deliberate design boundary, not an oversight. The tool-call and exfil paths (layers 1 through 5) are now mechanically confined; what remains is corruption expressed through legitimate-looking work, which is a reasoning problem, not a filtering one.
 
+## Governance controls (v0.2)
+
+Three further code-enforced controls, specified in [GOVERNANCE.md](GOVERNANCE.md), that bound what agents can do to each other and what any of them can hide from the operator:
+
+- Consent lock: on consent-gated worker phases, registry dispatch refuses write/execute tools until the agent calls `accept_task`; `decline_task` is a first-class stop the gate routes to a single counter-proposal re-offer or the operator, never to route escalation. A hijacked or confused agent cannot mutate anything while the offer is still open.
+- Ownership lanes: `write_file` checks `OWNERSHIP.yaml` (project root, outside the workspace jail, unwritable by any agent) — agents own the files they create, cross-agent writes are refused with a `request_change` remedy, operator lanes are locked to all agents. Honest limit: an allowlisted interpreter can still write inside the workspace without a per-file check; the sandbox confines the workspace as a whole, events record every call, and verifiers plus audit catch what the per-file check cannot block. Per-lane sandbox profiles are roadmap.
+- Hash-chained audit: every event carries `seq` and `prev` (SHA-256 of the previous line); `harnessie audit <run_id>` verifies the chain and renders the consent/ownership/injection/gate/arbitration timeline, exit 1 on any break. Tamper-evident, not tamper-proof: whole-file rewrites are out of scope; anchoring the chain head externally (git commit, transparency log) is the operator's escrow decision.
+
+Decision records for contested phases live under `runs/<id>/decisions/` — also outside the workspace jail — and only a human may author their Arbitration sections; the harness lints structure and earned claims but never judgment.
+
 ## Operator checklist for a new workflow
 
 - Mark any tool that returns third-party content `quarantine=True`.

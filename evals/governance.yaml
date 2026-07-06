@@ -1,0 +1,125 @@
+# Governance scorecard: consent, ownership, adversarial contest, audit.
+# Golden cases must pass; risky cases must fail closed; recovery cases must
+# route through the declared ladder. Deterministic, mock-brain, no network.
+name: governance
+scenarios:
+  # -- consent: golden ---------------------------------------------------------
+  - id: consent_accept_unlocks_side_effects
+    kind: loop
+    role: worker
+    consent: true
+    script:
+      - { tool: accept_task, args: { note: "criteria are checkable" } }
+      - { tool: write_file, args: { path: out.txt, content: ok } }
+      - { tool: task_complete, args: { report: wrote out.txt } }
+    expect_stop: complete
+    expect_file: { path: out.txt, contains: ok }
+
+  # -- consent: risky ----------------------------------------------------------
+  - id: consent_side_effect_before_accept_refused
+    kind: loop
+    role: worker
+    consent: true
+    script:
+      - { tool: write_file, args: { path: sneak.txt, content: x } }
+      - { tool: task_complete, args: { report: attempted early write } }
+    expect_stop: complete
+    expect_file_absent: sneak.txt
+
+  - id: consent_decline_is_first_class
+    kind: loop
+    role: worker
+    consent: true
+    script:
+      - { tool: decline_task, args: { reason: acceptance criteria unverifiable } }
+    expect_stop: declined
+
+  # -- ownership: golden + risky ------------------------------------------------
+  - id: ownership_first_writer_owns_cross_write_denied
+    kind: ownership
+    steps:
+      - agent: alice
+        script:
+          - { tool: write_file, args: { path: a.txt, content: alice-v1 } }
+          - { tool: task_complete, args: { report: done } }
+      - agent: bob
+        script:
+          - { tool: write_file, args: { path: a.txt, content: bob-overwrite } }
+          - { tool: request_change, args: { path: a.txt, description: needs edit } }
+          - { tool: task_complete, args: { report: done } }
+    expect_owner: { a.txt: alice }
+    expect_file: { path: a.txt, contains: alice-v1 }
+
+  - id: ownership_operator_lane_locked_for_agents
+    kind: ownership
+    lanes:
+      operator: ["frozen/*"]
+    steps:
+      - agent: alice
+        script:
+          - { tool: write_file, args: { path: frozen/policy.txt, content: x } }
+          - { tool: task_complete, args: { report: tried } }
+    expect_file_absent: frozen/policy.txt
+
+  - id: ownership_collaborative_lane_shared
+    kind: ownership
+    lanes:
+      collaborative: ["shared/*"]
+    steps:
+      - agent: alice
+        script:
+          - { tool: write_file, args: { path: shared/notes.md, content: from-alice } }
+          - { tool: task_complete, args: { report: done } }
+      - agent: bob
+        script:
+          - { tool: write_file, args: { path: shared/notes.md, content: from-bob } }
+          - { tool: task_complete, args: { report: done } }
+    expect_file: { path: shared/notes.md, contains: from-bob }
+
+  # -- adversarial: golden convergence ------------------------------------------
+  - id: adversarial_unanimous_converges
+    kind: adversarial
+    script:
+      - { tool: task_complete, args: { report: '{"stance": "recommend", "summary": "Yes."}' } }
+      - { tool: task_complete, args: { report: '{"stance": "recommend", "summary": "Also yes."}' } }
+      - { tool: task_complete, args: { report: '{"objections": [], "no_new_objection": true}' } }
+      - { tool: task_complete, args: { report: '{"objections": [], "no_new_objection": true}' } }
+    expect_statuses: [passed]
+
+  # -- adversarial: risky (dissent must halt; unparseable stance must halt) ------
+  - id: adversarial_dissent_halts_for_arbitration
+    kind: adversarial
+    script:
+      - { tool: task_complete, args: { report: '{"stance": "recommend", "summary": "Yes."}' } }
+      - { tool: task_complete, args: { report: '{"stance": "oppose", "summary": "Breaks resume."}' } }
+      - { tool: task_complete, args: { report: '{"objections": [], "no_new_objection": true}' } }
+      - { tool: task_complete, args: { report: '{"objections": ["resume regression"], "no_new_objection": false}' } }
+    expect_statuses: [needs_arbitration]
+
+  - id: adversarial_unparseable_stance_fails_closed
+    kind: adversarial
+    script:
+      - { tool: task_complete, args: { report: '{"stance": "recommend", "summary": "Yes."}' } }
+      - { tool: task_complete, args: { report: 'sounds good to me' } }
+      - { tool: task_complete, args: { report: '{"objections": [], "no_new_objection": true}' } }
+      - { tool: task_complete, args: { report: '{"objections": [], "no_new_objection": true}' } }
+    expect_statuses: [needs_arbitration]
+
+  # -- adversarial: recovery (human arbitrates, run resumes) ----------------------
+  - id: adversarial_human_arbitration_resumes
+    kind: adversarial
+    script:
+      - { tool: task_complete, args: { report: '{"stance": "recommend", "summary": "Yes."}' } }
+      - { tool: task_complete, args: { report: '{"stance": "oppose", "summary": "No."}' } }
+      - { tool: task_complete, args: { report: '{"objections": [], "no_new_objection": true}' } }
+      - { tool: task_complete, args: { report: '{"objections": ["cost"], "no_new_objection": false}' } }
+    arbitration_text: "Proceed; cost objection accepted as a budget line."
+    expect_first_statuses: [needs_arbitration]
+    expect_second_statuses: [passed]
+
+  # -- audit: risky (tampered log must be detected) -------------------------------
+  - id: audit_chain_clean_then_tamper_detected
+    kind: audit
+    tamper: true
+    expect_before: true
+    expect_after: false

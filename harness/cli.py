@@ -3,6 +3,7 @@
     harnessie run workflows/build-and-verify.yaml --goal "..."      run a workflow
     harnessie resume <run_id> workflows/build-and-verify.yaml       resume a crashed run
     harnessie report <run_id>                                       human-readable run report
+    harnessie audit <run_id>                                        verify hash chain + governance timeline
 """
 
 from __future__ import annotations
@@ -29,6 +30,10 @@ def main(argv: list[str] | None = None) -> int:
 
     p_report = sub.add_parser("report", help="print a run's journal and proofs")
     p_report.add_argument("run_id")
+
+    p_audit = sub.add_parser(
+        "audit", help="verify a run's event hash chain and print its governance timeline")
+    p_audit.add_argument("run_id")
 
     p_eval = sub.add_parser("eval", help="run deterministic eval scorecards")
     p_eval.add_argument("suite", nargs="?", help="optional eval suite YAML path")
@@ -67,6 +72,26 @@ def main(argv: list[str] | None = None) -> int:
             for p in sorted(proofs.iterdir()):
                 print(f"  {p.name}")
         return 0
+
+    if args.cmd == "audit":
+        from .adversarial import lint_record
+        from .audit import format_audit, governance_timeline, verify_chain
+
+        run_dir = root / "runs" / args.run_id
+        if not (run_dir / "events.jsonl").exists():
+            print(f"no events log at {run_dir / 'events.jsonl'}", file=sys.stderr)
+            return 2
+        chain = verify_chain(run_dir)
+        decisions = []
+        ddir = run_dir / "decisions"
+        if ddir.exists():
+            for rec in sorted(ddir.glob("*.md")):
+                lint = lint_record(rec.read_text(encoding="utf-8"))
+                decisions.append({"path": rec.name, "status": lint["status"],
+                                  "claims": lint["claims"]})
+        print(format_audit(args.run_id, chain, governance_timeline(run_dir),
+                           decisions))
+        return 0 if chain["ok"] else 1
 
     if args.cmd == "eval":
         from .evals import format_scorecard, run_eval_suite

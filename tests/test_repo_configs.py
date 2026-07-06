@@ -51,7 +51,15 @@ def test_workflows_parse_and_reference_real_agents():
         assert wf.get("phases"), wf_path.name
         for phase in wf["phases"]:
             assert "task" in phase, f"{wf_path.name}:{phase.get('name')}"
-            lib.get(phase.get("agent", "orchestrator"))   # raises on unknown
+            if phase.get("mode") == "adversarial":
+                positions = phase.get("positions")
+                assert positions, f"{wf_path.name}:{phase['name']} has no positions"
+                for pos in positions:
+                    lib.get(pos.get("agent", "implementer"))   # raises on unknown
+                assert phase.get("arbitration", "convergence") in (
+                    "convergence", "human"), f"{wf_path.name}:{phase['name']}"
+            else:
+                lib.get(phase.get("agent", "orchestrator"))   # raises on unknown
             # tool paths are workspace-relative; a task telling the agent to
             # touch "workspace/..." double-prefixes and fails its own gate
             assert "workspace/" not in phase["task"], \

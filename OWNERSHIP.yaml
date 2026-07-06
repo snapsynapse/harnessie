@@ -1,0 +1,9 @@
+# Ownership ledger — operator-owned; agents cannot reach this file (it lives
+# outside the workspace jail). lanes: are declared by the operator and always
+# win; files: are first-writer auto-claims maintained by the harness.
+# Semantics: harness/ownership.py; design: GOVERNANCE.md §3.
+lanes:
+  agent: {}
+  collaborative: []
+  operator: []
+files: {}

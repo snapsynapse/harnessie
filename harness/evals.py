@@ -75,6 +75,12 @@ def run_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
         return _run_workflow_scenario(scenario)
     if kind == "resume":
         return _run_resume_scenario(scenario)
+    if kind == "ownership":
+        return _run_ownership_scenario(scenario)
+    if kind == "adversarial":
+        return _run_adversarial_scenario(scenario)
+    if kind == "audit":
+        return _run_audit_scenario(scenario)
     return EvalCaseResult(
         id=scenario.get("id", "(missing-id)"),
         passed=False,
@@ -84,7 +90,23 @@ def run_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
     )
 
 
+def _check_file_expectations(scenario: dict[str, Any], workspace: Path,
+                             problems: list[str]) -> None:
+    expect_file = scenario.get("expect_file")
+    if expect_file:
+        target = workspace / expect_file["path"]
+        if not target.exists():
+            problems.append(f"expected file missing: {expect_file['path']}")
+        elif expect_file.get("contains") and \
+                expect_file["contains"] not in target.read_text(encoding="utf-8"):
+            problems.append(f"file {expect_file['path']} lacks expected content")
+    absent = scenario.get("expect_file_absent")
+    if absent and (workspace / absent).exists():
+        problems.append(f"file should not exist: {absent}")
+
+
 def _run_loop_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
+    problems: list[str] = []
     with tempfile.TemporaryDirectory(prefix="harnessie-eval-") as d:
         root = Path(d)
         reg = ToolRegistry()
@@ -100,16 +122,138 @@ def _run_loop_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
             model=model,
             registry=reg,
             events=EventLog(root / "run", echo=False),
-            max_steps=int(scenario.get("max_steps", 4)),
+            max_steps=int(scenario.get("max_steps", 6)),
+            agent_name=scenario.get("agent", "implementer"),
+            consent_required=bool(scenario.get("consent", False)),
         )
         result = loop.run("system", scenario.get("task", "task"))
-    expected = scenario["expect_stop"]
+        expected = scenario["expect_stop"]
+        if result.stop != expected:
+            problems.append(f"stop={result.stop}, expected {expected}")
+        _check_file_expectations(scenario, workspace, problems)
     return EvalCaseResult(
         id=scenario["id"],
-        passed=result.stop == expected,
+        passed=not problems,
         expected=expected,
-        observed=result.stop,
+        observed=result.stop if not problems else problems,
         notes=result.report[:500],
+    )
+
+
+def _run_ownership_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
+    """Sequential worker loops as different agents over one shared workspace
+    and ownership ledger; assertions on final ownership and file contents."""
+    from .ownership import OwnershipLedger
+
+    problems: list[str] = []
+    with tempfile.TemporaryDirectory(prefix="harnessie-eval-") as d:
+        root = Path(d)
+        workspace = root / "workspace"
+        workspace.mkdir()
+        lanes = scenario.get("lanes", {}) or {}
+        ledger = OwnershipLedger.load(root / "OWNERSHIP.yaml")
+        ledger.agent_lanes = {a: list(g) for a, g in (lanes.get("agent") or {}).items()}
+        ledger.collaborative = list(lanes.get("collaborative") or [])
+        ledger.operator = list(lanes.get("operator") or [])
+        events = EventLog(root / "run", echo=False)
+        reg = ToolRegistry()
+        register_builtin(reg, workspace=workspace, ledger=ledger, events=events)
+        for step in scenario.get("steps", []):
+            model = MockModel(
+                ModelSpec(name="mid", provider="mock", model_id="mock"),
+                script=[_turn(t, i) for i, t in enumerate(step.get("script", []), 1)],
+            )
+            AgentLoop(role="worker", model=model, registry=reg, events=events,
+                      max_steps=int(scenario.get("max_steps", 8)),
+                      agent_name=step.get("agent", "implementer")).run(
+                "system", step.get("task", "task"))
+        reloaded = OwnershipLedger.load(root / "OWNERSHIP.yaml")
+        for rel, owner in (scenario.get("expect_owner") or {}).items():
+            actual = reloaded.owner_of(rel)
+            if actual != owner:
+                problems.append(f"owner of {rel}: {actual!r}, expected {owner!r}")
+        _check_file_expectations(scenario, workspace, problems)
+    return EvalCaseResult(
+        id=scenario["id"],
+        passed=not problems,
+        expected="ownership expectations hold",
+        observed=problems or "ok",
+    )
+
+
+def _run_adversarial_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
+    """A contested phase driven by a scripted brain. With arbitration_text the
+    eval simulates the OPERATOR editing the record between runs (the eval
+    fixture plays the human; at runtime no code path does this)."""
+    problems: list[str] = []
+    with tempfile.TemporaryDirectory(prefix="harnessie-eval-") as d:
+        root = Path(d)
+        _scaffold_eval_project(root, max_attempts=2, adversarial=True)
+        first = _run_scripted_workflow(root, "evalrun", scenario.get("script", []),
+                                       scenario.get("goal", "eval goal"),
+                                       workflow="adv.yaml")
+        arbitration_text = scenario.get("arbitration_text")
+        if arbitration_text is None:
+            expected: Any = scenario["expect_statuses"]
+            if first != expected:
+                problems.append(f"statuses={first}, expected {expected}")
+        else:
+            expected = {"first": scenario["expect_first_statuses"],
+                        "second": scenario["expect_second_statuses"]}
+            if first != expected["first"]:
+                problems.append(f"first statuses={first}")
+            record = root / "runs" / "evalrun" / "decisions" / "DR-decide.md"
+            text = record.read_text(encoding="utf-8")
+            text = text.replace("status: open", "status: arbitrated")
+            text = text.replace("date: ", "decided: 2026-01-02\ndate: ", 1)
+            text = text.replace(
+                "## Arbitration\n",
+                "## Arbitration\n\n- decided_by: operator\n- date: 2026-01-02\n"
+                f"- decision: {arbitration_text}\n\nOperator rationale.\n")
+            record.write_text(text, encoding="utf-8")
+            second = _run_scripted_workflow(root, "evalrun", [],
+                                            scenario.get("goal", "eval goal"),
+                                            workflow="adv.yaml")
+            if second != expected["second"]:
+                problems.append(f"second statuses={second}")
+    return EvalCaseResult(
+        id=scenario["id"],
+        passed=not problems,
+        expected=expected,
+        observed=problems or "ok",
+    )
+
+
+def _run_audit_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
+    from .audit import verify_chain
+
+    problems: list[str] = []
+    with tempfile.TemporaryDirectory(prefix="harnessie-eval-") as d:
+        run_dir = Path(d) / "run"
+        log = EventLog(run_dir, echo=False)
+        for kind in ("workflow_start", "consent_granted", "gate_verdict",
+                     "workflow_done"):
+            log.emit(kind, detail=f"eval-{kind}")
+        log.close()
+        before = verify_chain(run_dir)["ok"]
+        if before != bool(scenario.get("expect_before", True)):
+            problems.append(f"chain before tamper: ok={before}")
+        if scenario.get("tamper"):
+            path = run_dir / "events.jsonl"
+            lines = path.read_text(encoding="utf-8").splitlines()
+            rec = json.loads(lines[1])
+            rec["detail"] = "history, tidied"
+            lines[1] = json.dumps(rec, ensure_ascii=False)
+            path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+            after = verify_chain(run_dir)["ok"]
+            if after != bool(scenario.get("expect_after", False)):
+                problems.append(f"chain after tamper: ok={after}")
+    return EvalCaseResult(
+        id=scenario["id"],
+        passed=not problems,
+        expected={"before": scenario.get("expect_before", True),
+                  "after": scenario.get("expect_after", False)},
+        observed=problems or "ok",
     )
 
 
@@ -150,13 +294,13 @@ def _run_resume_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
 
 
 def _run_scripted_workflow(root: Path, run_id: str, script: list[dict[str, Any]],
-                           goal: str) -> list[str]:
+                           goal: str, workflow: str = "eval.yaml") -> list[str]:
     runner = WorkflowRunner(project_root=root, run_id=run_id, echo=False)
     runner._models["mid"] = MockModel(
         ModelSpec(name="mid", provider="mock", model_id="mock"),
         script=[_turn(t, i) for i, t in enumerate(script, 1)],
     )
-    outcomes = runner.run_workflow(root / "workflows" / "eval.yaml", goal=goal)
+    outcomes = runner.run_workflow(root / "workflows" / workflow, goal=goal)
     return [o.status for o in outcomes]
 
 
@@ -181,7 +325,8 @@ def _turn(spec: dict[str, Any], idx: int) -> AssistantTurn:
     )
 
 
-def _scaffold_eval_project(root: Path, max_attempts: int) -> None:
+def _scaffold_eval_project(root: Path, max_attempts: int,
+                           adversarial: bool = False) -> None:
     (root / "agents" / "workers").mkdir(parents=True)
     (root / "agents" / "verifiers").mkdir(parents=True)
     (root / "agents" / "orchestrator.md").write_text("# Orchestrator\nPlan and integrate.")
@@ -217,6 +362,17 @@ def _scaffold_eval_project(root: Path, max_attempts: int) -> None:
             agent: orchestrator
             task: "Summarize: {{implement}}"
     """))
+    if adversarial:
+        (root / "workflows" / "adv.yaml").write_text(textwrap.dedent("""
+            name: adv
+            phases:
+              - name: decide
+                mode: adversarial
+                task: "Decide: {goal}"
+                positions:
+                  - { agent: implementer }
+                  - { agent: implementer }
+        """))
 
 
 def format_scorecard(scorecard: dict[str, Any]) -> str:
