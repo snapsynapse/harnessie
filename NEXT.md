@@ -1,4 +1,5 @@
 # Next session handoff
+> Stewardship rotation in effect: if you are the incoming (non-Claude) agent, your primary handoff is `handoffs/HANDOFF-CODEX.md` (local, untracked) — read it before this file. If handoffs/ is absent you are on a fresh clone; stop and ask the operator for the handoff bundle.
 ## Current state
 Harnessie is at v0.3.1 on `main`, post-arbitration. Both decision records are **human-arbitrated (2026-07-06)** with independent positions from four providers (anthropic, alibaba, google, openai — local qwen/gemma/gpt-oss runs; protocol and briefs preserved at `handoffs/position-sweep/`). The operator ratified: v0.2 governance direction; v0.3 direction; the v0.3.2 patch under a one-day hard cap; the Aggregated Intelligence tenets (eight canon, two claims provisional — GOVERNANCE §7 committed accordingly). Repo-standards tier and Turnfile adoption resolved as recorded INTENT §8 exceptions; soft-reference scrub deferred to the pre-promotion pass.
 ## Unblocked next work: v0.3.2 (approved, 1-day hard cap)
