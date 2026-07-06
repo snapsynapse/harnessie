@@ -23,6 +23,13 @@ harnessie init my-harnessie-project
 
 Worked end-to-end example with sample data: [examples/policy-compliance/README.md](examples/policy-compliance/README.md).
 
+## Documentation
+
+- [docs/getting-started.md](docs/getting-started.md): the five-minute path from install to a green run and reading the evidence.
+- [docs/GUIDE.md](docs/GUIDE.md): the complete user guide, concepts through extension, including workflow authoring, brain configuration, ownership, governance, and the halt-recovery table.
+
+The engineering references below (ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP) sit at the repo root; the user-facing guides live under `docs/`.
+
 ## Layout
 
 ```text
