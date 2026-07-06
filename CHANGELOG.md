@@ -10,6 +10,11 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 - Policy-construction unit tests for backend preference order, per-backend confinement flags, network opt-in, and Linux fail-closed; the escape parity tests accept the bwrap read-only-root kernel phrasing.
 - GitHub Actions CI: Linux bubblewrap parity job (asserts the backend is admitted, not silently skipped), macOS job, and a no-backend job asserting fail-closed.
 - SECURITY.md backend table: platform, backend, confinement primitive, known gaps.
+- README: "What governs a run" (decision-to-file table) and "When a run halts" (stop-condition-to-operator-action table), from the clarity-conformance audit's two highest-leverage fixes.
+
+### Security
+
+- SEC-001 (A04, from the 2026-07-06 security audit): prior-phase reports are prior-model output and are now run through the quarantine filter (`guard_result`) before substitution into the next phase's task, exactly as `read_file` results are — flagged content is fenced as data-not-instructions and an `injection_flag` event is emitted. The operator `goal` is never fenced. Closes the asymmetry where inter-phase report text reached the next phase's prompt unfiltered. Audit reports under `audits/`.
 
 ## 0.3.3 (2026-07-06)
 

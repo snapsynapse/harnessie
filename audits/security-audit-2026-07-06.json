@@ -1,0 +1,154 @@
+{
+  "date": "2026-07-06",
+  "previous_audit": null,
+  "tool": "security-audit v2",
+  "standards": [
+    "OWASP Top 10:2021"
+  ],
+  "summary": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 1,
+    "total": 1
+  },
+  "bandit": {
+    "lines_scanned": 3368,
+    "nosec_comments": 0,
+    "findings_count": 0,
+    "severity_breakdown": {
+      "HIGH": 1,
+      "MEDIUM": 3,
+      "LOW": 13
+    },
+    "medium_findings": [
+      {
+        "test_id": "B613",
+        "file": "harness/quarantine.py",
+        "line": 39,
+        "description": "False positive: bidi chars are literals inside the INVISIBLE_CHARS detection regex (the defense against trojan-source), not an attack."
+      },
+      {
+        "test_id": "B310",
+        "file": "harness/models/anthropic.py",
+        "line": 57,
+        "description": "Benign: urlopen target is the hardcoded https constant API_URL; no untrusted input. Not SSRF."
+      },
+      {
+        "test_id": "B310",
+        "file": "harness/models/openai_compat.py",
+        "line": 53,
+        "description": "Benign: urlopen target is operator-configured base_url, not untrusted request input."
+      },
+      {
+        "test_id": "B108",
+        "file": "harness/sandbox.py",
+        "line": 111,
+        "description": "False positive: the line is the bwrap --tmpfs /tmp argument (a private in-sandbox tmpfs confinement control), not a host temp-file operation."
+      }
+    ]
+  },
+  "dependencies": {
+    "python_vulns": 0,
+    "python_packages_affected": [],
+    "node_vulns": 0,
+    "node_packages_affected": []
+  },
+  "secrets": {
+    "hardcoded_secrets": 0,
+    "env_files_tracked": 0,
+    "env_files_tracked_details": null,
+    "git_history_warnings": 0,
+    "git_history_details": null
+  },
+  "config_review": {
+    "cors_production": "PASS",
+    "cors_methods_headers": "PASS",
+    "csp_script_src": "PASS",
+    "hsts": "PASS",
+    "x_frame_options": "PASS",
+    "x_content_type_options": "PASS",
+    "referrer_policy": "PASS",
+    "permissions_policy": "PASS",
+    "rate_limiting": "PASS",
+    "env_gitignore": "PASS",
+    "placeholder_detection": "PASS"
+  },
+  "owasp": {
+    "A01": {
+      "findings": 0,
+      "max_severity": null
+    },
+    "A02": {
+      "findings": 0,
+      "max_severity": null
+    },
+    "A03": {
+      "findings": 0,
+      "max_severity": null
+    },
+    "A04": {
+      "findings": 1,
+      "max_severity": "LOW"
+    },
+    "A05": {
+      "findings": 0,
+      "max_severity": null
+    },
+    "A06": {
+      "findings": 0,
+      "max_severity": null
+    },
+    "A07": {
+      "findings": 0,
+      "max_severity": null
+    },
+    "A08": {
+      "findings": 0,
+      "max_severity": null
+    },
+    "A09": {
+      "findings": 0,
+      "max_severity": null
+    },
+    "A10": {
+      "findings": 0,
+      "max_severity": null
+    }
+  },
+  "privacy": {},
+  "delta": null,
+  "findings": [
+    {
+      "id": "SEC-001",
+      "severity": "LOW",
+      "priority": "P3",
+      "owasp": "A04",
+      "title": "Inter-phase reports bypass the quarantine filter applied to tool results",
+      "file": "harness/runner.py",
+      "line": 169,
+      "status": "new",
+      "previous_id": null
+    }
+  ],
+  "positive_controls": [
+    "Policy enforced in code at registry dispatch, not in prompts (registry.py)",
+    "Fail-closed-everywhere sandbox: shell blocked when no backend passes its startup smoke test (sandbox.py)",
+    "Scrubbed child-process environment: provider keys not inherited (builtin.py scrubbed_env)",
+    "Layered quarantine: bidi/zero-width stripping, injection scanning, data-not-instructions fencing, secret redaction (quarantine.py)",
+    "Structured refusal grammar with hash-chained tamper-evident audit events (registry.py, audit.py)",
+    "find_secrets returns kind labels, never credential fragments (v0.3.3)",
+    "Minimal dependency surface: one runtime dependency (pyyaml)"
+  ],
+  "methodology": {
+    "date": "2026-07-06",
+    "tool": "security-audit v2",
+    "bandit_version": "1.9.4",
+    "pip_audit_version": "2.10.0",
+    "pnpm_version": null,
+    "backend_loc": 3368,
+    "files_analyzed": "harness package, 20 modules; OWASP pattern analysis manual; secret + git-history scan across all tracked source; deeper OWASP A01/A04 pass verified (12 of 13 proposed findings refuted, SEC-001 confirmed)",
+    "previous_audit_path": null,
+    "output_mode": "markdown+json"
+  }
+}

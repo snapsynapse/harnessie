@@ -26,6 +26,7 @@ from .memory import ProjectMemory, ProofStore
 from .models import build_model
 from .models.base import EFFORT_LEVELS, ModelSpec
 from .ownership import OwnershipLedger
+from .quarantine import guard_result
 from .roles import RoleLibrary
 from .routing import Budget, Route, Router, TIER_ORDER
 from .state import RunState, new_run_id
@@ -167,7 +168,18 @@ class WorkflowRunner:
             # blow up format parsing.
             task = phase["task"]
             for key, value in reports.items():
-                task = task.replace("{" + key + "}", str(value))
+                text = str(value)
+                if key != "goal":
+                    # Prior-phase reports are prior-model output: untrusted
+                    # ingress, exactly like a read_file result. Fence flagged
+                    # content as data-not-instructions before it lands in this
+                    # phase's task. The goal is the operator's own instruction
+                    # and is never fenced.
+                    text, flags = guard_result(text, source=f"phase:{key}")
+                    if flags:
+                        self.events.emit("injection_flag", phase=name,
+                                         source=f"phase:{key}", flags=flags)
+                task = task.replace("{" + key + "}", text)
             if phase.get("inject_memory_status"):
                 # Harness-prepared digest: memory and prior-run state live
                 # outside the workspace jail, so the harness injects a

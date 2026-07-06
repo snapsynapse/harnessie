@@ -54,10 +54,38 @@ Dogfooding this repo under Claude Code uses a local `.claude/` (subagent defs, a
 
 ## Requirements
 
-Python 3.11+ and PyYAML (installed by `pip install -e .`). The stdlib-only model adapters need no vendor SDK. The OS sandbox uses native macOS `sandbox-exec` when it can actually apply a Seatbelt profile; managed hosts that expose the binary but reject `sandbox_apply` are treated as sandbox-unavailable and shell-using workflows fail closed. On other platforms, shell-using workflows fail closed until a Linux backend is wired (see [SECURITY.md](SECURITY.md)).
+Python 3.11+ and PyYAML (installed by `pip install -e .`). The stdlib-only model adapters need no vendor SDK. The OS sandbox uses native macOS `sandbox-exec` when it can actually apply a Seatbelt profile; on Linux it uses bubblewrap, firejail, or docker (in that order of preference). Every backend is admitted only after a startup smoke test proves it can confine here; a present-but-unusable backend, and any platform with none (Windows), fails closed so shell-using workflows are blocked rather than run unconfined (see [SECURITY.md](SECURITY.md)).
 
 ## Design in one breath
 
 Goal enters, orchestrator (frontier, high effort) decomposes it into task packets with acceptance criteria and out-of-scope fences; task packets are offers, and workers consent (or decline with a counter-proposal) before side-effecting tools unlock; workers (cheap tiers) execute inside a jailed workspace with allowlisted tools, owning the files they create and never each other's; every worker phase exits through a gate that runs deterministic checks first, then an independent fresh-context verifier that never sees the worker's reasoning and fails closed; contested decisions fan out to an adversarial panel whose positions, objections, and dissent land in a decision record only a human may arbitrate; failures reformulate the task with evidence and escalate effort-then-tier before halting for a human; everything is journaled, budgeted, resumable, hash-chain audited, and leaves proof artifacts on disk.
 
 Full rationale and the verified source-to-decision map: [ARCHITECTURE.md](ARCHITECTURE.md). Governance layer (consent, ownership, contest, audit): [GOVERNANCE.md](GOVERNANCE.md). Prompt-injection and secret-handling model: [SECURITY.md](SECURITY.md). What comes next and platform support: [ROADMAP.md](ROADMAP.md).
+
+## What governs a run
+
+A run's behavior is not in one file; each decision has one owner. To predict or change what a run will do, edit the owner, not the prompt:
+
+| Decision | Governed by |
+|---|---|
+| Which model runs each task class, and how to swap brains | `config/models.yaml` (tiers + routing table) |
+| Token and dollar ceilings, effort per task class | `config/models.yaml` (budget + routing) |
+| Which phases run, in what order, with which gates and verifiers | the workflow YAML in `workflows/` |
+| Which files each agent may write | `OWNERSHIP.yaml` (lanes + first-writer claims) |
+| What each role may do (tools, shell allowlist, approval) | the tool registry (`harness/tools/builtin.py`) + role prompts in `agents/` |
+
+## When a run halts
+
+Silence is never success: every run ends in a named stop condition, and each maps to one operator action. Resuming is `harnessie run <same workflow> --goal ...` with the same run id — resume re-runs only phases that did not pass, so fixing the cause and re-running is safe.
+
+| Stop condition | What it means | What to do |
+|---|---|---|
+| `complete` / phase `passed` | task done, gate satisfied | nothing; the next phase proceeds |
+| `declined` | the worker declined the offered task packet | read the counter-proposal in the report; revise the packet or accept the objection, then re-run |
+| `needs_human` | a gate's checks or verifier failed after the retry ladder exhausted | read the proof artifacts under `runs/<id>/proofs/` and the report; fix the task or the acceptance criteria; re-run |
+| `needs_arbitration` | a contested phase produced dissent | open `runs/<id>/decisions/DR-<phase>.md`, record your arbitration decision in it, then re-run (resume keys on that record) |
+| `stuck` | the model repeated an identical failing or refused call | inspect the refusal (`harnessie audit <id>`); fix the tool grant, allowlist, or task; re-run |
+| `budget` | the run hit its token or dollar ceiling | raise the ceiling in `config/models.yaml` or narrow the goal; re-run |
+| `max_steps` | the loop hit its step ceiling without completing | raise `max_steps` for the phase or simplify the task |
+| `model_error` | the provider errored twice in a row | check the endpoint and API key; re-run |
+| `no_action` | the model produced no tool call even after a nudge | usually a role-prompt or model-fit issue; check the role prompt in `agents/` |
