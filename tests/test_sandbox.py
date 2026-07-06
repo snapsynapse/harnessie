@@ -97,7 +97,8 @@ def test_run_shell_fails_closed_without_backend(tmp_path, monkeypatch):
     monkeypatch.setattr(sandbox, "backend_name", lambda: None)
     res = reg.dispatch("worker", "run_shell", {"command": "ls"})
     assert res.ok            # tool returned cleanly...
-    assert "sandbox unavailable" in res.content and "blocked" in res.content
+    assert res.refusal and res.refusal.error == "sandbox_unavailable"
+    assert res.refusal.boundary == "sandbox"
 
 
 def test_gate_check_fails_closed_without_backend(tmp_path, monkeypatch):

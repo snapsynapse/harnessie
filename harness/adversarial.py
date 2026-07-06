@@ -22,6 +22,7 @@ from typing import Any
 
 import yaml
 
+from .ids import generate
 from .verify import _json_objects
 
 STANCES = ("recommend", "oppose", "alternative", "abstain")
@@ -93,6 +94,7 @@ def assemble_record(record_id: str, title: str, question: str, context: str,
     lines = [
         "---",
         f"id: {record_id}",
+        f"ref: DR-{generate(5, check_digit=True)}",
         # JSON string quoting is valid YAML and survives colons in titles
         # (the AIDR assemble tool learned this the hard way: unquoted plain
         # scalars go type-ambiguous or blow up the frontmatter parse).

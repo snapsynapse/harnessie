@@ -7,6 +7,7 @@ code path ever writes the Arbitration section.
 """
 
 import textwrap
+import re
 
 from harness.adversarial import (
     PositionRecord,
@@ -16,6 +17,7 @@ from harness.adversarial import (
     parse_objection_response,
     parse_stance,
 )
+from harness.ids import verify_check_digit
 from harness.models.base import AssistantTurn, MockModel, ModelSpec, ToolCall
 from harness.runner import WorkflowRunner
 
@@ -91,6 +93,8 @@ def test_assembled_record_lints_clean_and_earns_independence():
     assert lint["status"] == "open"
     assert "independent-positions" in lint["claims"]
     assert "human-arbitrated" not in lint["claims"]
+    ref = re.search(r"^ref: DR-([0-9ACDFGHJKMNPRUWY]{6})$", text, re.MULTILINE)
+    assert ref and verify_check_digit(ref.group(1))
 
 
 def test_same_provider_earns_no_independence_claim():
@@ -206,6 +210,7 @@ def test_dissent_halts_needs_arbitration(tmp_path):
     record = tmp_path / "runs" / "r2" / "decisions" / "DR-decide.md"
     text = record.read_text()
     assert "oppose" in text and "resume regression" in text   # dissent preserved
+    assert re.search(r"^ref: DR-[0-9ACDFGHJKMNPRUWY]{6}$", text, re.MULTILINE)
 
 
 def test_position_agents_are_read_only(tmp_path):

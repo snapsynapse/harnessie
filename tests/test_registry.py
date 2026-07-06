@@ -26,8 +26,19 @@ def test_role_filtering(tmp_path):
 
 def test_dispatch_denies_ungrated_role(tmp_path):
     reg = make_registry(tmp_path)
-    with pytest.raises(PermissionDenied):
+    with pytest.raises(PermissionDenied) as err:
         reg.dispatch("verifier", "write_file", {"path": "x.txt", "content": "hi"})
+    assert err.value.refusal
+    assert err.value.refusal.error == "authority_insufficient"
+    assert err.value.refusal.boundary == "role"
+
+
+def test_unknown_tool_is_structured_refusal(tmp_path):
+    reg = make_registry(tmp_path)
+    res = reg.dispatch("worker", "missing_tool", {})
+    assert not res.ok
+    assert res.refusal and res.refusal.error == "action_unsupported"
+    assert res.refusal.boundary == "allowlist"
 
 
 def test_workspace_jail(tmp_path):
@@ -35,7 +46,8 @@ def test_workspace_jail(tmp_path):
     res = reg.dispatch("worker", "write_file",
                        {"path": "../escape.txt", "content": "nope"})
     assert not res.ok
-    assert "escape" in res.content
+    assert res.refusal and res.refusal.error == "workspace_jail_escape"
+    assert res.refusal.boundary == "jail"
 
 
 def test_approval_fails_closed(tmp_path):
@@ -46,19 +58,43 @@ def test_approval_fails_closed(tmp_path):
                           allowed_roles=frozenset({"worker"}),
                           requires_approval=True))
     res = reg.dispatch("worker", "deploy", {})
-    assert not res.ok and "approval" in res.content
+    assert not res.ok
+    assert res.refusal and res.refusal.error == "approval_required"
+    assert res.refusal.boundary == "approval"
 
 
 def test_malformed_args_rejected(tmp_path):
     reg = make_registry(tmp_path)
     res = reg.dispatch("worker", "write_file", {"_malformed": "{bad json"})
-    assert not res.ok and "malformed" in res.content
+    assert not res.ok
+    assert res.refusal and res.refusal.error == "malformed_arguments"
+
+
+def test_bad_arguments_are_structured_refusal(tmp_path):
+    reg = make_registry(tmp_path)
+    res = reg.dispatch("worker", "write_file", {"path": "x.txt"})
+    assert not res.ok
+    assert res.refusal and res.refusal.error == "bad_arguments"
+
+
+def test_tool_exception_is_structured_refusal(tmp_path):
+    reg = ToolRegistry()
+    reg.register(ToolSpec(name="boom", description="d",
+                          parameters={"type": "object", "properties": {}},
+                          fn=lambda: (_ for _ in ()).throw(RuntimeError("nope")),
+                          effects="read",
+                          allowed_roles=frozenset({"worker"})))
+    res = reg.dispatch("worker", "boom", {})
+    assert not res.ok
+    assert res.refusal and res.refusal.error == "tool_exception"
 
 
 def test_shell_allowlist(tmp_path):
     reg = make_registry(tmp_path)
     res = reg.dispatch("worker", "run_shell", {"command": "rm -rf /"})
-    assert "not in allowlist" in res.content
+    assert res.ok
+    assert res.refusal and res.refusal.error == "command_not_allowlisted"
+    assert res.refusal.boundary == "allowlist"
 
 
 def test_verifier_shell_is_read_only(tmp_path):
@@ -67,10 +103,10 @@ def test_verifier_shell_is_read_only(tmp_path):
     # enforced by the allowlist, not just the prompt
     res = reg.dispatch("verifier", "run_shell",
                        {"command": "python3 -c \"open('x','w').write('pwned')\""})
-    assert "not in allowlist" in res.content
+    assert res.refusal and res.refusal.error == "command_not_allowlisted"
     assert not (tmp_path / "x").exists()
     res = reg.dispatch("verifier", "run_shell", {"command": "git checkout ."})
-    assert "not in allowlist" in res.content
+    assert res.refusal and res.refusal.error == "command_not_allowlisted"
     # but the test runner stays available
     res = reg.dispatch("verifier", "run_shell", {"command": "ls"})
     assert res.ok
@@ -79,9 +115,9 @@ def test_verifier_shell_is_read_only(tmp_path):
 def test_shell_argument_jail(tmp_path):
     reg = make_registry(tmp_path)
     res = reg.dispatch("worker", "run_shell", {"command": "cat /etc/passwd"})
-    assert "rejected" in res.content
+    assert res.refusal and res.refusal.error == "argument_jail_escape"
     res = reg.dispatch("worker", "run_shell", {"command": "ls ../.."})
-    assert "rejected" in res.content
+    assert res.refusal and res.refusal.error == "argument_jail_escape"
 
 
 def test_duplicate_registration_rejected(tmp_path):

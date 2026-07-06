@@ -10,14 +10,15 @@ from __future__ import annotations
 
 import json
 import time
-import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from .ids import generate
+
 
 def new_run_id() -> str:
-    return time.strftime("%Y%m%d-%H%M%S") + "-" + uuid.uuid4().hex[:6]
+    return time.strftime("%Y%m%d-%H%M%S") + "-" + generate(5, check_digit=True)
 
 
 @dataclass

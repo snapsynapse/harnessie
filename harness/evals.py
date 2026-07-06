@@ -111,6 +111,7 @@ def _run_loop_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
     problems: list[str] = []
     with tempfile.TemporaryDirectory(prefix="harnessie-eval-") as d:
         root = Path(d)
+        run_dir = root / "run"
         reg = ToolRegistry()
         workspace = root / "workspace"
         workspace.mkdir()
@@ -123,7 +124,7 @@ def _run_loop_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
             role=scenario.get("role", "worker"),
             model=model,
             registry=reg,
-            events=EventLog(root / "run", echo=False),
+            events=EventLog(run_dir, echo=False),
             max_steps=int(scenario.get("max_steps", 6)),
             agent_name=scenario.get("agent", "implementer"),
             consent_required=bool(scenario.get("consent", False)),
@@ -133,6 +134,7 @@ def _run_loop_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
         if result.stop != expected:
             problems.append(f"stop={result.stop}, expected {expected}")
         _check_file_expectations(scenario, workspace, problems)
+        _check_refusal_expectations(scenario, run_dir, problems)
     return EvalCaseResult(
         id=scenario["id"],
         passed=not problems,
@@ -140,6 +142,41 @@ def _run_loop_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
         observed=result.stop if not problems else problems,
         notes=result.report[:500],
     )
+
+
+def _check_refusal_expectations(scenario: dict[str, Any], run_dir: Path,
+                                problems: list[str]) -> None:
+    expected = scenario.get("expect_refusal")
+    if not expected:
+        return
+    events_path = run_dir / "events.jsonl"
+    events = []
+    if events_path.exists():
+        for line in events_path.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                events.append(json.loads(line))
+    refusals = [e for e in events if e.get("kind") == "refusal"]
+    if not refusals:
+        problems.append("expected refusal event, observed none")
+        return
+    expected_event = {k: v for k, v in expected.items() if k != "content_fields"}
+    if expected_event and not any(
+        all(e.get(key) == value for key, value in expected_event.items())
+        for e in refusals
+    ):
+        problems.append(f"no refusal event matching {expected_event!r}")
+    fields = expected.get("content_fields") or []
+    if fields:
+        tool_results = [e for e in events if e.get("kind") == "tool_result"]
+        decoded = []
+        for event in tool_results:
+            try:
+                decoded.append(json.loads(event.get("content", "")))
+            except json.JSONDecodeError:
+                continue
+        for field in fields:
+            if not any(field in obj for obj in decoded):
+                problems.append(f"tool_result content lacks refusal field {field!r}")
 
 
 def _run_ownership_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
@@ -175,6 +212,7 @@ def _run_ownership_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
             if actual != owner:
                 problems.append(f"owner of {rel}: {actual!r}, expected {owner!r}")
         _check_file_expectations(scenario, workspace, problems)
+        _check_refusal_expectations(scenario, root / "run", problems)
     return EvalCaseResult(
         id=scenario["id"],
         passed=not problems,

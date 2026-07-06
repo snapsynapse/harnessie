@@ -4,10 +4,10 @@ The events log (events.py) chains each line to its predecessor by SHA-256.
 verify_chain() walks the file and reports every broken link; a clean report
 means the log was appended in order and never edited in place. The governance
 timeline filters the log down to the events a human auditor cares about:
-consent, ownership, change requests, injection flags, gate verdicts, decisions,
-arbitration, operator actions (approval grants/denials, arbitration detected on
-resume), and memory maintenance (facts saved and expired) — one composite
-timeline of agent and human actions.
+consent, ownership, structured refusals, change requests, injection flags, gate
+verdicts, decisions, arbitration, operator actions (approval grants/denials,
+arbitration detected on resume), and memory maintenance (facts saved and
+expired) — one composite timeline of agent and human actions.
 """
 
 from __future__ import annotations
@@ -21,6 +21,7 @@ from .events import GENESIS, line_hash
 GOVERNANCE_KINDS = frozenset({
     "consent_granted", "consent_declined",
     "ownership_claimed", "ownership_denied", "change_request",
+    "refusal",
     "injection_flag",
     "gate_verdict", "check",
     "position_recorded", "objection_recorded",

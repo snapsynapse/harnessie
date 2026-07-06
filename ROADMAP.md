@@ -4,9 +4,9 @@ This is the forward view: versioned milestones, their themes, and platform suppo
 
 Roadmap items are intent, not commitments. Dates are omitted deliberately; milestones ship when their acceptance criteria are green, not on a calendar.
 
-## Current release: 0.3.0 (2026-07-06)
+## Current release: 0.3.2 (2026-07-06)
 
-The aggregated-intelligence release: operator actions (approvals, arbitrations) journaled into the same hash-chained audit stream as agent actions; project memory as provenance-and-expiry-bearing substrate maintained through `save_fact`/`expire_fact` (approval-gated, archival-only); `workflows/memory-triage.yaml` as the scheduled maintenance-agent pattern under enforcement. Tenets mapping: [GOVERNANCE.md](GOVERNANCE.md) §7; direction record `decisions/AIDR-0002` (human-arbitrated 2026-07-06; v0.3.2 patch approved under a one-day cap).
+The v0.3 patch line now includes the aggregated-intelligence release plus the v0.3.2 hardening patch: structured refusal grammar on denial surfaces, audited `refusal` events, and human-readable checked refs for run IDs, change requests, and generated decision records. Tenets mapping: [GOVERNANCE.md](GOVERNANCE.md) §7; direction record `decisions/AIDR-0002` (human-arbitrated 2026-07-06). Portability remains the undiluted 0.4 headline.
 
 ## Prior release: 0.2.0 (2026-07-06)
 
@@ -25,9 +25,9 @@ Shipped: brain-agnostic model interface with hot-swappable tiers, tool registry 
 
 ## Milestones
 
-### 0.3.0: Aggregated-intelligence tenets and agent triage — SHIPPED (current release above)
+### 0.3.x: Aggregated-intelligence tenets, agent triage, refusal hardening - SHIPPED (current release above)
 
-Acceptance met: triage runs headless as propose-only and applies only under recorded approval; a stale fact is surfaced by date, archived never deleted; the audit timeline shows agent and operator actions interleaved (114 tests, 24 eval scenarios green).
+Acceptance met: triage runs headless as propose-only and applies only under recorded approval; a stale fact is surfaced by date, archived never deleted; the audit timeline shows agent and operator actions interleaved; refusals carry `{error, boundary, detail, why}` and are audit-rendered. Current baseline: 117 passed, 3 skipped; 26 eval scenarios green.
 
 ### 0.4.0: Portability and proof (was 0.2.0, then 0.3.0; displaced twice — a third displacement should be declined absent operator arbitration)
 

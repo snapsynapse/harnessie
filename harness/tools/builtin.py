@@ -36,7 +36,8 @@ from ..memory import FACT_TYPES, ProjectMemory
 from ..ownership import OwnershipLedger
 from ..quarantine import find_secrets, redact_secrets
 from ..sandbox import SandboxUnavailable, wrap as sandbox_wrap
-from .registry import ToolRegistry, ToolSpec
+from .registry import Refusal, ToolRefusal, ToolRegistry, ToolSpec
+from ..ids import generate
 
 
 def scrubbed_env() -> dict[str, str]:
@@ -58,7 +59,10 @@ DEFAULT_SHELL_ALLOWLISTS: dict[str, tuple[str, ...]] = {
 def _jail(root: Path, rel: str) -> Path:
     p = (root / rel).resolve()
     if not p.is_relative_to(root.resolve()):
-        raise ValueError(f"path escapes workspace: {rel}")
+        raise ToolRefusal(
+            "workspace_jail_escape", "jail",
+            f"Path {rel!r} escapes the workspace. Use a relative path inside the project.",
+            "The workspace jail prevents tools from reading or writing outside their scope.")
     return p
 
 
@@ -86,9 +90,11 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
         if secrets:
             # Exfil guard: a prompt-injected worker copying credentials into
             # the workspace is blocked at the tool layer, fail closed.
-            raise ValueError(
-                f"refusing write: content contains credential-shaped strings "
-                f"({', '.join(secrets[:3])}). Remove them and retry.")
+            raise ToolRefusal(
+                "secret_write_refused", "secrets",
+                "Content contains credential-shaped strings "
+                f"({', '.join(secrets[:3])}). Remove them and retry.",
+                "Secrets must not be copied into workspace artifacts.")
         target = _jail(ws, path)
         rel = target.relative_to(ws).as_posix()
         if ledger is not None:
@@ -96,7 +102,12 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
             if not allowed:
                 _emit("ownership_denied", agent=_agent or _role, path=rel,
                       reason=reason[:200])
-                raise ValueError(f"OWNERSHIP DENIED: {reason}")
+                error = ("operator_lane_denied" if "operator-owned lane" in reason
+                         else "ownership_denied")
+                raise ToolRefusal(
+                    error, "ownership",
+                    reason,
+                    "Ownership lanes keep agents from mutating files outside their authority.")
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(content, encoding="utf-8")
         if ledger is not None and ledger.claim(_agent or _role, rel):
@@ -114,20 +125,32 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
         argv = shlex.split(command)
         allow = allowlists.get(_role, ())
         if not argv or argv[0] not in allow:
-            return (f"command {argv[0] if argv else ''!r} not in allowlist "
-                    f"for role {_role!r}: {sorted(allow)}")
+            return Refusal(
+                "command_not_allowlisted", "allowlist",
+                f"Command {argv[0] if argv else ''!r} is not in the allowlist "
+                f"for role {_role!r}: {sorted(allow)}.",
+                "Shell access is allowlist-first so prompts cannot expand execution authority.")
         for tok in argv[1:]:
             if tok.startswith("/") or tok == ".." or tok.startswith("../") or "/../" in tok:
-                return f"argument {tok!r} rejected: paths must stay inside the workspace"
+                return Refusal(
+                    "argument_jail_escape", "jail",
+                    f"Argument {tok!r} was rejected. Paths must stay inside the workspace.",
+                    "The argument jail blocks simple path escapes before process launch.")
         try:
             sandboxed = sandbox_wrap(argv, ws, allow_network=_allow_network)
         except SandboxUnavailable as e:
-            return f"sandbox unavailable, shell blocked (fail-closed): {e}"
+            return Refusal(
+                "sandbox_unavailable", "sandbox",
+                f"Sandbox unavailable; shell blocked fail-closed: {e}",
+                "Shell commands require OS confinement before execution.")
         proc = subprocess.run(sandboxed, cwd=ws, capture_output=True, text=True,
                               timeout=300, env=scrubbed_env())
         out, n_redacted = redact_secrets((proc.stdout + proc.stderr)[:20_000])
         if proc.returncode == 71 and "sandbox_apply" in out:
-            return f"sandbox unavailable, shell blocked (fail-closed): {out.strip()}"
+            return Refusal(
+                "sandbox_unavailable", "sandbox",
+                f"Sandbox unavailable; shell blocked fail-closed: {out.strip()}",
+                "Shell commands require a sandbox profile that can actually apply.")
         suffix = f"\n[{n_redacted} credential-shaped string(s) redacted]" if n_redacted else ""
         return f"exit={proc.returncode}\n{out}{suffix}"
 
@@ -178,9 +201,11 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
         # owning agent or an operator lane edit — decisions above the
         # requesting agent's authority.
         owner = ledger.owner_of(path) if ledger is not None else None
+        ref = "CR-" + generate(5, check_digit=True)
         _emit("change_request", agent=_agent or _role, path=path,
-              owner=owner, description=description[:500])
-        return (f"change request recorded for {path!r} (owner: {owner or 'unknown'}). "
+              owner=owner, description=description[:500], ref=ref)
+        return (f"change request {ref} recorded for {path!r} "
+                f"(owner: {owner or 'unknown'}). "
                 "It will be surfaced to the operator and the owning agent; you may "
                 "not modify the file yourself.")
 

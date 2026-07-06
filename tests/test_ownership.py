@@ -5,8 +5,10 @@ agent can edit it). Enforcement happens at write_file dispatch, fail closed.
 """
 
 import json
+import re
 
 from harness.events import EventLog
+from harness.ids import verify_check_digit
 from harness.loop import AgentLoop
 from harness.models.base import AssistantTurn, MockModel, ModelSpec, ToolCall
 from harness.ownership import OwnershipLedger
@@ -131,5 +133,7 @@ def test_request_change_recorded_not_granted(tmp_path):
     assert res.ok
     reqs = events_of(tmp_path, "change_request")
     assert reqs and reqs[0]["path"] == "a.txt"
+    assert re.match(r"^CR-[0-9ACDFGHJKMNPRUWY]{6}$", reqs[0]["ref"])
+    assert verify_check_digit(reqs[0]["ref"].removeprefix("CR-"))
     # the request records intent; it grants nothing
     assert (tmp_path / "ws" / "a.txt").read_text() == "alice-v1"

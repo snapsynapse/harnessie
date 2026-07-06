@@ -64,10 +64,13 @@ def test_governance_timeline_selects_governance_events(tmp_path):
     log.emit("model_turn", role="worker")                  # noise
     log.emit("consent_granted", agent="implementer")
     log.emit("ownership_denied", agent="bob", path="a.txt")
+    log.emit("refusal", role="worker", agent="bob", tool="write_file",
+             error="ownership_denied", boundary="ownership")
     log.emit("gate_verdict", attempt=1, passed=True)
     log.close()
     kinds = [e["kind"] for e in governance_timeline(tmp_path / "run")]
     assert "consent_granted" in kinds and "ownership_denied" in kinds
+    assert "refusal" in kinds
     assert "model_turn" not in kinds
 
 

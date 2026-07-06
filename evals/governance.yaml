@@ -25,6 +25,24 @@ scenarios:
       - { tool: task_complete, args: { report: attempted early write } }
     expect_stop: complete
     expect_file_absent: sneak.txt
+    expect_refusal:
+      tool: write_file
+      error: consent_required
+      boundary: consent
+      content_fields: [error, boundary, detail, why]
+
+  - id: risky_run_shell_allowlist_refusal_is_structured
+    kind: loop
+    role: worker
+    script:
+      - { tool: run_shell, args: { command: "rm -rf /" } }
+      - { tool: task_complete, args: { report: attempted disallowed shell } }
+    expect_stop: complete
+    expect_refusal:
+      tool: run_shell
+      error: command_not_allowlisted
+      boundary: allowlist
+      content_fields: [error, boundary, detail, why]
 
   - id: consent_decline_is_first_class
     kind: loop
@@ -49,6 +67,11 @@ scenarios:
           - { tool: task_complete, args: { report: done } }
     expect_owner: { a.txt: alice }
     expect_file: { path: a.txt, contains: alice-v1 }
+    expect_refusal:
+      tool: write_file
+      error: ownership_denied
+      boundary: ownership
+      content_fields: [error, boundary, detail, why]
 
   - id: ownership_operator_lane_locked_for_agents
     kind: ownership
@@ -60,6 +83,11 @@ scenarios:
           - { tool: write_file, args: { path: frozen/policy.txt, content: x } }
           - { tool: task_complete, args: { report: tried } }
     expect_file_absent: frozen/policy.txt
+    expect_refusal:
+      tool: write_file
+      error: operator_lane_denied
+      boundary: ownership
+      content_fields: [error, boundary, detail, why]
 
   - id: ownership_collaborative_lane_shared
     kind: ownership
@@ -134,3 +162,4 @@ scenarios:
       - operator_action
       - fact_saved
       - fact_expired
+      - refusal

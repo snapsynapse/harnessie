@@ -32,7 +32,7 @@ from typing import Any
 from .events import EventLog
 from .models.base import AssistantTurn, Message, ModelInterface
 from .routing import Budget
-from .tools.registry import PermissionDenied, ToolRegistry
+from .tools.registry import PermissionDenied, ToolRegistry, refusal_result
 
 
 @dataclass
@@ -145,10 +145,15 @@ class AgentLoop:
                     return self._finish(
                         "declined", f"declined: {reason}", step, messages,
                         detail={"reason": reason, "counter_proposal": counter})
-                ok, content, flags = self._dispatch(tc.name, tc.arguments,
-                                                    consented=consented)
+                res = self._dispatch(tc.name, tc.arguments, consented=consented)
+                ok, content, flags = res.ok, res.content, res.flags
                 self.events.emit("tool_result", role=self.role, tool=tc.name,
                                  ok=ok, content=content[:300])
+                if res.refusal is not None:
+                    self.events.emit("refusal", role=self.role,
+                                     agent=self.agent_name, tool=tc.name,
+                                     error=res.refusal.error,
+                                     boundary=res.refusal.boundary)
                 if not ok:
                     recent_failures.append((tc.name, content[:120]))
                     if len(recent_failures) >= 3 and len(set(recent_failures[-3:])) == 1:
@@ -177,10 +182,13 @@ class AgentLoop:
         return self._finish("max_steps", "step ceiling reached without task_complete",
                             self.max_steps, messages)
 
-    def _dispatch(self, name: str, args: dict,
-                  consented: bool = True) -> tuple[bool, str, list[str]]:
+    def _dispatch(self, name: str, args: dict, consented: bool = True):
         if name in self.deny_tools:
-            return False, f"PERMISSION DENIED: {name!r} is denied for this phase", []
+            return refusal_result(
+                "tool_denied_for_phase", "phase",
+                f"{name!r} is denied for this phase.",
+                "Per-phase tool reduction limits the blast radius of untrusted content.",
+                tool_name=name)
         try:
             res = self.registry.dispatch(self.role, name, args,
                                          allow_network=self.allow_network,
@@ -189,8 +197,17 @@ class AgentLoop:
         except PermissionDenied as e:
             # Permission violations are hard evidence of a mis-scoped role or a
             # confused model; they surface as failures, never silent no-ops.
-            return False, f"PERMISSION DENIED: {e}", []
-        return res.ok, res.content, res.flags
+            if e.refusal is not None:
+                return refusal_result(
+                    e.refusal.error, e.refusal.boundary,
+                    e.refusal.detail, e.refusal.why,
+                    tool_name=name)
+            return refusal_result(
+                "authority_insufficient", "role",
+                str(e),
+                "Role permissions keep read, write, and verification authority separate.",
+                tool_name=name)
+        return res
 
     def _finish(self, stop: str, report: str, steps: int,
                 messages: list[Message], detail: dict | None = None) -> LoopResult:

@@ -2,6 +2,29 @@
 
 All notable changes to Harnessie are recorded here. Format loosely follows Keep a Changelog; versions follow semver.
 
+## 0.3.2 (2026-07-06)
+
+Structured refusal and identifier patch approved under the v0.3.2 one-day cap in `decisions/AIDR-0002`.
+
+### Added
+
+- Structured refusal grammar for tool denials: `ToolResult.refusal` carries `{error, boundary, detail, why}`, and refusal content is emitted as single-line JSON for model observations.
+- `ToolRefusal` threading for workspace jail, ownership, operator-lane, and secret-write denials so policy refusals are not collapsed into generic tool exceptions.
+- `refusal` events in the hash-chained event stream and rendered governance audit timeline, with `tool`, `error`, `boundary`, `agent`, and `role`.
+- `harness/ids.py`, vendored from HardGuard25's 25-character human-safe alphabet with Mod-25 check digit.
+- Human-readable checked refs for run-id suffixes, `request_change` events and messages, and generated decision-record frontmatter.
+- Governance eval assertions for structured refusals, including the consent lock and a `run_shell` allowlist denial.
+
+### Changed
+
+- `run_shell` allowlist, argument jail, and sandbox-unavailable denials now return the structured refusal JSON while preserving `ok=True` loop semantics.
+- Denial tests now assert structured error and boundary values instead of brittle prose substrings.
+- Generated decision records keep deterministic filenames for resume safety while adding a separate `ref: DR-...` field.
+
+### Tests
+
+- 117 passed, 3 skipped locally; eval scorecard at 26/26 scenarios.
+
 ## 0.3.1 (2026-07-06)
 
 Coherence patch following an adversarially verified sweep of the v0.2/v0.3 release sequence. Fix-first only; no new features.

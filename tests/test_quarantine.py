@@ -73,7 +73,9 @@ def test_write_file_blocks_credential_shaped_content(tmp_path):
     reg, ws = make_env(tmp_path)
     res = reg.dispatch("worker", "write_file",
                        {"path": "notes.md", "content": "key is pplx-" + "a" * 40})
-    assert not res.ok and "refusing write" in res.content
+    assert not res.ok
+    assert res.refusal and res.refusal.error == "secret_write_refused"
+    assert res.refusal.boundary == "secrets"
     assert not (ws / "notes.md").exists()
 
 
@@ -118,4 +120,4 @@ def test_deny_tools_hides_and_blocks(tmp_path):
     assert "run_shell" not in [t["name"] for t in model.calls[0]["tools"]]
     # dispatch backstop: the attempted call was denied, not executed
     tool_msgs = [m for m in model.calls[1]["messages"] if m.role == "tool"]
-    assert any("PERMISSION DENIED" in m.content for m in tool_msgs)
+    assert any('"error":"tool_denied_for_phase"' in m.content for m in tool_msgs)
