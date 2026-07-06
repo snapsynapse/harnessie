@@ -1,16 +1,22 @@
 # Next session handoff
 ## Current state
-Harnessie is at v0.3.2 on `main`, post-arbitration and post-stewardship rotation. The v0.3.2 hard-cap patch from `handoffs/HANDOFF-CODEX.md` is implemented: structured refusal grammar covers the enumerated tool denial surfaces, `refusal` events render in audit, run IDs keep their timestamp prefix with a checked human-safe suffix, `request_change` emits `CR-...` refs, and generated decision records add `ref: DR-...` without changing deterministic filenames.
-The named exclusions held:
-- `run_shell` denials still return `ok=True` observations, preserving stuck-detector semantics.
-- Generated `DR-<phase>.md` filenames remain deterministic for resume safety.
-- Gate and operator-facing phase prose remain prose, not JSON refusal payloads.
+Harnessie is at v0.3.3 on `main`. The v0.3.2 verification rotation (independent Claude review of the Codex patch) confirmed the implementation and surfaced three findings; v0.3.3 mitigates all three:
+- `refusal` events carry `detail` and `why`; the eval checker asserts `content_fields` on the `refusal` event and never parses truncated `tool_result` content.
+- The stuck detector counts policy refusals regardless of the `ok` flag; `run_shell` denials keep `ok=True` observation semantics but can no longer spin the loop (operator-authorized semantic change, governance scenario `risky_repeated_identical_denial_ends_stuck`).
+- `find_secrets` returns kind labels, never credential value fragments.
+0.4 portability is underway: Linux sandbox backends (bwrap preferred, firejail, docker; startup smoke tests; fail closed when unusable) plus a CI matrix (`.github/workflows/ci.yml`: Linux bubblewrap parity with the backend asserted admitted, macOS, no-backend fail-closed) are committed. CI has not run yet — it needs a push, which awaits the operator.
 ## Verification status
-- `python3 -m pytest -q`: 117 passed, 3 skipped on this host.
-- `python3 -m harness.cli eval`: 26/26 passed.
-- Red-first proof: `evals/governance.yaml` failed at 11/13 before implementation for missing refusal events, then passed at 13/13 after implementation.
-## Next unblocked work
-0.4 portability remains the undiluted headline: Linux sandbox backend plus parity tests, live scorecards including governance and triage suites, live contested phase across two real providers, and trust-bundle MANIFEST integrity. A third displacement of portability should be declined absent explicit operator arbitration.
+- `python3 -m pytest -q`: 131 passed on this host (macOS; 3 formerly-skipped sandbox tests run here).
+- `python3 -m harness.cli eval`: 27/27 (includes 14 governance scenarios).
+- Scrub grep against staged diffs: clean on every commit.
+## Next unblocked work (0.4 remainder)
+- Push and prove the CI matrix green; treat a red Linux job as the top priority.
+- Live-endpoint smoke tests (one loop turn against a real Anthropic endpoint and one local OpenAI-compatible endpoint, opt-in by env var). Implementation step 11.
+- Scorecard expansion against real endpoints, including the governance suite per brain. Steps 11-12.
+- Live contested phase across two real providers on `workflows/contested-decision.yaml`.
+- Trust-bundle MANIFEST integrity.
+## Standing task
+Skills and runbook inventory (ROADMAP standing task, Claude-session scoped): preliminary shortlist at `handoffs/skills-inventory-preliminary.md` (local, gitignored). Full pass should verify, extend, and produce the decision-ready shortlist.
 ## Non-goals standing
 - No public promotion work yet.
 - No annotated tags or release checklist ceremony until public promotion.
