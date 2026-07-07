@@ -1,7 +1,11 @@
 # Harnessie INTENT
 
-Tier: personal-utility (private). Trajectory: public / portfolio-bound.
+Tier: personal-utility (private). Trajectory: public release under Snap Synapse LLC.
 Canonical home (registered, private until launch): https://harnessie.com/
+
+Entity decision (2026-07-06, Sam): Harnessie releases as a Snap Synapse LLC project, not a PAICE.work PBC portfolio component. Rationale: Snap Synapse is the tools-people-use brand and the repo already lives at snapsynapse/harnessie; a PAICE release would frame it inward as a standards reference implementation, while the strategic value runs the other way. Harnessie is a distribution vector FOR the PAICE specs: it enforces Turnfile and AIDR lessons in code and credits them on its public surfaces, so adoption of the tool pulls discovery of the standards. The corresponding portfolio-level line lives in paice-foundation/INTENT.md.
+
+Positioning (2026-07-06, Sam): the public claim is "the safest and easiest first AI harness for people". Two audiences, ordered: developers are the GitHub audience and get the falsifiable version first (the security model, fail-closed invariants, independent verification, the threat model in SECURITY.md); the non-developer on-ramp is the design story inside that, not an unverifiable headline. Every safety superlative on a public surface must point at a checkable artifact.
 
 This document follows the portfolio Repo Standards INTENT.md section template. Harnessie is not yet a portfolio component; this INTENT is pre-applied so a later promotion is clean.
 
@@ -44,7 +48,7 @@ N/A as a formal open-spec gate. The working change discipline is: the full test 
 
 ## 7. Relationships to other PAICE standards
 
-Harnessie is not currently a PAICE portfolio component (private, personal-utility). Its multi-agent structure is modeled on the Safe Agentic Workflow (SAW) patterns. As of v0.2 it deliberately imports, as harness-enforced mechanics, the shipped lessons of two portfolio standards: Turnfile (consent-based coordination, ownership lanes, authority order, bounded rebuttal, eval-first change loop) and AIDR (record lifecycle, preserved dissent, human-only arbitration, structurally earned claims; the repo dogfoods AIDR in `decisions/`). These are lesson imports and format alignments, not conformance claims — Harnessie asserts no Turnfile or AIDR conformance. Remaining non-binding future integrations if promoted: Graceful Boundaries for agent refusal surfaces, GuideCheck for the shipped `assistant-guide.txt` once it is rewritten to a conformable Level 3 profile at public promotion (today it is a minimal unstructured guide).
+Harnessie is not a PAICE portfolio component and will not become one: it releases under Snap Synapse LLC (see the entity decision above), relating to PAICE standards by adoption, not ownership. It is built on the Aggregated Intelligence tenets, ratified as canon 2026-07-06 (eight tenets; the tenet-to-mechanism mapping is `GOVERNANCE.md` §7). Its multi-agent structure is modeled on the Safe Agentic Workflow (SAW) patterns. As of v0.2 it deliberately imports, as harness-enforced mechanics, the shipped lessons of two portfolio standards: Turnfile (consent-based coordination, ownership lanes, authority order, bounded rebuttal, eval-first change loop) and AIDR (record lifecycle, preserved dissent, human-only arbitration, structurally earned claims; the repo dogfoods AIDR in `decisions/`). These are lesson imports and format alignments, not conformance claims — Harnessie asserts no Turnfile or AIDR conformance. Remaining non-binding future integrations if promoted: Graceful Boundaries for agent refusal surfaces, GuideCheck for the shipped `assistant-guide.txt` once it is rewritten to a conformable Level 3 profile at public promotion (today it is a minimal unstructured guide).
 
 ## 8. Exceptions to Repo Standards
 
@@ -57,6 +61,7 @@ Harnessie is not currently a PAICE portfolio component (private, personal-utilit
 
 ## 9. Changelog
 
+- 2026-07-06 - Entity and positioning decision recorded (Sam): public release under Snap Synapse LLC; PAICE relationship is adoption-and-credit, not ownership; safety claims must be falsifiable and developer-checkable. §7 updated for the tenets ratification. README gains audience framing and a standards-credit section; ROADMAP gains the 0.6.0 first-harness readiness milestone (launch gate).
 - 2026-07-06 - v0.3.2 refusal and identifier hardening patch: structured refusal grammar now covers tool denial surfaces with audited `refusal` events; run IDs, change requests, and generated decision records carry human-readable checked refs; 0.4 portability remains the next milestone.
 - 2026-07-06 - v0.3.0 aggregated-intelligence release (operator direction): operator actions enter the hash-chained audit stream (approval events, arbitration as operator_action, `approve_tools:` recorded pre-approval); memory becomes substrate (verified/verify_by provenance, save_fact/expire_fact tools, archival-only disposal); `workflows/memory-triage.yaml` ships the maintenance-agent pattern under enforcement. Invariant 12 added. Direction record `decisions/AIDR-0002` (open). Portability displaced a second time to 0.4.0; roadmap flags a third displacement for operator arbitration.
 - 2026-07-06 - v0.2.0 governance layer: adversarial collaboration and evals promoted to foundational principles (operator direction). Consent-based orchestration, ownership lanes, contested phases with human-only arbitration, hash-chained audit; design in `GOVERNANCE.md`, direction record `decisions/AIDR-0001` (open, awaiting arbitration by Sam). Design invariants 8-11 added; §7 updated to record the Turnfile/AIDR lesson imports. Portability milestone displaced to 0.3.0.
