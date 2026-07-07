@@ -26,6 +26,10 @@ Public surface (staged under prepare-and-stage; NOT live):
 3. Make the repo public (or keep private; Pages serves publicly either way once enabled).
 4. Verify PostHog: visit the live page, confirm a pageview lands in the dedicated Harnessie project (needs a PostHog login). Optionally set up dashboards.
 5. On promotion, the standard release path applies (annotated tag, RELEASE_CHECKLIST, CI-gate-before-tag) per INTENT §8.
+## Next rotation
+
+The full task ladder for the next steward (0.4 remainder, then 0.5, then the 0.6 headless subset, with per-rung exit criteria and the operator gates) is in `handoffs/HANDOFF-CODEX.md` (gitignored), rewritten 2026-07-06 for stewardship rotation 2.
+
 ## Next unblocked engineering work (0.4 remainder)
 - CI matrix is green on a real run (done). Optional: bump checkout/setup-python action versions to clear the Node 20 deprecation annotation.
 - Live-endpoint smoke tests (one loop turn against a real Anthropic endpoint and one local OpenAI-compatible endpoint, opt-in by env var). Step 11.
