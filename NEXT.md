@@ -65,7 +65,7 @@ python3 -m harness.cli eval --live
 - Threat-model comparison artifact: SECURITY.md properties vs prevailing harness failure modes, each row citing enforcing code and tests. DONE 2026-07-07: `docs/threat-model.md` (11 rows, 25 cited test nodes all passing), linked from README + SECURITY.md; see CHANGELOG Unreleased and ROADMAP 0.6.0.
 - Default-deny posture audit extending `tests/test_repo_configs.py`. DONE 2026-07-07: 11 assertions over the shipped registry, OWNERSHIP.yaml, and CLI seams; see CHANGELOG Unreleased and ROADMAP 0.6.0.
 - GuideCheck content rewrite of `assistant-guide.txt` to Level 3+ and manifest sidecar prep; end-to-end `.well-known` verify waits for Pages.
-- Graceful Boundaries conformance check and citation/gap list.
+- Graceful Boundaries conformance check and citation/gap list. DONE 2026-07-07: transport-adapted GB adoption (Level 1 grammar MET across all denial sites, Action Boundaries vocab aligned, SC-16 met, HTTP Levels 2-4 N/A); cited in GOVERNANCE.md §8 + INTENT.md §7, proven by `tests/test_graceful_boundaries.py`; see CHANGELOG Unreleased and ROADMAP 0.6.0.
 - PyPI packaging prep only; publishing is an operator act.
 
 ## Non-goals standing

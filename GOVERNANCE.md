@@ -139,7 +139,19 @@ The operational mapping:
 
 The memory-triage workflow (`workflows/memory-triage.yaml`) is the working expression: a scheduled maintenance agent — the same job as the operator's vault triage agent — running under these controls, so "should not delete without approval" becomes "cannot."
 
-## 8. What this is not
+## 8. Structured refusal grammar and Graceful Boundaries conformance
+
+Every denial the harness emits, at the registry, the shell tool, and the loop, carries one grammar: a frozen `Refusal(error, boundary, detail, why)` (`harness/tools/registry.py`). All four fields are required, so a partial refusal cannot be constructed; `error` is a stable snake_case code for programmatic matching, `why` gives the reason the boundary exists rather than restating the error. The loop emits each as a `refusal` event with all four fields (`harness/loop.py`), so the audit timeline in §5 is itself the structured-refusal surface.
+
+This adopts Graceful Boundaries (gracefulboundaries.dev, spec 1.5.1), transport-adapted. Harnessie is not an HTTP service, so the GB requirements that assume HTTP transport are Not Applicable by transport: the Level 2 limits-discovery endpoint (`/.well-known/limits`) and the Level 4 proactive `RateLimit` headers have no surface to live on in a local request-response harness. What is adopted, per the GB FAQ ("the principles and field names apply to any request-response protocol"):
+
+- Level 1 structured-refusal shape: MET across all denial sites. Each refusal carries `error` + `detail` + `why` (GB Level 1 core) plus a `boundary` tag. Proven by `tests/test_graceful_boundaries.py` (grammar completeness, snake_case error, why-is-a-reason) over the unknown-tool, role-denied, consent-locked, approval, secret-write, jail-escape, and shell-allowlist paths.
+- Action Boundaries refusal vocabulary (GB spec Appendix C.4): the harness's action-refusal codes `authority_insufficient`, `approval_required`, and `action_unsupported` are GB's exact recommended errors; consent, ownership, and approval map to the C.3 action statuses (`requires_approval`, `human_only`, `blocked`), and the hash-chained log is the C.3 `audit.eventLogAvailable` signal. Behavioral alignment, not a published Action Boundaries document.
+- SC-16 (machine-readable guidance is untrusted data): MET both directions. The harness treats tool results and artifact contents as data, never instructions (quarantine ingress filter, loop tripwire, and the machine-owned role boundaries in `harness/roles.py`), which is exactly SC-16's requirement for an agent consuming boundary responses.
+
+Named gaps, stated so the claim stays honest: no `/.well-known/limits` or Action Boundaries JSON document is published (N/A while there is no HTTP surface; revisit if a served API is ever added); the numbered Levels 2 through 4 are therefore not claimed. One representation detail: `run_shell` denials return their `Refusal` as an `ok=True` observation the agent can recover from within the loop (the loop keys stall and refusal detection on the refusal object, not on `ok`), while hard denials are `ok=False`; the GB grammar is complete in both cases.
+
+## 9. What this is not
 
 - Not a peer-to-peer protocol: Harnessie remains one orchestrator, one process. Turnfile's multi-runtime mailbox/worklog machinery is out of scope; if Harnessie sessions ever need to interoperate with other runtimes, that is a Turnfile adoption decision, not a reimplementation.
 - Not synthesis: contested decisions are never merged into a compromise by a model. The record preserves the disagreement; the human resolves it (AIDR WHY.md).
