@@ -2,7 +2,7 @@
 
 Brain-agnostic is a testable claim, not a slogan. This page is the receipt: the models that have actually produced work under the harness, each linked to the on-disk record that proves it, plus the set you can swap to by editing one file.
 
-Scope: this tracks models run under the harness at runtime. It does not track the development tooling used to write Harnessie's own code (that collaboration spans models too, but it is not the claim being made here).
+Scope: the table below tracks models run under the harness at runtime, each backed by a decision record. The models that built Harnessie's own code are a separate and honest story, credited under [Built with](#built-with) at the end.
 
 ## Proven under the harness
 
@@ -30,11 +30,20 @@ Declared in [config/models.yaml](https://github.com/snapsynapse/harnessie/blob/m
 
 Any OpenAI-compatible endpoint works with no code change: vLLM, Ollama, llama.cpp, Together, OpenRouter, Fireworks, DeepSeek, Mistral, xAI, and others. Swapping a provider is a `model_id` and `base_url` edit.
 
+## Built with
+
+Development provenance, distinct from the runtime table above: these frontier models wrote and reviewed Harnessie's own code rather than running under it, so they are not each backed by a single decision record. The trail is in the git history and the session handoffs.
+
+- Claude Fable 5 (Anthropic): primary implementation and review across the 0.1 to 0.4 line, and the frontier orchestrator in config.
+- GPT-5.5 (OpenAI, via Codex): implemented the v0.3.2 structured-refusal and checked-identifier patch, then handed it to Claude Fable 5, which verified it independently in the next session.
+
+Two frontier models from different providers handing work back and forth on the harness itself is the thesis applied to its own construction.
+
 ## Coverage we would like to add
 
 The claim gets stronger as it spans more of the capability curve and more independent providers. Open gaps worth closing, each by running the model through a contested phase so it earns a record:
 
-- A second frontier closed model from a different provider (Google Gemini, or a GPT-5-class or Grok model). Today the only frontier-tier proven brain is Anthropic; a frontier peer proves brain-agnostic at the top of the curve, not only that small local models can participate.
+- A frontier closed model from another provider with a runtime receipt. GPT-5.5 already built the harness (see Built with) but has not yet run under it; a frontier non-Anthropic brain producing an arbitrated position (a GPT-5-class model, Google Gemini, or Grok) would put a second frontier provider in the proven table, not only in the build.
 - Meta Llama (open weights): the most widely deployed open family, currently unrepresented.
 - Mistral (Mistral Large or a Mixtral): a European provider, added architectural and geographic diversity.
 - DeepSeek (V3 or R1): a distinct strong-reasoning provider, already namechecked in the config comments.
