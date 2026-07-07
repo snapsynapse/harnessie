@@ -6,6 +6,8 @@ Harnessie is built to be the safest and easiest first AI harness for people. "Sa
 
 The operating thesis: the harness structure carries the quality floor, the model carries the ceiling. Run it with Claude Fable 5 as the orchestrator and it exploits effort dials, long autonomous turns, and verifier subagents. Swap the workers (or everything) for Haiku, GLM, Qwen, or any OpenAI-compatible local endpoint by editing one YAML file, and the gates, jails, budgets, and retry ladders keep output honest.
 
+Beneath that thesis sit five engineering habits, each proven separately in the author's other tools and standards before it landed here as code: deterministic checks run before any model judgment (the gate order in [docs/GUIDE.md](docs/GUIDE.md)); evaluation comes before implementation — a governance mechanic without a red-then-green scenario pair does not merge ([EVALS.md](EVALS.md)); remembered facts carry verified and verify-by dates and expire visibly, never silently ([GOVERNANCE.md](GOVERNANCE.md)); every agent and operator action lands in one hash-chained, tamper-evident timeline ([docs/threat-model.md](docs/threat-model.md)); and any control that cannot be enforced fails closed rather than running unenforced ([SECURITY.md](SECURITY.md)). The same habits produced the standards Harnessie adopts — [Turnfile](https://turnfile.work/), [AIDR](https://aidr.work/), [Graceful Boundaries](https://gracefulboundaries.dev/) — which is why they fit together.
+
 ## Quick start
 
 ```bash
