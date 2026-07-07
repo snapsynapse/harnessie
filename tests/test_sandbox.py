@@ -47,7 +47,11 @@ def test_wrap_returns_sandbox_prefixed_argv(tmp_path):
             sandbox.wrap(["ls"], tmp_path)
         return
     argv = sandbox.wrap(["pytest", "-q"], tmp_path)
-    assert argv[0] == "sandbox-exec" and "pytest" in argv
+    # The wrapper binary is backend-specific: sandbox-exec on macOS, bwrap /
+    # firejail / docker on Linux. Assert it matches the admitted backend.
+    expected = {"seatbelt": "sandbox-exec", "bwrap": "bwrap",
+                "firejail": "firejail", "docker": "docker"}[sandbox.backend_name()]
+    assert argv[0] == expected and "pytest" in argv
 
 
 # -- the actual gap: interpreter escape (needs a real backend) --------------
