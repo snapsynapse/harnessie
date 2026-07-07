@@ -58,7 +58,7 @@ python3 -m harness.cli eval --live
 
 ### 0.6.0 headless subset
 
-- Grow `harnessie init` into guided first run: Python check, sandbox-backend detect, env-var API-key walk-through, ends on a green zero-dollar mock-brain run.
+- Grow `harnessie init` into guided first run: Python check, sandbox-backend detect, env-var API-key walk-through, ends on a green zero-dollar mock-brain run. DONE 2026-07-07: `harness/firstrun.py` + `init` wiring (readiness report, zero-dollar baseline run, named next commands; `--no-verify` to skip); proven by `tests/test_firstrun.py`; see CHANGELOG Unreleased and ROADMAP 0.6.0.
 - Plain-language operator surface: `harnessie report` and halt messages should self-explain with one named next action. DONE 2026-07-07: `harness/explain.py` + CLI wiring (`run`/`resume` summary, plain `report` with `--raw` fallback); each halt names one command; proven by `tests/test_explain.py`; see CHANGELOG Unreleased and ROADMAP 0.6.0.
 - Pre-run cost preview; refuse to start a live run when no ceiling is set. DONE 2026-07-07: `harness/preflight.py` + CLI wiring + `tests/test_preflight.py`; see CHANGELOG Unreleased and ROADMAP 0.6.0.
 - Non-developer quickstart + glossary; honest Windows/WSL2 page.

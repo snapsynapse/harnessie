@@ -79,10 +79,12 @@ def main(argv: list[str] | None = None) -> int:
         "verify-manifest", help="verify the trust-bundle MANIFEST integrity")
     p_manifest.add_argument("manifest", nargs="?", default="docs/MANIFEST.yaml")
 
-    p_init = sub.add_parser("init", help="create a minimal Harnessie project layout")
+    p_init = sub.add_parser("init", help="scaffold a project and run a guided first run")
     p_init.add_argument("path", nargs="?", default=".", help="target directory")
     p_init.add_argument("--force", action="store_true",
                         help="overwrite existing scaffold files")
+    p_init.add_argument("--no-verify", action="store_true",
+                        help="skip the guided readiness check and zero-dollar mock run")
 
     args = parser.parse_args(argv)
     root = Path(args.root).resolve()
@@ -153,7 +155,13 @@ def main(argv: list[str] | None = None) -> int:
         written = init_project(target, force=args.force)
         print(f"initialized Harnessie project at {target}")
         print(f"wrote {len(written)} file(s)")
-        return 0
+        if args.no_verify:
+            return 0
+        from .firstrun import guided_first_run
+
+        ready, report = guided_first_run(target)
+        print(report)
+        return 0 if ready else 1
 
     from .runner import WorkflowRunner, load_models_config  # deferred: import cost
     from .preflight import build_preview, format_preview
