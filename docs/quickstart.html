@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>Quickstart &mdash; Harnessie</title>
+  <meta name="description" content="The gentlest path into Harnessie: no git or shell fluency assumed, with a glossary and an honest Windows/WSL2 page.">
+  <meta name="author" content="Sam Rogers">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <meta name="theme-color" content="#2f6b28">
+  <link rel="canonical" href="https://harnessie.com/quickstart.html">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/plain" href="https://harnessie.com/llms.txt" title="LLM-readable summary">
+  <link rel="assistant-guide" href="https://harnessie.com/.well-known/assistant-guide.txt">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Harnessie">
+  <meta property="og:title" content="Quickstart &mdash; Harnessie">
+  <meta property="og:description" content="The gentlest path into Harnessie: no git or shell fluency assumed, with a glossary and an honest Windows/WSL2 page.">
+  <meta property="og:image" content="https://harnessie.com/imgs/og.png">
+  <meta property="og:url" content="https://harnessie.com/quickstart.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Quickstart &mdash; Harnessie">
+  <meta name="twitter:description" content="The gentlest path into Harnessie: no git or shell fluency assumed, with a glossary and an honest Windows/WSL2 page.">
+  <meta name="twitter:image" content="https://harnessie.com/imgs/og.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #f7f8fc; --bg-alt: #eceff4; --text: #17281a; --text-muted: #566458;
+      --accent: #2f6b28; --accent-hover: #24571f; --border: #d6dce2;
+      --code-bg: #16261a; --code-text: #e8ece4;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+      --max-width: 860px; --radius: 10px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.65; -webkit-font-smoothing: antialiased; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+    .skip-link { position: absolute; left: -9999px; top: 0; background: var(--accent); color: var(--bg); padding: 0.5rem 1rem; z-index: 100; }
+    .skip-link:focus { left: 0; }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 1.5rem; }
+    nav.site { border-bottom: 1px solid var(--border); background: var(--bg); }
+    nav.site .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem 1rem; padding-top: 0.8rem; padding-bottom: 0.8rem; }
+    nav.site .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--text); font-size: 1.05rem; }
+    nav.site .links { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.95rem; }
+    nav.site .links a { color: var(--text-muted); }
+    nav.site .links a[aria-current="page"] { color: var(--accent); font-weight: 600; }
+    main { padding: 2.5rem 0 3.5rem; }
+    h1 { font-size: 1.9rem; line-height: 1.25; margin-bottom: 1rem; }
+    h2 { font-size: 1.4rem; margin: 2.2rem 0 0.7rem; padding-top: 0.4rem; }
+    h3 { font-size: 1.12rem; margin: 1.6rem 0 0.5rem; }
+    h4 { font-size: 1rem; margin: 1.2rem 0 0.4rem; }
+    p { margin: 0 0 1rem; }
+    ul, ol { margin: 0 0 1rem 1.4rem; }
+    li { margin-bottom: 0.35rem; }
+    code { font-family: var(--mono); font-size: 0.88em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.08em 0.35em; }
+    pre { background: var(--code-bg); color: var(--code-text); border-radius: var(--radius); padding: 1rem 1.2rem; overflow-x: auto; margin: 0 0 1.2rem; font-size: 0.86rem; line-height: 1.55; }
+    pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+    .table-wrap { overflow-x: auto; margin: 0 0 1.2rem; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+    th, td { border: 1px solid var(--border); padding: 0.5rem 0.7rem; text-align: left; vertical-align: top; }
+    th { background: var(--bg-alt); }
+    .crumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.2rem; }
+    footer { border-top: 1px solid var(--border); background: var(--bg-alt); padding: 2rem 0; font-size: 0.9rem; color: var(--text-muted); }
+    footer .row { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin-bottom: 0.6rem; }
+  </style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="site" aria-label="Main navigation">
+  <div class="container">
+    <a href="/" class="logo" aria-label="Harnessie home">
+      <img src="/imgs/harnessie-mark.png" width="26" height="26" alt="">
+      <span>Harnessie</span>
+    </a>
+    <div class="links">
+      <a href="/quickstart.html" aria-current="page">Quickstart</a>
+      <a href="/getting-started.html">Getting started</a>
+      <a href="/guide.html">User guide</a>
+      <a href="/brains.html">Brains</a>
+      <a href="/threat-model.html">Threat model</a>
+      <a href="https://github.com/snapsynapse/harnessie" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</nav>
+<main id="main-content">
+  <div class="container">
+    <p class="crumb"><a href="/">harnessie.com</a> / docs / Quickstart</p>
+    <h1>Quickstart for people, not just developers</h1>
+<p>This is the gentlest path into Harnessie. It assumes you have never cloned a repository, never written YAML, and are not sure what a terminal is for. That is fine. Every command here is safe, nothing reaches the internet or spends money until you decide it should, and the tool checks your machine for you before anything runs.</p>
+<p>If you are already comfortable in a terminal, the faster five-minute path is <a href="/getting-started.html">Getting started</a>, and the full reference is <a href="/guide.html">the user guide</a>.</p>
+<h2 id="what-harnessie-is-in-one-breath">What Harnessie is, in one breath</h2>
+<p>A harness is the structure you put around an AI model so it can do real work while you stay in control. It decides what the AI is allowed to do, checks the work before moving on, and writes down everything that happened so you can read it back. Harnessie is built to be a safe first one: it runs on your own machine, and its first run costs nothing because it uses a pretend &quot;mock&quot; model instead of a paid one.</p>
+<p>New words (harness, agent, workflow, gate, brain, and so on) are collected in the <a href="#glossary">Glossary</a> at the end. You do not need to memorize them; glance down when one shows up.</p>
+<h2 id="what-you-need">What you need</h2>
+<ul><li>A computer running macOS, Linux, or Windows with WSL2 (see <a href="#running-on-windows">Running on Windows</a> below).</li><li>Python 3.11 or newer. To check, open a terminal and run <code>python3 --version</code>. If it prints 3.11 or higher, you are set. If not, install Python from python.org first.</li><li>A terminal. On macOS it is the Terminal app; on Linux it is your shell; on Windows it is the WSL2 (Ubuntu) window.</li></ul>
+<p>You do not need an API key, a credit card, or a cloud account to finish this quickstart.</p>
+<h2 id="step-1-get-harnessie">Step 1: Get Harnessie</h2>
+<p>Until Harnessie is published to the Python package index, you install it from source. Paste these lines into your terminal one block at a time:</p>
+<pre><code>git clone https://github.com/snapsynapse/harnessie.git
+cd harnessie
+pip install -e &quot;.[dev]&quot;</code></pre>
+<p>The first line downloads the code, the second moves into its folder, and the third installs the <code>harnessie</code> command. If <code>pip</code> is not found, try <code>python3 -m pip</code> in its place.</p>
+<h2 id="step-2-let-the-tool-check-your-machine">Step 2: Let the tool check your machine</h2>
+<p>Create your own project and let Harnessie tell you whether everything is ready:</p>
+<pre><code>harnessie init my-first-project</code></pre>
+<p>This scaffolds a small project (a config file, an example workflow, the agent instructions) and then runs a guided first check. You will see something like:</p>
+<pre><code>Guided first run — is this machine ready?
+
+  [ok  ] Python: Python 3.12 meets the 3.11+ requirement.
+  [ok  ] Sandbox: OS sandbox backend detected: seatbelt. Shell work will be confined.
+  [ok  ] API keys: No API key needed: this scaffold uses the mock brain, so your first run costs zero dollars.
+  [ok  ] First run: Zero-dollar mock run: 2/2 eval baseline checks passed. Your harness works end to end and billed nothing.
+
+You are ready. Run your first workflow:
+  harnessie run workflows/build-and-verify.yaml --goal &quot;your goal here&quot;</code></pre>
+<p>Read each line. If Python is too old, it says so. If your computer has no sandbox (the safety cage around any command the AI runs), it says so plainly and explains that shell work will simply be blocked until you add one, which is protection, not breakage. The last line proves the harness works, using the mock model, for zero dollars.</p>
+<h2 id="step-3-run-your-first-real-workflow">Step 3: Run your first real workflow</h2>
+<p>Move into your project and run the built-in workflow, which plans a small change, makes it, and checks it:</p>
+<pre><code>cd my-first-project
+harnessie run workflows/build-and-verify.yaml --goal &quot;a to-do list saved to a text file&quot;</code></pre>
+<p>Before it starts, Harnessie prints a cost preview. Because the scaffold uses the mock model, it will say <code>MOCK (zero-dollar, nothing is billed)</code>. The run then prints a plain summary at the end. Every run gets an id; note it down, or copy it from the summary.</p>
+<p>To use a real, paid AI model later, you edit one file (<code>config/models.yaml</code>) and set the model&#x27;s key as an environment variable in your terminal. You never paste a key into a file. Harnessie refuses to start a paid run that has no spending ceiling, so you cannot accidentally run up a bill.</p>
+<h2 id="step-4-read-what-happened">Step 4: Read what happened</h2>
+<p>A run never just says &quot;done&quot;. Ask for a plain-language report:</p>
+<pre><code>harnessie report &lt;run_id&gt;</code></pre>
+<p>Put your run&#x27;s id in place of <code>&lt;run_id&gt;</code>. The report tells you, in ordinary sentences, which steps completed, whether the run stopped and is waiting for you, and the single next thing to do. For the complete, hash-verified trail of every action, run <code>harnessie audit &lt;run_id&gt;</code>.</p>
+<h2 id="step-5-when-a-run-stops-and-waits-for-you">Step 5: When a run stops and waits for you</h2>
+<p>Silence is never treated as success. A run ends in a named condition, and each one names one action:</p>
+<ul><li>Completed: the goal was met and every check passed. Nothing to do.</li><li>Stopped and waiting for you (<code>needs_human</code>): a check did not pass. Read the report, fix what it points at, and run the <code>harnessie resume ...</code> command it gives you.</li><li>A contested decision needs your call (<code>needs_arbitration</code>): the agents disagreed and did not paper over it. The report names the exact decision file to edit; record your decision there, then resume.</li></ul>
+<p>Re-running is safe: a resume only re-does the steps that did not already pass.</p>
+<h2 id="running-on-windows">Running on Windows</h2>
+<p>Harnessie&#x27;s safety depends on an operating-system sandbox that confines any command the AI runs. macOS and Linux provide one. Bare Windows (the Command Prompt or PowerShell) does not provide one that Harnessie can use, so on bare Windows the harness fails closed: any workflow step that runs a shell command is blocked rather than run without a cage. That is deliberate. An unconfined command is exactly the risk the sandbox exists to remove, so running without one would quietly break the core safety promise.</p>
+<p>The supported path on Windows is WSL2 (Windows Subsystem for Linux), which gives you a real Linux environment inside Windows:</p>
+<ol><li>Open PowerShell as Administrator and run <code>wsl --install</code>. Restart when asked.</li><li>Launch the installed Ubuntu app and finish its first-time setup.</li><li>Inside that Ubuntu window, follow this quickstart from <a href="#step-1-get-harnessie">Step 1</a>. It is now a Linux machine, and the Linux sandbox (bubblewrap) applies.</li></ol>
+<p>Everything mock and offline works on bare Windows too (the checks, the eval baseline, reading reports), because none of it runs a sandboxed shell command. It is only shell-using workflow steps that require WSL2. If you are only exploring, you can start on bare Windows and move to WSL2 when you want to run a real workflow.</p>
+<h2 id="glossary">Glossary</h2>
+<p>Terms in the order a newcomer meets them, each in one plain sentence.</p>
+<ul><li>Harness: the structure around an AI model that decides what it may do, checks its work, and records what happened.</li><li>Brain / model: the AI itself. Harnessie can use different ones without code changes; you pick in a config file.</li><li>Mock brain: a pretend model that follows a fixed script, used so your first runs are free and predictable.</li><li>Tier: a named slot for a model (for example <code>cheap</code>, <code>mid</code>, <code>frontier</code>), so a workflow can ask for &quot;a capable model&quot; without naming a specific vendor.</li><li>Agent: one AI doing one job within a run. The three kinds below are all agents.</li><li>Orchestrator: the agent that breaks your goal into small tasks and hands them out. It cannot change files itself.</li><li>Worker: an agent that does one scoped task inside a walled-off folder and reports what it did.</li><li>Verifier: an independent agent that checks a worker&#x27;s result against the rules before the run moves on. It is deliberately not shown the worker&#x27;s reasoning.</li><li>Workflow: the ordered list of steps for a job, written in a small YAML file.</li><li>Phase / step: one entry in a workflow, handled by one agent.</li><li>Gate: the check at the end of a phase. If it fails, the run stops instead of building on unverified work.</li><li>Workspace: the walled-off folder agents may write in. They cannot reach outside it.</li><li>Sandbox: the operating-system cage around any command an agent runs, so it cannot touch your files or the network unless you allow it.</li><li>Ceiling / budget: the maximum tokens and dollars a run may spend. A paid run refuses to start without one.</li><li>Consent: a worker must accept a task before it is allowed to change anything; a task is an offer, not an order.</li><li>Ownership lane: a rule about which agent (or you) owns which files, so agents cannot overwrite each other&#x27;s work or yours.</li><li>Arbitration: when agents disagree, a human (you) makes the call. The tool never averages a disagreement into a fake consensus.</li><li>Refusal: a structured &quot;no&quot; from the harness that always says what was refused, which boundary applied, and why.</li><li>Audit: the tamper-evident log of every action in a run, which <code>harnessie audit</code> re-verifies end to end.</li></ul>
+<h2 id="where-to-next">Where to next</h2>
+<ul><li><a href="/getting-started.html">Getting started</a>: the same path, faster, for a terminal-comfortable reader.</li><li><a href="/guide.html">User guide</a>: the complete guide, from concepts to extending the harness.</li><li><a href="https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md">GOVERNANCE.md</a>: how consent, ownership, contested decisions, and the audit trail work.</li><li><a href="https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md">SECURITY.md</a>: the prompt-injection and secret-handling model, and the sandbox backends.</li></ul>
+  </div>
+</main>
+<footer>
+  <div class="container">
+    <div class="row">
+      <a href="/quickstart.html">Quickstart</a>
+      <a href="/getting-started.html">Getting started</a>
+      <a href="/guide.html">User guide</a>
+      <a href="/brains.html">Brains</a>
+      <a href="/threat-model.html">Threat model</a>
+    </div>
+    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/quickstart.md" target="_blank" rel="noopener">docs/quickstart.md</a>.</p>
+  </div>
+</footer>
+</body>
+</html>

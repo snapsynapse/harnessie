@@ -1,8 +1,10 @@
 # docs
 
-The public served tree. When Harnessie goes public, GitHub Pages publishes from `main` `/docs` per the portfolio Repo Standards, so everything here is intended to be publicly fetchable. Internal engineering and planning docs live at the repo root, not here.
+The public served tree. GitHub Pages publishes from `main` `/docs`, so everything here is publicly fetchable at https://harnessie.com/. Internal engineering and planning docs live at the repo root, not here.
 
 Contents:
-- `index.html` plus `favicon.svg`, `CNAME`, `sitemap.xml`, `robots.txt`, `llms.txt`, `site.webmanifest`, `404.html`: the canonical landing page (https://harnessie.com/) and its crawler and discovery files. Staged; GitHub Pages is not yet enabled.
-- `getting-started.md`: the five-minute path from install to a green run.
-- `GUIDE.md`: the complete user guide.
+- `index.html` plus `favicon.svg`, `CNAME`, `sitemap.xml`, `robots.txt`, `llms.txt`, `site.webmanifest`, `404.html`: the canonical landing page and its crawler and discovery files.
+- `quickstart.md`, `getting-started.md`, `GUIDE.md`, `brains.md`, `threat-model.md`: the user-facing docs, each also served as a styled HTML page (`quickstart.html`, `getting-started.html`, `guide.html`, `brains.html`, `threat-model.html`) so the site is navigable without GitHub.
+- The `.html` doc pages are GENERATED from the markdown by `scripts/build_docs_html.py`. Do not edit them directly: edit the markdown, run `python3 scripts/build_docs_html.py`, and commit source and output together.
+- `.well-known/`: the GuideCheck trust pair (`assistant-guide.txt`, byte-identical to the repo-root copy, plus its provenance sidecar `assistant-guide-manifest.txt`). Sync is enforced by `tests/test_guide_artifacts.py`. `.nojekyll` keeps Pages serving this dot-directory.
+- `MANIFEST.yaml`: the trust-bundle integrity manifest; `python3 -m harness.cli verify-manifest` checks it.

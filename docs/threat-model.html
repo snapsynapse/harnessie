@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>Threat model &mdash; Harnessie</title>
+  <meta name="description" content="A falsifiable comparison of Harnessie&#x27;s structural properties against the failure modes of prevailing agent harnesses, each row citing the enforcing code and its test.">
+  <meta name="author" content="Sam Rogers">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <meta name="theme-color" content="#2f6b28">
+  <link rel="canonical" href="https://harnessie.com/threat-model.html">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/plain" href="https://harnessie.com/llms.txt" title="LLM-readable summary">
+  <link rel="assistant-guide" href="https://harnessie.com/.well-known/assistant-guide.txt">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Harnessie">
+  <meta property="og:title" content="Threat model &mdash; Harnessie">
+  <meta property="og:description" content="A falsifiable comparison of Harnessie&#x27;s structural properties against the failure modes of prevailing agent harnesses, each row citing the enforcing code and its test.">
+  <meta property="og:image" content="https://harnessie.com/imgs/og.png">
+  <meta property="og:url" content="https://harnessie.com/threat-model.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Threat model &mdash; Harnessie">
+  <meta name="twitter:description" content="A falsifiable comparison of Harnessie&#x27;s structural properties against the failure modes of prevailing agent harnesses, each row citing the enforcing code and its test.">
+  <meta name="twitter:image" content="https://harnessie.com/imgs/og.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #f7f8fc; --bg-alt: #eceff4; --text: #17281a; --text-muted: #566458;
+      --accent: #2f6b28; --accent-hover: #24571f; --border: #d6dce2;
+      --code-bg: #16261a; --code-text: #e8ece4;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+      --max-width: 860px; --radius: 10px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.65; -webkit-font-smoothing: antialiased; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+    .skip-link { position: absolute; left: -9999px; top: 0; background: var(--accent); color: var(--bg); padding: 0.5rem 1rem; z-index: 100; }
+    .skip-link:focus { left: 0; }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 1.5rem; }
+    nav.site { border-bottom: 1px solid var(--border); background: var(--bg); }
+    nav.site .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem 1rem; padding-top: 0.8rem; padding-bottom: 0.8rem; }
+    nav.site .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--text); font-size: 1.05rem; }
+    nav.site .links { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.95rem; }
+    nav.site .links a { color: var(--text-muted); }
+    nav.site .links a[aria-current="page"] { color: var(--accent); font-weight: 600; }
+    main { padding: 2.5rem 0 3.5rem; }
+    h1 { font-size: 1.9rem; line-height: 1.25; margin-bottom: 1rem; }
+    h2 { font-size: 1.4rem; margin: 2.2rem 0 0.7rem; padding-top: 0.4rem; }
+    h3 { font-size: 1.12rem; margin: 1.6rem 0 0.5rem; }
+    h4 { font-size: 1rem; margin: 1.2rem 0 0.4rem; }
+    p { margin: 0 0 1rem; }
+    ul, ol { margin: 0 0 1rem 1.4rem; }
+    li { margin-bottom: 0.35rem; }
+    code { font-family: var(--mono); font-size: 0.88em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.08em 0.35em; }
+    pre { background: var(--code-bg); color: var(--code-text); border-radius: var(--radius); padding: 1rem 1.2rem; overflow-x: auto; margin: 0 0 1.2rem; font-size: 0.86rem; line-height: 1.55; }
+    pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+    .table-wrap { overflow-x: auto; margin: 0 0 1.2rem; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+    th, td { border: 1px solid var(--border); padding: 0.5rem 0.7rem; text-align: left; vertical-align: top; }
+    th { background: var(--bg-alt); }
+    .crumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.2rem; }
+    footer { border-top: 1px solid var(--border); background: var(--bg-alt); padding: 2rem 0; font-size: 0.9rem; color: var(--text-muted); }
+    footer .row { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin-bottom: 0.6rem; }
+  </style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="site" aria-label="Main navigation">
+  <div class="container">
+    <a href="/" class="logo" aria-label="Harnessie home">
+      <img src="/imgs/harnessie-mark.png" width="26" height="26" alt="">
+      <span>Harnessie</span>
+    </a>
+    <div class="links">
+      <a href="/quickstart.html">Quickstart</a>
+      <a href="/getting-started.html">Getting started</a>
+      <a href="/guide.html">User guide</a>
+      <a href="/brains.html">Brains</a>
+      <a href="/threat-model.html" aria-current="page">Threat model</a>
+      <a href="https://github.com/snapsynapse/harnessie" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</nav>
+<main id="main-content">
+  <div class="container">
+    <p class="crumb"><a href="/">harnessie.com</a> / docs / Threat model</p>
+    <h1>Threat-model comparison: Harnessie versus prevailing harness patterns</h1>
+<p>Harnessie&#x27;s headline claim is that it is the safest first agentic harness for people. This document is the artifact that claim points at, and it is written to be falsifiable. Every row below names a failure mode common to prevailing agent harnesses, states what Harnessie does instead, and cites both the code that enforces the difference and the test that proves the code does what the row says. If a citation does not hold, the row is wrong, and the claim is weaker than stated. That is the intended way to read it: as a set of checkable assertions, not a marketing table.</p>
+<p>Scope: this compares structural and mechanical properties, the things a role prompt cannot opt out of. Prompt-quality differences are out of scope because they are not falsifiable in code. The honest residual (what none of these layers catch) is stated at the end rather than hidden.</p>
+<p>The four patterns the industry defaults to, and where they fail, are the spine: unsandboxed shell, prompt-level-only guardrails, self-verification, and silent dissent-merging. The remaining rows extend the same discipline to cost, secrets, approval, ownership, consent, and audit.</p>
+<h2 id="comparison">Comparison</h2>
+<div class="table-wrap"><table><thead><tr><th>Prevailing failure mode</th><th>What prevailing harnesses do</th><th>What Harnessie does instead</th><th>Enforcing code</th><th>Proving test</th></tr></thead><tbody><tr><td>Unsandboxed shell: an allowlisted interpreter writes anywhere or opens a socket by hiding the target inside the code string</td><td>Run <code>python</code>/<code>bash</code> with the parent&#x27;s privileges and filesystem</td><td>Every child command is wrapped in an OS confinement: writes confined to the workspace subtree, network denied by default, fails closed on a host with no usable backend</td><td><code>harness/sandbox.py</code></td><td><code>tests/test_sandbox.py::test_worker_python_cannot_write_outside_workspace</code>, <code>::test_worker_network_denied_by_default</code>, <code>::test_run_shell_fails_closed_without_backend</code></td></tr><tr><td>Prompt-level-only guardrails: limits stated in the system prompt that a clever instruction can talk the model out of</td><td>Put all boundaries in the prompt and hope the model holds them</td><td>Boundaries are machine-owned text appended after the prompt file (the author cannot remove them) and role permissions are re-checked at dispatch, not just filtered from the schema</td><td><code>harness/roles.py</code> (<code>DEFAULT_BOUNDARIES</code>, <code>RoleDef.system_prompt</code>), <code>harness/tools/registry.py</code> (<code>dispatch</code> role check)</td><td><code>tests/test_repo_configs.py::test_role_without_grant_is_denied</code>, <code>::test_orchestrator_has_no_side_effecting_tools</code></td></tr><tr><td>Self-verification: the agent that did the work also grades it, so a plausible-but-wrong result passes</td><td>Ask the same model, in the same context, if its answer is good</td><td>A separate verifier runs in a fresh context, sees only artifacts and acceptance criteria (never the worker&#x27;s transcript), and fails closed when evidence is missing</td><td><code>harness/verify.py</code> (<code>VerificationGate.run</code>), <code>harness/adversarial.py</code> (position isolation)</td><td><code>tests/test_routing_verify.py::test_gate_deterministic_check_failure_blocks_verifier</code>, <code>tests/test_adversarial.py::test_position_agents_are_read_only</code></td></tr><tr><td>Silent dissent-merging: disagreeing agents are averaged into a false consensus with no human in the loop</td><td>Blend or majority-vote model outputs into one answer</td><td>A contested phase halts to <code>needs_arbitration</code> on any dissent; only a human may author the arbitration; agreement is treated as evidence, never authority</td><td><code>harness/adversarial.py</code></td><td><code>tests/test_adversarial.py::test_dissent_halts_needs_arbitration</code>, <code>::test_any_oppose_blocks_convergence</code>, <code>::test_human_arbitration_resumes_phase_to_passed</code></td></tr><tr><td>Prompt injection via ingested content: a scraped page or ticket carries text that hijacks the agent</td><td>Feed tool output straight into the model as if it were trusted</td><td>Quarantined reads are scanned at dispatch, hidden Unicode stripped, untrusted text fenced as data, and the loop re-asserts the boundary exactly where the flagged content landed</td><td><code>harness/quarantine.py</code>, <code>harness/loop.py</code></td><td><code>tests/test_quarantine.py::test_read_file_quarantine_at_registry</code>, <code>::test_loop_tripwire_reasserts_boundary</code></td></tr><tr><td>Secret exfiltration: an injected command reads an API key and surfaces it into the transcript or deliverable</td><td>Inherit the parent environment and return raw output</td><td>Child processes run under a scrubbed environment (no inherited keys), shell output is redacted before return, and <code>write_file</code> refuses credential-shaped content</td><td><code>harness/tools/builtin.py</code> (<code>scrubbed_env</code>, <code>run_shell</code> redaction, <code>write_file</code> guard), <code>harness/quarantine.py</code> (<code>redact_secrets</code>, <code>find_secrets</code>)</td><td><code>tests/test_quarantine.py::test_run_shell_env_is_scrubbed</code>, <code>::test_run_shell_output_redacts_secrets</code>, <code>::test_write_file_blocks_credential_shaped_content</code></td></tr><tr><td>Silent overspend: a runaway loop burns real money with no ceiling and no warning</td><td>Run until done, bill whatever it costs</td><td>Budgets are hard ceilings, and a live run refuses to start with no ceiling set, after a preview showing the worst-case dollar figure</td><td><code>harness/routing.py</code> (<code>Budget</code>), <code>harness/preflight.py</code></td><td><code>tests/test_routing_verify.py::test_budget_accounting</code>, <code>tests/test_preflight.py::test_live_run_without_ceiling_refuses</code></td></tr><tr><td>Approval bypass: a privileged or irreversible action runs silently when approval wiring is missing</td><td>Default to allow, or skip approval when unattended</td><td>Approval-gated tools fail closed under the default handler, so a misconfigured headless run refuses rather than mutating</td><td><code>harness/tools/registry.py</code> (default <code>approval_handler</code>), <code>harness/approval.py</code></td><td><code>tests/test_repo_configs.py::test_approval_gated_tool_fails_closed_under_default_handler</code>, <code>::test_default_approval_handler_denies</code></td></tr><tr><td>Cross-agent file tampering: one agent overwrites another&#x27;s work or an operator file</td><td>Shared mutable workspace, last writer wins</td><td>Ownership lanes: agents own the files they create, cross-agent writes are refused with a <code>request_change</code> remedy, and operator lanes are locked to all agents</td><td><code>harness/ownership.py</code>, <code>OWNERSHIP.yaml</code></td><td><code>tests/test_ownership.py::test_cross_agent_write_denied_at_dispatch</code>, <code>::test_operator_lane_denies_all_agents</code></td></tr><tr><td>Consent bypass: a task packet is treated as a command and mutation happens before the work is accepted</td><td>Dispatch side effects as soon as the model asks</td><td>Consent lock: registry dispatch refuses write/execute tools until the worker calls <code>accept_task</code>; read tools stay available so consent is informed</td><td><code>harness/tools/registry.py</code> (<code>dispatch</code>, <code>side_effects_locked</code>)</td><td><code>tests/test_consent.py::test_side_effects_locked_until_accept</code>, <code>::test_read_tools_available_before_accept</code></td></tr><tr><td>Audit tampering: an agent hides what it did by editing the log after the fact</td><td>Append-only text log, trusted as written</td><td>Every event carries <code>seq</code> and <code>prev</code> (SHA-256 of the previous line); any edit or deletion breaks the chain and <code>harnessie audit</code> exits non-zero</td><td><code>harness/events.py</code>, <code>harness/audit.py</code></td><td><code>tests/test_audit.py::test_edited_line_breaks_chain</code>, <code>::test_deleted_line_breaks_chain</code></td></tr></tbody></table></div>
+<h2 id="honest-residual">Honest residual</h2>
+<p>The tool-call and exfiltration paths are mechanically confined by the rows above. What remains is a well-crafted injection written as ordinary-looking advice, aimed at the deliverable rather than at tool calls: it passes every mechanical scan because it reads as plausible prose, and it can satisfy the acceptance criteria while still being wrong on purpose. That class is caught only by the independent verifier (a reasoning check, not a filter) and by human review of the diff before a run touches real credentials. This is a deliberate design boundary, not an oversight, and it is the reason layers 6 and 7 in <a href="https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md">SECURITY.md</a> exist. A harness that claimed to filter this away mechanically would be overclaiming.</p>
+<p>Two further limits stated plainly: the hash chain is tamper-evident, not tamper-proof (a whole-file rewrite is out of scope; anchoring the chain head externally is an operator decision), and an allowlisted interpreter can still write inside the workspace without a per-file ownership check (the sandbox confines the workspace as a whole; per-lane sandbox profiles are roadmap).</p>
+<h2 id="how-to-check-this-artifact">How to check this artifact</h2>
+<p>Run the suite and confirm the cited tests exist and pass:</p>
+<pre><code>python3 -m pytest -q</code></pre>
+<p>Every <code>file::test_name</code> above is a real node in that suite. A citation that no longer resolves is a defect in this document; fix the document or the code, never leave the claim standing without its test. This artifact is also a standing invitation to contest the claim: the disclosure path and the eval scenarios published as red-team targets are in <a href="https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md">SECURITY.md</a>.</p>
+  </div>
+</main>
+<footer>
+  <div class="container">
+    <div class="row">
+      <a href="/quickstart.html">Quickstart</a>
+      <a href="/getting-started.html">Getting started</a>
+      <a href="/guide.html">User guide</a>
+      <a href="/brains.html">Brains</a>
+      <a href="/threat-model.html">Threat model</a>
+    </div>
+    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/threat-model.md" target="_blank" rel="noopener">docs/threat-model.md</a>.</p>
+  </div>
+</footer>
+</body>
+</html>

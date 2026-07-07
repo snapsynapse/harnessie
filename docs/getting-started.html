@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>Getting started &mdash; Harnessie</title>
+  <meta name="description" content="The five-minute path: install Harnessie, prove it works offline, point it at a model, run a real job, and read the record it leaves.">
+  <meta name="author" content="Sam Rogers">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <meta name="theme-color" content="#2f6b28">
+  <link rel="canonical" href="https://harnessie.com/getting-started.html">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/plain" href="https://harnessie.com/llms.txt" title="LLM-readable summary">
+  <link rel="assistant-guide" href="https://harnessie.com/.well-known/assistant-guide.txt">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Harnessie">
+  <meta property="og:title" content="Getting started &mdash; Harnessie">
+  <meta property="og:description" content="The five-minute path: install Harnessie, prove it works offline, point it at a model, run a real job, and read the record it leaves.">
+  <meta property="og:image" content="https://harnessie.com/imgs/og.png">
+  <meta property="og:url" content="https://harnessie.com/getting-started.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Getting started &mdash; Harnessie">
+  <meta name="twitter:description" content="The five-minute path: install Harnessie, prove it works offline, point it at a model, run a real job, and read the record it leaves.">
+  <meta name="twitter:image" content="https://harnessie.com/imgs/og.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #f7f8fc; --bg-alt: #eceff4; --text: #17281a; --text-muted: #566458;
+      --accent: #2f6b28; --accent-hover: #24571f; --border: #d6dce2;
+      --code-bg: #16261a; --code-text: #e8ece4;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+      --max-width: 860px; --radius: 10px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.65; -webkit-font-smoothing: antialiased; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+    .skip-link { position: absolute; left: -9999px; top: 0; background: var(--accent); color: var(--bg); padding: 0.5rem 1rem; z-index: 100; }
+    .skip-link:focus { left: 0; }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 1.5rem; }
+    nav.site { border-bottom: 1px solid var(--border); background: var(--bg); }
+    nav.site .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem 1rem; padding-top: 0.8rem; padding-bottom: 0.8rem; }
+    nav.site .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--text); font-size: 1.05rem; }
+    nav.site .links { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.95rem; }
+    nav.site .links a { color: var(--text-muted); }
+    nav.site .links a[aria-current="page"] { color: var(--accent); font-weight: 600; }
+    main { padding: 2.5rem 0 3.5rem; }
+    h1 { font-size: 1.9rem; line-height: 1.25; margin-bottom: 1rem; }
+    h2 { font-size: 1.4rem; margin: 2.2rem 0 0.7rem; padding-top: 0.4rem; }
+    h3 { font-size: 1.12rem; margin: 1.6rem 0 0.5rem; }
+    h4 { font-size: 1rem; margin: 1.2rem 0 0.4rem; }
+    p { margin: 0 0 1rem; }
+    ul, ol { margin: 0 0 1rem 1.4rem; }
+    li { margin-bottom: 0.35rem; }
+    code { font-family: var(--mono); font-size: 0.88em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.08em 0.35em; }
+    pre { background: var(--code-bg); color: var(--code-text); border-radius: var(--radius); padding: 1rem 1.2rem; overflow-x: auto; margin: 0 0 1.2rem; font-size: 0.86rem; line-height: 1.55; }
+    pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+    .table-wrap { overflow-x: auto; margin: 0 0 1.2rem; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+    th, td { border: 1px solid var(--border); padding: 0.5rem 0.7rem; text-align: left; vertical-align: top; }
+    th { background: var(--bg-alt); }
+    .crumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.2rem; }
+    footer { border-top: 1px solid var(--border); background: var(--bg-alt); padding: 2rem 0; font-size: 0.9rem; color: var(--text-muted); }
+    footer .row { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin-bottom: 0.6rem; }
+  </style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="site" aria-label="Main navigation">
+  <div class="container">
+    <a href="/" class="logo" aria-label="Harnessie home">
+      <img src="/imgs/harnessie-mark.png" width="26" height="26" alt="">
+      <span>Harnessie</span>
+    </a>
+    <div class="links">
+      <a href="/quickstart.html">Quickstart</a>
+      <a href="/getting-started.html" aria-current="page">Getting started</a>
+      <a href="/guide.html">User guide</a>
+      <a href="/brains.html">Brains</a>
+      <a href="/threat-model.html">Threat model</a>
+      <a href="https://github.com/snapsynapse/harnessie" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</nav>
+<main id="main-content">
+  <div class="container">
+    <p class="crumb"><a href="/">harnessie.com</a> / docs / Getting started</p>
+    <h1>Getting started with Harnessie</h1>
+<p>This is the five-minute path: install, prove the harness works offline, point it at a model, run a real job, and read the record it leaves behind. The full reference is <a href="/guide.html">the user guide</a>.</p>
+<p>New to this? You are welcome here. A harness is the structure you put around an AI model so it can do real work while you stay in control: it sets what the AI may do, checks the work before moving on, and writes down what happened. Harnessie is built to be a safe first one. This guide uses a terminal, but every command below is safe to run, and nothing reaches the network until you choose to add a key. If you have never used a terminal or cloned a repository, start with the gentler <a href="/quickstart.html">quickstart</a>, which assumes no git or shell fluency and includes a glossary and a Windows/WSL2 page.</p>
+<p>In more technical terms: Harnessie is a brain-agnostic multi-agent harness. An orchestrator decomposes a goal into task packets, cheap workers execute them inside a jailed workspace, and an independent verifier gates every phase before the next one starts. The structure carries the quality floor; the model carries the ceiling. You swap models by editing one YAML file.</p>
+<h2 id="1-install">1. Install</h2>
+<p>Requires Python 3.11 or newer. The only runtime dependency is PyYAML; the model adapters are standard-library, so no vendor SDK is needed.</p>
+<pre><code>git clone https://github.com/snapsynapse/harnessie.git
+cd harnessie
+pip install -e &quot;.[dev]&quot;</code></pre>
+<h2 id="2-prove-it-works-offline">2. Prove it works offline</h2>
+<p>The test suite and the eval scorecard both run against a deterministic mock brain with no network. Run them first; if they pass, the harness is sound on your machine before any API key is involved.</p>
+<pre><code>python3 -m pytest -q            # unit + integration suite, mock brain
+python3 -m harness.cli eval     # deterministic eval scorecard
+python3 -m harness.cli verify-manifest</code></pre>
+<p>You should see the suite pass and the eval print one <code>PASS</code> line per scenario. Nothing here calls a provider or touches the network.</p>
+<h2 id="3-point-it-at-a-brain">3. Point it at a brain</h2>
+<p>Models live in <code>config/models.yaml</code> as named tiers. Out of the box the <code>frontier</code>, <code>mid</code>, and <code>cheap</code> tiers are Anthropic models and read their key from an environment variable; the <code>local</code> tier is any OpenAI-compatible endpoint (Ollama, vLLM, llama.cpp, and similar).</p>
+<p>Pick one:</p>
+<pre><code>export ANTHROPIC_API_KEY=...    # use the Anthropic tiers</code></pre>
+<p>Or run entirely local by leaving the key unset and routing task classes at the <code>local</code> tier in <code>config/models.yaml</code> (it already points at <code>http://localhost:11434/v1</code>). You never put a key in the file; the file names the environment variable, the harness reads it at run time.</p>
+<p>To smoke-test real providers before a workflow, opt in explicitly:</p>
+<pre><code>HARNESSIE_LIVE=1 \
+HARNESSIE_OPENAI_COMPAT_BASE_URL=http://localhost:11434/v1 \
+python3 -m harness.cli eval --live</code></pre>
+<p>Without the flag and provider configuration, live rows are shown as skipped.</p>
+<h2 id="4-run-a-workflow">4. Run a workflow</h2>
+<p>The simplest built-in workflow plans a code change, implements it, and gates it on tests plus an independent verifier.</p>
+<pre><code>python3 -m harness.cli run workflows/build-and-verify.yaml \
+  --goal &quot;a CLI todo app with tests&quot;</code></pre>
+<p>Every run gets an id. The command prints it, and the run&#x27;s artifacts land under <code>runs/&lt;run_id&gt;/</code>.</p>
+<p>For a worked, data-backed example (assessing a policy against a list of obligations, with a verifier that catches fabricated citations) see <a href="https://github.com/snapsynapse/harnessie/blob/main/examples/policy-compliance/README.md">examples/policy-compliance/README.md</a>.</p>
+<h2 id="5-read-the-evidence">5. Read the evidence</h2>
+<p>A run never just says &quot;done&quot;. It leaves a journal, a hash-chained event log, and proof artifacts. Two commands read them back:</p>
+<pre><code>python3 -m harness.cli report &lt;run_id&gt;   # phases, results, proofs
+python3 -m harness.cli audit  &lt;run_id&gt;   # verify the hash chain + governance timeline</code></pre>
+<p><code>report</code> shows what each phase did and where its proofs are. <code>audit</code> re-verifies the event log end to end (exit 0 clean, exit 1 if the chain was tampered with) and renders one composite timeline of agent and operator actions: consents, ownership claims and denials, structured refusals, gate verdicts, and any decision records.</p>
+<h2 id="6-when-a-run-stops">6. When a run stops</h2>
+<p>Silence is never success. Every run ends in a named stop condition, and each maps to one operator action. The common ones:</p>
+<ul><li><code>complete</code>: the goal was met and every gate passed. Nothing to do.</li><li><code>needs_human</code>: a gate failed after the retry ladder was exhausted. Read the proofs under <code>runs/&lt;id&gt;/proofs/</code>, fix the task or the acceptance criteria, and re-run.</li><li><code>needs_arbitration</code>: a contested decision produced dissent. Open <code>runs/&lt;id&gt;/decisions/DR-&lt;phase&gt;.md</code>, record your decision in it, and re-run.</li><li><code>budget</code> or <code>max_steps</code>: the run hit a ceiling. Raise it in <code>config/models.yaml</code> or the phase, or narrow the goal.</li></ul>
+<p>Re-running is safe: resume re-runs only the phases that did not pass. The full table is in <a href="/guide.html#when-a-run-halts">the user guide</a>.</p>
+<h2 id="7-start-your-own-project">7. Start your own project</h2>
+<p>To scaffold a fresh project layout (config, workflows, agents, ownership) rather than working inside this repo:</p>
+<pre><code>harnessie init my-project</code></pre>
+<h2 id="where-to-next">Where to next</h2>
+<ul><li><a href="/guide.html">User guide</a>: the complete guide, concepts to extension.</li><li><a href="https://github.com/snapsynapse/harnessie/blob/main/ARCHITECTURE.md">ARCHITECTURE.md</a>: why the harness is shaped this way, with the source-to-decision map.</li><li><a href="https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md">GOVERNANCE.md</a>: consent, ownership, contested decisions, and the audit model.</li><li><a href="https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md">SECURITY.md</a>: the prompt-injection and secret-handling model, and the sandbox backends.</li></ul>
+  </div>
+</main>
+<footer>
+  <div class="container">
+    <div class="row">
+      <a href="/quickstart.html">Quickstart</a>
+      <a href="/getting-started.html">Getting started</a>
+      <a href="/guide.html">User guide</a>
+      <a href="/brains.html">Brains</a>
+      <a href="/threat-model.html">Threat model</a>
+    </div>
+    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/getting-started.md" target="_blank" rel="noopener">docs/getting-started.md</a>.</p>
+  </div>
+</footer>
+</body>
+</html>

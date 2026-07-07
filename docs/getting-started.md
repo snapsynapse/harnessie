@@ -1,8 +1,8 @@
 # Getting started with Harnessie
 
-This is the five-minute path: install, prove the harness works offline, point it at a model, run a real job, and read the record it leaves behind. The full reference is [GUIDE.md](GUIDE.md).
+This is the five-minute path: install, prove the harness works offline, point it at a model, run a real job, and read the record it leaves behind. The full reference is [the user guide](GUIDE.md).
 
-New to this? You are welcome here. A harness is the structure you put around an AI model so it can do real work while you stay in control: it sets what the AI may do, checks the work before moving on, and writes down what happened. Harnessie is built to be a safe first one. This guide uses a terminal, but every command below is safe to run, and nothing reaches the network until you choose to add a key. If you have never used a terminal or cloned a repository, start with the gentler [quickstart.md](quickstart.md), which assumes no git or shell fluency and includes a glossary and a Windows/WSL2 page.
+New to this? You are welcome here. A harness is the structure you put around an AI model so it can do real work while you stay in control: it sets what the AI may do, checks the work before moving on, and writes down what happened. Harnessie is built to be a safe first one. This guide uses a terminal, but every command below is safe to run, and nothing reaches the network until you choose to add a key. If you have never used a terminal or cloned a repository, start with the gentler [quickstart](quickstart.md), which assumes no git or shell fluency and includes a glossary and a Windows/WSL2 page.
 
 In more technical terms: Harnessie is a brain-agnostic multi-agent harness. An orchestrator decomposes a goal into task packets, cheap workers execute them inside a jailed workspace, and an independent verifier gates every phase before the next one starts. The structure carries the quality floor; the model carries the ceiling. You swap models by editing one YAML file.
 
@@ -81,7 +81,7 @@ Silence is never success. Every run ends in a named stop condition, and each map
 - `needs_arbitration`: a contested decision produced dissent. Open `runs/<id>/decisions/DR-<phase>.md`, record your decision in it, and re-run.
 - `budget` or `max_steps`: the run hit a ceiling. Raise it in `config/models.yaml` or the phase, or narrow the goal.
 
-Re-running is safe: resume re-runs only the phases that did not pass. The full table is in [GUIDE.md](GUIDE.md#when-a-run-halts).
+Re-running is safe: resume re-runs only the phases that did not pass. The full table is in [the user guide](GUIDE.md#when-a-run-halts).
 
 ## 7. Start your own project
 
@@ -93,7 +93,7 @@ harnessie init my-project
 
 ## Where to next
 
-- [GUIDE.md](GUIDE.md): the complete user guide, concepts to extension.
+- [User guide](GUIDE.md): the complete guide, concepts to extension.
 - [ARCHITECTURE.md](../ARCHITECTURE.md): why the harness is shaped this way, with the source-to-decision map.
 - [GOVERNANCE.md](../GOVERNANCE.md): consent, ownership, contested decisions, and the audit model.
 - [SECURITY.md](../SECURITY.md): the prompt-injection and secret-handling model, and the sandbox backends.

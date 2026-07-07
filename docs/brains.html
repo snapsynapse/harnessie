@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>Brains &mdash; Harnessie</title>
+  <meta name="description" content="The brain-agnostic receipt: the models actually run under the harness, each linked to the decision record that proves it.">
+  <meta name="author" content="Sam Rogers">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <meta name="theme-color" content="#2f6b28">
+  <link rel="canonical" href="https://harnessie.com/brains.html">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/plain" href="https://harnessie.com/llms.txt" title="LLM-readable summary">
+  <link rel="assistant-guide" href="https://harnessie.com/.well-known/assistant-guide.txt">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Harnessie">
+  <meta property="og:title" content="Brains &mdash; Harnessie">
+  <meta property="og:description" content="The brain-agnostic receipt: the models actually run under the harness, each linked to the decision record that proves it.">
+  <meta property="og:image" content="https://harnessie.com/imgs/og.png">
+  <meta property="og:url" content="https://harnessie.com/brains.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Brains &mdash; Harnessie">
+  <meta name="twitter:description" content="The brain-agnostic receipt: the models actually run under the harness, each linked to the decision record that proves it.">
+  <meta name="twitter:image" content="https://harnessie.com/imgs/og.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #f7f8fc; --bg-alt: #eceff4; --text: #17281a; --text-muted: #566458;
+      --accent: #2f6b28; --accent-hover: #24571f; --border: #d6dce2;
+      --code-bg: #16261a; --code-text: #e8ece4;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+      --max-width: 860px; --radius: 10px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.65; -webkit-font-smoothing: antialiased; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+    .skip-link { position: absolute; left: -9999px; top: 0; background: var(--accent); color: var(--bg); padding: 0.5rem 1rem; z-index: 100; }
+    .skip-link:focus { left: 0; }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 1.5rem; }
+    nav.site { border-bottom: 1px solid var(--border); background: var(--bg); }
+    nav.site .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem 1rem; padding-top: 0.8rem; padding-bottom: 0.8rem; }
+    nav.site .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--text); font-size: 1.05rem; }
+    nav.site .links { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.95rem; }
+    nav.site .links a { color: var(--text-muted); }
+    nav.site .links a[aria-current="page"] { color: var(--accent); font-weight: 600; }
+    main { padding: 2.5rem 0 3.5rem; }
+    h1 { font-size: 1.9rem; line-height: 1.25; margin-bottom: 1rem; }
+    h2 { font-size: 1.4rem; margin: 2.2rem 0 0.7rem; padding-top: 0.4rem; }
+    h3 { font-size: 1.12rem; margin: 1.6rem 0 0.5rem; }
+    h4 { font-size: 1rem; margin: 1.2rem 0 0.4rem; }
+    p { margin: 0 0 1rem; }
+    ul, ol { margin: 0 0 1rem 1.4rem; }
+    li { margin-bottom: 0.35rem; }
+    code { font-family: var(--mono); font-size: 0.88em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.08em 0.35em; }
+    pre { background: var(--code-bg); color: var(--code-text); border-radius: var(--radius); padding: 1rem 1.2rem; overflow-x: auto; margin: 0 0 1.2rem; font-size: 0.86rem; line-height: 1.55; }
+    pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+    .table-wrap { overflow-x: auto; margin: 0 0 1.2rem; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+    th, td { border: 1px solid var(--border); padding: 0.5rem 0.7rem; text-align: left; vertical-align: top; }
+    th { background: var(--bg-alt); }
+    .crumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.2rem; }
+    footer { border-top: 1px solid var(--border); background: var(--bg-alt); padding: 2rem 0; font-size: 0.9rem; color: var(--text-muted); }
+    footer .row { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin-bottom: 0.6rem; }
+  </style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="site" aria-label="Main navigation">
+  <div class="container">
+    <a href="/" class="logo" aria-label="Harnessie home">
+      <img src="/imgs/harnessie-mark.png" width="26" height="26" alt="">
+      <span>Harnessie</span>
+    </a>
+    <div class="links">
+      <a href="/quickstart.html">Quickstart</a>
+      <a href="/getting-started.html">Getting started</a>
+      <a href="/guide.html">User guide</a>
+      <a href="/brains.html" aria-current="page">Brains</a>
+      <a href="/threat-model.html">Threat model</a>
+      <a href="https://github.com/snapsynapse/harnessie" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</nav>
+<main id="main-content">
+  <div class="container">
+    <p class="crumb"><a href="/">harnessie.com</a> / docs / Brains</p>
+    <h1>Brains run under Harnessie</h1>
+<p>Brain-agnostic is a testable claim, not a slogan. This page is the receipt: the models that have actually produced work under the harness, each linked to the on-disk record that proves it, plus the set you can swap to by editing one file.</p>
+<p>Scope: the table below tracks models run under the harness at runtime, each backed by a decision record. The models that built Harnessie&#x27;s own code are a separate and honest story, credited under <a href="#built-with">Built with</a> at the end.</p>
+<h2 id="proven-under-the-harness">Proven under the harness</h2>
+<p>Each of these formed an independent position in an adversarial contested phase, recorded verbatim with its model and provider in a hash-chained decision record. Different task classes route to different tiers, so a single contest draws genuinely different brains, which is what earns a record its <code>independent-positions</code> claim.</p>
+<div class="table-wrap"><table><thead><tr><th>Model</th><th>Provider</th><th>Role on record</th><th>Provenance</th></tr></thead><tbody><tr><td><code>claude-fable-5</code></td><td>Anthropic</td><td>Frontier orchestrator; position author and record assembler</td><td><a href="https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0001-adopt-v0-2-governance-layer.md">AIDR-0001</a>, <a href="https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0002-v0-3-tenets-and-triage.md">AIDR-0002</a></td></tr><tr><td><code>qwen3.6:35b-mlx</code></td><td>Alibaba</td><td>Contested-phase participant (isolated local inference)</td><td><a href="https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0001-adopt-v0-2-governance-layer.md">AIDR-0001</a>, <a href="https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0002-v0-3-tenets-and-triage.md">AIDR-0002</a></td></tr><tr><td><code>gemma4:31b-mlx</code></td><td>Google</td><td>Contested-phase participant (isolated local inference)</td><td><a href="https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0001-adopt-v0-2-governance-layer.md">AIDR-0001</a>, <a href="https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0002-v0-3-tenets-and-triage.md">AIDR-0002</a></td></tr><tr><td><code>gpt-oss:20b</code></td><td>OpenAI</td><td>Contested-phase participant (isolated local inference)</td><td><a href="https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0001-adopt-v0-2-governance-layer.md">AIDR-0001</a>, <a href="https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0002-v0-3-tenets-and-triage.md">AIDR-0002</a></td></tr></tbody></table></div>
+<p>Four providers, four model families, from a frontier closed model down to 20B-parameter local open-weights models, all producing arbitrated positions under the same harness. The decision the operator made in each case was a human&#x27;s; every position is preserved, including the ones that did not win.</p>
+<h2 id="configured-and-swappable">Configured and swappable</h2>
+<p>Declared in <a href="https://github.com/snapsynapse/harnessie/blob/main/config/models.yaml">config/models.yaml</a>. Point any task class at any tier; the gates, jails, budgets, and audit stay identical. API keys come from environment variables, never the file.</p>
+<div class="table-wrap"><table><thead><tr><th>Tier</th><th>Model</th><th>Provider</th></tr></thead><tbody><tr><td>frontier</td><td><code>claude-fable-5</code></td><td>Anthropic</td></tr><tr><td>mid</td><td><code>claude-sonnet-5</code></td><td>Anthropic</td></tr><tr><td>cheap</td><td><code>claude-haiku-4-5-20251001</code></td><td>Anthropic</td></tr><tr><td>local</td><td><code>qwen3.6:35b-mlx</code> (also runs <code>gemma4:31b-mlx</code>, <code>gemma4:latest</code>, <code>gpt-oss:20b</code>)</td><td>any OpenAI-compatible endpoint</td></tr></tbody></table></div>
+<p>Any OpenAI-compatible endpoint works with no code change: vLLM, Ollama, llama.cpp, Together, OpenRouter, Fireworks, DeepSeek, Mistral, xAI, and others. Swapping a provider is a <code>model_id</code> and <code>base_url</code> edit.</p>
+<h2 id="built-with">Built with</h2>
+<p>Development provenance, distinct from the runtime table above: these models built, reviewed, and fact-checked Harnessie during construction rather than running under it, so they are not each backed by a single decision record. The trail is in the git history, <a href="https://github.com/snapsynapse/harnessie/blob/main/source-verification.json">source-verification.json</a>, and the session handoffs.</p>
+<ul><li>Claude Fable 5 (Anthropic): the primary implementation and review model across the 0.1 to 0.4 line, and the frontier orchestrator in config.</li><li>Claude Opus 4.8 (Anthropic): also a recorded significant development co-author in the git history.</li><li>Claude Sonnet 5 (Anthropic): was used for several smaller cleanup tasks, especially those leveraging pre-existing skills.</li><li>GPT-5.5 (OpenAI, via Codex): the secondary implementation and review model, cycling and verifying independently in alternating sessions.</li><li>Gemini 3.5 Flash (Google): reviewed the 0.4.0 patch, verified the trust-bundle manifest and <a href="https://github.com/snapsynapse/harnessie/blob/main/harness/live_scorecard.py">live scorecard</a> skip policies, and ran the live scorecard against a local OpenAI-compatible endpoint.</li><li>Perplexity Sonar Pro (Perplexity): research and independent source verification at the outset; the trail is <a href="https://github.com/snapsynapse/harnessie/blob/main/source-verification.json">source-verification.json</a>, where twenty prior-art sources were checked and several confirmed via sonar-pro.</li></ul>
+<p>Four providers building, reviewing, and fact-checking the harness itself is the thesis applied to its own construction.</p>
+<h2 id="coverage-we-would-like-to-add">Coverage we would like to add</h2>
+<p>The claim gets stronger as it spans more of the capability curve and more independent providers. The proven table already covers a frontier closed model (<code>claude-fable-5</code>) plus three ~20-35B local open-weights families (Qwen, Google, OpenAI). The gaps below are the honest missing coverage, each closable by running the named model through a contested phase so it earns a record. Model names are Ollama pull identifiers as of the 2026-07-06 library scan; verify tags at pull time, and note that any tag reading <code>cloud</code> runs on Ollama Cloud rather than fully on-box.</p>
+<p>More of the capability curve:</p>
+<ul><li>The small-model floor, where structured tool-calling breaks first and the harness&#x27;s tool contract is under the most stress. Everything proven so far is 20B or larger; nothing below that has been run. Strong candidates: <code>granite4.1</code> (3B, 8B, 30B; IBM, tuned for disciplined function-calling), <code>functiongemma</code> (270M; a sub-1B model whose entire job is function-calling), <code>nemotron-3-nano</code> (4B; tools + thinking), or <code>phi4-mini</code> (3.8B; tools). If the registry&#x27;s contract survives a 270M brain, it survives anything.</li><li>A coding-specialist worker, directly relevant to the harnessie-worker role. Candidates: <code>qwen3-coder</code> (30B; tools) or <code>devstral</code> (24B; Mistral&#x27;s agentic code-editing model, built for exactly this job).</li></ul>
+<p>More independent providers:</p>
+<ul><li>A frontier closed model from another provider with a runtime receipt. GPT-5.5 already built the harness (see Built with) but has not yet run under it; a frontier non-Anthropic brain producing an arbitrated position (a GPT-5-class model, Google Gemini, or Grok) would put a second frontier provider in the proven table, not only in the build.</li><li>Meta Llama (open weights): the most widely deployed open family, currently unrepresented. Candidates: <code>llama3.3</code> (70B; tools) or <code>llama3.1</code> (8B/70B; tools).</li><li>Mistral: a European provider adding architectural and geographic diversity. Candidates: <code>magistral</code> (24B; tools + thinking) or <code>mistral-small3.2</code> (24B; vision + tools).</li><li>DeepSeek: a distinct strong-reasoning provider, already namechecked in the config comments. Candidates: <code>deepseek-r1</code> (7B-70B local; tools + thinking) or <code>deepseek-v3.2</code> (cloud).</li></ul>
+<h2 id="how-a-brain-becomes-quotprovenquot">How a brain becomes &quot;proven&quot;</h2>
+<p>Run it in a contested-decision workflow so it forms an independent position:</p>
+<pre><code>python3 -m harness.cli run workflows/contested-decision.yaml --goal &quot;&lt;a real decision&gt;&quot;</code></pre>
+<p>Route one of the <code>positions</code> at a tier pointed at the new model. When the panel resolves, the model and provider are written verbatim into <code>runs/&lt;id&gt;/decisions/DR-&lt;phase&gt;.md</code>. Promote that record into <code>decisions/</code> and add a row above. Configured is a claim; proven is a record.</p>
+  </div>
+</main>
+<footer>
+  <div class="container">
+    <div class="row">
+      <a href="/quickstart.html">Quickstart</a>
+      <a href="/getting-started.html">Getting started</a>
+      <a href="/guide.html">User guide</a>
+      <a href="/brains.html">Brains</a>
+      <a href="/threat-model.html">Threat model</a>
+    </div>
+    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/brains.md" target="_blank" rel="noopener">docs/brains.md</a>.</p>
+  </div>
+</footer>
+</body>
+</html>

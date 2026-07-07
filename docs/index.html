@@ -83,7 +83,7 @@
     "copyrightHolder": { "@type": "Organization", "name": "Snap Synapse" },
     "copyrightYear": 2026,
     "citation": [
-      { "@type": "WebPage", "name": "HardGuard25", "url": "https://hardguard25.com/" },
+      { "@type": "WebPage", "name": "GuideCheck", "url": "https://guidecheck.org/" },
       { "@type": "WebPage", "name": "Graceful Boundaries", "url": "https://gracefulboundaries.dev/" },
       { "@type": "WebPage", "name": "AI Decision Records", "url": "https://aidr.work/" }
     ]
@@ -525,7 +525,7 @@
 
 
     <div class="cta-row">
-      <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/getting-started.md" class="btn btn-primary" target="_blank" rel="noopener">Install and run your first workflow</a>
+      <a href="/getting-started.html" class="btn btn-primary">Install and run your first workflow</a>
       <a href="https://github.com/snapsynapse/harnessie" class="btn btn-secondary" target="_blank" rel="noopener">Read the source on GitHub</a>
     </div>
   </div>
@@ -581,7 +581,7 @@
       </div>
       <div class="pillar">
         <h3>Brain-agnostic</h3>
-        <p>A frontier orchestrator, cheap workers, and local open-source models via any OpenAI-compatible endpoint. Swap any tier by editing one YAML file; the gates, jails, and budgets never change. Four providers have already produced verified work under it (<a href="https://github.com/snapsynapse/harnessie/blob/main/docs/brains.md" target="_blank" rel="noopener">the receipts</a>).</p>
+        <p>A frontier orchestrator, cheap workers, and local open-source models via any OpenAI-compatible endpoint. Swap any tier by editing one YAML file; the gates, jails, and budgets never change. Four providers have already produced verified work under it (<a href="/brains.html">the receipts</a>).</p>
       </div>
       <div class="pillar">
         <h3>Auditable</h3>
@@ -597,9 +597,16 @@
     <p>This part uses a terminal. If that is new to you, it is a friendly place to start: every command below is safe to run, and nothing reaches the network until you choose to add a key.</p>
     <p>Requires Python 3.11 or newer and PyYAML. The model adapters are standard-library, so no vendor SDK is needed. The test suite and the eval scorecard run against a deterministic mock brain with no network, so you can prove the harness works before any API key is involved.</p>
 
+    <div class="code-block" style="margin-top: 1.5rem;">
+      <h3>Option 1: AI-assisted, with a verifiable guide</h3>
+      <p>Already working with an AI assistant? Point it at Harnessie's assistant guide instead of letting it improvise an install from web search:</p>
+<pre>Fetch and follow https://harnessie.com/.well-known/assistant-guide.txt</pre>
+      <p class="annotation">Why this is the safe way: the guide is a <a href="https://guidecheck.org/" target="_blank" rel="noopener">GuideCheck</a>-conformant plain-text file, so the bytes your assistant reads are exactly the bytes you can read &mdash; no hidden instructions a web page could smuggle past you. The assistant must first verify the guide (reporting its conformance level and SHA-256, cross-checked against a DNS-published hash), then ask for your explicit approval before acting, and every step it may take is a pre-declared, read-only action. Nothing installs, executes, or spends until you say so.</p>
+    </div>
+
     <div class="code-grid">
       <div class="code-block">
-        <h3>Install and run</h3>
+        <h3>Option 2: Install by hand</h3>
 <pre>git clone https://github.com/snapsynapse/harnessie.git
 cd harnessie
 pip install -e ".[dev]"
@@ -653,7 +660,7 @@ routing:
     </table>
 
     <h3>Five habits, made enforceable</h3>
-    <p>Everything in that table is the codified form of five engineering habits, each proven separately in the author's other tools and standards before it landed here as code: deterministic checks run before any model judgment (<a href="https://github.com/snapsynapse/harnessie/blob/main/docs/GUIDE.md" target="_blank" rel="noopener">the gate order</a>); evaluation comes before implementation &mdash; a governance mechanic without a red-then-green scenario pair does not merge (<a href="https://github.com/snapsynapse/harnessie/blob/main/EVALS.md" target="_blank" rel="noopener">EVALS.md</a>); remembered facts carry verified and verify-by dates and expire visibly, never silently (<a href="https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md" target="_blank" rel="noopener">GOVERNANCE.md</a>); every agent and operator action lands in one hash-chained, tamper-evident timeline (<a href="https://github.com/snapsynapse/harnessie/blob/main/docs/threat-model.md" target="_blank" rel="noopener">threat model</a>); and any control that cannot be enforced fails closed rather than running unenforced (<a href="https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md" target="_blank" rel="noopener">SECURITY.md</a>). The same habits produced the standards Harnessie adopts &mdash; <a href="https://turnfile.work/" target="_blank" rel="noopener">Turnfile</a>, <a href="https://aidr.work/" target="_blank" rel="noopener">AIDR</a>, <a href="https://gracefulboundaries.dev/" target="_blank" rel="noopener">Graceful Boundaries</a> &mdash; which is why they fit together.</p>
+    <p>Everything in that table is the codified form of five engineering habits, each proven separately in the author's other tools and standards before it landed here as code: deterministic checks run before any model judgment (<a href="/guide.html">the gate order</a>); evaluation comes before implementation &mdash; a governance mechanic without a red-then-green scenario pair does not merge (<a href="https://github.com/snapsynapse/harnessie/blob/main/EVALS.md" target="_blank" rel="noopener">EVALS.md</a>); remembered facts carry verified and verify-by dates and expire visibly, never silently (<a href="https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md" target="_blank" rel="noopener">GOVERNANCE.md</a>); every agent and operator action lands in one hash-chained, tamper-evident timeline (<a href="/threat-model.html">threat model</a>); and any control that cannot be enforced fails closed rather than running unenforced (<a href="https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md" target="_blank" rel="noopener">SECURITY.md</a>). The same habits produced the standards Harnessie adopts &mdash; <a href="https://turnfile.work/" target="_blank" rel="noopener">Turnfile</a>, <a href="https://aidr.work/" target="_blank" rel="noopener">AIDR</a>, <a href="https://gracefulboundaries.dev/" target="_blank" rel="noopener">Graceful Boundaries</a> &mdash; which is why they fit together.</p>
 
     <aside class="canonical-note" role="note">
       <strong>Canonical reference.</strong> This page is the authoritative home for Harnessie. Documentation, the architecture and governance rationale, and the security model live in the
@@ -672,12 +679,13 @@ routing:
       <div class="footer-meta">
         <p>Harnessie v0.6.0 &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a></p>
         <p>A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project by <a href="https://www.linkedin.com/in/samrogers" target="_blank" rel="noopener author">Sam Rogers</a>.</p>
-        <p style="margin-top: 0.5rem;">Builds on: <a href="https://hardguard25.com/" target="_blank" rel="noopener">HardGuard25</a> &middot; <a href="https://gracefulboundaries.dev/" target="_blank" rel="noopener">Graceful Boundaries</a> &middot; <a href="https://aidr.work/" target="_blank" rel="noopener">AI Decision Records</a></p>
+        <p style="margin-top: 0.5rem;">Builds on: <a href="https://guidecheck.org/" target="_blank" rel="noopener">GuideCheck</a> &middot; <a href="https://gracefulboundaries.dev/" target="_blank" rel="noopener">Graceful Boundaries</a> &middot; <a href="https://aidr.work/" target="_blank" rel="noopener">AI Decision Records</a></p>
       </div>
       <div class="footer-links">
         <a href="https://github.com/snapsynapse/harnessie" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/getting-started.md" target="_blank" rel="noopener">Getting started</a>
-        <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/GUIDE.md" target="_blank" rel="noopener">User guide</a>
+        <a href="/quickstart.html">Quickstart</a>
+        <a href="/getting-started.html">Getting started</a>
+        <a href="/guide.html">User guide</a>
         <a href="https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
         <a href="https://github.com/snapsynapse/harnessie/commits/main" target="_blank" rel="noopener">Revisions</a>
         <a href="/llms.txt">llms.txt</a>

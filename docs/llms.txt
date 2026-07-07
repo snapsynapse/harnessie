@@ -21,8 +21,9 @@ An orchestrator decomposes a goal into task packets with acceptance criteria and
 
 - Landing page: https://harnessie.com/
 - Repository: https://github.com/snapsynapse/harnessie
-- Getting started: https://github.com/snapsynapse/harnessie/blob/main/docs/getting-started.md
-- User guide: https://github.com/snapsynapse/harnessie/blob/main/docs/GUIDE.md
+- Quickstart (no shell fluency assumed): https://harnessie.com/quickstart.html
+- Getting started: https://harnessie.com/getting-started.html
+- User guide: https://harnessie.com/guide.html
 - Architecture: https://github.com/snapsynapse/harnessie/blob/main/ARCHITECTURE.md
 - Governance: https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md
 - Security model: https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md

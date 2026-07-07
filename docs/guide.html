@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>User guide &mdash; Harnessie</title>
+  <meta name="description" content="The complete Harnessie user guide: concepts, CLI, workflow authoring, brain configuration, ownership, governance, and the halt-recovery table.">
+  <meta name="author" content="Sam Rogers">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <meta name="theme-color" content="#2f6b28">
+  <link rel="canonical" href="https://harnessie.com/guide.html">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/plain" href="https://harnessie.com/llms.txt" title="LLM-readable summary">
+  <link rel="assistant-guide" href="https://harnessie.com/.well-known/assistant-guide.txt">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Harnessie">
+  <meta property="og:title" content="User guide &mdash; Harnessie">
+  <meta property="og:description" content="The complete Harnessie user guide: concepts, CLI, workflow authoring, brain configuration, ownership, governance, and the halt-recovery table.">
+  <meta property="og:image" content="https://harnessie.com/imgs/og.png">
+  <meta property="og:url" content="https://harnessie.com/guide.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="User guide &mdash; Harnessie">
+  <meta name="twitter:description" content="The complete Harnessie user guide: concepts, CLI, workflow authoring, brain configuration, ownership, governance, and the halt-recovery table.">
+  <meta name="twitter:image" content="https://harnessie.com/imgs/og.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #f7f8fc; --bg-alt: #eceff4; --text: #17281a; --text-muted: #566458;
+      --accent: #2f6b28; --accent-hover: #24571f; --border: #d6dce2;
+      --code-bg: #16261a; --code-text: #e8ece4;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+      --max-width: 860px; --radius: 10px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.65; -webkit-font-smoothing: antialiased; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+    .skip-link { position: absolute; left: -9999px; top: 0; background: var(--accent); color: var(--bg); padding: 0.5rem 1rem; z-index: 100; }
+    .skip-link:focus { left: 0; }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 1.5rem; }
+    nav.site { border-bottom: 1px solid var(--border); background: var(--bg); }
+    nav.site .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem 1rem; padding-top: 0.8rem; padding-bottom: 0.8rem; }
+    nav.site .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--text); font-size: 1.05rem; }
+    nav.site .links { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.95rem; }
+    nav.site .links a { color: var(--text-muted); }
+    nav.site .links a[aria-current="page"] { color: var(--accent); font-weight: 600; }
+    main { padding: 2.5rem 0 3.5rem; }
+    h1 { font-size: 1.9rem; line-height: 1.25; margin-bottom: 1rem; }
+    h2 { font-size: 1.4rem; margin: 2.2rem 0 0.7rem; padding-top: 0.4rem; }
+    h3 { font-size: 1.12rem; margin: 1.6rem 0 0.5rem; }
+    h4 { font-size: 1rem; margin: 1.2rem 0 0.4rem; }
+    p { margin: 0 0 1rem; }
+    ul, ol { margin: 0 0 1rem 1.4rem; }
+    li { margin-bottom: 0.35rem; }
+    code { font-family: var(--mono); font-size: 0.88em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.08em 0.35em; }
+    pre { background: var(--code-bg); color: var(--code-text); border-radius: var(--radius); padding: 1rem 1.2rem; overflow-x: auto; margin: 0 0 1.2rem; font-size: 0.86rem; line-height: 1.55; }
+    pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+    .table-wrap { overflow-x: auto; margin: 0 0 1.2rem; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+    th, td { border: 1px solid var(--border); padding: 0.5rem 0.7rem; text-align: left; vertical-align: top; }
+    th { background: var(--bg-alt); }
+    .crumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.2rem; }
+    footer { border-top: 1px solid var(--border); background: var(--bg-alt); padding: 2rem 0; font-size: 0.9rem; color: var(--text-muted); }
+    footer .row { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin-bottom: 0.6rem; }
+  </style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="site" aria-label="Main navigation">
+  <div class="container">
+    <a href="/" class="logo" aria-label="Harnessie home">
+      <img src="/imgs/harnessie-mark.png" width="26" height="26" alt="">
+      <span>Harnessie</span>
+    </a>
+    <div class="links">
+      <a href="/quickstart.html">Quickstart</a>
+      <a href="/getting-started.html">Getting started</a>
+      <a href="/guide.html" aria-current="page">User guide</a>
+      <a href="/brains.html">Brains</a>
+      <a href="/threat-model.html">Threat model</a>
+      <a href="https://github.com/snapsynapse/harnessie" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</nav>
+<main id="main-content">
+  <div class="container">
+    <p class="crumb"><a href="/">harnessie.com</a> / docs / User guide</p>
+    <h1>Harnessie user guide</h1>
+<p>The complete guide to running, configuring, and extending Harnessie. If you are new, read <a href="/getting-started.html">Getting started</a> first; it gets you to a green run in five minutes. This guide is the reference behind it.</p>
+<h2 id="contents">Contents</h2>
+<ul><li><a href="#what-harnessie-is">What Harnessie is</a></li><li><a href="#core-concepts">Core concepts</a></li><li><a href="#installation-and-requirements">Installation and requirements</a></li><li><a href="#the-cli">The CLI</a></li><li><a href="#what-governs-a-run">What governs a run</a></li><li><a href="#writing-a-workflow">Writing a workflow</a></li><li><a href="#configuring-brains">Configuring brains</a></li><li><a href="#ownership-lanes">Ownership lanes</a></li><li><a href="#governance-consent-contests-and-arbitration">Governance: consent, contests, and arbitration</a></li><li><a href="#when-a-run-halts">When a run halts</a></li><li><a href="#security-model">Security model</a></li><li><a href="#extending-the-harness">Extending the harness</a></li><li><a href="#evaluation">Evaluation</a></li><li><a href="#faq">FAQ</a></li></ul>
+<h2 id="what-harnessie-is">What Harnessie is</h2>
+<p>Harnessie is a brain-agnostic multi-agent harness for getting reliable work out of language models. A goal enters. An orchestrator (a capable model at high effort) decomposes it into task packets with acceptance criteria and out-of-scope fences. Workers (cheaper models) execute those packets inside a jailed workspace with allowlisted tools, owning the files they create. Every worker phase exits through a gate that runs deterministic checks first, then an independent fresh-context verifier that never sees the worker&#x27;s reasoning and fails closed. Contested decisions fan out to an adversarial panel whose positions and objections land in a decision record only a human may arbitrate. Everything is journaled, budgeted, resumable, and hash-chain audited.</p>
+<p>The operating thesis: the harness structure carries the quality floor, the model carries the ceiling. The gates, jails, budgets, ownership rules, and retry ladders keep output honest no matter which model you run underneath them. That is what &quot;brain-agnostic&quot; means here, and it is a testable claim, not a slogan: a model earns its place in a tier by passing a scorecard.</p>
+<h2 id="core-concepts">Core concepts</h2>
+<p>Roles. There are three role kinds. The orchestrator decomposes and integrates. Workers execute task packets and own their files. Verifiers judge a phase&#x27;s output in fresh context and can only fail it closed. Each role is a prompt file in <code>agents/</code> plus machine-owned boundary text the harness appends so no prompt can opt out of policy.</p>
+<p>Phases. A workflow is an ordered list of phases. Each phase runs one role against one task and, for worker phases, exits through a gate. Prior phases&#x27; reports are available to later phases through <code>{phase_name}</code> placeholders in the task template.</p>
+<p>Task packets and consent. A task packet is an offer, not a command. Before any side-effecting tool unlocks, a worker must call <code>accept_task</code>, or it can <code>decline_task</code> with a reason and an optional counter-proposal. Declining is a first-class, non-punished outcome.</p>
+<p>Gates. A gate runs the phase&#x27;s deterministic checks (shell commands that must exit 0), then an independent verifier in fresh context. The verifier never sees the worker&#x27;s reasoning, only the task and the artifacts. If either fails, the phase does not pass.</p>
+<p>Routing and budget. Task classes map to model tiers and effort levels in config. The orchestrator does not pick its own model; routing is config, not model self-assessment. A run has a token and dollar budget; hitting it stops the run cleanly.</p>
+<p>Memory. Project memory is a set of dated, provenance-stamped facts under <code>memory/</code>, maintained under approval gates. Nothing is deleted; expired facts move to an archive.</p>
+<p>Audit. Every run writes a hash-chained event log. <code>harnessie audit</code> re-verifies the chain and renders one composite timeline of agent and operator actions.</p>
+<h2 id="installation-and-requirements">Installation and requirements</h2>
+<p>Python 3.11 or newer and PyYAML, installed together:</p>
+<pre><code>pip install -e &quot;.[dev]&quot;</code></pre>
+<p>The model adapters are standard-library only and need no vendor SDK. Shell-using workflows require an OS sandbox: macOS uses native <code>sandbox-exec</code> (Seatbelt); Linux uses bubblewrap, firejail, or docker in that order of preference. Every backend is admitted only after a startup smoke test proves it can confine on your host. On any platform with no usable backend (Windows, or a host where the smoke test fails), shell-using workflows fail closed rather than run unconfined. See <a href="#security-model">Security model</a>.</p>
+<h2 id="the-cli">The CLI</h2>
+<p>All commands are subcommands of <code>python3 -m harness.cli</code> (or <code>harnessie</code> once installed). The <code>--root</code> flag sets the project root; it defaults to the current directory.</p>
+<div class="table-wrap"><table><thead><tr><th>Command</th><th>What it does</th></tr></thead><tbody><tr><td><code>run &lt;workflow&gt; --goal &quot;...&quot;</code></td><td>Run a workflow from a goal. Prints the run id.</td></tr><tr><td><code>resume &lt;run_id&gt; &lt;workflow&gt; --goal &quot;...&quot;</code></td><td>Resume a run from its journal. Re-runs only phases that did not pass.</td></tr><tr><td><code>report &lt;run_id&gt;</code></td><td>Print a run&#x27;s journal and proof artifacts.</td></tr><tr><td><code>audit &lt;run_id&gt;</code></td><td>Verify the hash chain and render the governance timeline. Exit 0 clean, 1 broken chain, 2 run not found.</td></tr><tr><td><code>eval [suite]</code></td><td>Run the deterministic eval scorecards (optionally one suite YAML).</td></tr><tr><td><code>eval --live</code></td><td>Run opt-in live provider scorecards; skipped visibly unless <code>HARNESSIE_LIVE=1</code> and provider configuration are present.</td></tr><tr><td><code>verify-manifest [manifest]</code></td><td>Verify the trust-bundle manifest. Defaults to <code>docs/MANIFEST.yaml</code>.</td></tr><tr><td><code>init [path]</code></td><td>Scaffold a minimal project layout (config, workflows, agents, ownership).</td></tr></tbody></table></div>
+<h2 id="what-governs-a-run">What governs a run</h2>
+<p>A run&#x27;s behavior is not in one file. Each decision has exactly one owner. To predict or change what a run does, edit the owner, not the prompt.</p>
+<div class="table-wrap"><table><thead><tr><th>Decision</th><th>Governed by</th></tr></thead><tbody><tr><td>Which model runs each task class, and how to swap brains</td><td><code>config/models.yaml</code> (tiers plus the routing table)</td></tr><tr><td>Token and dollar ceilings, effort per task class</td><td><code>config/models.yaml</code> (budget plus routing)</td></tr><tr><td>Which phases run, in what order, with which gates and verifiers</td><td>the workflow YAML in <code>workflows/</code></td></tr><tr><td>Which files each agent may write</td><td><code>OWNERSHIP.yaml</code> (lanes plus first-writer claims)</td></tr><tr><td>What each role may do (tools, shell allowlist, approval)</td><td>the tool registry (<code>harness/tools/builtin.py</code>) plus role prompts in <code>agents/</code></td></tr></tbody></table></div>
+<h2 id="writing-a-workflow">Writing a workflow</h2>
+<p>A workflow is a YAML file with a name, a description, and an ordered list of phases. Here is the built-in <code>build-and-verify</code> workflow, annotated.</p>
+<pre><code>name: build-and-verify
+description: Plan a code change, implement it, and gate it on tests plus a verifier.
+phases:
+  - name: plan
+    agent: orchestrator
+    task_class: plan          # -&gt; routes to the frontier tier at high effort
+    max_steps: 15
+    task: |
+      Goal from operator: {goal}
+      Produce an implementation plan: subtasks with acceptance criteria,
+      inputs, and out-of-scope fences. Inspect first; do not write files.
+  - name: implement
+    agent: implementer
+    task_class: implement
+    max_steps: 40
+    task: |
+      Implement the following plan in the workspace:
+      {plan}
+    verify:
+      max_attempts: 3
+      checks:
+        - name: tests
+          command: pytest -q      # deterministic gate: must exit 0
+      verifier: code-verifier     # independent, fresh-context judge
+      task_class: verify
+      criteria: |
+        Every criterion in the plan is met. Tests are meaningful and pass.
+        Nothing outside the plan&#x27;s scope was modified.
+  - name: integrate
+    agent: orchestrator
+    task_class: integrate
+    task: |
+      Original goal: {goal}
+      The implement phase finished with: {implement}
+      Write the final operator summary with evidence and follow-ups.</code></pre>
+<p>Phase fields:</p>
+<ul><li><code>name</code>: the phase id, and the placeholder later phases use to read its report.</li><li><code>agent</code>: the role to run. <code>orchestrator</code>, or a worker or verifier defined under <code>agents/</code>.</li><li><code>task_class</code>: the routing key. Looked up in <code>config/models.yaml</code> to pick tier and effort.</li><li><code>task</code>: the task template. <code>{goal}</code> is the operator&#x27;s goal; <code>{phase_name}</code> is a prior phase&#x27;s report.</li><li><code>max_steps</code>: the loop&#x27;s step ceiling for this phase.</li><li><code>verify</code>: the gate (worker phases). <code>checks</code> are shell commands that must exit 0; <code>verifier</code> names an independent judge in <code>agents/verifiers/</code>; <code>max_attempts</code> bounds the reformulate-and-retry loop; <code>criteria</code> is what the verifier judges against.</li><li><code>deny_tools</code>: tools removed from this phase, narrowing the blast radius of untrusted content.</li><li><code>allow_network</code>: opt this phase&#x27;s sandboxed shell into network access (off by default).</li><li><code>inject_memory_status</code>: prepend a deterministic memory-and-prior-run digest to the task.</li><li><code>approve_tools</code>: operator-recorded pre-approval for approval-gated tools, scoped to this phase.</li><li><code>parallel</code>: phases with the same label and placed consecutively run concurrently in separate workspaces under <code>workspace/.phases/&lt;phase&gt;</code>.</li></ul>
+<p>Prior-phase reports are treated as untrusted model output: before substitution they pass through the same quarantine filter that scans tool results, so injection attempts inside a report are fenced as data rather than followed. The operator&#x27;s <code>goal</code> is never fenced.</p>
+<p>Adversarial phases. A phase with <code>mode: adversarial</code> runs a panel instead of a single worker. Each <code>positions</code> entry is an agent on a task class (choose different task classes to get genuinely different brains, which is what earns the record its independent-positions claim). After <code>rebuttal_rounds</code> of objections, <code>arbitration: convergence</code> passes only on unanimous agreement with zero open objections; anything else halts as <code>needs_arbitration</code> with a decision record. See <a href="#governance-consent-contests-and-arbitration">Governance</a>.</p>
+<p>Approval policy. Approval-gated tools deny closed unless authorized. A workflow may use <code>approve_tools</code> for phase-local recorded pre-approval, or an operator can pass <code>--approval-policy approvals.yaml</code> with <code>allow</code> and <code>deny</code> lists. Each rule names a <code>tool</code> and may name a <code>phase</code>; explicit deny wins. <code>--approve-interactive</code> prompts on a TTY when no policy rule matches.</p>
+<p>Verification options. Start with the offline deterministic path: <code>pytest</code>, <code>harnessie eval</code>, and <code>harnessie verify-manifest</code>. When a local OpenAI-compatible endpoint such as Ollama is already running, <code>HARNESSIE_LIVE=1 HARNESSIE_OPENAI_COMPAT_BASE_URL=http://localhost:11434/v1 harnessie eval --live</code> gives a live-local scorecard without external provider calls. External provider scorecards are attended operations. CLI fan-out, local model review, or a separate model-family review can strengthen a change, but it is review evidence; the merge proof remains the repo&#x27;s tests, evals, manifests, and audit records.</p>
+<h2 id="configuring-brains">Configuring brains</h2>
+<p><code>config/models.yaml</code> is the only file you edit to swap models. It has three sections.</p>
+<p>Tiers name model endpoints, ordered cheap to capable (<code>local</code>, <code>cheap</code>, <code>mid</code>, <code>frontier</code>). Each tier declares a provider, a model id, the environment variable holding its key (never the key itself), token limits, whether it supports an effort dial, and cost-per-million-token rates for budgeting.</p>
+<pre><code>tiers:
+  frontier:
+    provider: anthropic
+    model_id: claude-fable-5
+    api_key_env: ANTHROPIC_API_KEY
+    supports_effort: true
+  local:
+    provider: openai-compat
+    model_id: qwen3.6:35b-mlx
+    base_url: http://localhost:11434/v1
+    api_key_env: &quot;&quot;          # local endpoints usually need no key</code></pre>
+<p>Routing maps each task class to a tier and effort. Workflow phases declare a <code>task_class</code>; the router resolves it here. This keeps model choice a policy decision, not something a model asserts about itself.</p>
+<pre><code>routing:
+  plan:      { tier: frontier, effort: high }
+  implement: { tier: mid,      effort: medium }
+  verify:    { tier: mid,      effort: high }
+  default:   { tier: mid,      effort: medium }</code></pre>
+<p>Budget sets the run-wide ceilings:</p>
+<pre><code>budget:
+  max_usd: 10.0
+  max_tokens: 2000000</code></pre>
+<p>To run everything on a local open-source model, point the task classes you use at the <code>local</code> tier and leave <code>ANTHROPIC_API_KEY</code> unset. To swap one provider for another, change the tier&#x27;s <code>provider</code>, <code>model_id</code>, and <code>base_url</code>. Nothing else in the harness changes.</p>
+<p>The escalation ladder walks the tier order. When a phase fails its gate, the harness first reformulates the task with the verifier&#x27;s evidence, then raises effort, then raises tier, before halting for a human. That ladder is why a cheap worker can carry bulk execution safely: a capable verifier and an automatic escalation stand behind it.</p>
+<h2 id="ownership-lanes">Ownership lanes</h2>
+<p><code>OWNERSHIP.yaml</code> at the project root declares who may write what. It sits outside the workspace jail and no agent can reach it. Three lane kinds:</p>
+<ul><li>Operator lanes are locked to every agent. No agent may write a path in an operator lane, full stop.</li><li>Agent lanes assign glob patterns to a named agent. Only that agent may write matching paths; another agent&#x27;s write is refused with a <code>request_change</code> remedy.</li><li>Collaborative lanes are shared: any agent may write matching paths, and no one exclusively claims them.</li></ul>
+<p>Paths not covered by any lane use first-writer-owns: the first agent to write a file claims it, and later cross-agent writes are refused. Claims and denials are logged as events and show up in the audit timeline. An agent that needs a file it does not own calls <code>request_change</code> to record the need rather than overwriting.</p>
+<h2 id="governance-consent-contests-and-arbitration">Governance: consent, contests, and arbitration</h2>
+<p>Harnessie treats agent work as governed, not merely executed. Three mechanisms carry that.</p>
+<p>Consent. A task packet is an offer. Before side-effecting tools unlock, the worker calls <code>accept_task</code>, or <code>decline_task</code> with a reason and an optional counter-proposal. A decline ends the phase cleanly and is never punished with a bigger model; escalation is for capability failures, not disagreement. A side-effecting call before acceptance is refused at dispatch with a structured refusal the model can read.</p>
+<p>Contested decisions. Some questions are decisions, not artifacts. An adversarial phase runs two or more agents on different brains, each forming an independent position from the workspace evidence, then objecting to each other&#x27;s. If they converge (unanimous recommendation, zero open objections) the phase passes. Otherwise it halts as <code>needs_arbitration</code> and writes an AIDR-style decision record to <code>runs/&lt;id&gt;/decisions/DR-&lt;phase&gt;.md</code> capturing each position, the objections, and the dissent.</p>
+<p>Arbitration. Only a human arbitrates a contested decision. You open the decision record, write your arbitration into it, and re-run; the run resumes from that record rather than re-running the contest (which would overwrite the recorded dissent). The record carries structurally earned claims: for example, <code>independent-positions</code> is earned only when the positions genuinely came from different providers.</p>
+<p>Everything above emits events into the hash-chained log. <code>harnessie audit &lt;run_id&gt;</code> renders them as one timeline: consents granted and declined, ownership claims and denials, structured refusals, change requests, injection flags, gate verdicts, approval grants and denials, operator arbitration, memory facts saved and expired, and decision records with their earned claims. See <a href="https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md">GOVERNANCE.md</a> for the full model.</p>
+<h2 id="when-a-run-halts">When a run halts</h2>
+<p>Every run ends in a named stop condition, and each maps to one operator action. Resuming is <code>harnessie resume &lt;run_id&gt; &lt;workflow&gt; --goal ...</code>; resume re-runs only phases that did not pass, so fixing the cause and re-running is safe.</p>
+<div class="table-wrap"><table><thead><tr><th>Stop condition</th><th>What it means</th><th>What to do</th></tr></thead><tbody><tr><td><code>complete</code> / phase <code>passed</code></td><td>task done, gate satisfied</td><td>nothing; the next phase proceeds</td></tr><tr><td><code>declined</code></td><td>the worker declined the offered task packet</td><td>read the counter-proposal in the report; revise the packet or accept the objection, then re-run</td></tr><tr><td><code>needs_human</code></td><td>a gate&#x27;s checks or verifier failed after the retry ladder exhausted</td><td>read the proofs under <code>runs/&lt;id&gt;/proofs/</code> and the report; fix the task or the acceptance criteria; re-run</td></tr><tr><td><code>needs_arbitration</code></td><td>a contested phase produced dissent</td><td>open <code>runs/&lt;id&gt;/decisions/DR-&lt;phase&gt;.md</code>, record your decision, then re-run (resume keys on that record)</td></tr><tr><td><code>stuck</code></td><td>the model repeated an identical failing or refused call</td><td>inspect the refusal via <code>harnessie audit &lt;id&gt;</code>; fix the tool grant, allowlist, or task; re-run</td></tr><tr><td><code>budget</code></td><td>the run hit its token or dollar ceiling</td><td>raise the ceiling in <code>config/models.yaml</code> or narrow the goal; re-run</td></tr><tr><td><code>max_steps</code></td><td>the loop hit its step ceiling without completing</td><td>raise <code>max_steps</code> for the phase or simplify the task</td></tr><tr><td><code>model_error</code></td><td>the provider errored twice in a row</td><td>check the endpoint and API key; re-run</td></tr><tr><td><code>no_action</code></td><td>the model produced no tool call even after a nudge</td><td>usually a role-prompt or model-fit issue; check the role prompt in <code>agents/</code></td></tr></tbody></table></div>
+<h2 id="security-model">Security model</h2>
+<p>Harnessie&#x27;s guarantees live in code at the tool and registry layer, so no role prompt can opt out of them. The layers, in brief:</p>
+<ul><li>Role permissions. The registry enforces which role may call which tool at dispatch time. A model never sees a tool its role cannot use, and a disallowed call is refused, not executed.</li><li>Consent lock. Side-effecting tools stay locked until the worker accepts the task.</li><li>Workspace jail. File tools resolve and confine paths to the workspace subtree; a path escape is refused.</li><li>OS sandbox. Every child command (shell and gate checks) runs in an OS confinement that denies writes outside the workspace and denies network by default. macOS uses Seatbelt; Linux uses bubblewrap, firejail, or docker. No usable backend means shell fails closed.</li><li>Quarantine. Tool results and inter-phase reports are scanned for injection patterns and invisible or bidirectional characters; flagged content is stripped of invisibles and fenced as data-not-instructions before a model sees it.</li><li>Secret handling. Child processes run under a scrubbed environment, so provider keys are never inherited. Shell output is redacted for credential-shaped strings, and writing credential-shaped content into the workspace is refused. Secret detection reports kind labels, never the value.</li><li>Structured refusals. Every denial returns a machine-readable refusal (<code>error</code>, <code>boundary</code>, <code>detail</code>, <code>why</code>) and emits an audit event, so refusals are actionable data for the model and legible entries for the operator.</li></ul>
+<p>The full threat model, the honest limits of each layer, and the per-platform backend table are in <a href="https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md">SECURITY.md</a>.</p>
+<h2 id="extending-the-harness">Extending the harness</h2>
+<p>Adding a tool. Tools are registered with a name, a JSON-schema signature, an effects class (<code>read</code>, <code>write</code>, or <code>execute</code>), the roles allowed to call it, and whether it requires approval. Registration is in <code>harness/tools/builtin.py</code>. The effects class and role grant are enforced at dispatch, so a new tool cannot bypass policy. The built-in grants are a useful template:</p>
+<div class="table-wrap"><table><thead><tr><th>Tool</th><th>Roles</th><th>Effects</th></tr></thead><tbody><tr><td><code>read_file</code>, <code>list_files</code>, <code>task_complete</code></td><td>orchestrator, worker, verifier</td><td>read</td></tr><tr><td><code>run_shell</code></td><td>worker, verifier</td><td>execute</td></tr><tr><td><code>write_file</code>, <code>accept_task</code>, <code>decline_task</code>, <code>save_fact</code>, <code>expire_fact</code>, <code>request_change</code></td><td>worker</td><td>write or read</td></tr></tbody></table></div>
+<p>Adding a role. A role is a markdown prompt file plus its kind. Orchestrators live at <code>agents/orchestrator.md</code>, workers under <code>agents/workers/&lt;name&gt;.md</code>, verifiers under <code>agents/verifiers/&lt;name&gt;.md</code>. The harness appends machine-owned boundary text per kind, so the prompt file defines the role&#x27;s job while policy stays in the harness. Reference the role by file name as a phase&#x27;s <code>agent</code>.</p>
+<p>Adding a workflow. Write a new YAML file under <code>workflows/</code> following the schema in <a href="#writing-a-workflow">Writing a workflow</a>. Nothing about the harness needs to change; workflows are declared, not coded.</p>
+<h2 id="evaluation">Evaluation</h2>
+<p>Harnessie ships deterministic eval scorecards that run against a mock brain with no network, so behavior is reproducible. <code>harnessie eval</code> runs the default suites; pass a suite YAML to run one. Scenarios come in three shapes: golden cases that must pass, risky cases that must fail closed, and recovery cases that must route through the declared ladder. The governance suite scores consent, ownership, contest, and audit behavior specifically, so those guarantees are measured rather than assumed. <code>harnessie eval --live</code> is the separate, operator-opted-in provider scorecard; it skips visibly without <code>HARNESSIE_LIVE=1</code> and provider configuration. See <a href="https://github.com/snapsynapse/harnessie/blob/main/EVALS.md">EVALS.md</a> for the scenario schema and how to add cases.</p>
+<h2 id="faq">FAQ</h2>
+<p>Do I need an API key to try it? No. The test suite and <code>harnessie eval</code> run against a mock brain offline. You only need a key (or a local endpoint) to run a real workflow.</p>
+<p>Can I run it fully offline on open-source models? Yes. Point the task classes you use at the <code>local</code> tier in <code>config/models.yaml</code> and use any OpenAI-compatible server (Ollama, vLLM, llama.cpp). Leave the key env unset.</p>
+<p>Does it run on Linux? Yes, with a sandbox backend present (bubblewrap preferred, then firejail, then docker). Without a usable backend, shell-using workflows fail closed by design. Windows should use WSL2, which presents as Linux.</p>
+<p>What happens if a worker goes off the rails? The gate is the backstop: deterministic checks plus an independent verifier that fails closed, then an automatic reformulate-effort-tier ladder, then a human halt. Ownership lanes and the sandbox bound what a single worker can touch in the meantime.</p>
+<p>Where is my run&#x27;s data? Under <code>runs/&lt;run_id&gt;/</code>: <code>journal.jsonl</code> (the resume ledger), <code>events.jsonl</code> (the hash-chained audit log), <code>proofs/</code> (check outputs), and <code>decisions/</code> (contested-phase records). This directory is gitignored.</p>
+<p>How do I make an agent stop overwriting another agent&#x27;s files? Declare lanes in <code>OWNERSHIP.yaml</code>, or rely on first-writer-owns. Cross-agent writes are refused with a <code>request_change</code> remedy.</p>
+<h2 id="see-also">See also</h2>
+<ul><li><a href="/getting-started.html">Getting started</a>: the five-minute path.</li><li><a href="https://github.com/snapsynapse/harnessie/blob/main/ARCHITECTURE.md">ARCHITECTURE.md</a>: the design rationale and source-to-decision map.</li><li><a href="https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md">GOVERNANCE.md</a>: consent, ownership, contests, and audit in full.</li><li><a href="https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md">SECURITY.md</a>: the threat model and sandbox backends.</li><li><a href="https://github.com/snapsynapse/harnessie/blob/main/ROADMAP.md">ROADMAP.md</a>: what is next and platform support.</li></ul>
+  </div>
+</main>
+<footer>
+  <div class="container">
+    <div class="row">
+      <a href="/quickstart.html">Quickstart</a>
+      <a href="/getting-started.html">Getting started</a>
+      <a href="/guide.html">User guide</a>
+      <a href="/brains.html">Brains</a>
+      <a href="/threat-model.html">Threat model</a>
+    </div>
+    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/GUIDE.md" target="_blank" rel="noopener">docs/GUIDE.md</a>.</p>
+  </div>
+</footer>
+</body>
+</html>

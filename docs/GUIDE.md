@@ -1,6 +1,6 @@
 # Harnessie user guide
 
-The complete guide to running, configuring, and extending Harnessie. If you are new, read [getting-started.md](getting-started.md) first; it gets you to a green run in five minutes. This guide is the reference behind it.
+The complete guide to running, configuring, and extending Harnessie. If you are new, read [Getting started](getting-started.md) first; it gets you to a green run in five minutes. This guide is the reference behind it.
 
 ## Contents
 
@@ -270,7 +270,7 @@ How do I make an agent stop overwriting another agent's files? Declare lanes in 
 
 ## See also
 
-- [getting-started.md](getting-started.md): the five-minute path.
+- [Getting started](getting-started.md): the five-minute path.
 - [ARCHITECTURE.md](../ARCHITECTURE.md): the design rationale and source-to-decision map.
 - [GOVERNANCE.md](../GOVERNANCE.md): consent, ownership, contests, and audit in full.
 - [SECURITY.md](../SECURITY.md): the threat model and sandbox backends.

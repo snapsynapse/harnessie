@@ -2,7 +2,7 @@
 
 This is the gentlest path into Harnessie. It assumes you have never cloned a repository, never written YAML, and are not sure what a terminal is for. That is fine. Every command here is safe, nothing reaches the internet or spends money until you decide it should, and the tool checks your machine for you before anything runs.
 
-If you are already comfortable in a terminal, the faster five-minute path is [getting-started.md](getting-started.md), and the full reference is [GUIDE.md](GUIDE.md).
+If you are already comfortable in a terminal, the faster five-minute path is [Getting started](getting-started.md), and the full reference is [the user guide](GUIDE.md).
 
 ## What Harnessie is, in one breath
 
@@ -125,7 +125,7 @@ Terms in the order a newcomer meets them, each in one plain sentence.
 
 ## Where to next
 
-- [getting-started.md](getting-started.md): the same path, faster, for a terminal-comfortable reader.
-- [GUIDE.md](GUIDE.md): the complete user guide, from concepts to extending the harness.
+- [Getting started](getting-started.md): the same path, faster, for a terminal-comfortable reader.
+- [User guide](GUIDE.md): the complete guide, from concepts to extending the harness.
 - [GOVERNANCE.md](../GOVERNANCE.md): how consent, ownership, contested decisions, and the audit trail work.
 - [SECURITY.md](../SECURITY.md): the prompt-injection and secret-handling model, and the sandbox backends.

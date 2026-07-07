@@ -2,6 +2,15 @@
 
 All notable changes to Harnessie are recorded here. Format loosely follows Keep a Changelog; versions follow semver.
 
+## Unreleased
+
+### Added
+
+- Served HTML doc pages: every markdown doc in `docs/` (quickstart, getting started, user guide, brains, threat model) now has a styled, navigable HTML page on harnessie.com, generated from the markdown by the new `scripts/build_docs_html.py` (dependency-free; edit the markdown, run the script, commit source and output together). Site nav, cross-links, and a per-page footer naming the generating source; internal links between docs resolve on-site, links to repo-root engineering docs still point at GitHub.
+- Landing page Quick start gains "Option 1: AI-assisted, with a verifiable guide": point an assistant at the served GuideCheck guide instead of letting it improvise an install from web search, with the safety rationale stated (same bytes for human and assistant, verify-then-approve, pre-declared read-only actions, nothing installs or spends without explicit approval). The hand-install path becomes Option 2.
+- Landing page and JSON-LD "builds on" credits swap HardGuard25 for GuideCheck; hero CTA, feature links, and footer doc links now point at the on-site pages instead of GitHub; footer gains a Quickstart link.
+- `docs/sitemap.xml` lists the five new doc pages; `docs/llms.txt` Key files point at the on-site pages; `docs/MANIFEST.yaml` re-pinned for both.
+
 ## 0.6.0 (2026-07-07)
 
 ### Added

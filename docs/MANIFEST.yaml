@@ -8,11 +8,11 @@ files:
   - path: docs/.well-known/assistant-guide-manifest.txt
     sha256: d3c9104fb7dce5503ddfe1fde1e3f97932aa0a4f91146a8d30de307600800f73
   - path: docs/llms.txt
-    sha256: e85ff9eb57ecb3dd4d796370f5680dd735b043ac3e39f24fbe0b42af7c354231
+    sha256: 528c2171c20551d1ba9243ea03d4830983df11e3ab4ac1e0a646f7c65f94ba3d
   - path: docs/robots.txt
     sha256: 88588b10d194d3d62ad9a4463f05a80f645ed1e7b23c59b10087cb28dd5a57f6
   - path: docs/sitemap.xml
-    sha256: 766558e2eb5d40a5db816aee0de53ab3f05afcbba93fe5d0bc90d6296dd328c9
+    sha256: 40ce141745828dd98f08736e7b1df4a6a14ad10a94301ad57081003d3ead6b32
   - path: docs/CNAME
     sha256: 6dc81288045a60be46e3eaf407380328466b8ce98c769fe1e637f69c97d5a97a
   - path: docs/site.webmanifest
