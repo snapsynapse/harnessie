@@ -155,6 +155,12 @@ class VerificationGate:
         # Deterministic checks the HARNESS computes in-process (no shell, no
         # sandbox): callables (attempt:int) -> CheckResult. e.g. memory_lint.
         harness_checks: list[Callable[[int], CheckResult]] | None = None,
+        # Cascade opt-in (0.7): replaces the default Route.escalate() walk
+        # with a policy-driven decision. Receives (current_route, failing
+        # verdict); returns the next route, the same route to hold, or None
+        # when the ladder is exhausted. Phases that do not opt in get the
+        # default — byte-identical to the pre-cascade ladder.
+        escalate_fn: Callable[[Route, "Verdict"], Route | None] | None = None,
     ) -> GateResult:
         verdicts: list[Verdict] = []
         current_task, current_route = task, route
@@ -229,7 +235,10 @@ class VerificationGate:
                 "Do not repeat the failed approach. Address every failure above, "
                 "then re-run the relevant checks yourself before calling task_complete.")
             if attempt >= 2:
-                nxt = current_route.escalate()
+                if escalate_fn is not None:
+                    nxt = escalate_fn(current_route, verdict)
+                else:
+                    nxt = current_route.escalate()
                 if nxt is None:
                     break
                 current_route = nxt

@@ -22,6 +22,7 @@ import yaml
 from .adversarial import (PositionRecord, assemble_record, converged,
                           lint_record, parse_objection_response, parse_stance)
 from .approval import ApprovalPolicy, tty_approval
+from .cascade import CascadePolicy, load_cascade_config, validate_against_tiers
 from .events import EventLog
 from .loop import AgentLoop, LoopResult
 from .memory import ProjectMemory, ProofStore
@@ -35,6 +36,17 @@ from .state import RunState, new_run_id
 from .tools.builtin import register_builtin
 from .tools.registry import ToolRegistry
 from .verify import Check, GateResult, VerificationGate
+
+
+def _escalation_reason(verdict) -> str:
+    """Mechanical map from a failing gate verdict to a cascade escalation
+    reason. Refusals are recognized so a policy can hold instead of up-tiering
+    (up-tiering on refusal is a containment leak); everything else is a gate
+    failure. schema_fail and tool_contract deepen with routing_trace (0.7
+    task 3)."""
+    if "loop stopped: refusal" in verdict.reasons:
+        return "refusal"
+    return "gate_fail"
 
 
 def load_models_config(path: Path) -> tuple[dict[str, ModelSpec], dict, dict]:
@@ -93,6 +105,10 @@ class WorkflowRunner:
         tiers, routing_table, budget_cfg = load_models_config(
             models_config or self.root / "config" / "models.yaml")
         self.router = Router(tiers=tiers, table=routing_table)
+        # Cascade policies (0.7, adopted via decisions/AIDR-0004): opt-in per
+        # phase; a policy naming an unconfigured tier refuses at startup.
+        self.cascade = load_cascade_config(self.root / "config" / "cascade.yaml")
+        validate_against_tiers(self.cascade, tiers)
         self.budget = Budget(**budget_cfg)
         self.run_id = run_id or new_run_id()
         self.run_dir = self.root / "runs" / self.run_id
@@ -251,7 +267,20 @@ class WorkflowRunner:
                 continue
 
             task_class = phase.get("task_class", "default")
-            route = self.router.route(task_class)
+            route, escalate_fn, cascade_refusal = self._resolve_cascade(
+                phase, self.router.route(task_class))
+            if cascade_refusal:
+                outcome = PhaseOutcome(name, "needs_human", cascade_refusal)
+                self.state.record(f"phase:{name}",
+                                  {"status": outcome.status,
+                                   "report": outcome.report})
+                reports[name] = outcome.report
+                outcomes.append(outcome)
+                self.events.emit("phase_done", phase=name,
+                                 status=outcome.status,
+                                 spent_usd=round(self.budget.spent_usd, 4),
+                                 spent_tokens=self.budget.spent_tokens)
+                break   # fail closed: an unroutable phase halts the run
             checks = [Check(**c) for c in phase.get("verify", {}).get("checks", [])]
             verifier_name = phase.get("verify", {}).get("verifier")
             agent_name = phase.get("agent", "orchestrator")
@@ -302,7 +331,8 @@ class WorkflowRunner:
                         checks=checks,
                         route=route,
                         allow_network=allow_network,
-                        harness_checks=self._harness_checks(phase))
+                        harness_checks=self._harness_checks(phase),
+                        escalate_fn=escalate_fn)
                 finally:
                     self.registry.approval_handler = prev_handler
                 outcome = PhaseOutcome(name, gres.status, gres.final_report)
@@ -416,7 +446,10 @@ class WorkflowRunner:
     ) -> PhaseOutcome:
         name = phase["name"]
         task_class = phase.get("task_class", "default")
-        route = self.router.route(task_class)
+        route, escalate_fn, cascade_refusal = self._resolve_cascade(
+            phase, self.router.route(task_class))
+        if cascade_refusal:
+            return PhaseOutcome(name, "needs_human", cascade_refusal)
         checks = [Check(**c) for c in phase.get("verify", {}).get("checks", [])]
         verifier_name = phase.get("verify", {}).get("verifier")
         agent_name = phase.get("agent", "orchestrator")
@@ -462,10 +495,53 @@ class WorkflowRunner:
                 checks=checks,
                 route=route,
                 allow_network=allow_network,
-                harness_checks=self._harness_checks(phase))
+                harness_checks=self._harness_checks(phase),
+                escalate_fn=escalate_fn)
         finally:
             registry.approval_handler = prev_handler
         return PhaseOutcome(name, gres.status, gres.final_report)
+
+    def _resolve_cascade(self, phase: dict, route: Route):
+        """Cascade opt-in resolution shared by the sequential and parallel
+        dispatch sites. Returns (route, escalate_fn, refusal). refusal is
+        None when resolved; otherwise the fail-closed message for a cascade
+        reference the config does not know (no model is ever dispatched)."""
+        cascade_name = phase.get("cascade")
+        if not cascade_name:
+            return route, None, None
+        try:
+            policy = self.cascade.policy(str(cascade_name))
+        except ValueError as exc:
+            return route, None, (
+                f"{exc}; fix the phase's cascade reference in the workflow "
+                "or add the policy to config/cascade.yaml, then resume the run")
+        return (Route(policy.ladder[0], route.effort),
+                self._cascade_escalator(policy, phase["name"]), None)
+
+    def _cascade_escalator(self, policy: CascadePolicy, phase_name: str):
+        """Policy-driven gate escalation for a cascade-opted phase. Effort
+        climbs first within the current tier (the same motion as the default
+        ladder); tier motion is the policy's call, and every tier decision is
+        an event so routing drift stays visible."""
+        climbs = {"used": 0}
+
+        def escalate(route: Route, verdict) -> Route | None:
+            e_idx = EFFORT_LEVELS.index(route.effort)
+            if e_idx < len(EFFORT_LEVELS) - 1:
+                return Route(route.tier, EFFORT_LEVELS[e_idx + 1])
+            reason = _escalation_reason(verdict)
+            decision = policy.next_tier(route.tier, climbs["used"], reason)
+            self.events.emit("cascade_decision", phase=phase_name,
+                             policy=policy.name, action=decision.action,
+                             tier=decision.tier, reason=decision.reason)
+            if decision.action == "climb":
+                climbs["used"] += 1
+                return Route(decision.tier, "medium")
+            if decision.action == "hold":
+                return route            # retry reformulated on the same rung
+            return None                 # exhausted: gate hands to the operator
+
+        return escalate
 
     def _stamp_phase_cost(
         self,
