@@ -2,9 +2,13 @@ kind: harnessie-trust-bundle
 version: 1
 files:
   - path: assistant-guide.txt
-    sha256: 74d5c3b46866f8a9f2efe8dfc9cec2c2f64732568b57dbca2fca6476bb4d6a4c
+    sha256: cef6aba8fc9eb6b4e475531029acf5904360232c88989404d9073e30fb9e987c
+  - path: docs/.well-known/assistant-guide.txt
+    sha256: cef6aba8fc9eb6b4e475531029acf5904360232c88989404d9073e30fb9e987c
+  - path: docs/.well-known/assistant-guide-manifest.txt
+    sha256: d3c9104fb7dce5503ddfe1fde1e3f97932aa0a4f91146a8d30de307600800f73
   - path: docs/llms.txt
-    sha256: c5c516d6bc1f3e4b89a031eaac0587ba0df1758d324e95db46446bb15a054115
+    sha256: e85ff9eb57ecb3dd4d796370f5680dd735b043ac3e39f24fbe0b42af7c354231
   - path: docs/robots.txt
     sha256: 88588b10d194d3d62ad9a4463f05a80f645ed1e7b23c59b10087cb28dd5a57f6
   - path: docs/sitemap.xml

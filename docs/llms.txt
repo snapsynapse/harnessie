@@ -26,6 +26,7 @@ An orchestrator decomposes a goal into task packets with acceptance criteria and
 - Architecture: https://github.com/snapsynapse/harnessie/blob/main/ARCHITECTURE.md
 - Governance: https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md
 - Security model: https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md
+- [Assistant Guide](https://harnessie.com/.well-known/assistant-guide.txt): bounded, human-verifiable guide for reviewing a Harnessie checkout before authorizing a run (GuideCheck profile)
 
 ## Related
 

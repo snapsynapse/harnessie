@@ -34,6 +34,7 @@ Worked end-to-end example with sample data: [examples/policy-compliance/README.m
 - [docs/getting-started.md](docs/getting-started.md): the five-minute path from install to a green run and reading the evidence.
 - [docs/GUIDE.md](docs/GUIDE.md): the complete user guide, concepts through extension, including workflow authoring, brain configuration, ownership, governance, and the halt-recovery table.
 - [docs/brains.md](docs/brains.md): the brain-agnostic receipt, the models actually run under the harness with a link to the record that proves each.
+- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide (GuideCheck Level 3 profile) for an assistant reviewing a Harnessie checkout before you authorize a run; served at [harnessie.com/.well-known/assistant-guide.txt](https://harnessie.com/.well-known/assistant-guide.txt) with a sidecar manifest for provenance.
 
 The engineering references below (ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP) sit at the repo root; the user-facing guides live under `docs/`.
 
