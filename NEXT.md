@@ -26,9 +26,9 @@ Public surface (staged under prepare-and-stage; NOT live):
 
 ## Verification status
 
-Re-run independently during the v0.5 Claude verification rotation:
-- `python3 -m pytest -q`: 144 passed, 1 skipped.
-- `python3 -m harness.cli eval`: all PASS (default, `evals/operability.yaml`, `evals/stewardship.yaml`).
+Current (after the 0.6 first-harness-readiness work):
+- `python3 -m pytest -q`: 189 passed, 1 skipped.
+- `python3 -m harness.cli eval`: all PASS (default, `evals/operability.yaml`, `evals/stewardship.yaml`, `evals/redteam.yaml`).
 - `python3 -m harness.cli verify-manifest`: passed, 7 files.
 - `python3 -m harness.cli eval --live`: keyless/no-endpoint skip path returns 0/0 with explicit `SKIP` rows unless live env vars are set. Confirmed.
 - `git diff --check`: clean.
