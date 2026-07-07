@@ -10,7 +10,7 @@ import pytest
 
 from harness.models.base import EFFORT_LEVELS
 from harness.roles import RoleLibrary
-from harness.routing import TIER_ORDER
+from harness.routing import VALID_TIERS
 from harness.runner import WorkflowRunner, load_models_config
 from harness.tools.registry import PermissionDenied, ToolRegistry
 from harness.tools.builtin import register_builtin
@@ -30,7 +30,7 @@ def _shipped_registry(tmp_path) -> ToolRegistry:
 
 def test_models_yaml_parses_and_routing_is_valid():
     cfg = yaml.safe_load((ROOT / "config" / "models.yaml").read_text())
-    assert set(cfg["tiers"]) <= set(TIER_ORDER)
+    assert set(cfg["tiers"]) <= set(VALID_TIERS)
     for task_class, row in cfg["routing"].items():
         assert row["tier"] in cfg["tiers"], task_class
         assert row["effort"] in EFFORT_LEVELS, task_class

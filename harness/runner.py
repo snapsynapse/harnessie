@@ -32,7 +32,7 @@ from .models.base import EFFORT_LEVELS, ModelSpec
 from .ownership import OwnershipLedger
 from .quarantine import guard_result
 from .roles import RoleLibrary
-from .routing import Budget, Route, Router, TIER_ORDER
+from .routing import Budget, Route, Router, VALID_TIERS
 from .state import RunState, new_run_id
 from .tools.builtin import register_builtin
 from .tools.registry import ToolRegistry
@@ -97,7 +97,7 @@ def _validate_models_config(
 ) -> None:
     if not tiers:
         raise ValueError(f"{path}: at least one model tier is required")
-    bad_tiers = set(tiers) - set(TIER_ORDER)
+    bad_tiers = set(tiers) - set(VALID_TIERS)
     if bad_tiers:
         raise ValueError(f"{path}: unknown tier names: {sorted(bad_tiers)}")
     for task_class, row in routing.items():
@@ -303,8 +303,10 @@ class WorkflowRunner:
                 continue
 
             task_class = phase.get("task_class", "default")
-            route, escalate_fn, cascade_refusal = self._resolve_cascade(
-                phase, self.router.route(task_class))
+            cascade_refusal = self._reserved_refusal(task_class)
+            if not cascade_refusal:
+                route, escalate_fn, cascade_refusal = self._resolve_cascade(
+                    phase, self.router.route(task_class))
             if cascade_refusal:
                 outcome = PhaseOutcome(name, "needs_human", cascade_refusal)
                 self.state.record(f"phase:{name}",
@@ -482,10 +484,13 @@ class WorkflowRunner:
     ) -> PhaseOutcome:
         name = phase["name"]
         task_class = phase.get("task_class", "default")
-        route, escalate_fn, cascade_refusal = self._resolve_cascade(
+        refusal = self._reserved_refusal(task_class)
+        if refusal:
+            return PhaseOutcome(name, "needs_human", refusal)
+        route, escalate_fn, refusal = self._resolve_cascade(
             phase, self.router.route(task_class), budget)
-        if cascade_refusal:
-            return PhaseOutcome(name, "needs_human", cascade_refusal)
+        if refusal:
+            return PhaseOutcome(name, "needs_human", refusal)
         checks = [Check(**c) for c in phase.get("verify", {}).get("checks", [])]
         verifier_name = phase.get("verify", {}).get("verifier")
         agent_name = phase.get("agent", "orchestrator")
@@ -536,6 +541,19 @@ class WorkflowRunner:
         finally:
             registry.approval_handler = prev_handler
         return PhaseOutcome(name, gres.status, gres.final_report)
+
+    def _reserved_refusal(self, task_class: str) -> str | None:
+        """The reserved pre-gate (0.7, adopted via decisions/AIDR-0004): a
+        work class named under reserved: in config/cascade.yaml never reaches
+        any model at any tier. The human-only Arbitration rule, generalized
+        and enforced as config rather than convention."""
+        if self.cascade.is_reserved(task_class):
+            return (f"work class {task_class!r} is reserved: it never reaches "
+                    "any model at any tier (config/cascade.yaml, reserved:). "
+                    "This work belongs to the operator — do it directly, or "
+                    "remove the class from reserved: if that is wrong, then "
+                    "resume the run")
+        return None
 
     def _resolve_cascade(self, phase: dict, route: Route,
                          budget: Budget | None = None):
@@ -766,8 +784,12 @@ class WorkflowRunner:
             n = seen_labels.get(agent, 0) + 1
             seen_labels[agent] = n
             label = agent if n == 1 else f"{agent}-{n}"
-            route = self.router.route(
-                pos_spec.get("task_class", phase.get("task_class", "default")))
+            pos_class = pos_spec.get("task_class",
+                                     phase.get("task_class", "default"))
+            refusal = self._reserved_refusal(pos_class)
+            if refusal:
+                return PhaseOutcome(name, "needs_human", refusal)
+            route = self.router.route(pos_class)
             spec = self.router.spec_for(route)
             pos_task = (
                 f"{task}\n\n## Position protocol\n"

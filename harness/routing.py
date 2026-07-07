@@ -22,8 +22,18 @@ from dataclasses import dataclass, field
 
 from .models.base import EFFORT_LEVELS, ModelSpec
 
-# tiers ordered cheap -> capable; escalation walks right
+# tiers ordered cheap -> capable; the DEFAULT escalation ladder walks right
 TIER_ORDER = ("local", "cheap", "mid", "frontier")
+
+# The sovereign slot (0.7, adopted via decisions/AIDR-0004): any
+# OpenAI-compatible controlled endpoint — self-hosted vLLM, a TEE-hosted
+# deployment, a private inference cluster — with the same swap-by-config
+# contract as every other tier. Deliberately NOT on the default escalation
+# walk: sovereign is an exposure class, not a capability rung, so it is
+# reached only where policy names it — a routing table row or a cascade
+# ladder — never by automatic escalation into or past a controlled
+# endpoint. It counts as unexposed for containment (cascade.CONTAINED_TIERS).
+VALID_TIERS = TIER_ORDER + ("sovereign",)
 
 
 @dataclass

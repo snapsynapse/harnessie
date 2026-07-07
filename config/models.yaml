@@ -1,8 +1,35 @@
 # Model tiers and routing policy — the ONLY file you edit to swap brains.
 #
 # Tiers are ordered cheap -> capable: local, cheap, mid, frontier.
-# The escalation ladder walks that order (see harness/routing.py).
+# The default escalation ladder walks that order (see harness/routing.py).
 # API keys come from env vars, never from this file.
+#
+# A fifth slot, sovereign, is valid but not configured by default: any
+# OpenAI-compatible controlled endpoint (self-hosted vLLM, TEE-hosted
+# inference, a private cluster). It is an exposure class, not a capability
+# rung — the default escalation walk never enters it; reach it via a routing
+# row or a cascade ladder (config/cascade.yaml), where it counts as
+# unexposed for containment. Example:
+#
+#  sovereign:
+#    provider: openai-compat
+#    model_id: your-model
+#    base_url: https://your-controlled-endpoint/v1
+#    api_key_env: SOVEREIGN_API_KEY
+#    max_tokens: 8192
+#    supports_effort: false
+#    cost_per_mtok_in: 0.0
+#    cost_per_mtok_out: 0.0
+#
+# Any tier may declare fallbacks: for sideways moves (same tier, different
+# provider; used by cascade-opted phases on refusal or availability failure).
+# A fallback inherits every field of the tier's primary and overrides what
+# it names. Example under any tier:
+#
+#    fallbacks:
+#      - model_id: alternate-model
+#      - model_id: third-choice
+#        base_url: https://other-provider/v1
 
 tiers:
   frontier:
