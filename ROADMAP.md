@@ -37,7 +37,7 @@ Acceptance met: triage runs headless as propose-only and applies only under reco
 
 Theme: make the harness runnable and measurable beyond a single Mac.
 
-- Linux sandbox backend, so shell-using workflows run confined on Linux instead of failing closed (detail in Platform support below). Implementation step 15 follow-up. LANDED 2026-07-06: bwrap/firejail/docker backends with startup smoke tests, policy-construction unit tests, and CI jobs (Linux bubblewrap parity, macOS, no-backend fail-closed). Remains open until the CI matrix is green on a real run.
+- Linux sandbox backend, so shell-using workflows run confined on Linux instead of failing closed (detail in Platform support below). Implementation step 15 follow-up. GREEN 2026-07-07: bwrap/firejail/docker backends with startup smoke tests, policy-construction unit tests, and a CI matrix (Linux bubblewrap parity, macOS, no-backend fail-closed) passing on a real run. The first run caught one macOS-hardcoded test, since fixed. This acceptance is met: the full suite is green on Linux with a backend present and fails closed on a runner with none.
 - Live-endpoint smoke tests: one loop turn against a real Anthropic endpoint and one against a local OpenAI-compatible endpoint, opt-in by env var. Implementation step 11.
 - Expand the golden-task evaluation scorecard beyond the current mock-brain baseline: golden, risky, and failure-recovery tasks scored into a comparable report against real Anthropic and local OpenAI-compatible endpoints — including the governance scorecard, so consent and ownership behavior is measured per brain, not assumed. Implementation steps 11 and 12.
 - Live contested-phase run: `workflows/contested-decision.yaml` across two real providers, earning `independent-positions` on a real record.
@@ -63,6 +63,25 @@ Theme: put a human comfortably in the loop for long autonomous runs.
 
 Acceptance: a requires_approval tool blocks headless by default and proceeds only under policy; two independent phases run concurrently, gate independently, and beat sequential wall-clock.
 
+### 0.6.0: First-harness readiness (public launch gate)
+
+Theme: make "the safest and easiest first AI harness for people" true for someone who has never identified as a developer, and make the safety claim falsifiable for the developers who will audit it. This milestone gates the public launch; it does not displace 0.4 portability or 0.5 operability, both of which it depends on.
+
+Ease (the first-run path):
+- PyPI packaging: `pip install harnessie` (or `pipx install harnessie`) replaces clone-and-editable-install as the documented entry; signed, tagged releases with `RELEASE_CHECKLIST.md` per the repo-standards promotion path.
+- Guided first run: `harnessie init` grows an interactive setup that checks Python version, detects a sandbox backend, walks API-key setup via environment variable (never a file), and ends with a green mock-brain run so the first experience costs zero dollars.
+- Plain-language operator surface: `harnessie report` and every halt message readable by a non-developer; each stop condition explains itself in one sentence and names the single next action (the README halt table becomes the in-tool text, not just docs).
+- Pre-run cost preview: before a live run, show the configured ceilings and a worst-case dollar estimate; refuse to start when no ceiling is set.
+- A non-developer quickstart in `docs/` (the served tree once public): one real, useful, low-risk workflow end to end, with a glossary that never assumes git or shell fluency.
+- Windows path documented honestly: WSL2 walkthrough, plus a clear statement of what fails closed on bare Windows and why that is protection, not breakage.
+
+Safety (the falsifiable claim):
+- A published threat-model comparison artifact: SECURITY.md properties mapped against the failure modes of prevailing harness patterns (unsandboxed shell, prompt-level-only guardrails, self-verification, silent dissent-merging), each row citing the enforcing code and its test. This is the artifact the "safest" headline points at.
+- A standing "break it" invitation: a `SECURITY.md` disclosure path plus eval scenarios published as red-team targets, so the claim is contestable in public rather than asserted.
+- Default-deny posture audit before launch: one pass proving every tool grant, network allowance, and approval gate defaults closed in the shipped configs (extends `tests/test_repo_configs.py`).
+
+Acceptance: a non-developer given only the quickstart reaches a green first run without touching a config file; the comparison artifact exists with every row citing code and test; a fresh install on a ceiling-less config refuses a live run.
+
 ### 1.0.0: Extensibility, earned
 
 Theme: stable surfaces and pluggability, only after the core is proven.
@@ -72,7 +91,7 @@ Theme: stable surfaces and pluggability, only after the core is proven.
 - Per-lane sandbox profiles, closing the ownership layer's honest limit (interpreter writes bypass the per-file check today).
 - Frozen config and workflow schema with a written deprecation policy.
 
-Gate: no 1.0 while any 0.3, 0.4, or 0.5 acceptance criterion is red.
+Gate: no 1.0 while any 0.3, 0.4, 0.5, or 0.6 acceptance criterion is red.
 
 ## Platform support
 
