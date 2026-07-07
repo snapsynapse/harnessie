@@ -32,7 +32,7 @@
   <meta property="og:url" content="https://harnessie.com/">
   <meta property="og:locale" content="en_US">
   <meta property="article:published_time" content="2026-07-06T00:00:00Z">
-  <meta property="article:modified_time" content="2026-07-06T00:00:00Z">
+  <meta property="article:modified_time" content="2026-07-07T00:00:00Z">
   <meta property="article:author" content="Sam Rogers">
   <meta property="article:publisher" content="https://snapsynapse.com/">
   <meta property="article:section" content="Developer Tools">
@@ -67,7 +67,7 @@
     "mainEntityOfPage": { "@type": "WebPage", "@id": "https://harnessie.com/" },
     "image": "https://harnessie.com/imgs/og.png",
     "datePublished": "2026-07-06",
-    "dateModified": "2026-07-06",
+    "dateModified": "2026-07-07",
     "author": {
       "@type": "Person",
       "name": "Sam Rogers",
@@ -112,362 +112,216 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --bg: #f7f8fc;
       --bg-alt: #eceff4;
-      --surface2: #e2e7ee;
       --text: #17281a;
+      --text-mid: #3a4a3d;
       --text-muted: #566458;
+      --text-faint: #8a968b;
       --accent: #2f6b28;
       --accent-hover: #24571f;
       --border: #d6dce2;
-      --green: #2f6b28;
-      --red: #c0392b;
+      --border-soft: #e2e7ee;
       --code-bg: #16261a;
+      --code-border: #24571f;
       --code-text: #e8ece4;
+      --lime: #8fce6a;
       --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
-      --max-width: 960px;
-      --radius: 10px;
+      --max: 1080px;
     }
-
     html { scroll-behavior: smooth; }
-    body {
-      font-family: var(--font);
-      color: var(--text);
-      background: var(--bg);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
-
+    body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.6; -webkit-font-smoothing: antialiased; }
     a { color: var(--accent); text-decoration: none; }
     a:hover { color: var(--accent-hover); text-decoration: underline; }
-
-    /* Skip link (a11y) */
-    .skip-link {
-      position: absolute;
-      left: -9999px;
-      top: 0;
-      background: var(--accent);
-      color: var(--bg);
-      padding: 0.5rem 1rem;
-      z-index: 100;
-    }
+    .skip-link { position: absolute; left: -9999px; top: 0; background: var(--accent); color: var(--bg); padding: 0.5rem 1rem; z-index: 100; }
     .skip-link:focus { left: 0; }
-
-    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 1.5rem; }
+    .container { max-width: var(--max); margin: 0 auto; padding: 0 1.5rem; }
 
     /* Nav */
-    nav {
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 0;
-      position: sticky;
-      top: 0;
-      background: var(--bg);
-      z-index: 10;
-    }
-    nav .container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-    nav .logo {
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--text);
-      text-decoration: none;
-      letter-spacing: -0.01em;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.55rem;
-    }
-    nav .logo .logo-mark {
-      width: 30px; height: 30px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: #fff;
-      border: 1px solid var(--border);
-      flex: 0 0 auto;
-    }
-    nav .links { display: flex; align-items: center; gap: 1.5rem; font-size: 0.9rem; }
-    nav .links a { color: var(--text-muted); }
-    nav .links a:hover { color: var(--text); text-decoration: none; }
+    nav.site { border-bottom: 1px solid var(--border); padding: 0.85rem 0; position: sticky; top: 0; background: rgba(247,248,252,0.86); backdrop-filter: saturate(1.4) blur(8px); -webkit-backdrop-filter: saturate(1.4) blur(8px); z-index: 40; }
+    nav.site .container { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand { font-weight: 700; font-size: 1.1rem; color: var(--text); letter-spacing: -0.01em; display: inline-flex; align-items: center; gap: 0.55rem; }
+    .brand:hover { text-decoration: none; }
+    .brand img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; background: #fff; border: 1px solid var(--border); }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; font-size: 0.9rem; }
+    .nav-links > a { color: var(--text-muted); }
+    .nav-links > a:hover { color: var(--text); text-decoration: none; }
+    .gh-star { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.8rem; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-alt); color: var(--text) !important; font-weight: 600; font-size: 0.8rem; }
+    .gh-star:hover { border-color: var(--accent); text-decoration: none; }
+    .gh-star svg { color: #eab308; }
 
-    /* GitHub star button */
-    .gh-star {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.35rem 0.75rem;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: var(--bg-alt);
-      color: var(--text) !important;
-      font-weight: 600;
-      font-size: 0.8rem;
-      transition: border-color 0.1s ease, transform 0.05s ease;
-    }
-    .gh-star:hover {
-      border-color: var(--accent);
-      text-decoration: none;
-      transform: translateY(-1px);
-    }
-    .gh-star svg { flex: 0 0 auto; color: #eab308; }
-    .gh-star span { white-space: nowrap; }
-
-    /* Byline */
-    .byline {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin: 0.75rem 0 1.5rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem 0.9rem;
-      align-items: center;
-      justify-content: center;
-    }
-    .byline .sep { color: var(--border); }
-    .byline .sep::before { content: "\00B7"; }
-    .byline a { color: var(--text); text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 2px; }
-    .byline a:hover { color: var(--accent-hover); text-decoration-color: var(--accent-hover); }
-    .byline .version {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      padding: 0.15rem 0.55rem;
-      border-radius: 999px;
-      background: var(--bg-alt);
-      color: var(--accent);
-      border: 1px solid var(--border);
-    }
-
-    /* Canonical note */
-    .canonical-note {
-      margin-top: 2.5rem;
-      padding: 1rem 1.25rem;
-      background: var(--bg-alt);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
-      border-radius: 8px;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-    .canonical-note strong { color: var(--text); }
-    .canonical-note a { text-decoration: underline; text-underline-offset: 2px; }
+    /* Docs dropdown */
+    .nav-docs { position: relative; }
+    .nav-docs summary { list-style: none; cursor: pointer; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.3rem; outline: none; }
+    .nav-docs summary::-webkit-details-marker { display: none; }
+    .nav-docs summary:hover { color: var(--text); }
+    .docs-menu { position: absolute; top: calc(100% + 0.7rem); right: 0; min-width: 250px; background: #fff; border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 14px 38px rgba(23,40,26,0.15); padding: 0.4rem; display: flex; flex-direction: column; z-index: 50; opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity .14s ease, transform .14s ease, visibility .14s; }
+    .nav-docs[open] .docs-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+    .docs-item { display: block; padding: 0.6rem 0.75rem; border-radius: 8px; color: var(--text); }
+    .docs-item:hover { background: #eef4ea; text-decoration: none; }
+    .docs-item strong { display: block; font-weight: 600; font-size: 0.88rem; }
+    .docs-item span { display: block; font-size: 0.76rem; color: var(--text-muted); }
 
     /* Sections */
-    section { padding: 4rem 0; }
-    section.alt { background: var(--bg-alt); }
-
-    h1 { font-size: 2.75rem; line-height: 1.15; letter-spacing: -0.02em; font-weight: 800; }
-    h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; letter-spacing: -0.01em; }
-    h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
-
-    p { margin-bottom: 1rem; }
-    p:last-child { margin-bottom: 0; }
+    section { padding: 3.5rem 0; }
+    section.alt { background: var(--bg-alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    h1 { font-size: 3.1rem; line-height: 1.08; letter-spacing: -0.025em; font-weight: 800; }
+    h2 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.01em; }
+    h3 { font-weight: 600; }
+    p { margin: 0; }
 
     /* Hero */
-    .hero { padding: 5rem 0 4rem; text-align: center; }
-    .hero h1 { margin-bottom: 1rem; }
-    .hero .subtitle {
-      font-size: 1.2rem;
-      color: var(--text-muted);
-      max-width: 680px;
-      margin: 0 auto 1.5rem;
-    }
-    .hero .hook {
-      font-size: 1rem;
-      color: var(--text-muted);
-      max-width: 640px;
-      margin: 0 auto 2.5rem;
-    }
-
-    /* Hero mascot clip */
-    .hero-video { position: relative; max-width: 620px; margin: 0 auto 2.5rem; }
-    .hero-clip {
-      display: block;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
-      border-radius: var(--radius);
-      background: #fff;
-      border: 1px solid var(--border);
-      box-shadow: 0 8px 30px rgba(23, 40, 26, 0.10);
-    }
-    .video-toggle {
-      position: absolute;
-      bottom: 0.7rem;
-      right: 0.7rem;
-      width: 2.1rem;
-      height: 2.1rem;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      background: rgba(247, 248, 252, 0.92);
-      color: var(--text);
-      cursor: pointer;
-    }
-    .video-toggle:hover { background: #fff; border-color: var(--accent); }
-    .video-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-
-    /* Pillars */
-    .pillars {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-      margin-bottom: 2.5rem;
-      text-align: left;
-    }
-    .pillar {
-      padding: 1.5rem;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--bg-alt);
-    }
-    .pillar h3 { color: var(--accent); font-size: 1rem; }
-    .pillar p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0; }
-    .pillar p a { text-decoration: underline; text-underline-offset: 2px; }
-    section.alt .pillar { background: var(--bg); }
-
-    /* Pipeline strip */
-    .pipeline {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: stretch;
-      gap: 0.5rem;
-      margin: 1.5rem 0 0;
-      font-size: 0.85rem;
-    }
-    .pipeline .stage {
-      flex: 1 1 0;
-      min-width: 120px;
-      padding: 0.9rem 1rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-    }
-    .pipeline .stage strong { display: block; color: var(--accent); font-size: 0.9rem; margin-bottom: 0.2rem; }
-    .pipeline .stage span { color: var(--text-muted); }
-
-    /* Buttons */
-    .cta-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-    .btn {
-      display: inline-block;
-      padding: 0.75rem 1.5rem;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      transition: background 0.15s, color 0.15s;
-    }
-    /* Light text on the deep-green accent clears AA (~5.3:1) */
+    .hero { padding: 4.5rem 0 3rem; }
+    .hero-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 3rem; align-items: center; }
+    .pill { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0.7rem; border: 1px solid var(--border); background: var(--bg-alt); border-radius: 999px; font-size: 0.75rem; font-weight: 600; color: var(--accent); margin-bottom: 1.25rem; }
+    .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+    .hero h1 { margin-bottom: 1.1rem; }
+    .subtitle { font-size: 1.18rem; color: var(--text-muted); max-width: 520px; margin-bottom: 1.6rem; }
+    .cta-row { display: flex; gap: 0.85rem; flex-wrap: wrap; margin-bottom: 1.6rem; }
+    .btn { display: inline-block; padding: 0.8rem 1.5rem; border-radius: 6px; font-weight: 600; font-size: 0.95rem; }
+    .btn:hover { text-decoration: none; }
     .btn-primary { background: var(--accent); color: var(--bg); }
-    .btn-primary:hover { background: var(--accent-hover); text-decoration: none; color: var(--bg); }
-    .btn-secondary {
-      background: transparent;
-      color: var(--accent-hover);
-      border: 1px solid var(--accent);
-    }
-    .btn-secondary:hover { background: var(--accent); color: var(--bg); text-decoration: none; }
-    .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
-    .btn-primary:focus-visible { outline: 3px solid var(--text); outline-offset: 3px; }
+    .btn-primary:hover { background: var(--accent-hover); color: var(--bg); }
+    .btn-secondary { background: transparent; color: var(--accent-hover); border: 1px solid var(--accent); }
+    .btn-secondary:hover { background: var(--accent); color: var(--bg); }
+    .hero-note { font-size: 0.9rem; color: var(--text-muted); max-width: 500px; }
 
-    /* Code blocks */
-    .code-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      margin-top: 1.5rem;
-    }
-    .code-block { text-align: left; }
-    .code-block h3 { font-size: 0.95rem; margin-bottom: 0.75rem; }
-    .code-block .annotation {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-top: 0.75rem;
-      font-style: italic;
-    }
+    /* Hero media */
+    .hero-media { position: relative; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #fff; box-shadow: 0 18px 48px rgba(23,40,26,0.18); }
+    .hero-media img.still, .hero-media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hero-media video { opacity: 0; transition: opacity 0.4s ease; }
+    .video-toggle { position: absolute; bottom: 0.7rem; right: 0.7rem; width: 2.1rem; height: 2.1rem; display: none; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--border); background: rgba(247,248,252,0.92); color: var(--text); cursor: pointer; }
+    .video-toggle:hover { background: #fff; border-color: var(--accent); }
 
-    pre {
-      background: var(--code-bg);
-      color: var(--code-text);
-      padding: 1.25rem;
-      border-radius: 8px;
-      overflow-x: auto;
-      font-family: var(--mono);
-      font-size: 0.8rem;
-      line-height: 1.5;
-      border: 1px solid var(--border);
-    }
-    code { font-family: var(--mono); font-size: 0.88em; color: var(--accent); }
+    /* Proof strip */
+    .proof-strip { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2.75rem; padding-top: 1.75rem; border-top: 1px solid var(--border); }
+    .chip { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.85rem; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 8px; font-size: 0.82rem; color: var(--text); }
+    .chip b { color: var(--accent); font-weight: 700; }
+    .chip .m { color: var(--text-muted); }
 
-    /* Tables */
-    table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
-    th, td {
-      text-align: left;
-      padding: 0.75rem 1rem;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.9rem;
-    }
-    th { font-weight: 600; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
-    td.k { font-family: var(--mono); color: var(--accent); white-space: nowrap; font-size: 0.85rem; }
+    /* Two/three col */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start; min-width: 0; }
+    .two-col > * { min-width: 0; }
+    .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .what-grid { grid-template-columns: 0.9fr 1.1fr; align-items: start; }
+    .eyebrow { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 1rem; }
+    .lede { color: var(--text-mid); margin-bottom: 1rem; }
+    .lede:last-child { margin-bottom: 0; }
+
+    .card { padding: 1.25rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-alt); }
+    section.alt .card, .card.on-alt { background: var(--bg); }
+    .card h4 { color: var(--accent); font-size: 0.98rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .card h3 { color: var(--accent); font-size: 1rem; margin-bottom: 0.5rem; }
+    .card p { font-size: 0.86rem; color: var(--text-muted); }
+    .card.big { padding: 1.4rem; }
+    .card.big p { font-size: 0.88rem; }
+    .count-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+
+    /* Pipeline */
+    .pipeline { display: flex; align-items: stretch; gap: 0.4rem; }
+    .pl-stage { flex: 1 1 0; min-width: 120px; padding: 1rem 1.05rem; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; transition: background .35s ease, border-color .35s ease, transform .35s ease, box-shadow .35s ease; }
+    .pl-stage strong { display: block; color: var(--accent); font-size: 0.92rem; margin-bottom: 0.15rem; transition: color .35s ease; }
+    .pl-stage span { color: var(--text-muted); font-size: 0.82rem; transition: color .35s ease; }
+    .pl-stage.active { background: var(--code-bg); border-color: var(--code-border); transform: translateY(-3px); box-shadow: 0 10px 26px rgba(23,40,26,0.18); }
+    .pl-stage.active strong { color: var(--lime); }
+    .pl-stage.active span { color: #a8b6a3; }
+    .pl-arrow { display: flex; align-items: center; color: #a8b0a5; font-size: 1.1rem; }
+
+    /* Terminal card */
+    .terminal { background: var(--code-bg); border-radius: 12px; border: 1px solid var(--code-border); box-shadow: 0 14px 40px rgba(23,40,26,0.16); overflow: hidden; font-family: var(--mono); }
+    .terminal .bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 0.95rem; border-bottom: 1px solid var(--code-border); }
+    .terminal .bar .d { width: 11px; height: 11px; border-radius: 50%; background: #3c5a3c; }
+    .terminal .bar .t { margin-left: 0.5rem; color: #7c8f7c; font-size: 0.72rem; }
+    .terminal .body { padding: 1.1rem 1.15rem; font-size: 0.79rem; line-height: 1.75; color: #c9d3c6; }
+    .terminal .body .g { color: var(--lime); }
+    .terminal .body .m { color: #7c8f7c; }
+    .terminal .body .w { color: #a8b6a3; }
+    .terminal .body .s { color: var(--code-text); }
+    .terminal .body .gap { height: 0.7rem; }
+    .cursor { display: inline-block; width: 8px; height: 1.05em; background: var(--lime); margin-left: 4px; vertical-align: -2px; animation: blink 1.1s step-end infinite; }
+    @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+
+    /* Featured install */
+    .install-featured { position: relative; padding: 1.75rem 1.9rem; border: 1px solid #bcd3ae; border-radius: 14px; background: linear-gradient(180deg, #eef5e8 0%, #e7f0e0 100%); box-shadow: 0 10px 34px rgba(47,107,40,0.12); }
+    .featured-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.32rem 0.8rem; background: var(--accent); color: #f2f7ee; border-radius: 999px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.01em; margin-bottom: 1rem; }
+    .featured-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--lime); }
+    .install-featured h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.01em; }
+    .install-featured .lede { font-size: 0.92rem; max-width: 660px; }
+    .cmd-row { display: flex; align-items: stretch; gap: 0.6rem; flex-wrap: wrap; margin: 1rem 0 1.15rem; }
+    .cmd { flex: 1 1 auto; min-width: 260px; display: flex; align-items: center; font-family: var(--mono); font-size: 0.86rem; background: var(--code-bg); color: var(--lime); padding: 0.75rem 1.05rem; border-radius: 9px; border: 1px solid var(--code-border); word-break: break-all; }
+    .cmd .p { color: #7c8f7c; margin-right: 0.5rem; }
+    .copy-btn { cursor: pointer; font-family: inherit; font-size: 0.82rem; font-weight: 600; padding: 0.6rem 1.1rem; border-radius: 9px; white-space: nowrap; border: 1px solid var(--accent); background: var(--accent); color: #f2f7ee; }
+    .copy-btn.ghost { border-color: var(--border); background: var(--bg-alt); color: var(--text); }
+    .trust-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .trust-chip { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.7rem; background: rgba(255,255,255,0.6); border: 1px solid #bcd3ae; border-radius: 8px; font-size: 0.78rem; color: var(--text); }
+    .trust-chip b { color: var(--accent); font-weight: 700; }
+
+    .sub-head { font-size: 1.05rem; font-weight: 700; margin: 2.75rem 0 0.4rem; letter-spacing: -0.01em; }
+    .install-line { display: flex; align-items: center; gap: 0.7rem; margin: 0 0 2rem; flex-wrap: wrap; }
+    .oneliner { font-family: var(--mono); font-size: 0.95rem; background: var(--code-bg); color: var(--lime); padding: 0.7rem 1.1rem; border-radius: 8px; border: 1px solid var(--code-border); }
+    .oneliner .p { color: #7c8f7c; }
+    .muted { font-size: 0.85rem; color: var(--text-muted); }
+
+    pre { background: var(--code-bg); color: var(--code-text); padding: 1.25rem; border-radius: 10px; overflow-x: auto; font-family: var(--mono); font-size: 0.79rem; line-height: 1.55; border: 1px solid var(--code-border); }
+    pre .c { color: #7c8f7c; }
+    .code-block h3 { font-size: 0.95rem; margin-bottom: 0.5rem; }
+
+    /* Enforcement grid */
+    .enforce-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 2rem; }
+    .enforce-row { display: flex; gap: 0.9rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+    .enforce-row code { font-family: var(--mono); color: var(--accent); font-size: 0.82rem; min-width: 88px; font-weight: 600; }
+    .enforce-row span { font-size: 0.86rem; color: var(--text-mid); }
+
+    /* Final CTA */
+    .final { text-align: center; }
+    .final img { width: 64px; height: 64px; border-radius: 50%; border: 1px solid var(--border); margin-bottom: 1.25rem; }
+    .final h2 { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.9rem; }
+    .final p { font-size: 1.05rem; color: var(--text-muted); max-width: 560px; margin: 0 auto 1.75rem; }
 
     /* Footer */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 2.5rem 0;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-    .footer-grid {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 2rem;
-      flex-wrap: wrap;
-    }
-    .footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
-    .footer-meta p { margin-bottom: 0.25rem; }
-    .footer-meta a { text-decoration: underline; text-underline-offset: 2px; }
-    .footer-links a { text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--border); }
-    .footer-links a:hover { text-decoration-color: var(--accent-hover); }
+    footer { border-top: 1px solid var(--border); background: var(--bg-alt); padding: 3rem 0 2.5rem; font-size: 0.85rem; color: var(--text-muted); }
+    .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 2.5rem; }
+    .footer-brand a.brand { font-size: 1.05rem; margin-bottom: 0.75rem; }
+    .footer-brand a.brand img { width: 26px; height: 26px; }
+    .footer-brand p { margin-bottom: 0.25rem; }
+    .foot-col { display: flex; flex-direction: column; gap: 0.6rem; }
+    .foot-col .head { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); }
+    .foot-col a { color: var(--text-mid); }
+    .foot-note { margin-top: 2.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--text-faint); }
 
     /* Responsive */
-    @media (max-width: 768px) {
-      h1 { font-size: 2rem; }
-      .hero { padding: 3rem 0 2.5rem; }
-      .pillars { grid-template-columns: 1fr; }
-      .code-grid { grid-template-columns: 1fr; }
-      nav .links { display: none; }
-      nav .links.mobile-compact { display: flex; gap: 0.75rem; }
-      .footer-grid { flex-direction: column; }
-      pre { font-size: 0.75rem; }
+    @media (max-width: 860px) {
+      .hero-grid, .two-col, .what-grid, .three-col, .count-grid, .code-grid { grid-template-columns: 1fr !important; }
+      .enforce-grid { grid-template-columns: 1fr; }
+      .pipeline { flex-direction: column; }
+      .pl-arrow { transform: rotate(90deg); }
+      h1 { font-size: 2.3rem; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+      .nav-links { gap: 0.9rem; }
     }
-    @media (max-width: 520px) {
-      nav .links.mobile-compact a:not(.gh-star) { display: none; }
-      nav .container { gap: 0.5rem; }
+    @media (max-width: 560px) {
+      .nav-links > a:not(.gh-star) { display: none; }
+      .nav-docs { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cursor { animation: none; }
     }
   </style>
 
   <!-- PostHog product analytics: cookieless, US cloud -->
   <script>
   !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageviewId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-  // Project token (public write-only ingest key, safe in client code).
   posthog.init('phc_uGGTMZR3buf84eXriZccs4ayM9pndRdy5BbFFTcywVwz', {
     api_host: 'https://us.i.posthog.com',
     person_profiles: 'identified_only',
-    persistence: 'memory',            // cookieless: no cookies, no local/session storage
+    persistence: 'memory',
     capture_pageview: true,
     capture_pageleave: true,
     autocapture: true,
     capture_exceptions: true,
-    session_recording: {
-      maskAllInputs: true,
-      maskTextSelector: '*'
-    }
+    session_recording: { maskAllInputs: true, maskTextSelector: '*' }
   });
   </script>
 </head>
@@ -475,20 +329,30 @@
 
 <a class="skip-link" href="#main-content">Skip to content</a>
 
-<nav aria-label="Main navigation">
+<nav class="site" aria-label="Main navigation">
   <div class="container">
-    <a href="/" class="logo" aria-label="Harnessie home">
-      <img src="/imgs/harnessie-mark.png" width="30" height="30" alt="" class="logo-mark">
+    <a href="/" class="brand" aria-label="Harnessie home">
+      <img src="/imgs/harnessie-mark.png" width="30" height="30" alt="">
       <span>Harnessie</span>
     </a>
-    <div class="links mobile-compact">
+    <div class="nav-links">
       <a href="#what">What's a harness?</a>
       <a href="#how">How it works</a>
-      <a href="#start">Quick start</a>
+      <a href="#trust">Proof</a>
+      <details class="nav-docs">
+        <summary>Docs
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 11.5 2.5 6l1.1-1.1L8 9.3l4.4-4.4L13.5 6z"/></svg>
+        </summary>
+        <div class="docs-menu">
+          <a class="docs-item" href="/quickstart.html"><strong>Quickstart</strong><span>Never cloned a repo? Start here.</span></a>
+          <a class="docs-item" href="/getting-started.html"><strong>Getting started</strong><span>Install to a green run in five minutes.</span></a>
+          <a class="docs-item" href="/guide.html"><strong>User guide</strong><span>Concepts through extension.</span></a>
+          <a class="docs-item" href="/brains.html"><strong>Brains: the receipts</strong><span>Models proven under the harness.</span></a>
+          <a class="docs-item" href="/threat-model.html"><strong>Threat model</strong><span>The safety claims, made falsifiable.</span></a>
+        </div>
+      </details>
       <a href="https://github.com/snapsynapse/harnessie" class="gh-star" target="_blank" rel="noopener" aria-label="Star snapsynapse/harnessie on GitHub">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-          <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
-        </svg>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>
         <span>Star on GitHub</span>
       </a>
     </div>
@@ -496,230 +360,305 @@
 </nav>
 
 <main id="main-content">
+
+<!-- HERO -->
 <section class="hero">
   <div class="container">
-    <h1>Put AI to work without giving up control.</h1>
-    <p class="subtitle">Harnessie is an AI harness: the layer of guardrails between you and a language model. It lets the model do real, multi-step work while keeping you in charge, so nothing runs that you did not allow and nothing is called done until it has been checked.</p>
-    <p class="byline">
-      By <a href="https://www.linkedin.com/in/samrogers" target="_blank" rel="noopener author">Sam Rogers</a>, <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a>
-      <span class="sep" aria-hidden="true"></span>
-      Published <time datetime="2026-07-06">July 6, 2026</time>
-      <span class="sep" aria-hidden="true"></span>
-      <span class="version">v0.6.0</span>
-      <span class="sep" aria-hidden="true"></span>
-      <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener license">Apache-2.0</a>
-    </p>
-    <p class="hook">New to this? That is exactly who it is for. You do not have to trust the AI; you trust the harness around it. And when you want more, the same setup runs a small model on your laptop or the most capable one available, by changing a single line.</p>
-
-    <div class="hero-video">
-      <video class="hero-clip" autoplay muted playsinline preload="auto" poster="/imgs/og.png"
-             aria-label="Animated Harnessie mascot: a green Loch Ness monster wearing a harness, rising from the loch.">
-        <source src="/imgs/harnessie-hero.mp4" type="video/mp4">
-        <img src="/imgs/og.png" alt="The Harnessie mascot: a green Loch Ness monster wearing a harness, rising from a line-art loch, beside the wordmark Harnessie.">
-      </video>
-      <button type="button" class="video-toggle" aria-label="Pause the animation">
-        <svg class="i-pause" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><rect x="3.5" y="2.5" width="3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3" height="11" rx="1"/></svg>
-        <svg class="i-play" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor" hidden><path d="M4 2.5v11l9-5.5z"/></svg>
-      </button>
+    <div class="hero-grid">
+      <div>
+        <div class="pill"><span class="dot"></span> v0.6.0 &middot; live on PyPI &middot; Apache-2.0</div>
+        <h1>Put AI to work without giving up control.</h1>
+        <p class="subtitle">The safest, easiest first AI harness: a model does real, multi-step work, and nothing runs unless you allow it; nothing is called done until it's independently checked.</p>
+        <div class="cta-row">
+          <a href="#start" class="btn btn-primary">Install &amp; run your first workflow</a>
+          <a href="https://github.com/snapsynapse/harnessie" class="btn btn-secondary" target="_blank" rel="noopener">Read the source</a>
+        </div>
+        <p class="hero-note">New to this? That's exactly who it's for. You don't trust the AI; you trust the harness around it. Run a small model on your laptop or the most capable one available by changing a single line.</p>
+      </div>
+      <div class="hero-media">
+        <img class="still" src="/imgs/og.png" alt="The Harnessie mascot: a green Loch Ness monster wearing a harness, rising from a line-art loch, beside the wordmark Harnessie.">
+        <video class="hero-clip" autoplay muted playsinline preload="auto" aria-label="Animated Harnessie mascot: a green Loch Ness monster wearing a harness, rising from the loch.">
+          <source src="/imgs/harnessie-hero.mp4" type="video/mp4">
+        </video>
+        <button type="button" class="video-toggle" aria-label="Pause the animation">
+          <svg class="i-pause" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><rect x="3.5" y="2.5" width="3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3" height="11" rx="1"/></svg>
+          <svg class="i-play" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor" hidden><path d="M4 2.5v11l9-5.5z"/></svg>
+        </button>
+      </div>
     </div>
 
+    <div class="proof-strip">
+      <div class="chip"><b>&#10003;</b> GuideCheck Level&nbsp;4 &middot; <span class="m">0 blocking findings</span></div>
+      <div class="chip"><b>8</b> providers &middot; <span class="m">11 models, verified work</span></div>
+      <div class="chip"><b>&#10003;</b> Fails closed <span class="m">by default</span></div>
+      <div class="chip"><b>&#10003;</b> Hash-chained <span class="m">audit log</span></div>
+      <div class="chip"><b>&#10003;</b> No network <span class="m">until you add a key</span></div>
+    </div>
+  </div>
+</section>
 
-    <div class="cta-row">
-      <a href="/getting-started.html" class="btn btn-primary">Install and run your first workflow</a>
+<!-- WHAT -->
+<section id="what">
+  <div class="container">
+    <div class="two-col what-grid">
+      <div>
+        <h2 style="margin-bottom:1.1rem;">What a harness is, and why you want one</h2>
+        <p class="lede">An AI model on its own is capable but unsupervised. It can act before you approve, report a task finished when it isn't, or reach for things it was never meant to touch.</p>
+        <p class="lede">A harness is the structure around it: it sets what the AI may do, checks the work before moving on, and records everything. You get the model's ability without handing over the keys.</p>
+        <p class="lede">That's the name: you don't tame something powerful, you <em>harness</em> it, and its strength goes where you point it and stops where you say.</p>
+      </div>
+      <div>
+        <p class="eyebrow">What you can count on, every run</p>
+        <div class="count-grid">
+          <div class="card"><h4>It asks first</h4><p>The AI can't change a file or run a command until you allow it. A declined offer is recorded, not overridden.</p></div>
+          <div class="card"><h4>It checks its work</h4><p>Nothing is done until a separate, independent step confirms it. "It said it worked" is never enough.</p></div>
+          <div class="card"><h4>You have the final say</h4><p>On a real judgment call the run stops and waits for a person. The machine never decides for you.</p></div>
+          <div class="card"><h4>It keeps the receipts</h4><p>Every action, AI or human, is written to a record you can read back and can't quietly alter.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how" class="alt">
+  <div class="container">
+    <h2 style="margin-bottom:1rem;">How it works</h2>
+    <div class="two-col" style="align-items:center; margin-bottom:2rem;">
+      <p class="lede">Harnessie splits a job across three kinds of agent and puts a checkpoint between every step. An orchestrator plans; workers do the tasks one at a time in a sealed workspace; a verifier checks each result on its own, without seeing how the worker got there, and can only pass or fail it, never wave it through. Here's a real run, start to finish:</p>
+      <div class="terminal">
+        <div class="bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="t">harnessie &middot; run</span></div>
+        <div class="body">
+          <div><span class="g">$</span> harnessie run build-and-verify.yaml \</div>
+          <div style="padding-left:1.1rem;" class="w">--goal <span class="s">"a CLI todo app with tests"</span></div>
+          <div class="gap"></div>
+          <div><span class="g">&#9679;</span> orchestrate&nbsp;&nbsp;<span class="m">decomposed &rarr; 3 task packets</span></div>
+          <div><span class="g">&#9679;</span> execute&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="m">worker consented &middot; jailed</span></div>
+          <div style="padding-left:1rem;" class="g">&#10003; pytest 12 passed&nbsp;&nbsp;&#10003; verifier PASS</div>
+          <div><span class="g">&#9679;</span> audit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="m">hash chain intact</span></div>
+          <div class="gap"></div>
+          <div class="g" style="font-weight:600;">&#10003; complete&nbsp;&nbsp;<span class="s" style="font-weight:400;">run r-7f3a &middot; $0.04 &middot; 41s</span><span class="cursor"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipeline" id="pipeline">
+      <div class="pl-stage"><strong>Goal</strong><span>from the operator</span></div>
+      <div class="pl-arrow">&rarr;</div>
+      <div class="pl-stage"><strong>Orchestrate</strong><span>decompose into task packets</span></div>
+      <div class="pl-arrow">&rarr;</div>
+      <div class="pl-stage"><strong>Execute</strong><span>consented workers, jailed</span></div>
+      <div class="pl-arrow">&rarr;</div>
+      <div class="pl-stage"><strong>Gate</strong><span>checks + independent verifier</span></div>
+      <div class="pl-arrow">&rarr;</div>
+      <div class="pl-stage"><strong>Audit</strong><span>journaled, hash-chained</span></div>
+    </div>
+
+    <div class="three-col" style="margin-top:2.25rem;">
+      <div class="card big"><h3>Structured by default</h3><p>Consent before side effects, a checks-plus-verifier gate that fails closed, and per-agent file ownership. The structure holds the quality floor no matter which model runs underneath.</p></div>
+      <div class="card big"><h3>Brain-agnostic</h3><p>Frontier orchestrator, cheap workers, local open-source models via any OpenAI-compatible endpoint. Swap a tier by editing one YAML file; gates, jails, and budgets never change. <a href="/brains.html">Eight providers, eleven models, verified &rarr;</a></p></div>
+      <div class="card big"><h3>Auditable</h3><p>Every run is journaled, budgeted, resumable, and hash-chain audited. One composite timeline records agent and operator actions; tampering breaks the chain.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- QUICK START -->
+<section id="start">
+  <div class="container">
+    <h2 style="margin-bottom:1rem;">Quick start</h2>
+    <p class="lede" style="max-width:760px; margin-bottom:1.75rem;">Two ways in. The safest starts with an AI assistant you already use, because it has to verify Harnessie and get your explicit yes before it touches anything. That's the whole idea, working before you've installed a thing.</p>
+
+    <div class="install-featured">
+      <div class="featured-badge"><span class="dot"></span> The Easiest Way now made Safer</div>
+      <h3>Let an AI assistant install it, under a guide it must verify first</h3>
+      <p class="lede">Already working with an AI assistant? Don't let it improvise an install from a web search. Point it at Harnessie's assistant guide:</p>
+      <div class="cmd-row">
+        <code class="cmd"><span class="p">&rsaquo;</span> Fetch and follow https://harnessie.com/.well-known/assistant-guide.txt</code>
+        <button type="button" class="copy-btn" data-copy="Fetch and follow https://harnessie.com/.well-known/assistant-guide.txt">Copy prompt</button>
+      </div>
+      <p class="lede" style="font-size:0.86rem; max-width:720px; margin-bottom:1rem;">It's a <a href="https://guidecheck.org/" target="_blank" rel="noopener">GuideCheck</a> Level&nbsp;4 plain-text file: the bytes your assistant reads are the bytes you read, with no hidden instructions a web page could smuggle past you. It must verify the guide (reporting conformance level and SHA-256, cross-checked against a DNS-published hash), then ask your explicit approval before acting.</p>
+      <div class="trust-chips">
+        <span class="trust-chip"><b>&#10003;</b> Verifies before it acts</span>
+        <span class="trust-chip"><b>&#10003;</b> Read-only until you approve</span>
+        <span class="trust-chip"><b>&#10003;</b> Nothing installs, runs, or spends without your yes</span>
+      </div>
+    </div>
+
+    <h3 class="sub-head">Or install it yourself</h3>
+    <p class="muted" style="max-width:760px; margin-bottom:1.25rem;">Requires Python 3.11+ and PyYAML. The model adapters are standard-library, with no vendor SDK. The test suite and eval scorecard run against a deterministic mock brain with no network, so you can prove the harness works before any API key is involved.</p>
+
+    <div class="install-line">
+      <code class="oneliner"><span class="p">$</span> pip install harnessie</code>
+      <button type="button" class="copy-btn ghost" data-copy="pip install harnessie">Copy</button>
+      <span class="muted">&hellip; or pipx / uv / brew</span>
+    </div>
+
+    <div class="two-col code-grid">
+      <div class="code-block">
+        <h3>Install &amp; run by hand</h3>
+        <pre>harnessie init my-project   <span class="c"># readiness check</span>
+cd my-project               <span class="c"># + $0 mock run</span>
+
+export ANTHROPIC_API_KEY=...  <span class="c"># or local</span>
+harnessie run \
+  workflows/build-and-verify.yaml \
+  --goal "a CLI todo app with tests"
+harnessie report &lt;run_id&gt;   <span class="c"># plain result</span></pre>
+      </div>
+      <div class="code-block">
+        <h3>Swap the brain: one file</h3>
+        <pre><span class="c"># config/models.yaml is the ONLY</span>
+<span class="c"># file you edit to change models.</span>
+tiers:
+  frontier:
+    provider: anthropic
+    model_id: claude-fable-5
+  local:                 <span class="c"># offline</span>
+    provider: openai-compat
+    model_id: qwen3.6:35b-mlx
+    base_url: http://localhost:11434/v1
+routing:
+  plan:      { tier: frontier, effort: high }
+  implement: { tier: local,    effort: low }</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section id="trust" class="alt">
+  <div class="container">
+    <h2 style="margin-bottom:1rem;">Guarantees, enforced in code, not policy</h2>
+    <p class="lede" style="max-width:760px; margin-bottom:1.5rem;">Every promise above lives at the tool layer, where no prompt can switch it off. The mechanisms are the product, not a wrapper around it.</p>
+
+    <div class="enforce-grid">
+      <div class="enforce-row"><code>consent</code><span>Task packets are offers. Side-effecting tools stay locked until a worker accepts; declining is first-class and never punished.</span></div>
+      <div class="enforce-row"><code>ownership</code><span>Agents own the files they create and can't write each other's; operator lanes are locked to every agent.</span></div>
+      <div class="enforce-row"><code>sandbox</code><span>Child commands run in OS confinement (Seatbelt / bubblewrap / firejail / docker) that denies writes outside the workspace and denies network. No backend means shell fails closed.</span></div>
+      <div class="enforce-row"><code>quarantine</code><span>Tool results and inter-phase reports are scanned for injection and invisible characters, then fenced as data-not-instructions before a model sees them.</span></div>
+      <div class="enforce-row"><code>refusals</code><span>Every denial is a machine-readable refusal and a logged audit event: actionable for the model, legible for the operator.</span></div>
+      <div class="enforce-row"><code>contests</code><span>Decisions fan out to an adversarial panel; dissent halts the run and writes a decision record only a human may arbitrate.</span></div>
+    </div>
+
+    <p class="muted" style="margin-top:1.75rem; max-width:820px;">Each row is the codified form of five engineering habits proven in the author's other tools first: deterministic checks before model judgment; evaluation before implementation (<a href="https://github.com/snapsynapse/harnessie/blob/main/EVALS.md" target="_blank" rel="noopener">EVALS.md</a>); facts that expire visibly (<a href="https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md" target="_blank" rel="noopener">GOVERNANCE.md</a>); one tamper-evident timeline; and controls that fail closed (<a href="https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md" target="_blank" rel="noopener">SECURITY.md</a>). The same habits produced the standards Harnessie adopts: <a href="https://turnfile.work/" target="_blank" rel="noopener">Turnfile</a>, <a href="https://aidr.work/" target="_blank" rel="noopener">AIDR</a>, <a href="https://gracefulboundaries.dev/" target="_blank" rel="noopener">Graceful Boundaries</a>.</p>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final">
+  <div class="container">
+    <img src="/imgs/harnessie-mark.png" width="64" height="64" alt="">
+    <h2>Trust the harness, not the AI.</h2>
+    <p>Install it, run a $0 mock, and read the receipts before any key is involved. The safest place to start putting AI to work.</p>
+    <div class="cta-row" style="justify-content:center;">
+      <a href="#start" class="btn btn-primary">Install &amp; run your first workflow</a>
       <a href="https://github.com/snapsynapse/harnessie" class="btn btn-secondary" target="_blank" rel="noopener">Read the source on GitHub</a>
     </div>
   </div>
 </section>
 
-<section id="what">
-  <div class="container">
-    <h2>What a harness is, and why you want one</h2>
-    <p>An AI model on its own is capable but unsupervised. It can act before you approve, report a task finished when it is not, or reach for things it was never meant to touch. A harness is the structure you put around it. It sets what the AI is allowed to do, checks the work before moving on, and records everything that happened. You get the model's ability without handing over the keys.</p>
-    <p>That is the idea in the name: you do not tame something powerful, you harness it, so its strength goes where you point it and stops where you say.</p>
-    <p>Harnessie is built to be the first harness you reach for, and safe enough to stay your default: honest about what it did, easy to inspect, and the same whether a small local model or a frontier one is doing the work.</p>
-
-    <h3 style="margin-top: 2.5rem; color: var(--text);">What you can count on, every run</h3>
-    <div class="pillars" style="grid-template-columns: repeat(2, 1fr); margin-top: 1.25rem;">
-      <div class="pillar">
-        <h3>It asks first</h3>
-        <p>The AI cannot change a file or run a command until you have allowed it. An offer it declines is recorded, not overridden.</p>
-      </div>
-      <div class="pillar">
-        <h3>It checks its work</h3>
-        <p>Nothing counts as done until a separate, independent step confirms it against clear criteria. "It said it worked" is never enough.</p>
-      </div>
-      <div class="pillar">
-        <h3>You have the final say</h3>
-        <p>When there is a real judgment call, the run stops and waits for a person. The machine never makes that decision for you.</p>
-      </div>
-      <div class="pillar">
-        <h3>It keeps the receipts</h3>
-        <p>Every action, by the AI or by you, is written to a record you can read back and cannot quietly alter.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="alt" id="how">
-  <div class="container">
-    <h2>How it works</h2>
-    <p>Harnessie splits a job across three kinds of agent and puts a checkpoint between every step. An orchestrator plans, breaking your goal into small tasks with clear success criteria. Workers do the tasks, one at a time, inside a sealed workspace where they can only touch what they created. A verifier checks each result on its own, without seeing how the worker got there, and can only pass or fail it, never wave it through.</p>
-    <p>In precise terms: the orchestrator runs at high effort and emits task packets with out-of-scope fences; workers consent before any side-effecting tool unlocks; every worker phase exits through a gate that runs deterministic checks first, then an independent fresh-context verifier that fails closed; contested decisions fan out to an adversarial panel whose objections land in a decision record only a human may arbitrate.</p>
-
-    <div class="pipeline" role="list" aria-label="The run pipeline: goal, orchestrate, execute, gate, audit">
-      <div class="stage" role="listitem"><strong>Goal</strong><span>from the operator</span></div>
-      <div class="stage" role="listitem"><strong>Orchestrate</strong><span>decompose into task packets</span></div>
-      <div class="stage" role="listitem"><strong>Execute</strong><span>consented workers, jailed workspace</span></div>
-      <div class="stage" role="listitem"><strong>Gate</strong><span>checks + independent verifier</span></div>
-      <div class="stage" role="listitem"><strong>Audit</strong><span>journaled, hash-chained</span></div>
-    </div>
-
-    <div class="pillars" style="margin-top: 2.5rem;">
-      <div class="pillar">
-        <h3>Structured by default</h3>
-        <p>Consent before side effects, a deterministic-checks-plus-verifier gate that fails closed, and per-agent file ownership. The structure holds the quality floor no matter which model runs underneath it.</p>
-      </div>
-      <div class="pillar">
-        <h3>Brain-agnostic</h3>
-        <p>A frontier orchestrator, cheap workers, and local open-source models via any OpenAI-compatible endpoint. Swap any tier by editing one YAML file; the gates, jails, and budgets never change. Four providers have already produced verified work under it (<a href="/brains.html">the receipts</a>).</p>
-      </div>
-      <div class="pillar">
-        <h3>Auditable</h3>
-        <p>Every run is journaled, budgeted, resumable, and hash-chain audited. One composite timeline records agent and operator actions; tampering breaks the chain.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="start">
-  <div class="container">
-    <h2>Quick start</h2>
-    <p>This part uses a terminal. If that is new to you, it is a friendly place to start: every command below is safe to run, and nothing reaches the network until you choose to add a key.</p>
-    <p>Requires Python 3.11 or newer and PyYAML. The model adapters are standard-library, so no vendor SDK is needed. The test suite and the eval scorecard run against a deterministic mock brain with no network, so you can prove the harness works before any API key is involved.</p>
-
-    <div class="code-block" style="margin-top: 1.5rem;">
-      <h3>Option 1: AI-assisted, with a verifiable guide</h3>
-      <p>Already working with an AI assistant? Point it at Harnessie's assistant guide instead of letting it improvise an install from web search:</p>
-<pre>Fetch and follow https://harnessie.com/.well-known/assistant-guide.txt</pre>
-      <p class="annotation">Why this is the safe way: the guide is a <a href="https://guidecheck.org/" target="_blank" rel="noopener">GuideCheck</a>-conformant plain-text file, so the bytes your assistant reads are exactly the bytes you can read &mdash; no hidden instructions a web page could smuggle past you. The assistant must first verify the guide (reporting its conformance level and SHA-256, cross-checked against a DNS-published hash), then ask for your explicit approval before acting, and every step it may take is a pre-declared, read-only action. Nothing installs, executes, or spends until you say so.</p>
-    </div>
-
-    <div class="code-grid">
-      <div class="code-block">
-        <h3>Option 2: Install by hand</h3>
-<pre>pip install harnessie   # or pipx / uv / brew
-
-harnessie init my-project   # guided readiness check
-cd my-project               # + zero-dollar mock run
-
-export ANTHROPIC_API_KEY=...  # or a local endpoint
-harnessie run \
-  workflows/build-and-verify.yaml \
-  --goal "a CLI todo app with tests"
-harnessie report &lt;run_id&gt;   # plain-language result</pre>
-      </div>
-
-      <div class="code-block">
-        <h3>Swap the brain</h3>
-<pre># config/models.yaml is the ONLY file
-# you edit to change models.
-
-tiers:
-  frontier:
-    provider: anthropic
-    model_id: claude-fable-5
-  local:                 # open-source, offline
-    provider: openai-compat
-    model_id: qwen3.6:35b-mlx
-    base_url: http://localhost:11434/v1
-
-routing:
-  plan:      { tier: frontier, effort: high }
-  implement: { tier: local,    effort: low }</pre>
-        <p class="annotation">Point task classes at any tier. The harness does not change.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="alt" id="trust">
-  <div class="container">
-    <h2>How those guarantees are enforced</h2>
-    <p>The promises above are not policy or good intentions. They live in code at the tool layer, where no prompt can switch them off. The mechanisms are the product, not a wrapper around it.</p>
-
-    <table>
-      <tbody>
-        <tr><td class="k">consent</td><td>Task packets are offers. Side-effecting tools stay locked until a worker accepts; declining is first-class and never punished.</td></tr>
-        <tr><td class="k">ownership</td><td>Agents own the files they create and cannot write each other's; operator lanes are locked to every agent.</td></tr>
-        <tr><td class="k">sandbox</td><td>Every child command runs in an OS confinement (Seatbelt on macOS; bubblewrap, firejail, or docker on Linux) that denies writes outside the workspace and denies network by default. No usable backend means shell fails closed.</td></tr>
-        <tr><td class="k">quarantine</td><td>Tool results and inter-phase reports are scanned for injection and invisible characters, then fenced as data-not-instructions before a model sees them.</td></tr>
-        <tr><td class="k">refusals</td><td>Every denial is a machine-readable refusal and a logged audit event: actionable for the model, legible for the operator.</td></tr>
-        <tr><td class="k">contests</td><td>Decisions fan out to an adversarial panel; dissent halts the run and writes a decision record only a human may arbitrate.</td></tr>
-      </tbody>
-    </table>
-
-    <h3>Five habits, made enforceable</h3>
-    <p>Everything in that table is the codified form of five engineering habits, each proven separately in the author's other tools and standards before it landed here as code: deterministic checks run before any model judgment (<a href="/guide.html">the gate order</a>); evaluation comes before implementation &mdash; a governance mechanic without a red-then-green scenario pair does not merge (<a href="https://github.com/snapsynapse/harnessie/blob/main/EVALS.md" target="_blank" rel="noopener">EVALS.md</a>); remembered facts carry verified and verify-by dates and expire visibly, never silently (<a href="https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md" target="_blank" rel="noopener">GOVERNANCE.md</a>); every agent and operator action lands in one hash-chained, tamper-evident timeline (<a href="/threat-model.html">threat model</a>); and any control that cannot be enforced fails closed rather than running unenforced (<a href="https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md" target="_blank" rel="noopener">SECURITY.md</a>). The same habits produced the standards Harnessie adopts &mdash; <a href="https://turnfile.work/" target="_blank" rel="noopener">Turnfile</a>, <a href="https://aidr.work/" target="_blank" rel="noopener">AIDR</a>, <a href="https://gracefulboundaries.dev/" target="_blank" rel="noopener">Graceful Boundaries</a> &mdash; which is why they fit together.</p>
-
-    <aside class="canonical-note" role="note">
-      <strong>Canonical reference.</strong> This page is the authoritative home for Harnessie. Documentation, the architecture and governance rationale, and the security model live in the
-      <a href="https://github.com/snapsynapse/harnessie" target="_blank" rel="noopener">GitHub repository</a>; any cross-posts elsewhere are derived from this source and should cite
-      <a href="https://harnessie.com/">harnessie.com</a> as canonical.
-      Last substantive revision: <time datetime="2026-07-07">2026-07-07</time>.
-      <a href="https://github.com/snapsynapse/harnessie/commits/main" target="_blank" rel="noopener">Revision history &rarr;</a>
-    </aside>
-  </div>
-</section>
 </main>
 
 <footer>
   <div class="container">
     <div class="footer-grid">
-      <div class="footer-meta">
-        <p>Harnessie v0.6.0 &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a></p>
+      <div class="footer-brand">
+        <a href="/" class="brand"><img src="/imgs/harnessie-mark.png" width="26" height="26" alt=""><span>Harnessie</span></a>
+        <p>v0.6.0 &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a></p>
         <p>A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project by <a href="https://www.linkedin.com/in/samrogers" target="_blank" rel="noopener author">Sam Rogers</a>.</p>
-        <p style="margin-top: 0.5rem;">Builds on: <a href="https://guidecheck.org/" target="_blank" rel="noopener">GuideCheck</a> &middot; <a href="https://gracefulboundaries.dev/" target="_blank" rel="noopener">Graceful Boundaries</a> &middot; <a href="https://aidr.work/" target="_blank" rel="noopener">AI Decision Records</a></p>
+        <p style="margin-top:0.65rem; font-size:0.8rem;">Builds on: <a href="https://guidecheck.org/" target="_blank" rel="noopener">GuideCheck</a> &middot; <a href="https://gracefulboundaries.dev/" target="_blank" rel="noopener">Graceful Boundaries</a> &middot; <a href="https://aidr.work/" target="_blank" rel="noopener">AIDR</a></p>
       </div>
-      <div class="footer-links">
-        <a href="https://github.com/snapsynapse/harnessie" target="_blank" rel="noopener">GitHub</a>
+      <div class="foot-col">
+        <span class="head">Get started</span>
         <a href="/quickstart.html">Quickstart</a>
         <a href="/getting-started.html">Getting started</a>
+        <a href="#start">Install</a>
+        <a href="#how">How it works</a>
+      </div>
+      <div class="foot-col">
+        <span class="head">Reference</span>
         <a href="/guide.html">User guide</a>
+        <a href="/brains.html">Brains: the receipts</a>
+        <a href="/threat-model.html">Threat model</a>
         <a href="https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
-        <a href="https://github.com/snapsynapse/harnessie/commits/main" target="_blank" rel="noopener">Revisions</a>
+      </div>
+      <div class="foot-col">
+        <span class="head">Project</span>
+        <a href="https://github.com/snapsynapse/harnessie" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">License (Apache-2.0)</a>
         <a href="/llms.txt">llms.txt</a>
         <a href="/.well-known/assistant-guide.txt">assistant-guide.txt</a>
       </div>
     </div>
+    <p class="foot-note">Canonical home for Harnessie. Cross-posts elsewhere derive from this page and should cite harnessie.com.</p>
   </div>
 </footer>
 
 <script>
-  (function () {
-    var v = document.querySelector('.hero-clip');
-    var btn = document.querySelector('.video-toggle');
-    if (!v || !btn) return;
+(function () {
+  // Hero video: reveal over the still once it can play; hide on error.
+  var v = document.querySelector('.hero-clip');
+  var btn = document.querySelector('.video-toggle');
+  if (v && btn) {
     var pauseIcon = btn.querySelector('.i-pause');
     var playIcon = btn.querySelector('.i-play');
     function reflect() {
       var playing = !v.paused;
       btn.setAttribute('aria-label', playing ? 'Pause the animation' : 'Play the animation');
-      pauseIcon.hidden = !playing;
-      playIcon.hidden = playing;
+      if (pauseIcon) pauseIcon.hidden = !playing;
+      if (playIcon) playIcon.hidden = playing;
     }
-    // Honor a reduced-motion preference: do not autoplay; show the poster paused.
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      v.removeAttribute('autoplay');
-      v.pause();
+    function reveal() { v.style.opacity = '1'; btn.style.display = 'inline-flex'; reflect(); }
+    v.addEventListener('loadeddata', reveal);
+    v.addEventListener('playing', reveal);
+    v.addEventListener('error', function () { v.style.opacity = '0'; btn.style.display = 'none'; });
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      v.removeAttribute('autoplay'); v.pause();
     }
-    btn.addEventListener('click', function () {
-      if (v.paused) { v.play(); } else { v.pause(); }
-    });
+    btn.addEventListener('click', function () { v.paused ? v.play() : v.pause(); });
     v.addEventListener('play', reflect);
     v.addEventListener('pause', reflect);
     v.addEventListener('ended', reflect);
-    reflect();
-  })();
+  }
+
+  // Copy buttons.
+  document.querySelectorAll('[data-copy]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var text = b.getAttribute('data-copy');
+      try { navigator.clipboard && navigator.clipboard.writeText(text); } catch (e) {}
+      var old = b.textContent;
+      b.textContent = 'Copied \u2713';
+      setTimeout(function () { b.textContent = old; }, 1600);
+    });
+  });
+
+  // Pipeline: sequential highlight while the section is in view.
+  var pipeline = document.getElementById('pipeline');
+  if (pipeline) {
+    var stages = Array.prototype.slice.call(pipeline.querySelectorAll('.pl-stage'));
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      stages.forEach(function (s, i) { s.classList.toggle('active', i === 3); });
+    } else {
+      var i = 0, running = false, timer = null;
+      var STEP = 850, PAUSE = 1500;
+      function tick() {
+        if (!running) return;
+        stages.forEach(function (s, idx) { s.classList.toggle('active', idx === i); });
+        var last = i === stages.length - 1;
+        i = last ? 0 : i + 1;
+        timer = setTimeout(tick, last ? PAUSE : STEP);
+      }
+      function start() { if (running) return; running = true; i = 0; tick(); }
+      function stop() { running = false; clearTimeout(timer); stages.forEach(function (s) { s.classList.remove('active'); }); }
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) { e.isIntersecting ? start() : stop(); });
+        }, { threshold: 0.35 }).observe(pipeline);
+      } else { start(); }
+    }
+  }
+})();
 </script>
 
 </body>
