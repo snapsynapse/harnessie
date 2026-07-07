@@ -141,7 +141,18 @@ def main(argv: list[str] | None = None) -> int:
         print(f"wrote {len(written)} file(s)")
         return 0
 
-    from .runner import WorkflowRunner  # deferred: import cost + optional deps
+    from .runner import WorkflowRunner, load_models_config  # deferred: import cost
+    from .preflight import build_preview, format_preview
+
+    # Cost preview and the ceiling-less-live-run refusal run BEFORE any run
+    # state is created or any brain is built, so a refused run leaves no trace
+    # and bills nothing.
+    tiers, _routing, budget_cfg = load_models_config(root / "config" / "models.yaml")
+    preview = build_preview(tiers, budget_cfg)
+    print(format_preview(preview))
+    if preview.refuse_reason is not None:
+        print(preview.refuse_reason, file=sys.stderr)
+        return 2
 
     run_id = args.run_id if args.cmd == "resume" else None
     approval_policy = (root / args.approval_policy).resolve() \

@@ -45,12 +45,19 @@ Four providers building, reviewing, and fact-checking the harness itself is the 
 
 ## Coverage we would like to add
 
-The claim gets stronger as it spans more of the capability curve and more independent providers. Open gaps worth closing, each by running the model through a contested phase so it earns a record:
+The claim gets stronger as it spans more of the capability curve and more independent providers. The proven table already covers a frontier closed model (`claude-fable-5`) plus three ~20-35B local open-weights families (Qwen, Google, OpenAI). The gaps below are the honest missing coverage, each closable by running the named model through a contested phase so it earns a record. Model names are Ollama pull identifiers as of the 2026-07-06 library scan; verify tags at pull time, and note that any tag reading `cloud` runs on Ollama Cloud rather than fully on-box.
+
+More of the capability curve:
+
+- The small-model floor, where structured tool-calling breaks first and the harness's tool contract is under the most stress. Everything proven so far is 20B or larger; nothing below that has been run. Strong candidates: `granite4.1` (3B, 8B, 30B; IBM, tuned for disciplined function-calling), `functiongemma` (270M; a sub-1B model whose entire job is function-calling), `nemotron-3-nano` (4B; tools + thinking), or `phi4-mini` (3.8B; tools). If the registry's contract survives a 270M brain, it survives anything.
+- A coding-specialist worker, directly relevant to the harnessie-worker role. Candidates: `qwen3-coder` (30B; tools) or `devstral` (24B; Mistral's agentic code-editing model, built for exactly this job).
+
+More independent providers:
 
 - A frontier closed model from another provider with a runtime receipt. GPT-5.5 already built the harness (see Built with) but has not yet run under it; a frontier non-Anthropic brain producing an arbitrated position (a GPT-5-class model, Google Gemini, or Grok) would put a second frontier provider in the proven table, not only in the build.
-- Meta Llama (open weights): the most widely deployed open family, currently unrepresented.
-- Mistral (Mistral Large or a Mixtral): a European provider, added architectural and geographic diversity.
-- DeepSeek (V3 or R1): a distinct strong-reasoning provider, already namechecked in the config comments.
+- Meta Llama (open weights): the most widely deployed open family, currently unrepresented. Candidates: `llama3.3` (70B; tools) or `llama3.1` (8B/70B; tools).
+- Mistral: a European provider adding architectural and geographic diversity. Candidates: `magistral` (24B; tools + thinking) or `mistral-small3.2` (24B; vision + tools).
+- DeepSeek: a distinct strong-reasoning provider, already namechecked in the config comments. Candidates: `deepseek-r1` (7B-70B local; tools + thinking) or `deepseek-v3.2` (cloud).
 
 ## How a brain becomes "proven"
 

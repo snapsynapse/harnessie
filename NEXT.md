@@ -26,11 +26,17 @@ Public surface (staged under prepare-and-stage; NOT live):
 
 ## Verification status
 
-- `python3 -m pytest -q`: 141 passed, 4 skipped.
-- `python3 -m harness.cli eval`: 29/29 passed.
+Re-run independently during the v0.5 Claude verification rotation:
+- `python3 -m pytest -q`: 144 passed, 1 skipped.
+- `python3 -m harness.cli eval`: all PASS (default, `evals/operability.yaml`, `evals/stewardship.yaml`).
 - `python3 -m harness.cli verify-manifest`: passed, 7 files.
-- `python3 -m harness.cli eval --live`: keyless/no-endpoint skip path should still return 0/0 with explicit `SKIP` rows unless live env vars are set.
-- Scrub check and `git diff --check` still need to be run after any final edits/commit.
+- `python3 -m harness.cli eval --live`: keyless/no-endpoint skip path returns 0/0 with explicit `SKIP` rows unless live env vars are set. Confirmed.
+- `git diff --check`: clean.
+- Scrub check still needs to be run before any commit that stages public surface.
+
+## Known limits
+
+- Budget ceiling is a soft cap across a parallel worker group, not a hard one. Each parallel phase gets a fresh `Budget` seeded with the full run ceiling (`harness/runner.py` `_run_parallel_phase`), blind to already-spent run total and to sibling phases running concurrently. A group entered near the ceiling can collectively overshoot the global budget by up to ~(N-1)x the ceiling before the merge-back via `Budget.add_spend` reconciles the run total. Post-merge accounting is coherent and the hash-chain audit is intact; only mid-group enforcement is loose. `phase_start_usd`/`phase_start_tokens` in `_run_parallel_phase` are captured but unused (each phase budget starts at zero). Fix path when hardened: seed each phase budget with remaining headroom (`max - spent`), or check `self.budget.exhausted` before submitting the group. Tracked as budget-safety hardening under 0.6.0; not a launch blocker given per-phase ceilings already bound a single runaway.
 
 ## Operator-attended steps ready and waiting
 
@@ -54,7 +60,7 @@ python3 -m harness.cli eval --live
 
 - Grow `harnessie init` into guided first run: Python check, sandbox-backend detect, env-var API-key walk-through, ends on a green zero-dollar mock-brain run.
 - Plain-language operator surface: `harnessie report` and halt messages should self-explain with one named next action.
-- Pre-run cost preview; refuse to start a live run when no ceiling is set.
+- Pre-run cost preview; refuse to start a live run when no ceiling is set. DONE 2026-07-07: `harness/preflight.py` + CLI wiring + `tests/test_preflight.py`; see CHANGELOG Unreleased and ROADMAP 0.6.0.
 - Non-developer quickstart + glossary; honest Windows/WSL2 page.
 - Threat-model comparison artifact: SECURITY.md properties vs prevailing harness failure modes, each row citing enforcing code and tests.
 - Default-deny posture audit extending `tests/test_repo_configs.py`.
