@@ -2,6 +2,8 @@
 
 A brain-agnostic multi-agent harness: orchestrator, swappable workers, independent verifiers, verification gates between every phase, consent-based orchestration, per-agent file ownership, adversarial decision records with human-only arbitration, self-maintaining project memory with stamped provenance and dated expiry, cost routing as declared config, and a tamper-evident audit log that records operator and agent actions in one composite timeline.
 
+Harnessie is built to be the safest and easiest first AI harness for people. "Safest" is not a slogan here; it is a set of checkable properties: guarantees live in code, not prompts ([GOVERNANCE.md](GOVERNANCE.md)); every control that cannot be enforced fails closed instead of running unenforced; nothing ships on an agent's say-so (independent fresh-context verifiers gate every side-effecting phase); an OS sandbox confines shell work; a seven-layer prompt-injection defense with a written threat model ([SECURITY.md](SECURITY.md)) covers the rest; and a hash-chained audit log records every agent and operator action in one tamper-evident timeline. If you find a way to break any of these claims, that is a bug report we want. "Easiest" means the person running it does not need to be a developer: runs carry declared token and dollar ceilings, every halt is a named condition with one plain operator action, and disagreement between agents becomes a human decision, never a silent merge.
+
 The operating thesis: the harness structure carries the quality floor, the model carries the ceiling. Run it with Claude Fable 5 as the orchestrator and it exploits effort dials, long autonomous turns, and verifier subagents. Swap the workers (or everything) for Haiku, GLM, Qwen, or any OpenAI-compatible local endpoint by editing one YAML file, and the gates, jails, budgets, and retry ladders keep output honest.
 
 ## Quick start
@@ -27,6 +29,7 @@ Worked end-to-end example with sample data: [examples/policy-compliance/README.m
 
 - [docs/getting-started.md](docs/getting-started.md): the five-minute path from install to a green run and reading the evidence.
 - [docs/GUIDE.md](docs/GUIDE.md): the complete user guide, concepts through extension, including workflow authoring, brain configuration, ownership, governance, and the halt-recovery table.
+- [docs/brains.md](docs/brains.md): the brain-agnostic receipt, the models actually run under the harness with a link to the record that proves each.
 
 The engineering references below (ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP) sit at the repo root; the user-facing guides live under `docs/`.
 
@@ -96,6 +99,16 @@ Silence is never success: every run ends in a named stop condition, and each map
 | `max_steps` | the loop hit its step ceiling without completing | raise `max_steps` for the phase or simplify the task |
 | `model_error` | the provider errored twice in a row | check the endpoint and API key; re-run |
 | `no_action` | the model produced no tool call even after a nudge | usually a role-prompt or model-fit issue; check the role prompt in `agents/` |
+
+## Built on open standards
+
+Harnessie's governance mechanics are code-enforced imports of two open, vendor-neutral standards, and the design philosophy beneath both:
+
+- [Turnfile](https://turnfile.work/): consent-based coordination, ownership lanes, authority order, and bounded rebuttal became the task-packet offer contract, `OWNERSHIP.yaml`, and the objection rounds in contested phases.
+- [AIDR](https://aidr.work/): the decision-record lifecycle, preserved dissent, human-only arbitration, and structurally earned claims became the contested-phase records in `decisions/` and `runs/<id>/decisions/`. This repo dogfoods AIDR for its own direction decisions.
+- [The Aggregated Intelligence tenets](https://paice.foundation/papers/aggregated-intelligence-tenets.html): intelligence lives in the arrangement, not the node; disagreement is the engine, not the exhaust; independence before influence; consensus is evidence, never authority; authority is human because accountability is human. The full tenet-to-mechanism mapping is [GOVERNANCE.md](GOVERNANCE.md) §7.
+
+These are lesson imports, not conformance claims: Harnessie asserts no Turnfile or AIDR conformance. If the harness makes you ask why its rules work, those standards are the answer.
 
 ## Contributing
 
