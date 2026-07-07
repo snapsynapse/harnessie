@@ -68,6 +68,10 @@ python3 -m harness.cli eval --live
 - Graceful Boundaries conformance check and citation/gap list. DONE 2026-07-07: transport-adapted GB adoption (Level 1 grammar MET across all denial sites, Action Boundaries vocab aligned, SC-16 met, HTTP Levels 2-4 N/A); cited in GOVERNANCE.md §8 + INTENT.md §7, proven by `tests/test_graceful_boundaries.py`; see CHANGELOG Unreleased and ROADMAP 0.6.0.
 - PyPI packaging prep only; publishing is an operator act.
 
+### 0.7.0 planned (post-launch, design gated)
+
+ROADMAP.md now carries a full 0.7.0 section: sovereignty cascade routing (policy scoping over the existing reformulate/effort/tier gate ladder, containment-constrained ladders, sideways provider fallback distinct from upward escalation, sovereign tier slot, routing_trace) plus a containment boundary (deterministic PII strip/rehydrate adapted from PAICE.work PBC production code, a stricter secrets class with tool-output scrubbing, per-tool rehydration grants on the approval-policy grammar) and its eval-shaped proof (canary leak evals, gate-integrity canaries, bundle-identity proven-brain claims). Implementation does not start until the 0.6 launch gate closes AND an adoption AIDR runs through `workflows/contested-decision.yaml` with human arbitration. Fuller planning context is in the operator's private planning note.
+
 ## Non-goals standing
 
 - No Pages/DNS/public-repo/PyPI promotion from a headless agent session.

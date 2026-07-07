@@ -86,6 +86,35 @@ Safety (the falsifiable claim):
 
 Acceptance: a non-developer given only the quickstart reaches a green first run without touching a config file; the comparison artifact exists with every row citing code and test; a fresh install on a ceiling-less config refuses a live run; the GuideCheck pair verifies, the Graceful Boundaries status (level or gap list) is cited in a tracked doc, and the live page passes the Siteline bar.
 
+### 0.7.0: Sovereignty cascade routing and the containment boundary
+
+Theme: route every task to the least-exposed environment that can complete it, and make containment a mechanical property of the run rather than an operator habit. Extends the existing gate ladder (reformulate, then effort up, then tier up) into declared, containment-aware routing policy. Opens only after the 0.6 launch gate closes, and only after the design passes a contested-decision run recorded as an AIDR: the harness's own governance decides its routing layer.
+
+Routing (policy over the existing ladder):
+
+- Cascade policies as config (`config/cascade.yaml`): a workflow phase may reference a named policy instead of a fixed `task_class` tier. A policy declares a tier ladder, the escalation reasons that climb it (gate fail, schema fail, refusal, tool-contract break), a maximum climb, and an on-exhaust action (reduce scope or defer, never silent). Phases that do not opt in behave exactly as today.
+- Containment-constrained ladders: a policy names the data classes it may carry, and a contained ladder never escalates past its allowed tier set. Redaction (below) can transform a task's data class and therefore its allowed ladder.
+- Sideways fallback, distinct from upward escalation: availability failures (rate limit, overload, provider error) and guardrail refusals move across providers at the same tier; they never auto-escalate a contained task upward, because up-tiering on refusal is a containment leak. Both motions are recorded with their reasons.
+- A `sovereign` tier slot between `local` and `frontier` in `config/models.yaml`: any OpenAI-compatible controlled endpoint, including TEE-hosted inference, with the same swap-by-config contract as every other tier.
+- A reserved pre-gate: work classes named `reserved:` in policy never reach any model at any tier and halt with a named operator action (the existing human-only Arbitration rule, generalized and enforced as config).
+- Escalation headroom: a climb is refused when the remaining run budget cannot cover it, extending the 0.6 budget-safety hardening; an escalation can never be the thing that busts the ceiling.
+- `routing_trace` in decision records and events: per attempt, the tier, model, outcome, and reason. Aggregated across runs this becomes the capability evidence behind [docs/brains.md](docs/brains.md), and it makes frontier overuse a queryable number: escalations to frontier without a recorded lower-rung failure should be zero by construction.
+
+Containment boundary (the mechanical half of the sovereignty claim):
+
+- A deterministic strip/rehydrate boundary at the provider adapter (`harness/boundary.py`), adapted with provenance from PAICE.work PBC's production PII service: structured PII (multilingual pattern set) is replaced with stable placeholders before any egress; models never see values; every run artifact (workspace, phase reports, events, decision records) carries placeholders only; rehydration happens solely at the operator boundary. The filter is regex over text, no model in the filter path, so it cannot be prompt-injected into leaking.
+- A secrets class with stricter lifecycle than PII: known-prefix and entropy detection (gitleaks-style rulesets, adopted not invented), placeholders that reference environment-variable names and are resolved only at the tool-execution boundary (the boundary never stores secret values), and a hard rule that a secret is never rehydrated into any text, record, or report. A detected secret in an egress payload always halts; there is no warn mode.
+- Tool-output scrubbing: tool results are scrubbed before they enter context, closing the loop where a worker reads an env var or config file and the value would otherwise ride the next model call out.
+- Per-tool rehydration grants using the shipped approval-policy grammar (allow/deny by tool and phase, explicit deny wins, no match denies closed), starting deny-all.
+
+Proof (the claim is eval-shaped, per the eval-first discipline):
+
+- Canary leak evals: seeded fake PII and secrets in eval inputs, asserting zero appearance in egress payloads, records, and reports.
+- Gate-integrity canaries: deterministic manipulation templates (phantom prior context, self-contradiction, autonomy grab) injected into phase inputs, asserting the gate or verifier catches them.
+- Proven-brain claims tighten to bundle identity: a scorecard result pins model, provider, endpoint, prompt version, parser version, and sampling, and any component change requires a re-run — change control, not drift monitoring.
+
+Acceptance: a phase under a contained policy completes a real task with zero canary PII or secret bytes in any egress payload or run artifact; `routing_trace` shows every escalation and fallback with its reason; an escalation without budget headroom is refused before dispatch; a workflow that does not opt into cascade routing produces byte-identical routing behavior to 0.6; the adopting AIDR is on record with human arbitration.
+
 ### 1.0.0: Extensibility, earned
 
 Theme: stable surfaces and pluggability, only after the core is proven.
@@ -95,7 +124,7 @@ Theme: stable surfaces and pluggability, only after the core is proven.
 - Per-lane sandbox profiles, closing the ownership layer's honest limit (interpreter writes bypass the per-file check today).
 - Frozen config and workflow schema with a written deprecation policy.
 
-Gate: no 1.0 while any 0.3, 0.4, 0.5, or 0.6 acceptance criterion is red.
+Gate: no 1.0 while any 0.3, 0.4, 0.5, 0.6, or 0.7 acceptance criterion is red.
 
 ## Platform support
 
