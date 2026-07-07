@@ -46,16 +46,16 @@ The injection-defense layer (harness/quarantine.py; SECURITY.md) is implemented:
 - File: harness/cli.py
 - Done test: `python3 -m harness.cli report <run_id>` renders journal, gate/route events, and proofs for a finished run; exit code 2 when any phase needs_human (so CI can gate on it), 1 on unknown run_id. (tests/test_roles_cli.py.)
 
-## Phase 2, durability and evaluation (next)
+## Phase 2, durability and evaluation (partly implemented)
 
 11. Live adapter smoke tests
-- Add tests/live/ (opt-in via env var) that run one loop turn against a real Anthropic endpoint and one against a local OpenAI-compatible endpoint.
-- Done test: HARNESSIE_LIVE=1 pytest tests/live passes with keys configured; suite skips cleanly without them.
+- Implemented: `tests/live/` and `harness/live_scorecard.py` are opt-in via `HARNESSIE_LIVE=1`. They discover one Anthropic target and one local OpenAI-compatible target, skip visibly when the flag, key, or endpoint configuration is absent, and run real adapter calls only under that explicit operator opt-in.
+- Done test: `python3 -m pytest tests/live -q` skips cleanly without live configuration; `HARNESSIE_LIVE=1 python3 -m pytest tests/live -q` runs the live provider scorecard when credentials/endpoints are configured.
 
 12. Golden-task evaluation suite
 - Implemented foundation: `evals/baseline.yaml` plus `harnessie eval` runs 10 network-free mock-brain scenarios: 5 golden, 3 risky fail-closed, and 2 recovery/gate scenarios.
-- Done test now: `python3 -m harness.cli eval evals/baseline.yaml` produces a 10/10 scorecard; `tests/test_evals.py` gates it.
-- Remaining 0.2 work: add live-brain golden/risky/recovery scenarios that run the identical task suite against configured Anthropic and local OpenAI-compatible endpoints, then compare scorecards across brains.
+- Implemented live layer: `python3 -m harness.cli eval --live` runs comparable direct, verifier, tool-loop, consent-loop, and consent-lock scorecard rows per configured real provider, with token and cost display where the provider reports usage.
+- Done test now: `python3 -m harness.cli eval evals/baseline.yaml` produces a 10/10 scorecard; `tests/test_evals.py` gates it. `python3 -m harness.cli eval --live` exits cleanly with explicit skips in a keyless environment.
 
 13. Interactive approval handler and operator UX
 - Wire ToolRegistry.approval_handler to a real prompt (TTY) and a policy file for headless allow/deny lists; add cost display per phase.

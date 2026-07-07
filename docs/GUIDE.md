@@ -62,6 +62,8 @@ All commands are subcommands of `python3 -m harness.cli` (or `harnessie` once in
 | `report <run_id>` | Print a run's journal and proof artifacts. |
 | `audit <run_id>` | Verify the hash chain and render the governance timeline. Exit 0 clean, 1 broken chain, 2 run not found. |
 | `eval [suite]` | Run the deterministic eval scorecards (optionally one suite YAML). |
+| `eval --live` | Run opt-in live provider scorecards; skipped visibly unless `HARNESSIE_LIVE=1` and provider configuration are present. |
+| `verify-manifest [manifest]` | Verify the trust-bundle manifest. Defaults to `docs/MANIFEST.yaml`. |
 | `init [path]` | Scaffold a minimal project layout (config, workflows, agents, ownership). |
 
 ## What governs a run
@@ -244,7 +246,7 @@ Adding a workflow. Write a new YAML file under `workflows/` following the schema
 
 ## Evaluation
 
-Harnessie ships deterministic eval scorecards that run against a mock brain with no network, so behavior is reproducible. `harnessie eval` runs the default suites; pass a suite YAML to run one. Scenarios come in three shapes: golden cases that must pass, risky cases that must fail closed, and recovery cases that must route through the declared ladder. The governance suite scores consent, ownership, contest, and audit behavior specifically, so those guarantees are measured per brain rather than assumed. See [EVALS.md](../EVALS.md) for the scenario schema and how to add cases.
+Harnessie ships deterministic eval scorecards that run against a mock brain with no network, so behavior is reproducible. `harnessie eval` runs the default suites; pass a suite YAML to run one. Scenarios come in three shapes: golden cases that must pass, risky cases that must fail closed, and recovery cases that must route through the declared ladder. The governance suite scores consent, ownership, contest, and audit behavior specifically, so those guarantees are measured rather than assumed. `harnessie eval --live` is the separate, operator-opted-in provider scorecard; it skips visibly without `HARNESSIE_LIVE=1` and provider configuration. See [EVALS.md](../EVALS.md) for the scenario schema and how to add cases.
 
 ## FAQ
 

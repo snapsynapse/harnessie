@@ -3,6 +3,7 @@ Harnessie evals are YAML scorecards under `evals/`. They are deliberately small,
 ## Commands
 - Run every suite: `python3 -m harness.cli eval`
 - Run one suite: `python3 -m harness.cli eval evals/baseline.yaml`
+- Run opt-in live provider scorecards: `HARNESSIE_LIVE=1 python3 -m harness.cli eval --live`
 - Test the eval runner: `python3 -m pytest tests/test_evals.py -q`
 ## Scenario contract
 Every scenario has:
@@ -68,8 +69,8 @@ Add cases in this order:
 - Recovery cases: a first failure should reformulate, retry, escalate, or halt as specified.
 Prefer narrow scenarios. A scenario should explain one harness guarantee. If it needs many unrelated turns, split it.
 ## Live eval path
-The mock-brain baseline proves harness mechanics. The 0.4 live scorecard should reuse the same categories — including the governance and triage suites, so consent, ownership, and disposal behavior is measured per brain — against configured real endpoints:
-- Anthropic smoke: one golden workflow and one verifier verdict.
-- Local OpenAI-compatible smoke: one golden workflow and one risky fail-closed case.
-- Brain-swap report: same task set, same acceptance criteria, comparable pass/fail and cost output.
-Do not make live evals part of the default no-network suite. Gate them behind an explicit environment flag and skip cleanly without credentials.
+The mock-brain baseline proves harness mechanics. The 0.4 live scorecard in `harness/live_scorecard.py` reuses the same categories against configured real endpoints, including governance probes for consent and the locked-side-effect boundary:
+- Anthropic target: configured from `config/models.yaml` by default; requires `HARNESSIE_LIVE=1` and `ANTHROPIC_API_KEY`.
+- Local OpenAI-compatible target: requires `HARNESSIE_LIVE=1` and either `HARNESSIE_OPENAI_COMPAT_BASE_URL` or `HARNESSIE_LIVE_OPENAI_COMPAT=1` to use the checked-in local tier.
+- Scorecard rows: direct completion, verifier JSON, tool-loop completion, consent-loop completion, and consent-lock risky behavior.
+Do not make live evals part of the default no-network suite. Gate them behind the explicit environment flag; absent credentials or endpoints produce visible `SKIP` rows, not silent omissions.

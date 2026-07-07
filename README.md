@@ -12,6 +12,7 @@ The operating thesis: the harness structure carries the quality floor, the model
 pip install -e ".[dev]"
 python3 -m pytest -q                 # mock brain, no network
 python3 -m harness.cli eval          # deterministic eval scorecard
+python3 -m harness.cli verify-manifest
 export ANTHROPIC_API_KEY=sk-ant-...  # or point tiers at a local endpoint
 python3 -m harness.cli run workflows/build-and-verify.yaml --goal "a CLI todo app with tests"
 python3 -m harness.cli report <run_id>
@@ -53,6 +54,7 @@ examples/           worked end-to-end example (policy-compliance) with sample da
 runs/               per-run journal.jsonl (resume ledger) + events.jsonl (hash-chained audit)
                     + proofs/ + decisions/ (contested-phase records) (gitignored)
 evals/              deterministic scorecards over mock-brain golden/risky/recovery scenarios
+docs/MANIFEST.yaml  trust-bundle integrity manifest for machine-readable public artifacts
 tests/              the done-tests for every subsystem
 docs/               reserved for the canonical web page (GitHub Pages publish source once public)
 *.md at root        ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP, IMPLEMENTATION_PLAN, PROMPTS, EVALS, NEXT,
@@ -65,6 +67,14 @@ Dogfooding this repo under Claude Code uses a local `.claude/` (subagent defs, a
 ## Requirements
 
 Python 3.11+ and PyYAML (installed by `pip install -e .`). The stdlib-only model adapters need no vendor SDK. The OS sandbox uses native macOS `sandbox-exec` when it can actually apply a Seatbelt profile; on Linux it uses bubblewrap, firejail, or docker (in that order of preference). Every backend is admitted only after a startup smoke test proves it can confine here; a present-but-unusable backend, and any platform with none (Windows), fails closed so shell-using workflows are blocked rather than run unconfined (see [SECURITY.md](SECURITY.md)).
+
+Live provider scorecards are opt-in and never part of the default no-network suite. With credentials and a local endpoint configured, run:
+```bash
+HARNESSIE_LIVE=1 \
+HARNESSIE_OPENAI_COMPAT_BASE_URL=http://localhost:11434/v1 \
+python3 -m harness.cli eval --live
+```
+Without `HARNESSIE_LIVE=1` or provider configuration, the live scorecard reports explicit `SKIP` rows and exits cleanly.
 
 ## Design in one breath
 

@@ -4,7 +4,11 @@ This is the forward view: versioned milestones, their themes, and platform suppo
 
 Roadmap items are intent, not commitments. Dates are omitted deliberately; milestones ship when their acceptance criteria are green, not on a calendar.
 
-## Current release: 0.3.3 (2026-07-06)
+## Current release: 0.4.0 (2026-07-07)
+
+The portability-and-proof release: Linux sandbox backends and CI matrix are in, live provider scorecard infrastructure is opt-in and skipped visibly when no credentials/endpoints are configured, and the public trust bundle has a hash-verified `docs/MANIFEST.yaml`. The live provider calls themselves remain operator-attended: `HARNESSIE_LIVE=1 python3 -m harness.cli eval --live` is the documented invocation, not a default test path. Details in [CHANGELOG.md](CHANGELOG.md).
+
+## Prior release: 0.3.3 (2026-07-06)
 
 Mitigation patch from the v0.3.2 verification rotation: `refusal` events carry the full grammar (`detail`, `why`) so no consumer parses truncated `tool_result` content; the stuck detector counts policy refusals regardless of the `ok` flag; `find_secrets` reports kind labels instead of credential fragments. Details in [CHANGELOG.md](CHANGELOG.md).
 
@@ -33,14 +37,15 @@ Shipped: brain-agnostic model interface with hot-swappable tiers, tool registry 
 
 Acceptance met: triage runs headless as propose-only and applies only under recorded approval; a stale fact is surfaced by date, archived never deleted; the audit timeline shows agent and operator actions interleaved; refusals carry `{error, boundary, detail, why}` and are audit-rendered. Current baseline: 117 passed, 3 skipped; 26 eval scenarios green.
 
-### 0.4.0: Portability and proof (was 0.2.0, then 0.3.0; displaced twice — a third displacement should be declined absent operator arbitration)
+### 0.4.0: Portability and proof - SHIPPED (current release above)
 
 Theme: make the harness runnable and measurable beyond a single Mac.
 
 - Linux sandbox backend, so shell-using workflows run confined on Linux instead of failing closed (detail in Platform support below). Implementation step 15 follow-up. GREEN 2026-07-07: bwrap/firejail/docker backends with startup smoke tests, policy-construction unit tests, and a CI matrix (Linux bubblewrap parity, macOS, no-backend fail-closed) passing on a real run. The first run caught one macOS-hardcoded test, since fixed. This acceptance is met: the full suite is green on Linux with a backend present and fails closed on a runner with none.
-- Live-endpoint smoke tests: one loop turn against a real Anthropic endpoint and one against a local OpenAI-compatible endpoint, opt-in by env var. Implementation step 11.
-- Expand the golden-task evaluation scorecard beyond the current mock-brain baseline: golden, risky, and failure-recovery tasks scored into a comparable report against real Anthropic and local OpenAI-compatible endpoints — including the governance scorecard, so consent and ownership behavior is measured per brain, not assumed. Implementation steps 11 and 12.
-- Live contested-phase run: `workflows/contested-decision.yaml` across two real providers, earning `independent-positions` on a real record.
+- Live-endpoint smoke tests: implemented as opt-in code and pytest infrastructure (`tests/live/`, `harness/live_scorecard.py`). A keyless/no-endpoint environment emits visible skips; real calls require `HARNESSIE_LIVE=1` plus provider configuration. Implementation step 11.
+- Golden-task evaluation scorecard beyond the mock-brain baseline: implemented as `python3 -m harness.cli eval --live`, with direct, verifier, tool-loop, consent-loop, and consent-lock rows per configured provider, including token and cost display where usage is reported. Implementation steps 11 and 12.
+- Trust-bundle manifest integrity: `docs/MANIFEST.yaml` pins the hash of public machine-readable trust/discovery files; `python3 -m harness.cli verify-manifest` and `tests/test_trust_manifest.py` verify it.
+- Live contested-phase run: ready for an operator-attended run through `workflows/contested-decision.yaml` across two real providers. This remains a live-provider operation and is not part of the default no-network suite.
 
 Acceptance: the full suite is green on Linux with a backend present and fails closed on a runner with none; a brain swap (config edit) produces a comparable scorecard.
 

@@ -23,6 +23,7 @@ The test suite and the eval scorecard both run against a deterministic mock brai
 ```bash
 python3 -m pytest -q            # unit + integration suite, mock brain
 python3 -m harness.cli eval     # deterministic eval scorecard
+python3 -m harness.cli verify-manifest
 ```
 
 You should see the suite pass and the eval print one `PASS` line per scenario. Nothing here calls a provider or touches the network.
@@ -38,6 +39,14 @@ export ANTHROPIC_API_KEY=...    # use the Anthropic tiers
 ```
 
 Or run entirely local by leaving the key unset and routing task classes at the `local` tier in `config/models.yaml` (it already points at `http://localhost:11434/v1`). You never put a key in the file; the file names the environment variable, the harness reads it at run time.
+
+To smoke-test real providers before a workflow, opt in explicitly:
+```bash
+HARNESSIE_LIVE=1 \
+HARNESSIE_OPENAI_COMPAT_BASE_URL=http://localhost:11434/v1 \
+python3 -m harness.cli eval --live
+```
+Without the flag and provider configuration, live rows are shown as skipped.
 
 ## 4. Run a workflow
 

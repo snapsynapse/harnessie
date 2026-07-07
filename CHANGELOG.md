@@ -2,7 +2,7 @@
 
 All notable changes to Harnessie are recorded here. Format loosely follows Keep a Changelog; versions follow semver.
 
-## Unreleased (0.4 line)
+## 0.4.0 (2026-07-07)
 
 ### Added
 
@@ -11,10 +11,16 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 - GitHub Actions CI: Linux bubblewrap parity job (asserts the backend is admitted, not silently skipped), macOS job, and a no-backend job asserting fail-closed.
 - SECURITY.md backend table: platform, backend, confinement primitive, known gaps.
 - README: "What governs a run" (decision-to-file table) and "When a run halts" (stop-condition-to-operator-action table), from the clarity-conformance audit's two highest-leverage fixes.
+- Opt-in live provider scorecard infrastructure (`harness/live_scorecard.py`, `tests/live/`, `harnessie eval --live`): discovers Anthropic and local OpenAI-compatible targets, skips visibly without `HARNESSIE_LIVE=1` or provider configuration, and runs direct, verifier, tool-loop, consent-loop, and consent-lock rows under explicit operator opt-in.
+- Trust-bundle manifest integrity (`docs/MANIFEST.yaml`, `harness/trust_manifest.py`, `harnessie verify-manifest`): pins SHA-256 hashes for the public machine-readable trust/discovery files and fails on drift or path escape.
 
 ### Security
 
 - SEC-001 (A04, from the 2026-07-06 security audit): prior-phase reports are prior-model output and are now run through the quarantine filter (`guard_result`) before substitution into the next phase's task, exactly as `read_file` results are — flagged content is fenced as data-not-instructions and an `injection_flag` event is emitted. The operator `goal` is never fenced. Closes the asymmetry where inter-phase report text reached the next phase's prompt unfiltered. Audit reports under `audits/`.
+
+### Tests
+
+- 136 passed, 4 skipped locally; eval scorecard 27/27. The extra skipped test is the live-provider pytest path, which is intentionally visible in a keyless environment.
 
 ## 0.3.3 (2026-07-06)
 

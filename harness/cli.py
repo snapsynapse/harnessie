@@ -37,6 +37,12 @@ def main(argv: list[str] | None = None) -> int:
 
     p_eval = sub.add_parser("eval", help="run deterministic eval scorecards")
     p_eval.add_argument("suite", nargs="?", help="optional eval suite YAML path")
+    p_eval.add_argument("--live", action="store_true",
+                        help="run opt-in live provider scorecards")
+
+    p_manifest = sub.add_parser(
+        "verify-manifest", help="verify the trust-bundle MANIFEST integrity")
+    p_manifest.add_argument("manifest", nargs="?", default="docs/MANIFEST.yaml")
 
     p_init = sub.add_parser("init", help="create a minimal Harnessie project layout")
     p_init.add_argument("path", nargs="?", default=".", help="target directory")
@@ -94,12 +100,31 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if chain["ok"] else 1
 
     if args.cmd == "eval":
+        if args.live:
+            from .live_scorecard import format_live_scorecard, run_live_scorecard
+
+            scorecard = run_live_scorecard(root)
+            print(format_live_scorecard(scorecard))
+            return 0 if scorecard["passed"] == scorecard["total"] else 2
+
         from .evals import format_scorecard, run_eval_suite
 
         suite = (root / args.suite).resolve() if args.suite else None
         scorecard = run_eval_suite(root, suite_path=suite)
         print(format_scorecard(scorecard))
         return 0 if scorecard["passed"] == scorecard["total"] else 2
+
+    if args.cmd == "verify-manifest":
+        from .trust_manifest import verify_manifest
+
+        result = verify_manifest(root, (root / args.manifest).resolve())
+        if result.ok:
+            print(f"trust manifest OK: {len(result.files)} file(s)")
+            return 0
+        print("trust manifest FAILED", file=sys.stderr)
+        for problem in result.problems:
+            print(f"- {problem}", file=sys.stderr)
+        return 2
 
     if args.cmd == "init":
         from .init_project import init_project
