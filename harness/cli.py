@@ -14,6 +14,32 @@ import sys
 from pathlib import Path
 
 
+def _print_raw_report(run_dir: Path) -> None:
+    """Developer view: the raw journal, selected events, and proof filenames.
+    Kept behind `report --raw`; the default report is the plain-language one."""
+    journal = run_dir / "journal.jsonl"
+    if journal.exists():
+        print("\njournal (phase results, resume ledger):")
+        for line in journal.read_text(encoding="utf-8").splitlines():
+            rec = json.loads(line)
+            print(f"{rec.get('kind'):>14}  "
+                  f"{json.dumps({k: v for k, v in rec.items() if k not in ('ts', 'kind')}, default=str)[:200]}")
+    events = run_dir / "events.jsonl"
+    if events.exists():
+        print("\nevents (routes, gate verdicts, costs):")
+        wanted = {"role_start", "gate_verdict", "check", "phase_done", "workflow_done"}
+        for line in events.read_text(encoding="utf-8").splitlines():
+            rec = json.loads(line)
+            if rec.get("kind") in wanted:
+                print(f"{rec.get('kind'):>14}  "
+                      f"{json.dumps({k: v for k, v in rec.items() if k not in ('ts', 'kind')}, default=str)[:200]}")
+    proofs = run_dir / "proofs"
+    if proofs.exists():
+        print("\nproofs:")
+        for p in sorted(proofs.iterdir()):
+            print(f"  {p.name}")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="harnessie")
     parser.add_argument("--root", default=".", help="project root (default: cwd)")
@@ -34,8 +60,11 @@ def main(argv: list[str] | None = None) -> int:
     p_resume.add_argument("--approve-interactive", action="store_true",
                           help="prompt on TTY for approval-gated tools")
 
-    p_report = sub.add_parser("report", help="print a run's journal and proofs")
+    p_report = sub.add_parser(
+        "report", help="plain-language summary of a run and its next action")
     p_report.add_argument("run_id")
+    p_report.add_argument("--raw", action="store_true",
+                          help="also print the raw journal, events, and proofs")
 
     p_audit = sub.add_parser(
         "audit", help="verify a run's event hash chain and print its governance timeline")
@@ -59,30 +88,15 @@ def main(argv: list[str] | None = None) -> int:
     root = Path(args.root).resolve()
 
     if args.cmd == "report":
+        from .explain import format_report
+
         run_dir = root / "runs" / args.run_id
-        journal = run_dir / "journal.jsonl"
-        if not journal.exists():
-            print(f"no journal at {journal}", file=sys.stderr)
+        if not (run_dir / "events.jsonl").exists() and not (run_dir / "journal.jsonl").exists():
+            print(f"no run found at {run_dir}", file=sys.stderr)
             return 1
-        print("journal (phase results, resume ledger):")
-        for line in journal.read_text(encoding="utf-8").splitlines():
-            rec = json.loads(line)
-            print(f"{rec.get('kind'):>14}  "
-                  f"{json.dumps({k: v for k, v in rec.items() if k not in ('ts', 'kind')}, default=str)[:200]}")
-        events = run_dir / "events.jsonl"
-        if events.exists():
-            print("\nevents (routes, gate verdicts, costs):")
-            wanted = {"role_start", "gate_verdict", "check", "phase_done", "workflow_done"}
-            for line in events.read_text(encoding="utf-8").splitlines():
-                rec = json.loads(line)
-                if rec.get("kind") in wanted:
-                    print(f"{rec.get('kind'):>14}  "
-                          f"{json.dumps({k: v for k, v in rec.items() if k not in ('ts', 'kind')}, default=str)[:200]}")
-        proofs = run_dir / "proofs"
-        if proofs.exists():
-            print("\nproofs:")
-            for p in sorted(proofs.iterdir()):
-                print(f"  {p.name}")
+        print(format_report(run_dir))
+        if getattr(args, "raw", False):
+            _print_raw_report(run_dir)
         return 0
 
     if args.cmd == "audit":
@@ -161,16 +175,15 @@ def main(argv: list[str] | None = None) -> int:
                             approval_policy=approval_policy,
                             interactive_approvals=bool(
                                 getattr(args, "approve_interactive", False)))
+    from .explain import HALT_STATUSES, format_run_summary
+
     outcomes = runner.run_workflow(root / args.workflow, goal=args.goal)
-    print(f"\nrun {runner.run_id}: spent ${runner.budget.spent_usd:.4f}, "
-          f"{runner.budget.spent_tokens} tokens")
-    worst = 0
-    for o in outcomes:
-        print(f"  [{o.status:>14}] {o.phase}: "
-              f"${o.spent_usd:.6f}, {o.spent_tokens} tokens; {o.report[:120]}")
-        if o.status == "needs_human":
-            worst = 2
-    return worst
+    print()
+    print(format_run_summary(
+        runner.run_id, args.workflow,
+        [(o.phase, o.status) for o in outcomes],
+        runner.budget.spent_usd, runner.budget.spent_tokens))
+    return 2 if any(o.status in HALT_STATUSES for o in outcomes) else 0
 
 
 if __name__ == "__main__":

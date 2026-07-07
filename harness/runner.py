@@ -160,8 +160,12 @@ class WorkflowRunner:
 
     def run_workflow(self, workflow_path: Path, goal: str = "") -> list[PhaseOutcome]:
         wf = yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
+        try:
+            workflow_ref = str(workflow_path.resolve().relative_to(self.root))
+        except ValueError:
+            workflow_ref = str(workflow_path)
         self.events.emit("workflow_start", name=wf.get("name"), run_id=self.run_id,
-                         goal=goal)
+                         goal=goal, workflow=workflow_ref)
         outcomes: list[PhaseOutcome] = []
         reports: dict[str, str] = {"goal": goal}
 

@@ -28,22 +28,31 @@ def test_cli_report_missing_run(tmp_path):
 
 def test_cli_run_exits_2_on_needs_human(tmp_path, capsys):
     # unscripted mock brain never calls tools -> plan phase ends no_action ->
-    # needs_human -> CI-gateable exit code 2
+    # needs_human -> CI-gateable exit code 2, plain-language halt with an action
     scaffold_project(tmp_path)
     code = main(["--root", str(tmp_path), "run", "workflows/mini.yaml",
                  "--goal", "g"])
     assert code == 2
-    assert "needs_human" in capsys.readouterr().out
+    out = capsys.readouterr().out
+    assert "stopped and is waiting for you" in out   # plain, not raw status
+    assert "harnessie resume" in out                 # one named next action
 
 
 def test_cli_report_renders_finished_run(tmp_path, capsys):
     scaffold_project(tmp_path)
     main(["--root", str(tmp_path), "run", "workflows/mini.yaml", "--goal", "g"])
     capsys.readouterr()
-    assert main(["--root", str(tmp_path), "report",
-                 next((tmp_path / "runs").iterdir()).name]) == 0
+    run_id = next((tmp_path / "runs").iterdir()).name
+    assert main(["--root", str(tmp_path), "report", run_id]) == 0
     out = capsys.readouterr().out
-    assert "step_done" in out and "events" in out
+    # plain-language report leads, names the audit follow-up, no raw JSON dump
+    assert "Phases:" in out
+    assert f"harnessie audit {run_id}" in out
+    assert "step_done" not in out
+    # the raw developer view is still available behind --raw
+    assert main(["--root", str(tmp_path), "report", run_id, "--raw"]) == 0
+    raw = capsys.readouterr().out
+    assert "events" in raw
 
 
 def test_cli_init_scaffolds_project(tmp_path, capsys):
