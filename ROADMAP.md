@@ -6,7 +6,7 @@ Roadmap items are intent, not commitments. Dates are omitted deliberately; miles
 
 ## Released so far
 
-Versions 0.1.0 through 0.5.0 are shipped; the current release is 0.5.0, the operability line. This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
+Versions 0.1.0 through 0.6.0 are shipped; the current release is 0.6.0, the first-harness-readiness line that gated the public launch. This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
 
 ## Guiding priorities
 
@@ -33,7 +33,7 @@ Theme: make the harness runnable and measurable beyond a single Mac.
 
 Acceptance: the full suite is green on Linux with a backend present and fails closed on a runner with none; a brain swap (config edit) produces a comparable scorecard.
 
-### 0.5.0: Operability - SHIPPED (current release)
+### 0.5.0: Operability - SHIPPED
 
 Theme: put a human comfortably in the loop for long autonomous runs.
 
@@ -42,9 +42,9 @@ Theme: put a human comfortably in the loop for long autonomous runs.
 
 Acceptance: a requires_approval tool blocks headless by default and proceeds only under policy; two independent phases run concurrently, gate independently, and beat sequential wall-clock.
 
-### 0.6.0: First-harness readiness (public launch gate)
+### 0.6.0: First-harness readiness (public launch gate) - SHIPPED (current release)
 
-Theme: make "the safest and easiest first AI harness for people" true for someone who has never identified as a developer, and make the safety claim falsifiable for the developers who will audit it. This milestone gates the public launch; it does not displace 0.4 portability or 0.5 operability, both of which it depends on.
+Theme: make "the safest and easiest first AI harness for people" true for someone who has never identified as a developer, and make the safety claim falsifiable for the developers who will audit it. This milestone gated the public launch; it does not displace 0.4 portability or 0.5 operability, both of which it depends on. Released 2026-07-07; the repo and canonical page are public. Two acceptance items close as follow-ups now that the site is live: the Siteline live-page bar (the hero CTAs were sharpened for it; a re-scan after Pages redeploys should clear 90) and the GuideCheck `.well-known` pair (content and sidecar land next, the end-to-end hash verify needs the served tree).
 
 Ease (the first-run path):
 - PyPI packaging: `pip install harnessie` (or `pipx install harnessie`) replaces clone-and-editable-install as the documented entry; signed, tagged releases with `RELEASE_CHECKLIST.md` per the repo-standards promotion path.

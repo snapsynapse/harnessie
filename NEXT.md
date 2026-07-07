@@ -2,7 +2,7 @@
 
 ## Current state
 
-Harnessie is at v0.5.0 locally after the Codex v0.5 operability pass. The branch is ahead of `origin/main`; do not assume it has been pushed.
+Harnessie is at v0.6.0 (first-harness-readiness line): the repo and the canonical page (harnessie.com) are public, and the 0.6.0 release is cut in `CHANGELOG.md`, `pyproject.toml`, the landing page, and `assistant-guide.txt`. Two 0.6 acceptance items close as follow-ups now the site is live: the Siteline live-page bar (hero CTAs sharpened; re-scan after Pages redeploys) and GuideCheck (`.well-known` pair + Level 3+ rewrite, in progress).
 
 Engineering:
 - v0.4.0 portability/proof remains in: Linux sandbox backends, opt-in live provider scorecards, and trust-bundle manifest integrity.

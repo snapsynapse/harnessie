@@ -2,7 +2,7 @@
 
 All notable changes to Harnessie are recorded here. Format loosely follows Keep a Changelog; versions follow semver.
 
-## Unreleased
+## 0.6.0 (2026-07-07)
 
 ### Added
 
