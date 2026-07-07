@@ -94,7 +94,7 @@
 <p>In more technical terms: Harnessie is a brain-agnostic multi-agent harness. An orchestrator decomposes a goal into task packets, cheap workers execute them inside a jailed workspace, and an independent verifier gates every phase before the next one starts. The structure carries the quality floor; the model carries the ceiling. You swap models by editing one YAML file.</p>
 <h2 id="1-install">1. Install</h2>
 <p>Requires Python 3.11 or newer. The only runtime dependency is PyYAML; the model adapters are standard-library, so no vendor SDK is needed.</p>
-<pre><code>pip install harnessie          # or: pipx install harnessie / uv tool install harnessie
+<pre><code>pip install harnessie          # or: pipx / uv tool install / brew install snapsynapse/tap/harnessie
 harnessie init my-project      # scaffold + guided readiness check + zero-dollar mock run
 cd my-project</code></pre>
 <p>Working on Harnessie itself (or wanting the test suite)? Install from source instead:</p>

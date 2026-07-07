@@ -26,7 +26,7 @@ One line installs the `harnessie` command from the Python package index:
 pip install harnessie
 ```
 
-If `pip` is not found, try `python3 -m pip install harnessie`. If you use pipx or uv, `pipx install harnessie` and `uv tool install harnessie` work the same way. You do not need to download or clone anything.
+If `pip` is not found, try `python3 -m pip install harnessie`. If you use pipx, uv, or Homebrew, `pipx install harnessie`, `uv tool install harnessie`, and `brew install snapsynapse/tap/harnessie` work the same way. You do not need to download or clone anything.
 
 ## Step 2: Let the tool check your machine
 

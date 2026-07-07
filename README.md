@@ -11,7 +11,7 @@ Beneath that thesis sit five engineering habits, each proven separately in the a
 ## Quick start
 
 ```bash
-pip install harnessie                # from PyPI; or pipx/uv tool install
+pip install harnessie                # or: pipx / uv tool install / brew install snapsynapse/tap/harnessie
 harnessie init my-project            # scaffold + guided readiness check + zero-dollar mock run
 ```
 

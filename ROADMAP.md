@@ -109,6 +109,13 @@ Theme: stable surfaces and pluggability, only after the core is proven.
 
 Gate: no 1.0 while any 0.3, 0.4, 0.5, 0.6, or 0.7 acceptance criterion is red.
 
+### Post-1.0 candidates
+
+Deliberately after 1.0, not before:
+
+- Official Docker image. The complication is that the sandbox story inverts inside a container: the docker sandbox backend needs a daemon the container does not have, so an image must either nest a backend (bwrap inside the container), document a reduced-confinement mode honestly, or treat the container boundary itself as the sandbox with the fail-closed rules re-derived for that topology. That is a security-docs problem as much as a packaging problem, which is why it waits for the stable 1.0 surfaces. Acceptance when it lands: the image's confinement posture is stated in SECURITY.md with the same fail-closed honesty as the bare-metal table, and the threat-model artifact gains a container row citing enforcing config and test.
+- conda-forge feedstock, if data-science users ask; the review process is external and the PyPI package already serves `pip`/`pipx`/`uv`.
+
 ## Platform support
 
 ### Supported today
