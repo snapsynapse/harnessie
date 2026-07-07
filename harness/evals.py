@@ -480,18 +480,39 @@ def _run_audit_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
     )
 
 
+def _check_events_contain(scenario: dict[str, Any], run_dir: Path,
+                          problems: list[str]) -> None:
+    """Assert expected strings DID reach the events log (the positive twin of
+    _check_events_absent): e.g. an injection_flag event proving the quarantine
+    layer saw a gate-integrity canary rather than the halt merely coinciding."""
+    needles = scenario.get("expect_events_contain") or []
+    if not needles:
+        return
+    events_path = run_dir / "events.jsonl"
+    raw = events_path.read_text(encoding="utf-8") if events_path.exists() else ""
+    for needle in needles:
+        if needle not in raw:
+            problems.append(f"expected event content missing: {needle!r}")
+
+
 def _run_workflow_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
+    problems: list[str] = []
     with tempfile.TemporaryDirectory(prefix="harnessie-eval-") as d:
         root = Path(d)
         _scaffold_eval_project(root, max_attempts=int(scenario.get("max_attempts", 2)))
         statuses = _run_scripted_workflow(root, "evalrun", scenario.get("script", []),
                                           scenario.get("goal", "eval goal"))
-    expected = scenario["expect_statuses"]
+        expected = scenario["expect_statuses"]
+        if statuses != expected:
+            problems.append(f"statuses={statuses}, expected {expected}")
+        run_dir = root / "runs" / "evalrun"
+        _check_events_contain(scenario, run_dir, problems)
+        _check_events_absent(scenario, run_dir, problems)
     return EvalCaseResult(
         id=scenario["id"],
-        passed=statuses == expected,
-        expected=expected,
-        observed=statuses,
+        passed=not problems,
+        expected=scenario["expect_statuses"],
+        observed=problems or statuses,
     )
 
 

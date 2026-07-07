@@ -8,9 +8,10 @@ scorecard when the operator explicitly enables live calls.
 
 from __future__ import annotations
 
+import hashlib
 import os
 import tempfile
-from dataclasses import dataclass, replace
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from typing import Mapping, Sequence
 
@@ -21,10 +22,76 @@ from .models.base import Message, ModelSpec
 from .runner import load_models_config
 from .tools.builtin import register_builtin
 from .tools.registry import ToolRegistry
-from .verify import parse_verdict
+from .verify import PARSER_VERSION, parse_verdict
 
 
 LIVE_FLAG = "HARNESSIE_LIVE"
+
+# Sampling posture of every smoke in this scorecard. Part of bundle identity:
+# a scorecard earned at one effort level is not evidence about another.
+SCORECARD_SAMPLING = "effort=low"
+
+
+@dataclass(frozen=True)
+class BundleIdentity:
+    """The exact bundle a scorecard result proves (0.7 proof suite, adopted
+    via decisions/AIDR-0004): model, provider, endpoint, prompt version,
+    parser version, and sampling. Change any component and the claim must be
+    re-earned — change control, not drift monitoring."""
+    model: str
+    provider: str
+    endpoint: str
+    prompt_sha: str
+    parser_version: str
+    sampling: str
+
+    @property
+    def bundle_id(self) -> str:
+        joined = "|".join((self.model, self.provider, self.endpoint,
+                           self.prompt_sha, self.parser_version, self.sampling))
+        return hashlib.sha256(joined.encode()).hexdigest()[:12]
+
+    def as_dict(self) -> dict:
+        d = asdict(self)
+        d["bundle_id"] = self.bundle_id
+        return d
+
+
+def prompt_sha(root: Path) -> str:
+    """Deterministic hash over every role prompt the harness ships (agents/
+    tree, sorted by path). Editing any prompt rotates every bundle."""
+    h = hashlib.sha256()
+    agents = root / "agents"
+    for path in sorted(agents.rglob("*.md")) if agents.exists() else []:
+        h.update(str(path.relative_to(agents)).encode())
+        h.update(b"\0")
+        h.update(path.read_bytes())
+    return h.hexdigest()[:12]
+
+
+def bundle_identity(root: Path, spec: ModelSpec) -> BundleIdentity:
+    return BundleIdentity(
+        model=spec.model_id,
+        provider=spec.provider,
+        endpoint=spec.base_url or f"{spec.provider}:default",
+        prompt_sha=prompt_sha(root),
+        parser_version=PARSER_VERSION,
+        sampling=SCORECARD_SAMPLING,
+    )
+
+
+def bundle_drift(recorded: dict, current: BundleIdentity) -> list[str]:
+    """Name every component that differs between a recorded scorecard's
+    bundle and the current one. Non-empty means the recorded claim is stale
+    and the scorecard must be re-run before the brain is called proven."""
+    drift = []
+    for field, value in current.as_dict().items():
+        if field == "bundle_id":
+            continue
+        if str(recorded.get(field, "")) != str(value):
+            drift.append(f"{field}: recorded={recorded.get(field)!r} "
+                         f"current={value!r}")
+    return drift
 
 
 @dataclass
@@ -79,21 +146,30 @@ def discover_live_targets(
 
 def run_live_scorecard(root: Path, env: Mapping[str, str] | None = None) -> dict:
     results: list[LiveTarget | LiveCaseResult] = []
+    bundles: dict[str, dict] = {}
     for target in discover_live_targets(root, env=env):
         if target.status == "skipped":
             results.append(target)
             continue
         assert target.spec is not None
+        bundles[target.id] = bundle_identity(root, target.spec).as_dict()
         results.extend(_run_target_scorecard(target))
     total = sum(1 for r in results if r.status != "skipped")
     passed = sum(1 for r in results if r.status != "skipped" and getattr(r, "passed", False))
-    return {"passed": passed, "total": total, "results": results}
+    return {"passed": passed, "total": total, "results": results,
+            "bundles": bundles}
 
 
 def format_live_scorecard(scorecard: dict) -> str:
     lines = [
         f"live scorecard: {scorecard['passed']}/{scorecard['total']} passed"
     ]
+    for target_id, bundle in (scorecard.get("bundles") or {}).items():
+        lines.append(
+            f"BUNDLE {target_id}: {bundle['bundle_id']} "
+            f"model={bundle['model']} endpoint={bundle['endpoint']} "
+            f"prompts={bundle['prompt_sha']} parser=v{bundle['parser_version']} "
+            f"{bundle['sampling']}")
     for result in scorecard["results"]:
         if result.status == "skipped":
             lines.append(f"SKIP {result.id}: {result.notes}")
@@ -312,9 +388,13 @@ def _cost(spec: ModelSpec | None, tokens_in: int, tokens_out: int) -> float:
 
 __all__ = [
     "LIVE_FLAG",
+    "BundleIdentity",
     "LiveCaseResult",
     "LiveTarget",
+    "bundle_drift",
+    "bundle_identity",
     "discover_live_targets",
     "format_live_scorecard",
+    "prompt_sha",
     "run_live_scorecard",
 ]

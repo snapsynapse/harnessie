@@ -47,6 +47,13 @@ class CheckResult:
     output: str
 
 
+# Version of the verifier-verdict parsing contract (parse_verdict: last JSON
+# object with a "passed" key wins; fail closed otherwise). Part of a proven
+# brain's bundle identity: bump on ANY behavior change to the parser, because
+# a scorecard earned under one parsing contract says nothing about another.
+PARSER_VERSION = "1"
+
+
 @dataclass
 class Verdict:
     passed: bool
