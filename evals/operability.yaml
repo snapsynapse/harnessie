@@ -17,10 +17,56 @@ scenarios:
     expect_statuses: [passed, passed]
     expect_archived: stale-fact
 
+  - id: approval_invalid_policy_denies_closed
+    kind: triage
+    approve_expiry: false
+    approval_policy:
+      allow:
+        - phase: triage
+    script:
+      - { tool: accept_task, args: { note: "memory status reviewed" } }
+      - { tool: expire_fact, args: { slug: stale-fact, reason: past verify_by } }
+      - { tool: task_complete, args: { report: "proposed expiry only" } }
+      - { tool: task_complete, args: { report: "summary" } }
+    expect_statuses: [passed, passed]
+    expect_fact_kept: stale-fact
+
+  - id: approval_policy_phase_scope_denies_elsewhere
+    kind: triage
+    approve_expiry: false
+    approval_policy:
+      allow:
+        - tool: expire_fact
+          phase: other-phase
+    script:
+      - { tool: accept_task, args: { note: "memory status reviewed" } }
+      - { tool: expire_fact, args: { slug: stale-fact, reason: past verify_by } }
+      - { tool: task_complete, args: { report: "proposed expiry only" } }
+      - { tool: task_complete, args: { report: "summary" } }
+    expect_statuses: [passed, passed]
+    expect_fact_kept: stale-fact
+
   - id: parallel_phases_use_independent_workspaces
     kind: parallel
     expect_statuses: [passed, passed, passed, passed]
     expect_elapsed_lt: 0.35
+    expect_files:
+      left/out.txt: left
+      right/out.txt: right
+    expect_root_absent: [out.txt]
+
+  - id: parallel_failure_halts_downstream
+    kind: parallel
+    fail_phase: left
+    expect_statuses: [passed, needs_human, passed]
+    expect_files:
+      right/out.txt: right
+    expect_root_absent: [out.txt]
+
+  - id: parallel_audit_chain_survives_concurrency
+    kind: parallel
+    expect_statuses: [passed, passed, passed, passed]
+    expect_audit_ok: true
     expect_files:
       left/out.txt: left
       right/out.txt: right

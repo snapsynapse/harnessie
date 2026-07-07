@@ -48,7 +48,7 @@ def run_eval_suite(root: Path, suite_path: Path | None = None) -> dict[str, Any]
     for path in files:
         suite = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
         for scenario in suite.get("scenarios", []):
-            results.append(run_scenario(scenario))
+            results.append(run_scenario(scenario, root=root))
     passed = sum(1 for r in results if r.passed)
     return {
         "passed": passed,
@@ -57,7 +57,7 @@ def run_eval_suite(root: Path, suite_path: Path | None = None) -> dict[str, Any]
     }
 
 
-def run_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
+def run_scenario(scenario: dict[str, Any], root: Path | None = None) -> EvalCaseResult:
     kind = scenario.get("kind")
     if kind == "verdict":
         verdict = parse_verdict(scenario.get("report", ""))
@@ -86,6 +86,8 @@ def run_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
         return _run_triage_scenario(scenario)
     if kind == "parallel":
         return _run_parallel_scenario(scenario)
+    if kind == "repo_hygiene":
+        return _run_repo_hygiene_scenario(scenario, root)
     return EvalCaseResult(
         id=scenario.get("id", "(missing-id)"),
         passed=False,
@@ -315,6 +317,8 @@ def _run_triage_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
 
 
 def _run_parallel_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
+    from .audit import verify_chain
+
     problems: list[str] = []
     with tempfile.TemporaryDirectory(prefix="harnessie-eval-") as d:
         root = Path(d)
@@ -323,16 +327,26 @@ def _run_parallel_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
         def brain(messages: list[Message]) -> AssistantTurn:
             task = messages[1].content
             if messages[-1].name == "accept_task" and "Write left" in task:
+                content = "wrong" if scenario.get("fail_phase") == "left" else "left"
                 return _turn({"tool": "write_file",
-                              "args": {"path": "out.txt", "content": "left"}}, 1)
+                              "args": {"path": "out.txt", "content": content}}, 1)
             if messages[-1].name == "accept_task" and "Write right" in task:
+                content = "wrong" if scenario.get("fail_phase") == "right" else "right"
                 return _turn({"tool": "write_file",
-                              "args": {"path": "out.txt", "content": "right"}}, 1)
+                              "args": {"path": "out.txt", "content": content}}, 1)
             if messages[-1].name == "write_file":
                 return _turn({"tool": "task_complete",
                               "args": {"report": f"wrote {task.split()[1]}"}}, 1)
             if "Plan for goal" in task:
                 return _turn({"tool": "task_complete", "args": {"report": "PLAN"}}, 1)
+            if "Verify completed work" in task:
+                failed_left = scenario.get("fail_phase") == "left" and "Write left" in task
+                failed_right = scenario.get("fail_phase") == "right" and "Write right" in task
+                if failed_left or failed_right:
+                    return _turn({"tool": "task_complete",
+                                  "args": {"report": '{"passed": false, "reasons": "wrong artifact"}'}}, 1)
+                return _turn({"tool": "task_complete",
+                              "args": {"report": '{"passed": true, "reasons": "artifact ok"}'}}, 1)
             if "Write left" in task or "Write right" in task:
                 time.sleep(0.2)
                 return _turn({"tool": "accept_task", "args": {}}, 1)
@@ -361,6 +375,41 @@ def _run_parallel_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
                 problems.append(f"expected file missing: {rel}")
             elif target.read_text(encoding="utf-8") != content:
                 problems.append(f"file {rel} content mismatch")
+        for rel in scenario.get("expect_root_absent") or []:
+            if (root / "workspace" / rel).exists():
+                problems.append(f"root workspace file should be absent: {rel}")
+        if scenario.get("expect_audit_ok") is not None:
+            ok = verify_chain(root / "runs" / "evalrun")["ok"]
+            if ok != bool(scenario["expect_audit_ok"]):
+                problems.append(f"audit chain ok={ok}")
+    return EvalCaseResult(
+        id=scenario["id"],
+        passed=not problems,
+        expected=expected,
+        observed=problems or "ok",
+    )
+
+
+def _run_repo_hygiene_scenario(
+    scenario: dict[str, Any],
+    root: Path | None,
+) -> EvalCaseResult:
+    root = (root or Path.cwd()).resolve()
+    problems: list[str] = []
+    paths: list[Path] = []
+    for pattern in scenario.get("paths", []):
+        paths.extend(sorted(root.glob(pattern)))
+    paths = [p for p in dict.fromkeys(paths) if p.is_file()]
+    for path in paths:
+        rel = path.relative_to(root).as_posix()
+        text = path.read_text(encoding="utf-8", errors="replace")
+        for needle in scenario.get("deny_contains", []):
+            if needle in text:
+                problems.append(f"{rel} contains forbidden text {needle!r}")
+        for required in scenario.get("require_contains", []):
+            if required not in text:
+                problems.append(f"{rel} lacks required text {required!r}")
+    expected = "repo hygiene expectations hold"
     return EvalCaseResult(
         id=scenario["id"],
         passed=not problems,
@@ -559,12 +608,16 @@ def _scaffold_eval_project(root: Path, max_attempts: int,
                 task: "Write left out.txt from {plan}"
                 verify:
                   max_attempts: 1
+                  verifier: code-verifier
+                  criteria: out.txt contains left
               - name: right
                 parallel: workers
                 agent: implementer
                 task: "Write right out.txt from {plan}"
                 verify:
                   max_attempts: 1
+                  verifier: code-verifier
+                  criteria: out.txt contains right
               - name: integrate
                 agent: orchestrator
                 task: "Summarize {left} and {right}"

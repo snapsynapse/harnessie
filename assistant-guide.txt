@@ -11,7 +11,7 @@ Before making claims about project health, run:
 - `python3 -m harness.cli eval`
 Expected current result (as of v0.5.0):
 - Tests: 141 passed, 4 skipped on this host.
-- Evals: 29/29 passed across baseline, governance, operability, and triage suites.
+- Evals: 35/35 passed across baseline, governance, operability, stewardship, and triage suites.
 Key invariants:
 - Guarantees live in code (registry, loop, OS layer), never in prompts.
 - Routing is config, not model self-assessment; missing tiers fail early.
@@ -27,3 +27,10 @@ Working rules:
 - Update docs and tests in the same change when behavior changes.
 - Add eval scenarios for new guarantees, especially risky and recovery behavior; a governance mechanic without a red-then-green scenario pair does not merge.
 - Do not stage `.agents/`, `.codex/`, `runs/`, `workspace/`, `.pytest_cache/`, or local scratch unless explicitly requested.
+
+Agent operating posture:
+- Prefer deterministic offline evals first; they are the merge gate.
+- Use local OpenAI-compatible/Ollama endpoints for optional live-local scorecards when available and operator-approved.
+- Use CLI fan-out, local model review, or a separate model-family review when it can improve verification, but treat it as review evidence, not proof by itself.
+- Do not run unattended external provider calls; external live-provider scorecards are operator-attended.
+- Keep operator gates explicit: no Pages/DNS/public-repo/PyPI promotion, no Arbitration edits, no external launch naming from an agent session.

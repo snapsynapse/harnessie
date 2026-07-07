@@ -8,12 +8,13 @@ Harnessie evals are YAML scorecards under `evals/`. They are deliberately small,
 ## Scenario contract
 Every scenario has:
 - `id`: stable snake-case identifier, unique within the suite.
-- `kind`: one of `verdict`, `loop`, `workflow`, `resume`, `ownership`, `adversarial`, `audit`, `triage`, or `parallel`.
+- `kind`: one of `verdict`, `loop`, `workflow`, `resume`, `ownership`, `adversarial`, `audit`, `triage`, `parallel`, or `repo_hygiene`.
 - Expected result fields, which depend on `kind`.
 ## Suites
 - `evals/baseline.yaml`: core harness guarantees (verdicts, stop conditions, gates, resume).
 - `evals/governance.yaml`: the v0.2 governance layer (consent, ownership, adversarial contest, audit). Written red before the implementation per the eval-first change discipline (GOVERNANCE.md §6); a governance feature without a red-then-green scenario pair does not merge.
-- `evals/operability.yaml`: the v0.5 operability layer (headless approval policy, parallel phase workspaces).
+- `evals/operability.yaml`: the v0.5 operability layer (headless approval policy, invalid-policy fail-closed behavior, parallel phase workspaces, parallel failure halts, audit-chain survival under concurrency).
+- `evals/stewardship.yaml`: meta checks for future-agent handoff quality and public-doc hygiene.
 - `evals/triage.yaml`: the v0.3 memory-triage layer (approval-gated expiry, headless propose-only, memory lint halting). Same red-first discipline.
 ## Scenario kinds
 ### verdict
@@ -58,9 +59,14 @@ A memory-triage workflow over seeded facts (one fresh, one stale).
 - Use for recorded-approval expiry, headless propose-only fail-closed behavior, and memory-lint halting.
 ### parallel
 Exercises a plan -> two parallel worker phases -> integrate workflow.
-- Input: optional `goal`, `expect_elapsed_lt`
-- Expected: `expect_statuses`, optional `expect_files` mapping phase-relative paths under `workspace/.phases/` to exact contents.
-- Use for proving independent phases gate under separate workspaces and beat the sequential wall-clock.
+- Input: optional `goal`, optional `fail_phase`, optional `expect_elapsed_lt`, optional `expect_audit_ok`
+- Expected: `expect_statuses`, optional `expect_files` mapping phase-relative paths under `workspace/.phases/` to exact contents, optional `expect_root_absent`.
+- Use for proving independent phases gate under separate workspaces, beat the sequential wall-clock, halt downstream on failure, and preserve the audit chain under concurrency.
+### repo_hygiene
+Checks tracked repo text directly.
+- Input: `paths` glob list, optional `deny_contains`, optional `require_contains`
+- Expected: all listed files avoid forbidden text and include required text.
+- Use for public-surface hygiene, local-path leakage, and handoff-quality checks.
 ## Script turns
 Mock-brain script entries can be tool calls:
 - `tool`: tool name such as `task_complete`, `write_file`, or `read_file`

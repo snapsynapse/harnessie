@@ -1,0 +1,29 @@
+# Stewardship scorecard: meta checks that keep future-agent handoffs and public
+# surfaces aligned with Harnessie's operating posture.
+suite: stewardship
+description: Handoff quality and public-surface hygiene for agent rotations.
+scenarios:
+  - id: public_surface_has_no_local_paths
+    kind: repo_hygiene
+    paths:
+      - README.md
+      - assistant-guide.txt
+      - docs/**/*.md
+      - docs/**/*.html
+    deny_contains:
+      - "file://"
+      - "/Users/"
+      - "handoffs/"
+
+  - id: next_handoff_names_state_gates_and_verification
+    kind: repo_hygiene
+    paths:
+      - NEXT.md
+    require_contains:
+      - "Current state"
+      - "Verification status"
+      - "Operator-attended steps"
+      - "Non-goals standing"
+      - "python3 -m pytest -q"
+      - "python3 -m harness.cli eval"
+      - "0.6.0 headless subset"

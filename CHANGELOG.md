@@ -2,6 +2,18 @@
 
 All notable changes to Harnessie are recorded here. Format loosely follows Keep a Changelog; versions follow semver.
 
+## Unreleased
+
+### Added
+
+- Expanded `evals/operability.yaml` with risky/recovery coverage for invalid approval policies, phase-scoped approval denial, parallel failure halting downstream work, root-workspace bleed prevention, and audit-chain survival under concurrent phases.
+- Added `evals/stewardship.yaml` for public-surface local-path hygiene and `NEXT.md` handoff quality checks.
+- Documented the agent operating posture for optional local OpenAI-compatible/Ollama checks and CLI fan-out review: useful verification evidence, not a replacement for deterministic evals and operator-gated live-provider rules.
+
+### Tests
+
+- Eval scorecard now passes 35/35.
+
 ## 0.5.0 (2026-07-07)
 
 ### Added

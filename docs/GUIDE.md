@@ -140,6 +140,8 @@ Adversarial phases. A phase with `mode: adversarial` runs a panel instead of a s
 
 Approval policy. Approval-gated tools deny closed unless authorized. A workflow may use `approve_tools` for phase-local recorded pre-approval, or an operator can pass `--approval-policy approvals.yaml` with `allow` and `deny` lists. Each rule names a `tool` and may name a `phase`; explicit deny wins. `--approve-interactive` prompts on a TTY when no policy rule matches.
 
+Verification options. Start with the offline deterministic path: `pytest`, `harnessie eval`, and `harnessie verify-manifest`. When a local OpenAI-compatible endpoint such as Ollama is already running, `HARNESSIE_LIVE=1 HARNESSIE_OPENAI_COMPAT_BASE_URL=http://localhost:11434/v1 harnessie eval --live` gives a live-local scorecard without external provider calls. External provider scorecards are attended operations. CLI fan-out, local model review, or a separate model-family review can strengthen a change, but it is review evidence; the merge proof remains the repo's tests, evals, manifests, and audit records.
+
 ## Configuring brains
 
 `config/models.yaml` is the only file you edit to swap models. It has three sections.
