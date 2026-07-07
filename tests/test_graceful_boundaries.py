@@ -22,7 +22,6 @@ from harness.tools.registry import (
     PermissionDenied,
     Refusal,
     ToolRegistry,
-    refusal_result,
 )
 from harness.tools.builtin import register_builtin
 
