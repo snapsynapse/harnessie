@@ -38,9 +38,10 @@ Development provenance, distinct from the runtime table above: these models buil
 - Claude Opus 4.8 (Anthropic): also a recorded development co-author in the git history.
 - Claude Sonnet 5 (Anthropic): added this line and its own git trail in the same commit.
 - GPT-5.5 (OpenAI, via Codex): implemented the v0.3.2 structured-refusal and checked-identifier patch, then handed it to Claude Fable 5, which verified it independently in the next session.
+- Gemini 3.5 Flash (Google): reviewed the 0.4.0 patch, verified the trust-bundle manifest and [live scorecard](file:///Users/snap/Git/harnessie/harness/live_scorecard.py) skip policies, and ran the live scorecard against a local OpenAI-compatible endpoint.
 - Perplexity Sonar Pro (Perplexity): research and independent source verification at the outset; the trail is [source-verification.json](https://github.com/snapsynapse/harnessie/blob/main/source-verification.json), where twenty prior-art sources were checked and several confirmed via sonar-pro.
 
-Three providers building, reviewing, and fact-checking the harness itself is the thesis applied to its own construction.
+Four providers building, reviewing, and fact-checking the harness itself is the thesis applied to its own construction.
 
 ## Coverage we would like to add
 
