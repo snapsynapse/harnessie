@@ -1,0 +1,38 @@
+Harnessie
+Copyright 2026 Snap Synapse LLC (https://snapsynapse.com/)
+
+Licensed under the Apache License, Version 2.0. See LICENSE.
+
+TRADEMARKS
+
+"Harnessie" and harnessie.com are marks of Snap Synapse LLC. Per Section 6
+of the Apache License, this license does not grant permission to use them.
+
+PAICE.WORK PBC STANDARDS AND SPECIFICATIONS
+
+Harnessie adopts lessons from, and credits, standards stewarded by
+PAICE.work PBC (https://paice.work/): Turnfile, AIDR (AI Decision Records),
+Graceful Boundaries, and GuideCheck. Those specifications, their names, and
+their canonical texts remain the property of PAICE.work PBC and are NOT
+licensed by this repository. Harnessie's relationship to them is adoption
+and credit, not ownership; conformance is asserted only where a tracked
+document cites the achieved level and its proving tests (see INTENT.md §7
+and GOVERNANCE.md). Nothing in this repository grants any right to the
+PAICE.work PBC specifications beyond what their own licenses provide.
+
+PAICE.WORK PBC ORIGINATED CODE
+
+As of this version, no PAICE.work PBC code is vendored into this
+repository. Standing rule: code originating in PAICE.work PBC repositories
+enters Harnessie only under an explicit written grant from PAICE.work PBC,
+recorded in this NOTICE with the grant date, the source, and the scope,
+before the vendored code appears in any public commit. Planned under the
+0.7.0 roadmap: a containment boundary adapted from PAICE.work PBC
+production PII-handling code; that adaptation will not merge before its
+grant line appears here.
+
+THIRD-PARTY MATERIALS
+
+This repository currently vendors no third-party code beyond the Python
+standard library. Future vendored components and their licenses will be
+credited here.

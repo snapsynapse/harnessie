@@ -60,7 +60,7 @@ tests/              the done-tests for every subsystem
 docs/               reserved for the canonical web page (GitHub Pages publish source once public)
 *.md at root        ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP, IMPLEMENTATION_PLAN, PROMPTS, EVALS, NEXT,
                     session-url-log, plus INTENT (9-section standard), CHANGELOG, README,
-                    LICENSE (MIT); source-verification.json is the build provenance data
+                    LICENSE (Apache-2.0) + NOTICE; source-verification.json is the build provenance data
 ```
 
 Dogfooding this repo under Claude Code uses a local `.claude/` (subagent defs, a `/run-workflow` command, a pytest hook). Per repo convention `.claude/` is gitignored, so it does not ship; the canonical role prompts it wraps live in `agents/`, and the CLI is the primary interface.
@@ -139,4 +139,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, the eval-first change discipli
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+Apache-2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE) (copyright Snap Synapse LLC; trademark and PAICE.work PBC spec/code carveouts).

@@ -6,6 +6,7 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ### Added
 
+- Relicensed MIT -> Apache-2.0 ahead of public release (sole author, no external contributors; copyright Snap Synapse LLC). Adds NOTICE with the trademark carveout (Apache section 6), the PAICE.work PBC specifications carveout (adoption and credit, not ownership), and the standing rule that PBC-originated code enters only under an explicit written grant recorded in NOTICE before any public commit. License references updated in README, pyproject.toml, and the landing page.
 - Expanded `evals/operability.yaml` with risky/recovery coverage for invalid approval policies, phase-scoped approval denial, parallel failure halting downstream work, root-workspace bleed prevention, and audit-chain survival under concurrent phases.
 - Added `evals/stewardship.yaml` for public-surface local-path hygiene and `NEXT.md` handoff quality checks.
 - Documented the agent operating posture for optional local OpenAI-compatible/Ollama checks and CLI fan-out review: useful verification evidence, not a replacement for deterministic evals and operator-gated live-provider rules.
