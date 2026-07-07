@@ -4,7 +4,11 @@ This is the forward view: versioned milestones, their themes, and platform suppo
 
 Roadmap items are intent, not commitments. Dates are omitted deliberately; milestones ship when their acceptance criteria are green, not on a calendar.
 
-## Current release: 0.4.0 (2026-07-07)
+## Current release: 0.5.0 (2026-07-07)
+
+The operability release: approval-gated tools can be governed by a headless allow/deny policy file or an interactive TTY prompt; run output and audit events now show per-phase cost; independent phases declared with the same `parallel:` label fan out into per-phase workspaces and gate independently. Details in [CHANGELOG.md](CHANGELOG.md).
+
+## Prior release: 0.4.0 (2026-07-07)
 
 The portability-and-proof release: Linux sandbox backends and CI matrix are in, live provider scorecard infrastructure is opt-in and skipped visibly when no credentials/endpoints are configured, and the public trust bundle has a hash-verified `docs/MANIFEST.yaml`. The live provider calls themselves remain operator-attended: `HARNESSIE_LIVE=1 python3 -m harness.cli eval --live` is the documented invocation, not a default test path. Details in [CHANGELOG.md](CHANGELOG.md).
 
@@ -37,7 +41,7 @@ Shipped: brain-agnostic model interface with hot-swappable tiers, tool registry 
 
 Acceptance met: triage runs headless as propose-only and applies only under recorded approval; a stale fact is surfaced by date, archived never deleted; the audit timeline shows agent and operator actions interleaved; refusals carry `{error, boundary, detail, why}` and are audit-rendered. Current baseline: 117 passed, 3 skipped; 26 eval scenarios green.
 
-### 0.4.0: Portability and proof - SHIPPED (current release above)
+### 0.4.0: Portability and proof - SHIPPED
 
 Theme: make the harness runnable and measurable beyond a single Mac.
 
@@ -49,12 +53,12 @@ Theme: make the harness runnable and measurable beyond a single Mac.
 
 Acceptance: the full suite is green on Linux with a backend present and fails closed on a runner with none; a brain swap (config edit) produces a comparable scorecard.
 
-### 0.5.0: Operability
+### 0.5.0: Operability - SHIPPED (current release above)
 
 Theme: put a human comfortably in the loop for long autonomous runs.
 
-- Interactive approval handler wired to a TTY prompt and a headless allow/deny policy file; per-phase cost display. Implementation step 13.
-- Parallel workers: independent phases fan out with per-phase workspaces to prevent write conflicts. Implementation step 14.
+- Interactive approval handler wired to a TTY prompt and a headless allow/deny policy file; per-phase cost display. Implementation step 13. GREEN 2026-07-07: `--approval-policy` and `--approve-interactive` are wired through CLI and `WorkflowRunner`; policy denials fail closed; phase outcomes/events carry local cost deltas.
+- Parallel workers: independent phases fan out with per-phase workspaces to prevent write conflicts. Implementation step 14. GREEN 2026-07-07: contiguous phases with the same `parallel:` label run concurrently under `workspace/.phases/<phase>`, gate independently, and beat the sequential wall-clock in the mock-brain test.
 
 Acceptance: a requires_approval tool blocks headless by default and proceeds only under policy; two independent phases run concurrently, gate independently, and beat sequential wall-clock.
 

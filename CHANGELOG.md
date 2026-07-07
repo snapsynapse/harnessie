@@ -2,6 +2,24 @@
 
 All notable changes to Harnessie are recorded here. Format loosely follows Keep a Changelog; versions follow semver.
 
+## 0.5.0 (2026-07-07)
+
+### Added
+
+- Headless approval policy files (`harness/approval.py`, CLI `--approval-policy`): `allow:` and `deny:` rules name approval-gated tools, optionally scoped to a phase. Default remains deny; explicit deny wins; invalid broad rules deny closed.
+- TTY approval prompt path (`--approve-interactive`) for approval-gated tool calls when stdin is interactive.
+- Per-phase cost display: `PhaseOutcome` and `phase_done` events now carry phase-local token and USD deltas alongside cumulative run spend; CLI run output prints per-phase cost.
+- Parallel worker groups: consecutive phases with the same `parallel:` label run concurrently, gate independently, and use isolated workspaces under `workspace/.phases/<phase>` to avoid write conflicts.
+- `evals/operability.yaml` with v0.5 red-then-green scenarios for approval-policy execution and parallel phase isolation.
+
+### Changed
+
+- `EventLog.emit` and `Budget.charge` are lock-guarded so concurrent phases preserve a valid hash chain and consistent spend accounting.
+
+### Tests
+
+- 141 passed, 4 skipped locally; eval scorecard 29/29.
+
 ## 0.4.0 (2026-07-07)
 
 ### Added

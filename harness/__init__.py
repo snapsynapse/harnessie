@@ -22,4 +22,4 @@ Security model: SECURITY.md. Architecture and source map: ARCHITECTURE.md.
 Governance layer (consent, ownership, contest, audit): GOVERNANCE.md.
 """
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"

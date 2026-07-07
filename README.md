@@ -80,6 +80,16 @@ Without `HARNESSIE_LIVE=1` or provider configuration, the live scorecard reports
 
 Goal enters, orchestrator (frontier, high effort) decomposes it into task packets with acceptance criteria and out-of-scope fences; task packets are offers, and workers consent (or decline with a counter-proposal) before side-effecting tools unlock; workers (cheap tiers) execute inside a jailed workspace with allowlisted tools, owning the files they create and never each other's; every worker phase exits through a gate that runs deterministic checks first, then an independent fresh-context verifier that never sees the worker's reasoning and fails closed; contested decisions fan out to an adversarial panel whose positions, objections, and dissent land in a decision record only a human may arbitrate; failures reformulate the task with evidence and escalate effort-then-tier before halting for a human; everything is journaled, budgeted, resumable, hash-chain audited, and leaves proof artifacts on disk.
 
+For long runs, approval-gated tools can be authorized by a small headless policy file:
+```yaml
+allow:
+  - tool: expire_fact
+    phase: triage
+deny:
+  - tool: deploy
+```
+Run with `--approval-policy approvals.yaml`, or use `--approve-interactive` to prompt on a TTY. Independent phases can fan out by sharing a `parallel:` label; each runs under `workspace/.phases/<phase>` and gates independently before later phases see its report.
+
 Full rationale and the verified source-to-decision map: [ARCHITECTURE.md](ARCHITECTURE.md). Governance layer (consent, ownership, contest, audit): [GOVERNANCE.md](GOVERNANCE.md). Prompt-injection and secret-handling model: [SECURITY.md](SECURITY.md). What comes next and platform support: [ROADMAP.md](ROADMAP.md).
 
 ## What governs a run

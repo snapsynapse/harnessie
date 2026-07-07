@@ -2,6 +2,7 @@
 integrate workflow, then the run resumes from its journal without re-running."""
 
 import json
+import time
 import textwrap
 
 from harness import sandbox
@@ -199,3 +200,118 @@ def test_clean_report_flows_unfenced(tmp_path, monkeypatch):
     implement_task = brain.calls[1]["messages"][1].content
     assert "PLAN: create greeting.txt containing hello" in implement_task
     assert "UNTRUSTED CONTENT" not in implement_task
+
+
+def test_phase_outcomes_and_events_show_phase_costs(tmp_path, monkeypatch):
+    monkeypatch.setattr(sandbox, "wrap",
+                        lambda argv, workspace, allow_network=False: argv)
+    scaffold_project(tmp_path)
+    runner = WorkflowRunner(project_root=tmp_path, run_id="costrun", echo=False)
+    runner._models["mid"] = MockModel(
+        ModelSpec(name="mid", provider="mock", model_id="mock",
+                  cost_per_mtok_in=10.0, cost_per_mtok_out=20.0),
+        script=[
+            turn_tool("task_complete", {"report": "PLAN"},
+                      call_id="p").__class__(
+                content="", stop_reason="tool_use",
+                tool_calls=[ToolCall(id="p", name="task_complete",
+                                     arguments={"report": "PLAN"})],
+                input_tokens=100, output_tokens=50),
+            turn_tool("accept_task", {}, call_id="a"),
+            AssistantTurn(content="", stop_reason="tool_use",
+                          tool_calls=[ToolCall(id="w", name="write_file",
+                                               arguments={"path": "greeting.txt",
+                                                          "content": "hello"})],
+                          input_tokens=25, output_tokens=25),
+            turn_tool("task_complete", {"report": "wrote"}, call_id="d"),
+            turn_tool("read_file", {"path": "greeting.txt"}, call_id="r"),
+            AssistantTurn(content="", stop_reason="tool_use",
+                          tool_calls=[ToolCall(id="v", name="task_complete",
+                                               arguments={"report": '{"passed": true}'})],
+                          input_tokens=40, output_tokens=10),
+            turn_tool("task_complete", {"report": "FINAL"}, call_id="i"),
+        ])
+
+    outcomes = runner.run_workflow(tmp_path / "workflows" / "mini.yaml", goal="g")
+
+    assert outcomes[0].spent_tokens == 150
+    assert outcomes[0].spent_usd > 0
+    events = [
+        json.loads(line)
+        for line in (tmp_path / "runs" / "costrun" / "events.jsonl").read_text().splitlines()
+        if line.strip()
+    ]
+    done = [e for e in events if e["kind"] == "phase_done"]
+    assert all("phase_spent_tokens" in e for e in done)
+    assert all("phase_spent_usd" in e for e in done)
+
+
+def test_parallel_phases_use_independent_workspaces_and_beat_sequential(tmp_path, monkeypatch):
+    monkeypatch.setattr(sandbox, "wrap",
+                        lambda argv, workspace, allow_network=False: argv)
+    scaffold_project(tmp_path)
+    (tmp_path / "workflows" / "parallel.yaml").write_text(textwrap.dedent("""
+        name: parallel
+        phases:
+          - name: plan
+            agent: orchestrator
+            task: "Plan for goal: {goal}"
+          - name: left
+            parallel: workers
+            agent: implementer
+            task: "Write left out.txt from {plan}"
+            verify:
+              max_attempts: 1
+              checks:
+                - name: left-file
+                  command: python3 -c "import pathlib,sys; sys.exit(0 if pathlib.Path('out.txt').read_text() == 'left' else 1)"
+          - name: right
+            parallel: workers
+            agent: implementer
+            task: "Write right out.txt from {plan}"
+            verify:
+              max_attempts: 1
+              checks:
+                - name: right-file
+                  command: python3 -c "import pathlib,sys; sys.exit(0 if pathlib.Path('out.txt').read_text() == 'right' else 1)"
+          - name: integrate
+            agent: orchestrator
+            task: "Summarize {left} and {right}"
+    """))
+
+    def brain(messages):
+        task = messages[1].content
+        if messages[-1].name == "accept_task" and "Write left" in task:
+            return turn_tool("write_file", {"path": "out.txt", "content": "left"})
+        if messages[-1].name == "accept_task" and "Write right" in task:
+            return turn_tool("write_file", {"path": "out.txt", "content": "right"})
+        if messages[-1].name == "write_file":
+            return turn_tool("task_complete", {"report": f"wrote {task.split()[1]}"})
+        if "Plan for goal" in task:
+            return turn_tool("task_complete", {"report": "PLAN"})
+        if "Write left" in task:
+            time.sleep(0.2)
+            return AssistantTurn(
+                content="", stop_reason="tool_use",
+                tool_calls=[ToolCall(id="l", name="accept_task", arguments={})])
+        if "Write right" in task:
+            time.sleep(0.2)
+            return AssistantTurn(
+                content="", stop_reason="tool_use",
+                tool_calls=[ToolCall(id="r", name="accept_task", arguments={})])
+        if "Summarize" in task:
+            return turn_tool("task_complete", {"report": "FINAL"})
+        return turn_tool("task_complete", {"report": '{"passed": true}'})
+
+    runner = WorkflowRunner(project_root=tmp_path, run_id="parallelrun", echo=False)
+    runner._models["mid"] = MockModel(
+        ModelSpec(name="mid", provider="mock", model_id="mock"), fn=brain)
+    start = time.monotonic()
+    outcomes = runner.run_workflow(tmp_path / "workflows" / "parallel.yaml", goal="g")
+    elapsed = time.monotonic() - start
+
+    assert [o.status for o in outcomes] == ["passed", "passed", "passed", "passed"]
+    assert elapsed < 0.35
+    assert (tmp_path / "workspace" / ".phases" / "left" / "out.txt").read_text() == "left"
+    assert (tmp_path / "workspace" / ".phases" / "right" / "out.txt").read_text() == "right"
+    assert not (tmp_path / "workspace" / "out.txt").exists()

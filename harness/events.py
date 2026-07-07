@@ -19,6 +19,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
+import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -38,6 +39,7 @@ class EventLog:
     _fh: Any = field(default=None, repr=False)
     _seq: int = field(default=0, repr=False)
     _prev: str = field(default=GENESIS, repr=False)
+    _lock: Any = field(default_factory=threading.Lock, repr=False)
 
     def __post_init__(self) -> None:
         self.run_dir.mkdir(parents=True, exist_ok=True)
@@ -51,13 +53,14 @@ class EventLog:
         self._fh = path.open("a", encoding="utf-8")
 
     def emit(self, kind: str, **data: Any) -> dict:
-        event = {"ts": time.time(), "seq": self._seq + 1, "prev": self._prev,
-                 "kind": kind, **data}
-        line = json.dumps(event, ensure_ascii=False, default=str)
-        self._fh.write(line + "\n")
-        self._fh.flush()
-        self._seq += 1
-        self._prev = line_hash(line)
+        with self._lock:
+            event = {"ts": time.time(), "seq": self._seq + 1, "prev": self._prev,
+                     "kind": kind, **data}
+            line = json.dumps(event, ensure_ascii=False, default=str)
+            self._fh.write(line + "\n")
+            self._fh.flush()
+            self._seq += 1
+            self._prev = line_hash(line)
         if self.echo:
             brief = {k: v for k, v in data.items() if k not in ("content", "messages")}
             print(f"[{kind}] {json.dumps(brief, default=str)[:240]}", file=sys.stderr)

@@ -9,9 +9,9 @@ Read these first:
 Before making claims about project health, run:
 - `python3 -m pytest -q`
 - `python3 -m harness.cli eval`
-Expected current result (as of v0.3.2):
-- Tests: 117 passed, 3 skipped on hosts without usable Seatbelt confinement for those cases.
-- Evals: 26/26 passed across baseline, governance, and triage suites.
+Expected current result (as of v0.5.0):
+- Tests: 141 passed, 4 skipped on this host.
+- Evals: 29/29 passed across baseline, governance, operability, and triage suites.
 Key invariants:
 - Guarantees live in code (registry, loop, OS layer), never in prompts.
 - Routing is config, not model self-assessment; missing tiers fail early.

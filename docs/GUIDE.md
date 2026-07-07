@@ -131,10 +131,14 @@ Phase fields:
 - `deny_tools`: tools removed from this phase, narrowing the blast radius of untrusted content.
 - `allow_network`: opt this phase's sandboxed shell into network access (off by default).
 - `inject_memory_status`: prepend a deterministic memory-and-prior-run digest to the task.
+- `approve_tools`: operator-recorded pre-approval for approval-gated tools, scoped to this phase.
+- `parallel`: phases with the same label and placed consecutively run concurrently in separate workspaces under `workspace/.phases/<phase>`.
 
 Prior-phase reports are treated as untrusted model output: before substitution they pass through the same quarantine filter that scans tool results, so injection attempts inside a report are fenced as data rather than followed. The operator's `goal` is never fenced.
 
 Adversarial phases. A phase with `mode: adversarial` runs a panel instead of a single worker. Each `positions` entry is an agent on a task class (choose different task classes to get genuinely different brains, which is what earns the record its independent-positions claim). After `rebuttal_rounds` of objections, `arbitration: convergence` passes only on unanimous agreement with zero open objections; anything else halts as `needs_arbitration` with a decision record. See [Governance](#governance-consent-contests-and-arbitration).
+
+Approval policy. Approval-gated tools deny closed unless authorized. A workflow may use `approve_tools` for phase-local recorded pre-approval, or an operator can pass `--approval-policy approvals.yaml` with `allow` and `deny` lists. Each rule names a `tool` and may name a `phase`; explicit deny wins. `--approve-interactive` prompts on a TTY when no policy rule matches.
 
 ## Configuring brains
 

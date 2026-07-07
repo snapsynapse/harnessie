@@ -57,13 +57,13 @@ The injection-defense layer (harness/quarantine.py; SECURITY.md) is implemented:
 - Implemented live layer: `python3 -m harness.cli eval --live` runs comparable direct, verifier, tool-loop, consent-loop, and consent-lock scorecard rows per configured real provider, with token and cost display where the provider reports usage.
 - Done test now: `python3 -m harness.cli eval evals/baseline.yaml` produces a 10/10 scorecard; `tests/test_evals.py` gates it. `python3 -m harness.cli eval --live` exits cleanly with explicit skips in a keyless environment.
 
-13. Interactive approval handler and operator UX
-- Wire ToolRegistry.approval_handler to a real prompt (TTY) and a policy file for headless allow/deny lists; add cost display per phase.
-- Done test: a requires_approval tool blocks in headless mode by default and proceeds when policy allows; approvals appear in the journal.
+13. Interactive approval handler and operator UX (implemented)
+- `ToolRegistry.approval_handler` is wired to workflow pre-approval, a headless allow/deny policy file (`--approval-policy`), and an optional TTY prompt (`--approve-interactive`); per-phase token/USD deltas are shown in phase outcomes, `phase_done` events, and CLI output.
+- Done test: a requires_approval tool blocks in headless mode by default and proceeds when policy allows; approvals appear in the journal. Covered by `tests/test_approval.py`, `tests/test_triage.py`, and `evals/operability.yaml`.
 
-14. Parallel workers
-- Extend the runner so independent phases (declared `parallel: group-N`) fan out across workers, with per-phase workspaces to prevent write conflicts.
-- Done test: two independent phases run concurrently with disjoint workspaces and both gate independently; total wall-clock beats sequential on a mock brain with latency.
+14. Parallel workers (implemented)
+- Independent consecutive phases declared with the same `parallel:` label fan out across workers, with per-phase workspaces under `workspace/.phases/<phase>` to prevent write conflicts.
+- Done test: two independent phases run concurrently with disjoint workspaces and both gate independently; total wall-clock beats sequential on a mock brain with latency. Covered by `tests/test_runner.py` and `evals/operability.yaml`.
 
 15. OS sandbox for shell execution (implemented)
 - run_shell and gate checks run inside an OS confinement (harness/sandbox.py; macOS Seatbelt via sandbox-exec) that limits writes to the workspace and denies network by default, closing the interpreter escape that per-role allowlists and the argument jail only narrow. Policy: fail closed everywhere (no backend means shell/checks are blocked, not run unconfined); network is per-phase opt-in via allow_network.

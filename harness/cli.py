@@ -22,11 +22,17 @@ def main(argv: list[str] | None = None) -> int:
     p_run = sub.add_parser("run", help="run a workflow")
     p_run.add_argument("workflow")
     p_run.add_argument("--goal", default="", help="top-level goal passed to the workflow")
+    p_run.add_argument("--approval-policy", help="headless approval policy YAML")
+    p_run.add_argument("--approve-interactive", action="store_true",
+                       help="prompt on TTY for approval-gated tools")
 
     p_resume = sub.add_parser("resume", help="resume a run from its journal")
     p_resume.add_argument("run_id")
     p_resume.add_argument("workflow")
     p_resume.add_argument("--goal", default="")
+    p_resume.add_argument("--approval-policy", help="headless approval policy YAML")
+    p_resume.add_argument("--approve-interactive", action="store_true",
+                          help="prompt on TTY for approval-gated tools")
 
     p_report = sub.add_parser("report", help="print a run's journal and proofs")
     p_report.add_argument("run_id")
@@ -138,13 +144,19 @@ def main(argv: list[str] | None = None) -> int:
     from .runner import WorkflowRunner  # deferred: import cost + optional deps
 
     run_id = args.run_id if args.cmd == "resume" else None
-    runner = WorkflowRunner(project_root=root, run_id=run_id)
+    approval_policy = (root / args.approval_policy).resolve() \
+        if getattr(args, "approval_policy", None) else None
+    runner = WorkflowRunner(project_root=root, run_id=run_id,
+                            approval_policy=approval_policy,
+                            interactive_approvals=bool(
+                                getattr(args, "approve_interactive", False)))
     outcomes = runner.run_workflow(root / args.workflow, goal=args.goal)
     print(f"\nrun {runner.run_id}: spent ${runner.budget.spent_usd:.4f}, "
           f"{runner.budget.spent_tokens} tokens")
     worst = 0
     for o in outcomes:
-        print(f"  [{o.status:>14}] {o.phase}: {o.report[:120]}")
+        print(f"  [{o.status:>14}] {o.phase}: "
+              f"${o.spent_usd:.6f}, {o.spent_tokens} tokens; {o.report[:120]}")
         if o.status == "needs_human":
             worst = 2
     return worst

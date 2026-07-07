@@ -13,6 +13,7 @@ completed phases. Prior phase reports are available to later phases via
 from __future__ import annotations
 
 import json
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -20,6 +21,7 @@ import yaml
 
 from .adversarial import (PositionRecord, assemble_record, converged,
                           lint_record, parse_objection_response, parse_stance)
+from .approval import ApprovalPolicy, tty_approval
 from .events import EventLog
 from .loop import AgentLoop, LoopResult
 from .memory import ProjectMemory, ProofStore
@@ -76,13 +78,17 @@ class PhaseOutcome:
     phase: str
     status: str  # "passed" | "needs_human" | "needs_arbitration" | "skipped_resume"
     report: str
+    spent_usd: float = 0.0
+    spent_tokens: int = 0
 
 HALT_STATUSES = ("needs_human", "needs_arbitration")
 
 
 class WorkflowRunner:
     def __init__(self, project_root: Path, models_config: Path | None = None,
-                 run_id: str | None = None, echo: bool = True) -> None:
+                 run_id: str | None = None, echo: bool = True,
+                 approval_policy: Path | None = None,
+                 interactive_approvals: bool = False) -> None:
         self.root = project_root.resolve()
         tiers, routing_table, budget_cfg = load_models_config(
             models_config or self.root / "config" / "models.yaml")
@@ -96,6 +102,9 @@ class WorkflowRunner:
         self.proofs = ProofStore(self.run_dir)
         self.roles = RoleLibrary.load(self.root / "agents")
         self.registry = ToolRegistry()
+        self.approval_policy = (ApprovalPolicy.load(approval_policy)
+                                if approval_policy else None)
+        self.interactive_approvals = interactive_approvals
         # The ownership ledger lives at the project root — outside the
         # workspace jail — so no agent can edit its own permissions.
         self.ledger = OwnershipLedger.load(self.root / "OWNERSHIP.yaml")
@@ -111,13 +120,15 @@ class WorkflowRunner:
     def _loop_for(self, role_kind: str, route: Route, max_steps: int = 40,
                   deny_tools: frozenset[str] = frozenset(),
                   allow_network: bool = False, agent_name: str = "",
-                  consent_required: bool = False) -> AgentLoop:
+                  consent_required: bool = False,
+                  registry: ToolRegistry | None = None,
+                  budget: Budget | None = None) -> AgentLoop:
         spec = self.router.spec_for(route)
         if spec.name not in self._models:
             self._models[spec.name] = build_model(spec)
         return AgentLoop(role=role_kind, model=self._models[spec.name],
-                         registry=self.registry, events=self.events,
-                         budget=self.budget, max_steps=max_steps,
+                         registry=registry or self.registry, events=self.events,
+                         budget=budget or self.budget, max_steps=max_steps,
                          deny_tools=deny_tools, allow_network=allow_network,
                          agent_name=agent_name, consent_required=consent_required)
 
@@ -125,12 +136,16 @@ class WorkflowRunner:
                   extra_context: str = "", max_steps: int = 40,
                   deny_tools: frozenset[str] = frozenset(),
                   allow_network: bool = False,
-                  consent_required: bool = False) -> LoopResult:
+                  consent_required: bool = False,
+                  registry: ToolRegistry | None = None,
+                  budget: Budget | None = None) -> LoopResult:
         role = self.roles.get(agent_name)
         loop = self._loop_for(role.kind, route, max_steps=max_steps,
                               deny_tools=deny_tools, allow_network=allow_network,
                               agent_name=agent_name,
-                              consent_required=consent_required)
+                              consent_required=consent_required,
+                              registry=registry,
+                              budget=budget)
         # Memory index goes to orchestrator phases only; workers and verifiers
         # get exactly what their task packet names (context hygiene).
         memory_index = (self.memory.context_block()
@@ -150,8 +165,12 @@ class WorkflowRunner:
         outcomes: list[PhaseOutcome] = []
         reports: dict[str, str] = {"goal": goal}
 
-        for phase in wf.get("phases", []):
+        phases = wf.get("phases", [])
+        handled_parallel: set[str] = set()
+        for idx, phase in enumerate(phases):
             name = phase["name"]
+            if name in handled_parallel:
+                continue
             if self.state.has(f"phase:{name}"):
                 prior = self.state.result(f"phase:{name}")
                 # Resume skips ONLY verified successes. A journaled needs_human
@@ -163,9 +182,33 @@ class WorkflowRunner:
                                                  reports[name]))
                     continue
 
+            if phase.get("parallel"):
+                group = []
+                label = phase.get("parallel")
+                for candidate in phases[idx:]:
+                    if candidate.get("parallel") != label:
+                        break
+                    group.append(candidate)
+                handled_parallel.update(p["name"] for p in group)
+                group_outcomes = self._run_parallel_group(group, reports)
+                for outcome in group_outcomes:
+                    self.state.record(
+                        f"phase:{outcome.phase}",
+                        {"status": outcome.status, "report": outcome.report})
+                    reports[outcome.phase] = outcome.report
+                    outcomes.append(outcome)
+                if any(o.status in HALT_STATUSES for o in group_outcomes):
+                    break
+                continue
+
             # Placeholder substitution by literal replace, not str.format —
             # phase reports routinely contain braces (JSON, code) that would
             # blow up format parsing.
+            phase_start_usd = self.budget.spent_usd
+            phase_start_tokens = self.budget.spent_tokens
+            self.events.emit("phase_start", phase=name,
+                             spent_usd=round(phase_start_usd, 4),
+                             spent_tokens=phase_start_tokens)
             task = phase["task"]
             for key, value in reports.items():
                 text = str(value)
@@ -188,12 +231,17 @@ class WorkflowRunner:
 
             if phase.get("mode") == "adversarial":
                 outcome = self._run_adversarial_phase(name, phase, task)
+                self._stamp_phase_cost(outcome, phase_start_usd,
+                                       phase_start_tokens)
                 self.state.record(f"phase:{name}",
                                   {"status": outcome.status, "report": outcome.report})
                 reports[name] = outcome.report
                 outcomes.append(outcome)
                 self.events.emit("phase_done", phase=name, status=outcome.status,
-                                 spent_usd=round(self.budget.spent_usd, 4))
+                                 spent_usd=round(self.budget.spent_usd, 4),
+                                 spent_tokens=self.budget.spent_tokens,
+                                 phase_spent_usd=outcome.spent_usd,
+                                 phase_spent_tokens=outcome.spent_tokens)
                 if outcome.status in HALT_STATUSES:
                     break
                 continue
@@ -255,12 +303,16 @@ class WorkflowRunner:
                     self.registry.approval_handler = prev_handler
                 outcome = PhaseOutcome(name, gres.status, gres.final_report)
 
+            self._stamp_phase_cost(outcome, phase_start_usd, phase_start_tokens)
             self.state.record(f"phase:{name}",
                               {"status": outcome.status, "report": outcome.report})
             reports[name] = outcome.report
             outcomes.append(outcome)
             self.events.emit("phase_done", phase=name, status=outcome.status,
-                             spent_usd=round(self.budget.spent_usd, 4))
+                             spent_usd=round(self.budget.spent_usd, 4),
+                             spent_tokens=self.budget.spent_tokens,
+                             phase_spent_usd=outcome.spent_usd,
+                             phase_spent_tokens=outcome.spent_tokens)
             if outcome.status in HALT_STATUSES:
                 break   # fail closed: later phases would build on unverified work
 
@@ -269,6 +321,153 @@ class WorkflowRunner:
                          spent_usd=round(self.budget.spent_usd, 4),
                          proofs=self.proofs.listing())
         return outcomes
+
+    def _run_parallel_group(
+        self,
+        phases: list[dict],
+        reports: dict[str, str],
+    ) -> list[PhaseOutcome]:
+        snapshot = dict(reports)
+        self.events.emit("parallel_group_start",
+                         group=phases[0].get("parallel"),
+                         phases=[p["name"] for p in phases])
+        with ThreadPoolExecutor(max_workers=len(phases)) as pool:
+            futures = [
+                pool.submit(self._run_parallel_phase, phase, snapshot)
+                for phase in phases
+            ]
+            outcomes = [future.result() for future in futures]
+        self.events.emit("parallel_group_done",
+                         group=phases[0].get("parallel"),
+                         statuses={o.phase: o.status for o in outcomes})
+        return outcomes
+
+    def _run_parallel_phase(
+        self,
+        phase: dict,
+        reports: dict[str, str],
+    ) -> PhaseOutcome:
+        name = phase["name"]
+        if phase.get("mode") == "adversarial":
+            return PhaseOutcome(
+                name, "needs_human",
+                "adversarial phases cannot run inside a parallel worker group")
+        if self.state.has(f"phase:{name}"):
+            prior = self.state.result(f"phase:{name}")
+            if prior.get("status") == "passed":
+                return PhaseOutcome(name, "skipped_resume",
+                                    prior.get("report", ""))
+        phase_start_usd = self.budget.spent_usd
+        phase_start_tokens = self.budget.spent_tokens
+        workspace = self.root / "workspace" / ".phases" / name
+        workspace.mkdir(parents=True, exist_ok=True)
+        phase_budget = Budget(max_usd=self.budget.max_usd,
+                              max_tokens=self.budget.max_tokens)
+        registry = ToolRegistry()
+        register_builtin(registry, workspace=workspace,
+                         ledger=None, events=self.events,
+                         memory=self.memory,
+                         provenance=f"run {self.run_id}, phase {name}")
+        task = self._render_task(phase, reports)
+        outcome = self._execute_standard_phase(
+            phase, task, workspace=workspace, registry=registry,
+            budget=phase_budget)
+        outcome.spent_usd = round(phase_budget.spent_usd, 6)
+        outcome.spent_tokens = phase_budget.spent_tokens
+        self.budget.add_spend(phase_budget.spent_usd, phase_budget.spent_tokens)
+        self.events.emit("phase_done", phase=name, status=outcome.status,
+                         parallel=phase.get("parallel"),
+                         workspace=str(workspace),
+                         spent_usd=round(self.budget.spent_usd, 4),
+                         spent_tokens=self.budget.spent_tokens,
+                         phase_spent_usd=outcome.spent_usd,
+                         phase_spent_tokens=outcome.spent_tokens)
+        return outcome
+
+    def _render_task(self, phase: dict, reports: dict[str, str]) -> str:
+        name = phase["name"]
+        task = phase["task"]
+        for key, value in reports.items():
+            text = str(value)
+            if key != "goal":
+                text, flags = guard_result(text, source=f"phase:{key}")
+                if flags:
+                    self.events.emit("injection_flag", phase=name,
+                                     source=f"phase:{key}", flags=flags)
+            task = task.replace("{" + key + "}", text)
+        if phase.get("inject_memory_status"):
+            task = task.rstrip() + "\n\n" + self._memory_status_block()
+        return task
+
+    def _execute_standard_phase(
+        self,
+        phase: dict,
+        task: str,
+        workspace: Path,
+        registry: ToolRegistry,
+        budget: Budget | None = None,
+    ) -> PhaseOutcome:
+        name = phase["name"]
+        task_class = phase.get("task_class", "default")
+        route = self.router.route(task_class)
+        checks = [Check(**c) for c in phase.get("verify", {}).get("checks", [])]
+        verifier_name = phase.get("verify", {}).get("verifier")
+        agent_name = phase.get("agent", "orchestrator")
+        max_steps = int(phase.get("max_steps", 40))
+        deny_tools = frozenset(phase.get("deny_tools", []))
+        allow_network = bool(phase.get("allow_network", False))
+
+        if self.roles.get(agent_name).kind == "orchestrator":
+            result = self._run_role(agent_name, task, route, max_steps=max_steps,
+                                    deny_tools=deny_tools,
+                                    allow_network=allow_network,
+                                    registry=registry,
+                                    budget=budget)
+            return PhaseOutcome(
+                name, "passed" if result.ok else "needs_human", result.report)
+
+        consent_required = bool(phase.get("consent", True))
+        gate = VerificationGate(
+            workspace=workspace, proofs=self.proofs,
+            events=self.events,
+            max_attempts=int(phase.get("verify", {}).get("max_attempts", 3)))
+        prev_handler = registry.approval_handler
+        registry.approval_handler = self._approval_handler_for(
+            name, frozenset(phase.get("approve_tools", [])))
+        try:
+            gres: GateResult = gate.run(
+                task=task,
+                attempt_fn=lambda t, r: self._run_role(
+                    agent_name, t, r, max_steps=max_steps,
+                    deny_tools=deny_tools, allow_network=allow_network,
+                    consent_required=consent_required, registry=registry,
+                    budget=budget),
+                verify_fn=(
+                    (lambda worker_report: self._run_role(
+                        verifier_name,
+                        self._verifier_task(task, phase, worker_report),
+                        self.router.route(
+                            phase.get("verify", {}).get("task_class", "verify")),
+                        max_steps=20,
+                        registry=registry,
+                        budget=budget))
+                    if verifier_name else None),
+                checks=checks,
+                route=route,
+                allow_network=allow_network,
+                harness_checks=self._harness_checks(phase))
+        finally:
+            registry.approval_handler = prev_handler
+        return PhaseOutcome(name, gres.status, gres.final_report)
+
+    def _stamp_phase_cost(
+        self,
+        outcome: PhaseOutcome,
+        start_usd: float,
+        start_tokens: int,
+    ) -> None:
+        outcome.spent_usd = round(self.budget.spent_usd - start_usd, 6)
+        outcome.spent_tokens = self.budget.spent_tokens - start_tokens
 
     # -- governance helpers ----------------------------------------------------
 
@@ -281,6 +480,24 @@ class WorkflowRunner:
                 self.events.emit("approval_granted", tool=tool,
                                  phase=phase_name, source="workflow-config")
                 return True
+            if self.approval_policy is not None:
+                decision = self.approval_policy.decide(phase_name, tool, args)
+                if decision is not None:
+                    kind = "approval_granted" if decision else "approval_denied"
+                    self.events.emit(kind, tool=tool, phase=phase_name,
+                                     source="policy-file")
+                    if self.approval_policy.problems:
+                        self.events.emit("approval_policy_invalid",
+                                         phase=phase_name,
+                                         problems=self.approval_policy.problems)
+                    return decision
+            if self.interactive_approvals:
+                decision = tty_approval(phase_name, tool, args)
+                if decision is not None:
+                    kind = "approval_granted" if decision else "approval_denied"
+                    self.events.emit(kind, tool=tool, phase=phase_name,
+                                     source="tty")
+                    return decision
             self.events.emit("approval_denied", tool=tool,
                              phase=phase_name, source="default-deny")
             return False

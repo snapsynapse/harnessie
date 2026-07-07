@@ -17,6 +17,7 @@ reports rather than silently burning money.
 
 from __future__ import annotations
 
+import threading
 from dataclasses import dataclass, field
 
 from .models.base import EFFORT_LEVELS, ModelSpec
@@ -48,11 +49,18 @@ class Budget:
     max_tokens: int = 2_000_000
     spent_usd: float = 0.0
     spent_tokens: int = 0
+    _lock: object = field(default_factory=threading.Lock, repr=False)
 
     def charge(self, spec: ModelSpec, tokens_in: int, tokens_out: int) -> None:
-        self.spent_tokens += tokens_in + tokens_out
-        self.spent_usd += (tokens_in * spec.cost_per_mtok_in
-                           + tokens_out * spec.cost_per_mtok_out) / 1_000_000
+        with self._lock:
+            self.spent_tokens += tokens_in + tokens_out
+            self.spent_usd += (tokens_in * spec.cost_per_mtok_in
+                               + tokens_out * spec.cost_per_mtok_out) / 1_000_000
+
+    def add_spend(self, spent_usd: float, spent_tokens: int) -> None:
+        with self._lock:
+            self.spent_usd += spent_usd
+            self.spent_tokens += spent_tokens
 
     @property
     def exhausted(self) -> bool:

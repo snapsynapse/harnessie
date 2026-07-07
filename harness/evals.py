@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import tempfile
 import textwrap
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -18,7 +19,7 @@ import yaml
 
 from .events import EventLog
 from .loop import AgentLoop
-from .models.base import AssistantTurn, MockModel, ModelSpec, ToolCall
+from .models.base import AssistantTurn, Message, MockModel, ModelSpec, ToolCall
 from .runner import WorkflowRunner
 from .tools.builtin import register_builtin
 from .tools.registry import ToolRegistry
@@ -83,6 +84,8 @@ def run_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
         return _run_audit_scenario(scenario)
     if kind == "triage":
         return _run_triage_scenario(scenario)
+    if kind == "parallel":
+        return _run_parallel_scenario(scenario)
     return EvalCaseResult(
         id=scenario.get("id", "(missing-id)"),
         passed=False,
@@ -278,10 +281,16 @@ def _run_triage_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
         if scenario.get("corrupt_index"):
             mem.index_path.write_text(mem.index_path.read_text()
                                       + "- [Ghost](facts/ghost.md) `lesson`\n")
+        approval_policy = None
+        if scenario.get("approval_policy"):
+            approval_policy = root / "approval-policy.yaml"
+            approval_policy.write_text(yaml.safe_dump(scenario["approval_policy"]),
+                                       encoding="utf-8")
         statuses = _run_scripted_workflow(root, "evalrun",
                                           scenario.get("script", []),
                                           scenario.get("goal", ""),
-                                          workflow="triage.yaml")
+                                          workflow="triage.yaml",
+                                          approval_policy=approval_policy)
         expected = scenario["expect_statuses"]
         if statuses != expected:
             problems.append(f"statuses={statuses}, expected {expected}")
@@ -297,6 +306,61 @@ def _run_triage_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
             slug = scenario["expect_fact_kept"]
             if not (root / "memory" / "facts" / f"{slug}.md").exists():
                 problems.append(f"fact should have been kept: {slug}")
+    return EvalCaseResult(
+        id=scenario["id"],
+        passed=not problems,
+        expected=expected,
+        observed=problems or "ok",
+    )
+
+
+def _run_parallel_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
+    problems: list[str] = []
+    with tempfile.TemporaryDirectory(prefix="harnessie-eval-") as d:
+        root = Path(d)
+        _scaffold_eval_project(root, max_attempts=1, parallel=True)
+
+        def brain(messages: list[Message]) -> AssistantTurn:
+            task = messages[1].content
+            if messages[-1].name == "accept_task" and "Write left" in task:
+                return _turn({"tool": "write_file",
+                              "args": {"path": "out.txt", "content": "left"}}, 1)
+            if messages[-1].name == "accept_task" and "Write right" in task:
+                return _turn({"tool": "write_file",
+                              "args": {"path": "out.txt", "content": "right"}}, 1)
+            if messages[-1].name == "write_file":
+                return _turn({"tool": "task_complete",
+                              "args": {"report": f"wrote {task.split()[1]}"}}, 1)
+            if "Plan for goal" in task:
+                return _turn({"tool": "task_complete", "args": {"report": "PLAN"}}, 1)
+            if "Write left" in task or "Write right" in task:
+                time.sleep(0.2)
+                return _turn({"tool": "accept_task", "args": {}}, 1)
+            if "Summarize" in task:
+                return _turn({"tool": "task_complete", "args": {"report": "FINAL"}}, 1)
+            return _turn({"tool": "task_complete", "args": {"report": "done"}}, 1)
+
+        runner = WorkflowRunner(project_root=root, run_id="evalrun", echo=False)
+        runner._models["mid"] = MockModel(
+            ModelSpec(name="mid", provider="mock", model_id="mock"),
+            fn=brain)
+        start = time.monotonic()
+        outcomes = runner.run_workflow(root / "workflows" / "parallel.yaml",
+                                       goal=scenario.get("goal", "eval goal"))
+        elapsed = time.monotonic() - start
+        observed = [o.status for o in outcomes]
+        expected = scenario["expect_statuses"]
+        if observed != expected:
+            problems.append(f"statuses={observed}, expected {expected}")
+        limit = scenario.get("expect_elapsed_lt")
+        if limit is not None and elapsed >= float(limit):
+            problems.append(f"elapsed={elapsed:.3f}, expected < {limit}")
+        for rel, content in (scenario.get("expect_files") or {}).items():
+            target = root / "workspace" / ".phases" / rel
+            if not target.exists():
+                problems.append(f"expected file missing: {rel}")
+            elif target.read_text(encoding="utf-8") != content:
+                problems.append(f"file {rel} content mismatch")
     return EvalCaseResult(
         id=scenario["id"],
         passed=not problems,
@@ -381,8 +445,10 @@ def _run_resume_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
 
 
 def _run_scripted_workflow(root: Path, run_id: str, script: list[dict[str, Any]],
-                           goal: str, workflow: str = "eval.yaml") -> list[str]:
-    runner = WorkflowRunner(project_root=root, run_id=run_id, echo=False)
+                           goal: str, workflow: str = "eval.yaml",
+                           approval_policy: Path | None = None) -> list[str]:
+    runner = WorkflowRunner(project_root=root, run_id=run_id, echo=False,
+                            approval_policy=approval_policy)
     runner._models["mid"] = MockModel(
         ModelSpec(name="mid", provider="mock", model_id="mock"),
         script=[_turn(t, i) for i, t in enumerate(script, 1)],
@@ -415,7 +481,8 @@ def _turn(spec: dict[str, Any], idx: int) -> AssistantTurn:
 def _scaffold_eval_project(root: Path, max_attempts: int,
                            adversarial: bool = False,
                            triage: bool = False,
-                           approve_expiry: bool = False) -> None:
+                           approve_expiry: bool = False,
+                           parallel: bool = False) -> None:
     (root / "agents" / "workers").mkdir(parents=True)
     (root / "agents" / "verifiers").mkdir(parents=True)
     (root / "agents" / "orchestrator.md").write_text("# Orchestrator\nPlan and integrate.")
@@ -479,6 +546,29 @@ def _scaffold_eval_project(root: Path, max_attempts: int,
             '  - name: summary\n'
             '    agent: orchestrator\n'
             '    task: "Summarize: {triage}"\n')
+    if parallel:
+        (root / "workflows" / "parallel.yaml").write_text(textwrap.dedent("""
+            name: parallel
+            phases:
+              - name: plan
+                agent: orchestrator
+                task: "Plan for goal: {goal}"
+              - name: left
+                parallel: workers
+                agent: implementer
+                task: "Write left out.txt from {plan}"
+                verify:
+                  max_attempts: 1
+              - name: right
+                parallel: workers
+                agent: implementer
+                task: "Write right out.txt from {plan}"
+                verify:
+                  max_attempts: 1
+              - name: integrate
+                agent: orchestrator
+                task: "Summarize {left} and {right}"
+        """))
 
 
 def format_scorecard(scorecard: dict[str, Any]) -> str:

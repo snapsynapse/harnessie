@@ -1,0 +1,26 @@
+# v0.5 operability scorecard: approval policy and parallel workers.
+suite: operability
+description: Headless approval policy and independent parallel phase execution.
+scenarios:
+  - id: approval_policy_allows_requires_approval_tool
+    kind: triage
+    approve_expiry: false
+    approval_policy:
+      allow:
+        - tool: expire_fact
+          phase: triage
+    script:
+      - { tool: accept_task, args: { note: "memory status reviewed" } }
+      - { tool: expire_fact, args: { slug: stale-fact, reason: past verify_by } }
+      - { tool: task_complete, args: { report: "expired stale fact under policy" } }
+      - { tool: task_complete, args: { report: "summary" } }
+    expect_statuses: [passed, passed]
+    expect_archived: stale-fact
+
+  - id: parallel_phases_use_independent_workspaces
+    kind: parallel
+    expect_statuses: [passed, passed, passed, passed]
+    expect_elapsed_lt: 0.35
+    expect_files:
+      left/out.txt: left
+      right/out.txt: right
