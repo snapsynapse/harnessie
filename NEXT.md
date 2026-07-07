@@ -5,7 +5,7 @@ Harnessie is at v0.3.3 on `main`, pushed. Two bodies of work this cycle: core ha
 Engineering:
 - v0.3.2 verification rotation confirmed the Codex patch and surfaced three findings; v0.3.3 mitigates all three (refusal events carry `detail`/`why` and the eval checker asserts on the event not truncated `tool_result` content; the stuck detector counts policy refusals regardless of the `ok` flag; `find_secrets` returns kind labels, never value fragments).
 - SEC-001 (from this cycle's security audit): inter-phase reports now pass through the quarantine filter before task substitution, like `read_file` results.
-- 0.4 portability: Linux sandbox backends (bwrap preferred, firejail, docker; startup smoke tests; fail closed when unusable) plus `.github/workflows/ci.yml` (Linux bubblewrap parity, macOS, no-backend fail-closed). CI has been pushed and runs on GitHub; the next session should confirm the matrix is green (check the Actions tab) rather than assume.
+- 0.4 portability: Linux sandbox backends (bwrap preferred, firejail, docker; startup smoke tests; fail closed when unusable) plus `.github/workflows/ci.yml`. The CI matrix is GREEN on a real run (2026-07-07): macOS, Linux bubblewrap parity, and no-backend fail-closed all pass. The first run caught one macOS-hardcoded test (`test_wrap_returns_sandbox_prefixed_argv` asserted `sandbox-exec`); fixed to assert the admitted backend. This is the 0.4 portability acceptance met on a real run. Non-blocking annotation: the checkout/setup-python actions still target Node 20 (auto-forced to Node 24); bump the action versions when convenient.
 
 Public surface (staged under prepare-and-stage; NOT live):
 - Landing page `docs/index.html` at canonical `harnessie.com` plus crawler/discovery files (favicon, CNAME, sitemap, robots.txt with AI/SEO allowlist, llms.txt, site.webmanifest, 404). Light theme built around the Nessie mascot; copy rewritten for newcomers and developers both; the tenets appear as four plain-language guarantees.
@@ -27,7 +27,7 @@ Public surface (staged under prepare-and-stage; NOT live):
 4. Verify PostHog: visit the live page, confirm a pageview lands in the dedicated Harnessie project (needs a PostHog login). Optionally set up dashboards.
 5. On promotion, the standard release path applies (annotated tag, RELEASE_CHECKLIST, CI-gate-before-tag) per INTENT §8.
 ## Next unblocked engineering work (0.4 remainder)
-- Confirm the CI matrix is green; a red Linux job is top priority.
+- CI matrix is green on a real run (done). Optional: bump checkout/setup-python action versions to clear the Node 20 deprecation annotation.
 - Live-endpoint smoke tests (one loop turn against a real Anthropic endpoint and one local OpenAI-compatible endpoint, opt-in by env var). Step 11.
 - Scorecard expansion against real endpoints, including the governance suite per brain. Steps 11-12.
 - Live contested phase across two real providers on `workflows/contested-decision.yaml`.
