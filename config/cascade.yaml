@@ -1,0 +1,36 @@
+# Cascade routing policies (0.7 sovereignty layer; adopted via decisions/AIDR-0004).
+#
+# A workflow phase opts in by naming a policy instead of a fixed task_class
+# tier; phases that do not opt in behave exactly as before. A policy declares
+# its tier ladder, which failure reasons climb it (gate_fail, schema_fail,
+# refusal, tool_contract), a maximum climb, and an on-exhaust action
+# (reduce_scope or defer) — exhaustion is never silent.
+#
+# A contained policy's ladder may only use unexposed tiers (local, sovereign):
+# data the boundary cannot classify never egresses to an exposed provider.
+#
+# Work classes under reserved: never reach any model at any tier and halt
+# with a named operator action. Arbitration is reserved by default — the
+# standing human-only rule, enforced as config rather than convention.
+
+policies:
+  # Example: spend as little as possible, climb only on verified failure,
+  # and hand to the operator rather than silently burning frontier tokens.
+  # cheap-first:
+  #   ladder: [local, mid, frontier]
+  #   escalate_on: [gate_fail, schema_fail]
+  #   max_climb: 2
+  #   on_exhaust: defer
+
+  # Example: free-text-sensitive work stays under operator control; the
+  # ladder cannot name an exposed tier at all.
+  # contained-local:
+  #   ladder: [local, sovereign]
+  #   data_classes: [freeform_sensitive]
+  #   contained: true
+  #   escalate_on: [gate_fail]
+  #   max_climb: 1
+  #   on_exhaust: defer
+
+reserved:
+  - arbitration
