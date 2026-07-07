@@ -10,6 +10,7 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 - Landing page Quick start gains "Option 1: AI-assisted, with a verifiable guide": point an assistant at the served GuideCheck guide instead of letting it improvise an install from web search, with the safety rationale stated (same bytes for human and assistant, verify-then-approve, pre-declared read-only actions, nothing installs or spends without explicit approval). The hand-install path becomes Option 2.
 - Landing page and JSON-LD "builds on" credits swap HardGuard25 for GuideCheck; hero CTA, feature links, and footer doc links now point at the on-site pages instead of GitHub; footer gains a Quickstart link.
 - `docs/sitemap.xml` lists the five new doc pages; `docs/llms.txt` Key files point at the on-site pages; `docs/MANIFEST.yaml` re-pinned for both.
+- Published harnessie 0.6.0 to PyPI (wheel + sdist; twine check passed; artifacts swept for private files before upload; LICENSE and NOTICE ship in both). `pip install harnessie` (or pipx / `uv tool install`) is now the documented entry across README, quickstart, getting-started, and the landing page's Option 2, each ending on the guided init's zero-dollar green run; source install is kept for development. Verified by a fresh install from the live index reaching the green readiness report.
 
 ## 0.6.0 (2026-07-07)
 

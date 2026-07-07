@@ -98,11 +98,9 @@
 <ul><li>A computer running macOS, Linux, or Windows with WSL2 (see <a href="#running-on-windows">Running on Windows</a> below).</li><li>Python 3.11 or newer. To check, open a terminal and run <code>python3 --version</code>. If it prints 3.11 or higher, you are set. If not, install Python from python.org first.</li><li>A terminal. On macOS it is the Terminal app; on Linux it is your shell; on Windows it is the WSL2 (Ubuntu) window.</li></ul>
 <p>You do not need an API key, a credit card, or a cloud account to finish this quickstart.</p>
 <h2 id="step-1-get-harnessie">Step 1: Get Harnessie</h2>
-<p>Until Harnessie is published to the Python package index, you install it from source. Paste these lines into your terminal one block at a time:</p>
-<pre><code>git clone https://github.com/snapsynapse/harnessie.git
-cd harnessie
-pip install -e &quot;.[dev]&quot;</code></pre>
-<p>The first line downloads the code, the second moves into its folder, and the third installs the <code>harnessie</code> command. If <code>pip</code> is not found, try <code>python3 -m pip</code> in its place.</p>
+<p>One line installs the <code>harnessie</code> command from the Python package index:</p>
+<pre><code>pip install harnessie</code></pre>
+<p>If <code>pip</code> is not found, try <code>python3 -m pip install harnessie</code>. If you use pipx or uv, <code>pipx install harnessie</code> and <code>uv tool install harnessie</code> work the same way. You do not need to download or clone anything.</p>
 <h2 id="step-2-let-the-tool-check-your-machine">Step 2: Let the tool check your machine</h2>
 <p>Create your own project and let Harnessie tell you whether everything is ready:</p>
 <pre><code>harnessie init my-first-project</code></pre>

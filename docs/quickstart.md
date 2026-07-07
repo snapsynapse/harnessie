@@ -20,15 +20,13 @@ You do not need an API key, a credit card, or a cloud account to finish this qui
 
 ## Step 1: Get Harnessie
 
-Until Harnessie is published to the Python package index, you install it from source. Paste these lines into your terminal one block at a time:
+One line installs the `harnessie` command from the Python package index:
 
 ```bash
-git clone https://github.com/snapsynapse/harnessie.git
-cd harnessie
-pip install -e ".[dev]"
+pip install harnessie
 ```
 
-The first line downloads the code, the second moves into its folder, and the third installs the `harnessie` command. If `pip` is not found, try `python3 -m pip` in its place.
+If `pip` is not found, try `python3 -m pip install harnessie`. If you use pipx or uv, `pipx install harnessie` and `uv tool install harnessie` work the same way. You do not need to download or clone anything.
 
 ## Step 2: Let the tool check your machine
 

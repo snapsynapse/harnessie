@@ -11,6 +11,12 @@ Beneath that thesis sit five engineering habits, each proven separately in the a
 ## Quick start
 
 ```bash
+pip install harnessie                # from PyPI; or pipx/uv tool install
+harnessie init my-project            # scaffold + guided readiness check + zero-dollar mock run
+```
+
+Developing on the harness itself, install from source:
+```bash
 pip install -e ".[dev]"
 python3 -m pytest -q                 # mock brain, no network
 python3 -m harness.cli eval          # deterministic eval scorecard
@@ -19,11 +25,6 @@ export ANTHROPIC_API_KEY=sk-ant-...  # or point tiers at a local endpoint
 python3 -m harness.cli run workflows/build-and-verify.yaml --goal "a CLI todo app with tests"
 python3 -m harness.cli report <run_id>
 python3 -m harness.cli audit <run_id>   # verify the hash chain + governance timeline
-```
-
-Installed CLI usage can scaffold a fresh project layout:
-```bash
-harnessie init my-harnessie-project
 ```
 
 Worked end-to-end example with sample data: [examples/policy-compliance/README.md](examples/policy-compliance/README.md).

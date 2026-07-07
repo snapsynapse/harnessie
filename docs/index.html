@@ -607,17 +607,16 @@
     <div class="code-grid">
       <div class="code-block">
         <h3>Option 2: Install by hand</h3>
-<pre>git clone https://github.com/snapsynapse/harnessie.git
-cd harnessie
-pip install -e ".[dev]"
+<pre>pip install harnessie   # or pipx / uv tool install
 
-python3 -m pytest -q          # mock brain, offline
-python3 -m harness.cli eval   # deterministic scorecard
+harnessie init my-project   # guided readiness check
+cd my-project               # + zero-dollar mock run
 
 export ANTHROPIC_API_KEY=...  # or a local endpoint
-python3 -m harness.cli run \
+harnessie run \
   workflows/build-and-verify.yaml \
-  --goal "a CLI todo app with tests"</pre>
+  --goal "a CLI todo app with tests"
+harnessie report &lt;run_id&gt;   # plain-language result</pre>
       </div>
 
       <div class="code-block">

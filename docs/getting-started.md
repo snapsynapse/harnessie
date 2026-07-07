@@ -11,6 +11,14 @@ In more technical terms: Harnessie is a brain-agnostic multi-agent harness. An o
 Requires Python 3.11 or newer. The only runtime dependency is PyYAML; the model adapters are standard-library, so no vendor SDK is needed.
 
 ```bash
+pip install harnessie          # or: pipx install harnessie / uv tool install harnessie
+harnessie init my-project      # scaffold + guided readiness check + zero-dollar mock run
+cd my-project
+```
+
+Working on Harnessie itself (or wanting the test suite)? Install from source instead:
+
+```bash
 git clone https://github.com/snapsynapse/harnessie.git
 cd harnessie
 pip install -e ".[dev]"
