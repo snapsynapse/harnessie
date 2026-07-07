@@ -361,12 +361,15 @@ class WorkflowRunner:
             if prior.get("status") == "passed":
                 return PhaseOutcome(name, "skipped_resume",
                                     prior.get("report", ""))
-        phase_start_usd = self.budget.spent_usd
-        phase_start_tokens = self.budget.spent_tokens
+        phase_budget = self.budget.child()
+        if phase_budget.exhausted:
+            return PhaseOutcome(
+                name, "needs_human",
+                "run budget exhausted before this parallel phase started; "
+                "raise the ceiling in config/models.yaml (budget:) and resume "
+                "the run")
         workspace = self.root / "workspace" / ".phases" / name
         workspace.mkdir(parents=True, exist_ok=True)
-        phase_budget = Budget(max_usd=self.budget.max_usd,
-                              max_tokens=self.budget.max_tokens)
         registry = ToolRegistry()
         register_builtin(registry, workspace=workspace,
                          ledger=None, events=self.events,
@@ -378,7 +381,7 @@ class WorkflowRunner:
             budget=phase_budget)
         outcome.spent_usd = round(phase_budget.spent_usd, 6)
         outcome.spent_tokens = phase_budget.spent_tokens
-        self.budget.add_spend(phase_budget.spent_usd, phase_budget.spent_tokens)
+        # charges flowed to self.budget live via the child budget; no merge here
         self.events.emit("phase_done", phase=name, status=outcome.status,
                          parallel=phase.get("parallel"),
                          workspace=str(workspace),

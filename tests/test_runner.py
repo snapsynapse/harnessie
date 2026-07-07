@@ -315,3 +315,76 @@ def test_parallel_phases_use_independent_workspaces_and_beat_sequential(tmp_path
     assert (tmp_path / "workspace" / ".phases" / "left" / "out.txt").read_text() == "left"
     assert (tmp_path / "workspace" / ".phases" / "right" / "out.txt").read_text() == "right"
     assert not (tmp_path / "workspace" / "out.txt").exists()
+
+
+def test_parallel_phase_refuses_when_run_budget_already_exhausted(tmp_path, monkeypatch):
+    monkeypatch.setattr(sandbox, "wrap",
+                        lambda argv, workspace, allow_network=False: argv)
+    scaffold_project(tmp_path)
+    (tmp_path / "workflows" / "parbudget.yaml").write_text(textwrap.dedent("""
+        name: parbudget
+        phases:
+          - name: left
+            parallel: workers
+            agent: implementer
+            task: "left {goal}"
+          - name: right
+            parallel: workers
+            agent: implementer
+            task: "right {goal}"
+    """))
+    runner = WorkflowRunner(project_root=tmp_path, run_id="parbudget", echo=False)
+    brain = MockModel(ModelSpec(name="mid", provider="mock", model_id="mock"))
+    runner._models["mid"] = brain
+    runner.budget.add_spend(runner.budget.max_usd, 0)   # run enters the group broke
+
+    outcomes = runner.run_workflow(tmp_path / "workflows" / "parbudget.yaml", goal="g")
+
+    assert [o.status for o in outcomes] == ["needs_human", "needs_human"]
+    assert all("budget exhausted" in o.report for o in outcomes)
+    assert brain.calls == []                            # refused before any dispatch
+    assert not (tmp_path / "workspace" / ".phases").exists()
+
+
+def test_parallel_spend_flows_to_run_budget_without_double_count(tmp_path, monkeypatch):
+    monkeypatch.setattr(sandbox, "wrap",
+                        lambda argv, workspace, allow_network=False: argv)
+    scaffold_project(tmp_path)
+    (tmp_path / "workflows" / "parcost.yaml").write_text(textwrap.dedent("""
+        name: parcost
+        phases:
+          - name: left
+            parallel: workers
+            agent: implementer
+            task: "Write left {goal}"
+          - name: right
+            parallel: workers
+            agent: implementer
+            task: "Write right {goal}"
+          - name: integrate
+            agent: orchestrator
+            task: "Summarize {left} and {right}"
+    """))
+
+    def brain(messages):
+        return AssistantTurn(
+            content="", stop_reason="tool_use",
+            tool_calls=[ToolCall(id="c", name="task_complete",
+                                 arguments={"report": "done"})],
+            input_tokens=10, output_tokens=5)
+
+    runner = WorkflowRunner(project_root=tmp_path, run_id="parcost", echo=False)
+    runner._models["mid"] = MockModel(
+        ModelSpec(name="mid", provider="mock", model_id="mock",
+                  cost_per_mtok_in=10.0, cost_per_mtok_out=20.0), fn=brain)
+
+    outcomes = runner.run_workflow(tmp_path / "workflows" / "parcost.yaml", goal="g")
+
+    assert [o.status for o in outcomes] == ["passed", "passed", "passed"]
+    # every charge flowed through the child budgets exactly once: the run
+    # total equals the sum of per-phase spends (the old merge double-counted
+    # if combined with charge-through, and lost mid-group enforcement without)
+    assert runner.budget.spent_tokens == sum(o.spent_tokens for o in outcomes)
+    assert runner.budget.spent_tokens == 45              # 3 calls x 15 tokens
+    assert round(runner.budget.spent_usd, 6) == round(
+        sum(o.spent_usd for o in outcomes), 6)

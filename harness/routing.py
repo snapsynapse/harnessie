@@ -50,20 +50,41 @@ class Budget:
     spent_usd: float = 0.0
     spent_tokens: int = 0
     _lock: object = field(default_factory=threading.Lock, repr=False)
+    _parent: "Budget | None" = field(default=None, repr=False)
 
     def charge(self, spec: ModelSpec, tokens_in: int, tokens_out: int) -> None:
         with self._lock:
             self.spent_tokens += tokens_in + tokens_out
             self.spent_usd += (tokens_in * spec.cost_per_mtok_in
                                + tokens_out * spec.cost_per_mtok_out) / 1_000_000
+        if self._parent is not None:
+            self._parent.charge(spec, tokens_in, tokens_out)
 
     def add_spend(self, spent_usd: float, spent_tokens: int) -> None:
         with self._lock:
             self.spent_usd += spent_usd
             self.spent_tokens += spent_tokens
+        if self._parent is not None:
+            self._parent.add_spend(spent_usd, spent_tokens)
+
+    def child(self) -> "Budget":
+        """Headroom-scoped view for one parallel phase.
+
+        The child's ceiling is what the run has left at creation time, and
+        every charge flows through to the parent, so sibling phases see each
+        other's spend mid-group. Overshoot is bounded to the model turns
+        already in flight when the ceiling is crossed, not (N-1)x the run
+        ceiling as with an independently seeded copy.
+        """
+        with self._lock:
+            return Budget(max_usd=max(self.max_usd - self.spent_usd, 0.0),
+                          max_tokens=max(self.max_tokens - self.spent_tokens, 0),
+                          _parent=self)
 
     @property
     def exhausted(self) -> bool:
+        if self._parent is not None and self._parent.exhausted:
+            return True
         return self.spent_usd >= self.max_usd or self.spent_tokens >= self.max_tokens
 
 

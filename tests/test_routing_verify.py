@@ -46,6 +46,44 @@ def test_budget_accounting():
     assert b.exhausted   # 0.01 ceiling crossed
 
 
+def test_child_budget_is_headroom_seeded_and_charges_through():
+    spec = ModelSpec("x", "mock", "m", cost_per_mtok_in=5.0, cost_per_mtok_out=25.0)
+    parent = Budget(max_usd=1.0, max_tokens=10_000)
+    parent.add_spend(0.4, 4_000)
+
+    child = parent.child()
+    assert round(child.max_usd, 6) == 0.6          # remaining headroom, not the run ceiling
+    assert child.max_tokens == 6_000
+    assert child.spent_usd == 0.0
+
+    child.charge(spec, tokens_in=1000, tokens_out=200)
+    charged = (1000 * 5 + 200 * 25) / 1e6
+    assert round(child.spent_usd, 6) == round(charged, 6)
+    # the same charge landed on the parent live, no merge step needed
+    assert round(parent.spent_usd, 6) == round(0.4 + charged, 6)
+    assert parent.spent_tokens == 4_000 + 1200
+
+
+def test_child_budget_sees_sibling_spend_via_parent_exhaustion():
+    parent = Budget(max_usd=1.0, max_tokens=10_000)
+    a = parent.child()
+    b = parent.child()
+    assert not a.exhausted and not b.exhausted
+    # sibling a spends the run to its ceiling; b must stop even though b
+    # itself has spent nothing (this was the 0.6 known-limit overshoot)
+    a.add_spend(1.0, 0)
+    assert parent.exhausted
+    assert b.exhausted
+
+
+def test_child_of_exhausted_budget_starts_exhausted():
+    parent = Budget(max_usd=0.5, max_tokens=10_000)
+    parent.add_spend(0.5, 0)
+    child = parent.child()
+    assert child.max_usd == 0.0
+    assert child.exhausted
+
+
 def test_parse_verdict_last_object_wins_and_fails_closed():
     ok = parse_verdict('All good.\n```json\n{"passed": true, "reasons": "fine"}\n```')
     assert ok.passed
