@@ -1,7 +1,7 @@
 # Harnessie INTENT
 
-Tier: personal-utility (private). Trajectory: public release under Snap Synapse LLC.
-Canonical home (registered, private until launch): https://harnessie.com/
+Tier: public tool under Snap Synapse LLC (launched 2026-07-07: repo public, site live, 0.6.0 on PyPI).
+Canonical home: https://harnessie.com/
 
 Entity decision (2026-07-06, Sam): Harnessie releases as a Snap Synapse LLC project, not a PAICE.work PBC portfolio component. Rationale: Snap Synapse is the tools-people-use brand and the repo already lives at snapsynapse/harnessie; a PAICE release would frame it inward as a standards reference implementation, while the strategic value runs the other way. Harnessie is a distribution vector FOR the PAICE specs: it enforces Turnfile and AIDR lessons in code and credits them on its public surfaces, so adoption of the tool pulls discovery of the standards. The corresponding portfolio-level line lives in paice-foundation/INTENT.md.
 
@@ -36,7 +36,7 @@ Most AI products fail at the harness layer, not the model: unclear tool boundari
 
 In scope: the harness runtime (models, tools, loop, verify, routing, memory, state, roles, quarantine, sandbox, runner, CLI), role prompts, workflow definitions, the security layers, and their tests.
 
-Out of scope: being an open standard or spec; a hosted surface or web UI; model training or fine-tuning; secrets management beyond env-var hygiene and the mechanical guards; non-macOS sandbox backends (roadmapped, currently fail closed).
+Out of scope: being an open standard or spec; a hosted surface or web UI; model training or fine-tuning; secrets management beyond env-var hygiene and the mechanical guards; Windows-native sandboxing (bare Windows fails closed; WSL2 presents as Linux and uses the Linux backends shipped in 0.4).
 
 ## 5. Conformance philosophy
 
@@ -57,7 +57,7 @@ Harnessie is not a PAICE portfolio component and will not become one: it release
 - `INTENT.md` is present although the personal-utility tier does not require it, pre-applied for the public/portfolio trajectory.
 - Recorded exception (2026-07-06, operator default): the tracked `assistant-guide.txt` would classify this repo agent-facing under portfolio Repo Standards v0.7; the repo remains personal-utility tier until public promotion, at which point annotated tags, `RELEASE_CHECKLIST.md`, and CI-gate-before-tag are adopted via the standard promotion path. Until then, versions are commits-not-releases by deliberate choice.
 - Recorded exception (2026-07-06, operator default): the Turnfile adoption row ("repo runs multi-agent collaboration sessions") is not adopted. Harnessie is one-process orchestration under a single operator, not cross-runtime peer sessions; Turnfile interop is declared out of scope in `GOVERNANCE.md` and would be a deliberate 0.5-era decision, not a conformance default.
-- `docs/` is reserved for the canonical web page (https://harnessie.com/). Per the portfolio Repo Standards docs/-publish rule, when Harnessie goes public GitHub Pages will publish from `main` `/docs`, so that directory is kept as the future public served tree and holds only a placeholder today. All internal engineering and planning docs (ARCHITECTURE, SECURITY, ROADMAP, IMPLEMENTATION_PLAN, PROMPTS, session-url-log, source-verification.json) live at the repo root, which stays private and unserved. Pages is not yet enabled.
+- `docs/` is the live public served tree (https://harnessie.com/, GitHub Pages from `main` `/docs` per the portfolio Repo Standards docs/-publish rule): the landing page, the generated HTML doc pages (`scripts/build_docs_html.py`), and the `.well-known/` GuideCheck trust pair. Internal engineering and planning docs (ARCHITECTURE, SECURITY, ROADMAP, IMPLEMENTATION_PLAN, PROMPTS, session-url-log, source-verification.json) live at the repo root and are not served, though the repo itself is public.
 
 ## 9. Changelog
 

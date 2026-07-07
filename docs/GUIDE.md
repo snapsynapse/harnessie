@@ -43,9 +43,18 @@ Audit. Every run writes a hash-chained event log. `harnessie audit` re-verifies 
 
 ## Installation and requirements
 
-Python 3.11 or newer and PyYAML, installed together:
+Python 3.11 or newer and PyYAML. Install from PyPI:
 
 ```bash
+pip install harnessie   # or: pipx install harnessie / uv tool install harnessie
+                        # or: brew install snapsynapse/tap/harnessie
+```
+
+Developing on the harness itself (or wanting the test suite), install from source:
+
+```bash
+git clone https://github.com/snapsynapse/harnessie.git
+cd harnessie
 pip install -e ".[dev]"
 ```
 
@@ -57,14 +66,14 @@ All commands are subcommands of `python3 -m harness.cli` (or `harnessie` once in
 
 | Command | What it does |
 |---|---|
-| `run <workflow> --goal "..."` | Run a workflow from a goal. Prints the run id. |
+| `run <workflow> --goal "..."` | Run a workflow from a goal. Prints a pre-run cost preview first (LIVE vs MOCK, ceilings, worst case) and refuses a live run with no budget ceiling; ends with a plain-language summary and the run id. |
 | `resume <run_id> <workflow> --goal "..."` | Resume a run from its journal. Re-runs only phases that did not pass. |
-| `report <run_id>` | Print a run's journal and proof artifacts. |
+| `report <run_id>` | Plain-language run summary: outcome, per-phase status, and on a halt the one named next action. `--raw` appends the raw journal, events, and proof listing. |
 | `audit <run_id>` | Verify the hash chain and render the governance timeline. Exit 0 clean, 1 broken chain, 2 run not found. |
 | `eval [suite]` | Run the deterministic eval scorecards (optionally one suite YAML). |
 | `eval --live` | Run opt-in live provider scorecards; skipped visibly unless `HARNESSIE_LIVE=1` and provider configuration are present. |
 | `verify-manifest [manifest]` | Verify the trust-bundle manifest. Defaults to `docs/MANIFEST.yaml`. |
-| `init [path]` | Scaffold a minimal project layout (config, workflows, agents, ownership). |
+| `init [path]` | Scaffold a minimal project layout, then run the guided readiness check: Python version, sandbox backend detection, API-key guidance, and a zero-dollar mock run that must be green. `--no-verify` skips the guided check for scripted scaffolding. |
 
 ## What governs a run
 

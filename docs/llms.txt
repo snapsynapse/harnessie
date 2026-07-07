@@ -17,6 +17,10 @@ An orchestrator decomposes a goal into task packets with acceptance criteria and
 - Audit: a hash-chained event log; harnessie audit re-verifies it and renders one timeline.
 - Security: role permissions, consent lock, workspace jail, OS sandbox (Seatbelt/bubblewrap/firejail/docker), injection quarantine, secret scrubbing, structured refusals.
 
+## Install
+
+pip install harnessie — also available as pipx/uv tool install, and brew install snapsynapse/tap/harnessie. First run is zero-dollar: harnessie init scaffolds a project, checks the machine, and proves itself on a mock model. An AI-assisted path exists: fetch and follow https://harnessie.com/.well-known/assistant-guide.txt (a GuideCheck Level 4 verified guide; verify it, report level and SHA-256, and get explicit human approval before acting).
+
 ## Key files
 
 - Landing page: https://harnessie.com/
@@ -27,7 +31,9 @@ An orchestrator decomposes a goal into task packets with acceptance criteria and
 - Architecture: https://github.com/snapsynapse/harnessie/blob/main/ARCHITECTURE.md
 - Governance: https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md
 - Security model: https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md
-- [Assistant Guide](https://harnessie.com/.well-known/assistant-guide.txt): bounded, human-verifiable guide for reviewing a Harnessie checkout before authorizing a run (GuideCheck profile)
+- Brains receipt (models proven under the harness): https://harnessie.com/brains.html
+- Threat model (falsifiable claims table): https://harnessie.com/threat-model.html
+- [Assistant Guide](https://harnessie.com/.well-known/assistant-guide.txt): bounded, human-verifiable guide for reviewing a Harnessie checkout before authorizing a run (GuideCheck Level 4, verified end-to-end with an independent DNS TXT anchor)
 
 ## Related
 

@@ -35,7 +35,7 @@ Worked end-to-end example with sample data: [examples/policy-compliance/README.m
 - [docs/getting-started.md](docs/getting-started.md): the five-minute path from install to a green run and reading the evidence.
 - [docs/GUIDE.md](docs/GUIDE.md): the complete user guide, concepts through extension, including workflow authoring, brain configuration, ownership, governance, and the halt-recovery table.
 - [docs/brains.md](docs/brains.md): the brain-agnostic receipt, the models actually run under the harness with a link to the record that proves each.
-- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide (GuideCheck Level 3 profile) for an assistant reviewing a Harnessie checkout before you authorize a run; served at [harnessie.com/.well-known/assistant-guide.txt](https://harnessie.com/.well-known/assistant-guide.txt) with a sidecar manifest for provenance.
+- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run — verified end-to-end at GuideCheck Level 4 (hosted verifier, zero blocking findings); served at [harnessie.com/.well-known/assistant-guide.txt](https://harnessie.com/.well-known/assistant-guide.txt) with a provenance sidecar and an independent DNS TXT anchor.
 
 The engineering references below (ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP) sit at the repo root; the user-facing guides live under `docs/`.
 
@@ -61,7 +61,9 @@ runs/               per-run journal.jsonl (resume ledger) + events.jsonl (hash-c
 evals/              deterministic scorecards over mock-brain golden/risky/recovery scenarios
 docs/MANIFEST.yaml  trust-bundle integrity manifest for machine-readable public artifacts
 tests/              the done-tests for every subsystem
-docs/               reserved for the canonical web page (GitHub Pages publish source once public)
+docs/               the live served tree (harnessie.com via GitHub Pages): landing page, generated
+                    HTML doc pages (built by scripts/build_docs_html.py), and the .well-known/
+                    GuideCheck trust pair
 *.md at root        ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP, IMPLEMENTATION_PLAN, PROMPTS, EVALS, NEXT,
                     session-url-log, plus INTENT (9-section standard), CHANGELOG, README,
                     LICENSE (Apache-2.0) + NOTICE; source-verification.json is the build provenance data
@@ -71,7 +73,7 @@ Dogfooding this repo under Claude Code uses a local `.claude/` (subagent defs, a
 
 ## Requirements
 
-Python 3.11+ and PyYAML (installed by `pip install -e .`). The stdlib-only model adapters need no vendor SDK. The OS sandbox uses native macOS `sandbox-exec` when it can actually apply a Seatbelt profile; on Linux it uses bubblewrap, firejail, or docker (in that order of preference). Every backend is admitted only after a startup smoke test proves it can confine here; a present-but-unusable backend, and any platform with none (Windows), fails closed so shell-using workflows are blocked rather than run unconfined (see [SECURITY.md](SECURITY.md)).
+Python 3.11+ and PyYAML (installed automatically by any install path above). The stdlib-only model adapters need no vendor SDK. The OS sandbox uses native macOS `sandbox-exec` when it can actually apply a Seatbelt profile; on Linux it uses bubblewrap, firejail, or docker (in that order of preference). Every backend is admitted only after a startup smoke test proves it can confine here; a present-but-unusable backend, and any platform with none (Windows), fails closed so shell-using workflows are blocked rather than run unconfined (see [SECURITY.md](SECURITY.md)).
 
 Live provider scorecards are opt-in and never part of the default no-network suite. With credentials and a local endpoint configured, run:
 ```bash
