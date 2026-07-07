@@ -92,7 +92,7 @@ Run with `--approval-policy approvals.yaml`, or use `--approve-interactive` to p
 
 Optional extra review can use local OpenAI-compatible endpoints such as Ollama or CLI fan-out across agents. That is useful evidence, especially for patches touching orchestration, but it does not replace the deterministic suite: `pytest`, `harnessie eval`, manifest verification, and scrub/audit checks remain the proof surface.
 
-Full rationale and the verified source-to-decision map: [ARCHITECTURE.md](ARCHITECTURE.md). Governance layer (consent, ownership, contest, audit): [GOVERNANCE.md](GOVERNANCE.md). Prompt-injection and secret-handling model: [SECURITY.md](SECURITY.md). What comes next and platform support: [ROADMAP.md](ROADMAP.md).
+Full rationale and the verified source-to-decision map: [ARCHITECTURE.md](ARCHITECTURE.md). Governance layer (consent, ownership, contest, audit): [GOVERNANCE.md](GOVERNANCE.md). Prompt-injection and secret-handling model: [SECURITY.md](SECURITY.md). The "safest" claim as a falsifiable table, each row citing enforcing code and its test, versus prevailing harness patterns: [docs/threat-model.md](docs/threat-model.md). What comes next and platform support: [ROADMAP.md](ROADMAP.md).
 
 ## What governs a run
 

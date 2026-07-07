@@ -4,6 +4,8 @@ The threat: a workflow ingests untrusted content (a policy PDF, a scraped page, 
 
 Design rule throughout: guarantees live in code, at the registry, loop, and OS layer, so no role prompt can opt out of them. Filters reduce risk; they do not eliminate it. Injection phrased as plausible design advice passes every mechanical scan, which is why layers 6 and 7 exist.
 
+For the same properties framed against the failure modes of prevailing agent harnesses (unsandboxed shell, prompt-level-only guardrails, self-verification, silent dissent-merging, and more), each row citing the enforcing code and the test that proves it, see the falsifiable comparison at [docs/threat-model.md](docs/threat-model.md).
+
 ## The layers
 
 ### 1. Ingress filter (mechanical, harness-enforced)
