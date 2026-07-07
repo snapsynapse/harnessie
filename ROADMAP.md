@@ -44,16 +44,6 @@ Theme: make the harness runnable and measurable beyond a single Mac.
 
 Acceptance: the full suite is green on Linux with a backend present and fails closed on a runner with none; a brain swap (config edit) produces a comparable scorecard.
 
-### Standing task: skills and runbook inventory (Claude-session scoped, operator-requested 2026-07-06)
-
-Not version-gated; runs in a Claude Code session because two of the three sources are only visible from one. Inventory three skill sources and assess which patterns are appropriate to copy or adapt into the harness:
-
-1. Local skill bundles under `~/Git/skills` (and skill repos elsewhere under `~/Git`).
-2. Skills available to Claude sessions through the Skill tool and connectors (plugin skills, MCP-exposed capabilities).
-3. The open-skills library at https://unlock-ai.natebjones.com/open-skills/skills — both skills and runbooks.
-
-Assessment bar, per the guiding priorities: Harnessie is brain-agnostic, so a skill is copied as a harness-native artifact (a registered tool with declared effects and roles, a workflow YAML, an eval scenario, or a prompt-layer convention), never as a Claude-only `SKILL.md` dependency. A candidate is appropriate when it (a) survives the registry's policy model (effects class, role grant, approval gate), (b) does not import a hosted-service or single-vendor assumption, and (c) earns its complexity against the lean-and-solo-operable priority. Output: a decision-ready shortlist with per-candidate adaptation cost, written to `handoffs/` for operator review; adoption of any candidate is a normal roadmap change, not part of the inventory task.
-
 ### 0.5.0: Operability
 
 Theme: put a human comfortably in the loop for long autonomous runs.

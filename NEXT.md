@@ -32,8 +32,6 @@ Public surface (staged under prepare-and-stage; NOT live):
 - Scorecard expansion against real endpoints, including the governance suite per brain. Steps 11-12.
 - Live contested phase across two real providers on `workflows/contested-decision.yaml`.
 - Trust-bundle MANIFEST integrity.
-## Standing task
-Skills and runbook inventory (ROADMAP standing task, Claude-session scoped): preliminary shortlist at `handoffs/skills-inventory-preliminary.md` (local, gitignored). Full pass should verify, extend, and produce the decision-ready shortlist.
 ## Non-goals standing
 - Promotion PREP is done and staged; going LIVE (Pages/DNS/public) is a deliberate operator step, not yet taken.
 - No annotated tags or release checklist ceremony until that promotion.
