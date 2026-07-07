@@ -32,12 +32,13 @@ Any OpenAI-compatible endpoint works with no code change: vLLM, Ollama, llama.cp
 
 ## Built with
 
-Development provenance, distinct from the runtime table above: these frontier models wrote and reviewed Harnessie's own code rather than running under it, so they are not each backed by a single decision record. The trail is in the git history and the session handoffs.
+Development provenance, distinct from the runtime table above: these models built, reviewed, and fact-checked Harnessie during construction rather than running under it, so they are not each backed by a single decision record. The trail is in the git history, [source-verification.json](https://github.com/snapsynapse/harnessie/blob/main/source-verification.json), and the session handoffs.
 
 - Claude Fable 5 (Anthropic): primary implementation and review across the 0.1 to 0.4 line, and the frontier orchestrator in config.
 - GPT-5.5 (OpenAI, via Codex): implemented the v0.3.2 structured-refusal and checked-identifier patch, then handed it to Claude Fable 5, which verified it independently in the next session.
+- Perplexity Sonar Pro (Perplexity): research and independent source verification at the outset; the trail is [source-verification.json](https://github.com/snapsynapse/harnessie/blob/main/source-verification.json), where twenty prior-art sources were checked and several confirmed via sonar-pro.
 
-Two frontier models from different providers handing work back and forth on the harness itself is the thesis applied to its own construction.
+Three providers building, reviewing, and fact-checking the harness itself is the thesis applied to its own construction.
 
 ## Coverage we would like to add
 
