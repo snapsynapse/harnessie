@@ -1,0 +1,38 @@
+# Three-position variant of contested-decision.yaml: same adversarial panel,
+# one more independent brain. Position three routes through the `research`
+# task class (cheap tier), so three positions draw three distinct brains.
+# Invoke: harnessie run workflows/contested-decision-3panel.yaml --goal "<question>"
+name: contested-decision-3panel
+description: Three independent positions -> objections -> decision record -> convergence or human arbitration.
+
+phases:
+  - name: decide
+    mode: adversarial
+    task: |
+      Question from operator: {goal}
+
+      Form your own position on this question from the evidence in the
+      workspace. You are read-only: inspect, cite, argue; do not build.
+    positions:
+      - agent: researcher
+        task_class: plan          # frontier tier
+      - agent: implementer
+        task_class: mechanical    # local tier
+      - agent: researcher
+        task_class: research      # cheap tier (third distinct brain)
+    rebuttal_rounds: 1
+    arbitration: convergence
+
+  - name: integrate
+    agent: orchestrator
+    task_class: integrate
+    task: |
+      Original question: {goal}
+
+      The contested phase resolved as:
+
+      {decide}
+
+      Write the operator summary: the decision, which positions supported or
+      opposed it, what the record's earned claims are, and any follow-ups the
+      objections imply. Deliver via task_complete.

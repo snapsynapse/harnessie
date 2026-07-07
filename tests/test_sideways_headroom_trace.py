@@ -207,6 +207,53 @@ def test_contained_policy_cannot_climb_on_refusal():
                       escalate_on=("gate_fail", "refusal"))
 
 
+def test_escalated_run_never_exceeds_ceiling_plus_one_turn(tmp_path, monkeypatch):
+    """The headroom invariant (AIDR-0005): with Option A as the climb-
+    admission floor, per-turn ceiling enforcement bounds an escalated run's
+    total spend to at most the ceiling plus one worst-case turn — the same
+    residual the budget hardening accepted (a turn cannot be un-called
+    mid-flight). The floor's worst-case-turn proxy is max_tokens at both
+    rates; a prompt larger than max_tokens could exceed the proxy, which is
+    the estimate's stated limit, not a hole in enforcement."""
+    monkeypatch.setattr(sandbox, "wrap",
+                        lambda argv, workspace, allow_network=False: argv)
+    # mid worst-case turn: 8192 * (3 + 15) / 1e6 = $0.1475; budget $0.50 —
+    # the climb is admitted (0.1475 <= 0.50 remaining) and the escalated
+    # attempts then burn real dollars per turn until enforcement stops them
+    scaffold(tmp_path, default_effort="max", mid_cost=(3.0, 15.0),
+             budget_usd=0.5, cascade_yaml=textwrap.dedent("""
+        policies:
+          climb-up:
+            ladder: [local, mid]
+    """))
+    workflow(tmp_path, extra="cascade: climb-up", max_attempts=6, checks=True)
+
+    def burning_brain(messages):
+        turn = working_brain(messages)
+        turn.input_tokens, turn.output_tokens = 8000, 8000   # ~$0.144/turn at mid
+        return turn
+
+    runner = WorkflowRunner(project_root=tmp_path, run_id="r1", echo=False)
+    runner._models["local"] = MockModel(
+        ModelSpec(name="local", provider="mock", model_id="mock"),
+        fn=working_brain)
+    # the loop charges from the model's own spec, so the mock must carry the
+    # mid tier's real rates for escalated turns to bill dollars
+    runner._models["mid"] = MockModel(runner.router.tiers["mid"],
+                                      fn=burning_brain)
+    outcomes = runner.run_workflow(tmp_path / "workflows" / "wf.yaml", goal="g")
+
+    assert outcomes[0].status == "needs_human"
+    ev = events_of(tmp_path)
+    assert [e for e in ev if e["kind"] == "cascade_decision"
+            and e["action"] == "climb"], "the climb must have been admitted"
+    from harness.runner import _climb_cost_estimate
+    mid_spec = runner.router.tiers["mid"]
+    worst_turn = _climb_cost_estimate(mid_spec)
+    assert runner.budget.spent_usd > 0            # escalated turns really billed
+    assert runner.budget.spent_usd <= runner.budget.max_usd + worst_turn + 1e-9
+
+
 def test_routing_trace_covers_every_attempt(tmp_path, monkeypatch):
     monkeypatch.setattr(sandbox, "wrap",
                         lambda argv, workspace, allow_network=False: argv)

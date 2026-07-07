@@ -54,11 +54,15 @@ def _escalation_reason(verdict) -> str:
 
 def _climb_cost_estimate(spec: ModelSpec) -> float:
     """Worst-case dollars for one maximal model turn at a tier: max_tokens
-    charged at both the input and output rate. The estimate behind the
-    escalation-headroom refusal. Estimate shape is under contested decision
-    (runs/20260707-115427-MCNRMR DR-decide: single-turn floor vs
-    max_steps-scaled); this is the single-turn floor pending arbitration.
-    Zero-cost tiers estimate zero and always clear the check."""
+    charged at both the input and output rate. The climb-admission floor
+    behind the escalation-headroom refusal, adopted via decisions/AIDR-0005:
+    per-turn ceiling enforcement bounds any run's overspend to one maximal
+    in-flight turn, and this floor guarantees an admitted climb's worst first
+    turn fits inside the ceiling (invariant proven by
+    test_escalated_run_never_exceeds_ceiling_plus_one_turn). Stated limit:
+    the proxy is max_tokens at both rates, so a prompt larger than max_tokens
+    can exceed the input half — an admission-precision limit, not an
+    enforcement hole. Zero-cost tiers estimate zero and always clear."""
     return spec.max_tokens * (spec.cost_per_mtok_in
                               + spec.cost_per_mtok_out) / 1_000_000
 
