@@ -169,7 +169,7 @@ def main(argv: list[str] | None = None) -> int:
     # Cost preview and the ceiling-less-live-run refusal run BEFORE any run
     # state is created or any brain is built, so a refused run leaves no trace
     # and bills nothing.
-    tiers, _routing, budget_cfg = load_models_config(root / "config" / "models.yaml")
+    tiers, _routing, budget_cfg, _fallbacks = load_models_config(root / "config" / "models.yaml")
     preview = build_preview(tiers, budget_cfg)
     print(format_preview(preview))
     if preview.refuse_reason is not None:

@@ -30,6 +30,11 @@ TIER_ORDER = ("local", "cheap", "mid", "frontier")
 class Route:
     tier: str
     effort: str
+    # Sideways fallback index at this tier: 0 is the primary brain, n picks
+    # the tier's nth configured fallback. Availability failures and refusals
+    # move sideways (same tier, different provider), never upward — see
+    # cascade.SIDEWAYS_REASONS. Any upward move resets to the primary.
+    alt: int = 0
 
     def escalate(self) -> "Route | None":
         """Next rung on the ladder: bump effort first, then tier. None when
@@ -100,6 +105,9 @@ class Router:
     tiers: dict[str, ModelSpec]                 # tier name -> model spec
     table: dict[str, dict] = field(default_factory=dict)  # task_class -> {tier, effort}
     default: Route = field(default_factory=lambda: Route("mid", "medium"))
+    # tier name -> ordered fallback specs for sideways moves (same tier,
+    # different provider); parsed from the tier's `fallbacks:` list
+    fallbacks: dict[str, list[ModelSpec]] = field(default_factory=dict)
 
     def route(self, task_class: str) -> Route:
         row = self.table.get(task_class)
@@ -109,6 +117,13 @@ class Router:
                      effort=row.get("effort", self.default.effort))
 
     def spec_for(self, route: Route) -> ModelSpec:
+        if getattr(route, "alt", 0):
+            alts = self.fallbacks.get(route.tier, [])
+            if route.alt <= len(alts):
+                return alts[route.alt - 1]
+            raise ValueError(
+                f"route tier {route.tier!r} has no fallback #{route.alt} "
+                f"({len(alts)} configured)")
         spec = self.tiers.get(route.tier)
         if spec is None:
             raise ValueError(

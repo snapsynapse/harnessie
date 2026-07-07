@@ -22,7 +22,8 @@ import yaml
 from .adversarial import (PositionRecord, assemble_record, converged,
                           lint_record, parse_objection_response, parse_stance)
 from .approval import ApprovalPolicy, tty_approval
-from .cascade import CascadePolicy, load_cascade_config, validate_against_tiers
+from .cascade import (CascadePolicy, SIDEWAYS_REASONS, load_cascade_config,
+                      validate_against_tiers)
 from .events import EventLog
 from .loop import AgentLoop, LoopResult
 from .memory import ProjectMemory, ProofStore
@@ -39,25 +40,49 @@ from .verify import Check, GateResult, VerificationGate
 
 
 def _escalation_reason(verdict) -> str:
-    """Mechanical map from a failing gate verdict to a cascade escalation
-    reason. Refusals are recognized so a policy can hold instead of up-tiering
-    (up-tiering on refusal is a containment leak); everything else is a gate
-    failure. schema_fail and tool_contract deepen with routing_trace (0.7
-    task 3)."""
+    """Mechanical map from a failing gate verdict to a cascade reason.
+    Refusals and availability failures move sideways (same tier, different
+    provider), never automatically up — up-tiering on refusal is a
+    containment leak, and a provider outage says nothing about task
+    difficulty. Everything else is a gate failure."""
     if "loop stopped: refusal" in verdict.reasons:
         return "refusal"
+    if "loop stopped: model_error" in verdict.reasons:
+        return "availability"
     return "gate_fail"
 
 
-def load_models_config(path: Path) -> tuple[dict[str, ModelSpec], dict, dict]:
+def _climb_cost_estimate(spec: ModelSpec) -> float:
+    """Worst-case dollars for one maximal model turn at a tier: max_tokens
+    charged at both the input and output rate. The estimate behind the
+    escalation-headroom refusal. Estimate shape is under contested decision
+    (runs/20260707-115427-MCNRMR DR-decide: single-turn floor vs
+    max_steps-scaled); this is the single-turn floor pending arbitration.
+    Zero-cost tiers estimate zero and always clear the check."""
+    return spec.max_tokens * (spec.cost_per_mtok_in
+                              + spec.cost_per_mtok_out) / 1_000_000
+
+
+def load_models_config(
+    path: Path,
+) -> tuple[dict[str, ModelSpec], dict, dict, dict[str, list[ModelSpec]]]:
     cfg = yaml.safe_load(path.read_text(encoding="utf-8"))
-    tiers = {
-        name: ModelSpec(name=name, **{k: v for k, v in spec.items()})
-        for name, spec in cfg.get("tiers", {}).items()
-    }
+    tiers: dict[str, ModelSpec] = {}
+    fallbacks: dict[str, list[ModelSpec]] = {}
+    for name, spec in cfg.get("tiers", {}).items():
+        spec = dict(spec)
+        alt_rows = spec.pop("fallbacks", None) or []
+        tiers[name] = ModelSpec(name=name, **spec)
+        # A fallback inherits every field of its tier's primary and overrides
+        # what it names (usually just model_id, sometimes base_url/provider):
+        # a sideways move is the same tier contract on a different brain.
+        fallbacks[name] = [
+            ModelSpec(**{**spec, **dict(row), "name": f"{name}~alt{i + 1}"})
+            for i, row in enumerate(alt_rows)
+        ]
     routing = cfg.get("routing", {})
     _validate_models_config(path, tiers, routing, cfg.get("budget", {}))
-    return tiers, routing, cfg.get("budget", {})
+    return tiers, routing, cfg.get("budget", {}), fallbacks
 
 
 def _validate_models_config(
@@ -102,9 +127,10 @@ class WorkflowRunner:
                  approval_policy: Path | None = None,
                  interactive_approvals: bool = False) -> None:
         self.root = project_root.resolve()
-        tiers, routing_table, budget_cfg = load_models_config(
+        tiers, routing_table, budget_cfg, fallbacks = load_models_config(
             models_config or self.root / "config" / "models.yaml")
-        self.router = Router(tiers=tiers, table=routing_table)
+        self.router = Router(tiers=tiers, table=routing_table,
+                             fallbacks=fallbacks)
         # Cascade policies (0.7, adopted via decisions/AIDR-0004): opt-in per
         # phase; a policy naming an unconfigured tier refuses at startup.
         self.cascade = load_cascade_config(self.root / "config" / "cascade.yaml")
@@ -169,8 +195,14 @@ class WorkflowRunner:
         system = role.system_prompt(memory_index=memory_index,
                                     extra_context=extra_context)
         self.events.emit("role_start", agent=agent_name, role_kind=role.kind,
-                         route=vars(route))
-        return loop.run(system, task, effort=route.effort)
+                         route={"tier": route.tier, "effort": route.effort})
+        result = loop.run(system, task, effort=route.effort)
+        spec = self.router.spec_for(route)
+        self.events.emit("routing_trace", agent=agent_name, tier=route.tier,
+                         effort=route.effort, alt=route.alt,
+                         model=spec.model_id, provider=spec.provider,
+                         outcome=result.stop)
+        return result
 
     # -- workflow execution --------------------------------------------------
 
@@ -447,7 +479,7 @@ class WorkflowRunner:
         name = phase["name"]
         task_class = phase.get("task_class", "default")
         route, escalate_fn, cascade_refusal = self._resolve_cascade(
-            phase, self.router.route(task_class))
+            phase, self.router.route(task_class), budget)
         if cascade_refusal:
             return PhaseOutcome(name, "needs_human", cascade_refusal)
         checks = [Check(**c) for c in phase.get("verify", {}).get("checks", [])]
@@ -501,7 +533,8 @@ class WorkflowRunner:
             registry.approval_handler = prev_handler
         return PhaseOutcome(name, gres.status, gres.final_report)
 
-    def _resolve_cascade(self, phase: dict, route: Route):
+    def _resolve_cascade(self, phase: dict, route: Route,
+                         budget: Budget | None = None):
         """Cascade opt-in resolution shared by the sequential and parallel
         dispatch sites. Returns (route, escalate_fn, refusal). refusal is
         None when resolved; otherwise the fail-closed message for a cascade
@@ -516,27 +549,70 @@ class WorkflowRunner:
                 f"{exc}; fix the phase's cascade reference in the workflow "
                 "or add the policy to config/cascade.yaml, then resume the run")
         return (Route(policy.ladder[0], route.effort),
-                self._cascade_escalator(policy, phase["name"]), None)
+                self._cascade_escalator(policy, phase["name"],
+                                        budget or self.budget), None)
 
-    def _cascade_escalator(self, policy: CascadePolicy, phase_name: str):
-        """Policy-driven gate escalation for a cascade-opted phase. Effort
-        climbs first within the current tier (the same motion as the default
-        ladder); tier motion is the policy's call, and every tier decision is
-        an event so routing drift stays visible."""
+    def _cascade_escalator(self, policy: CascadePolicy, phase_name: str,
+                           budget: Budget):
+        """Policy-driven gate escalation for a cascade-opted phase.
+
+        Motion order per failing attempt: sideways first (refusal and
+        availability move to the tier's next configured fallback, same tier,
+        never up), then effort within the tier (the 0.6 motion), then a tier
+        climb as the policy's decision — and an approved climb is still
+        refused when the remaining run budget cannot cover its worst-case
+        first turn. Every tier decision is an event so routing drift stays
+        visible."""
         climbs = {"used": 0}
 
         def escalate(route: Route, verdict) -> Route | None:
+            reason = _escalation_reason(verdict)
+            if reason in SIDEWAYS_REASONS:
+                alts = self.router.fallbacks.get(route.tier, [])
+                if route.alt < len(alts):
+                    self.events.emit(
+                        "cascade_decision", phase=phase_name,
+                        policy=policy.name, action="sideways",
+                        tier=route.tier,
+                        reason=f"{reason} moves sideways to "
+                               f"{alts[route.alt].model_id} (fallback "
+                               f"{route.alt + 1} of {len(alts)})")
+                    return Route(route.tier, route.effort, route.alt + 1)
+                if reason == "availability":
+                    self.events.emit(
+                        "cascade_decision", phase=phase_name,
+                        policy=policy.name, action="hold", tier=route.tier,
+                        reason="availability failure with no fallback left; "
+                               "holding (availability never climbs)")
+                    return route
+                # refusal with every fallback spent falls through: the policy
+                # decides (a contained policy can never name refusal)
             e_idx = EFFORT_LEVELS.index(route.effort)
             if e_idx < len(EFFORT_LEVELS) - 1:
-                return Route(route.tier, EFFORT_LEVELS[e_idx + 1])
-            reason = _escalation_reason(verdict)
+                return Route(route.tier, EFFORT_LEVELS[e_idx + 1], route.alt)
             decision = policy.next_tier(route.tier, climbs["used"], reason)
+            if decision.action == "climb":
+                target = self.router.spec_for(Route(decision.tier, "medium"))
+                estimate = _climb_cost_estimate(target)
+                remaining = budget.max_usd - budget.spent_usd
+                if estimate > remaining:
+                    self.events.emit(
+                        "cascade_decision", phase=phase_name,
+                        policy=policy.name, action="refused_headroom",
+                        tier=decision.tier,
+                        reason=f"climb to {decision.tier} needs "
+                               f"~${estimate:.4f} and ${remaining:.4f} of "
+                               "the run budget remains; refused before "
+                               "dispatch")
+                    return None         # an escalation never busts the ceiling
+                self.events.emit("cascade_decision", phase=phase_name,
+                                 policy=policy.name, action="climb",
+                                 tier=decision.tier, reason=decision.reason)
+                climbs["used"] += 1
+                return Route(decision.tier, "medium")
             self.events.emit("cascade_decision", phase=phase_name,
                              policy=policy.name, action=decision.action,
                              tier=decision.tier, reason=decision.reason)
-            if decision.action == "climb":
-                climbs["used"] += 1
-                return Route(decision.tier, "medium")
             if decision.action == "hold":
                 return route            # retry reformulated on the same rung
             return None                 # exhausted: gate hands to the operator

@@ -61,7 +61,7 @@ def discover_live_targets(
     """
 
     env = env or os.environ
-    tiers, _, _ = load_models_config(root / "config" / "models.yaml")
+    tiers, _, _, _ = load_models_config(root / "config" / "models.yaml")
     enabled = env.get(LIVE_FLAG) == "1"
     if not enabled:
         return [

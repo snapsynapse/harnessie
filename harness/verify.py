@@ -179,7 +179,8 @@ class VerificationGate:
                 verdicts.append(Verdict(False, f"consent declined: {reason}",
                                         "consent"))
                 self.events.emit("gate_verdict", attempt=attempt, passed=False,
-                                 source="consent", route=vars(current_route))
+                                 source="consent", route={"tier": current_route.tier,
+                                    "effort": current_route.effort})
                 if counter and not counter_used:
                     counter_used = True
                     current_task = (
@@ -223,7 +224,8 @@ class VerificationGate:
 
             verdicts.append(verdict)
             self.events.emit("gate_verdict", attempt=attempt, passed=verdict.passed,
-                             source=verdict.source, route=vars(current_route))
+                             source=verdict.source, route={"tier": current_route.tier,
+                                    "effort": current_route.effort})
             if verdict.passed:
                 return GateResult("passed", attempt, work.report, verdicts)
 

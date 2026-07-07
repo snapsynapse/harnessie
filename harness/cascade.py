@@ -26,6 +26,12 @@ from pathlib import Path
 # sideways (same tier, different provider) — see ROADMAP 0.7.0.
 ESCALATION_REASONS = ("gate_fail", "schema_fail", "refusal", "tool_contract")
 
+# Reasons that move sideways (same tier, different provider via the tier's
+# configured fallbacks) before any ladder is consulted. Availability never
+# climbs a ladder at all; a refusal may climb only when a policy names it in
+# escalate_on, and a contained policy may never do so.
+SIDEWAYS_REASONS = ("refusal", "availability")
+
 ON_EXHAUST = ("reduce_scope", "defer")
 
 # Tiers that never leave operator control: on-box inference and any
@@ -81,6 +87,11 @@ class CascadePolicy:
                     f"cascade policy {self.name!r}: contained ladder names "
                     f"exposed tier(s) {exposed}; contained ladders may only "
                     f"use {list(CONTAINED_TIERS)}")
+            if "refusal" in self.escalate_on:
+                raise ValueError(
+                    f"cascade policy {self.name!r}: a contained policy may "
+                    "not climb on refusal (up-tiering on refusal is a "
+                    "containment leak); refusals move sideways or hold")
 
     @property
     def climb_ceiling(self) -> int:
