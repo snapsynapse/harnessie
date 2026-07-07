@@ -28,6 +28,7 @@ Worked end-to-end example with sample data: [examples/policy-compliance/README.m
 
 ## Documentation
 
+- [docs/quickstart.md](docs/quickstart.md): the gentlest path for someone who has never cloned a repo or written YAML, assuming no git or shell fluency, with a glossary and an honest Windows/WSL2 page.
 - [docs/getting-started.md](docs/getting-started.md): the five-minute path from install to a green run and reading the evidence.
 - [docs/GUIDE.md](docs/GUIDE.md): the complete user guide, concepts through extension, including workflow authoring, brain configuration, ownership, governance, and the halt-recovery table.
 - [docs/brains.md](docs/brains.md): the brain-agnostic receipt, the models actually run under the harness with a link to the record that proves each.
