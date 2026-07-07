@@ -37,3 +37,9 @@ workspace/
 # Local agent-runtime wrappers: never staged without an explicit operator decision
 .agents/
 .codex/
+
+# Private roadmap: operator-only planning notes (unreleased scope, portfolio
+# integration candidates not yet ready to name publicly). Sibling to the
+# tracked ROADMAP.md; promote an item to the public file only after a scrub
+# pass. Never referenced from any tracked file beyond this comment.
+ROADMAP-PRIVATE.md

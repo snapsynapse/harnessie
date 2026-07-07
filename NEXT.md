@@ -37,6 +37,7 @@ Public surface (staged under prepare-and-stage; NOT live):
 - No annotated tags or release checklist ceremony until that promotion.
 - No gated third-party names on tracked surfaces; scrub staged diffs before every commit using `handoffs/scrub-list.txt`.
 - Provisional tenets claims remain provisional wherever cited.
+- Private planning notes for this repo live in `ROADMAP-PRIVATE.md` at repo root (gitignored, not tracked); its contents are never referenced from any tracked file beyond this line.
 ## First commands for the next agent
 - `git status --short --branch && git log --oneline -8`
 - `python3 -m pytest -q`
