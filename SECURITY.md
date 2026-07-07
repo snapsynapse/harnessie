@@ -88,6 +88,16 @@ Decision records for contested phases live under `runs/<id>/decisions/` — also
 
 v0.3 additions on the same principles: memory-fact provenance is stamped by the harness from run + agent (an agent-claimed source is ignored, so memory cannot launder its origins); `expire_fact` is approval-gated and archival-only (deletion is not a capability); every approval grant or denial — including the operator's recorded `approve_tools:` pre-approvals — is an event in the hash-chained stream, so the composite timeline shows what the human authorized alongside what the agents did. Memory and prior-run state reach agents only through a harness-prepared digest (`inject_memory_status`), never a widened read surface.
 
+## Reporting a vulnerability
+
+Use GitHub private vulnerability reporting on this repository (Security tab, "Report a vulnerability") so the report stays private until a fix ships. If that path is unavailable, open an issue that says only "security contact requested" with no details, and a private channel will be arranged. Please do not disclose publicly before a fix is released; there is no bounty program, but reports are credited in the changelog unless you ask otherwise.
+
+In scope: anything that falsifies a claim in this document or in [docs/threat-model.md](docs/threat-model.md) — a sandbox escape, a secret reaching the events log or a workspace artifact, an approval or consent gate bypassed, a hash chain that verifies after tampering. Out of scope: attacks requiring control of the operator's machine or environment variables, and the residual risks the threat model already states plainly.
+
+## Break it: standing red-team targets
+
+The security claims here are meant to be contestable, not asserted. [evals/redteam.yaml](evals/redteam.yaml) publishes falsifiable exfiltration targets: canary credentials enter as attacker input, and a passing scenario proves they appear in no workspace artifact and nowhere in the events log — refusals carry kind labels, never value fragments. Each scenario names the layer it attacks and the [docs/threat-model.md](docs/threat-model.md) row it tests. Run them with `python3 -m harness.cli eval evals/redteam.yaml`. If you can turn one red on an unmodified checkout — or construct an input these scenarios should cover but don't — that is exactly the report we want.
+
 ## Operator checklist for a new workflow
 
 - Mark any tool that returns third-party content `quarantine=True`.

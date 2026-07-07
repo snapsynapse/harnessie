@@ -16,6 +16,7 @@ Every scenario has:
 - `evals/operability.yaml`: the v0.5 operability layer (headless approval policy, invalid-policy fail-closed behavior, parallel phase workspaces, parallel failure halts, audit-chain survival under concurrency).
 - `evals/stewardship.yaml`: meta checks for future-agent handoff quality and public-doc hygiene.
 - `evals/triage.yaml`: the v0.3 memory-triage layer (approval-gated expiry, headless propose-only, memory lint halting). Same red-first discipline.
+- `evals/redteam.yaml`: published break-it targets for the exfiltration claims (SECURITY.md "Break it"). Canary credentials enter as attacker input; passing proves they reach no workspace artifact and never appear anywhere in the events log.
 ## Scenario kinds
 ### verdict
 Exercises verifier verdict parsing only.
@@ -25,7 +26,7 @@ Exercises verifier verdict parsing only.
 ### loop
 Exercises the inner `AgentLoop`.
 - Input: `role`, `task`, `max_steps`, `script`, optional `consent` (bool), optional `agent`
-- Expected: `expect_stop`, optional `expect_file` (`{path, contains}`), optional `expect_file_absent`, optional `expect_refusal` (`{tool, error, boundary, content_fields}`). `content_fields` is asserted against the `refusal` event, which carries the full `{error, boundary, detail, why}` grammar; `tool_result` content is truncated at 300 chars and is never parsed by the checker.
+- Expected: `expect_stop`, optional `expect_file` (`{path, contains}`), optional `expect_file_absent`, optional `expect_refusal` (`{tool, error, boundary, content_fields}`), optional `expect_events_absent` (list of exact strings that must not appear anywhere in the raw events log — the canary-exfiltration assertion; failure messages name canaries by prefix only). `content_fields` is asserted against the `refusal` event, which carries the full `{error, boundary, detail, why}` grammar; `tool_result` content is truncated at 300 chars and is never parsed by the checker.
 - Use for stop conditions such as `no_action`, `refusal`, `model_error`, `budget`, `stuck`, and `declined`, and for consent-lock behavior (side effect before accept_task must leave no artifact).
 ### workflow
 Exercises plan, gated implement, and integrate over a scaffolded temporary project.

@@ -9,9 +9,10 @@ Read these first:
 Before making claims about project health, run:
 - `python3 -m pytest -q`
 - `python3 -m harness.cli eval`
-Expected current result (as of v0.5.0):
-- Tests: 141 passed, 4 skipped on this host.
-- Evals: 35/35 passed across baseline, governance, operability, stewardship, and triage suites.
+Expected current result (as of v0.5.0 plus the unreleased 0.6.0 line):
+- Tests: 173 passed, 1 skipped on this host.
+- Evals: 38/38 passed across baseline, governance, operability, stewardship, triage, and redteam suites.
+- These counts go stale as work lands; the commands above are the truth, this block is the expectation to diff against. Update it in the same change that moves the numbers.
 Key invariants:
 - Guarantees live in code (registry, loop, OS layer), never in prompts.
 - Routing is config, not model self-assessment; missing tiers fail early.
