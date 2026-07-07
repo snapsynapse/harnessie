@@ -63,7 +63,7 @@ python3 -m harness.cli eval --live
 - Pre-run cost preview; refuse to start a live run when no ceiling is set. DONE 2026-07-07: `harness/preflight.py` + CLI wiring + `tests/test_preflight.py`; see CHANGELOG Unreleased and ROADMAP 0.6.0.
 - Non-developer quickstart + glossary; honest Windows/WSL2 page.
 - Threat-model comparison artifact: SECURITY.md properties vs prevailing harness failure modes, each row citing enforcing code and tests.
-- Default-deny posture audit extending `tests/test_repo_configs.py`.
+- Default-deny posture audit extending `tests/test_repo_configs.py`. DONE 2026-07-07: 11 assertions over the shipped registry, OWNERSHIP.yaml, and CLI seams; see CHANGELOG Unreleased and ROADMAP 0.6.0.
 - GuideCheck content rewrite of `assistant-guide.txt` to Level 3+ and manifest sidecar prep; end-to-end `.well-known` verify waits for Pages.
 - Graceful Boundaries conformance check and citation/gap list.
 - PyPI packaging prep only; publishing is an operator act.

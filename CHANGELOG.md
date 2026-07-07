@@ -10,11 +10,13 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 - Added `evals/stewardship.yaml` for public-surface local-path hygiene and `NEXT.md` handoff quality checks.
 - Documented the agent operating posture for optional local OpenAI-compatible/Ollama checks and CLI fan-out review: useful verification evidence, not a replacement for deterministic evals and operator-gated live-provider rules.
 - Pre-run cost preview and ceiling-less-live-run refusal (`harness/preflight.py`, wired into CLI `run`/`resume`): before any run state is created or any brain is built, the harness states whether the configured brains are live or mock (zero-dollar), shows the budget ceilings and a worst-case dollar figure with which ceiling binds first, and refuses to start a live run when no ceiling is set. Mock runs are always free and never refused; an unknown provider is treated as billable (fail-safe). First 0.6.0 "Ease" rung; satisfies the 0.6 acceptance "a fresh install on a ceiling-less config refuses a live run."
+- Default-deny posture audit (0.6.0 launch gate) extending `tests/test_repo_configs.py`: eleven assertions proving the shipped `register_builtin` registry, `OWNERSHIP.yaml`, and both CLI seams default closed — orchestrator holds no side-effecting tool, verifier never writes, every write/execute tool excludes the orchestrator and includes the worker, `expire_fact` is approval-gated, `dispatch`/`_loop_for` default network off, and unknown-tool / wrong-role / unapproved / pre-consent dispatches all fail closed.
 
 ### Tests
 
 - Eval scorecard now passes 35/35.
-- `tests/test_preflight.py`: mock never refuses, live-without-ceiling refuses with a fix pointer, live-with-ceiling proceeds, worst-case math and binding-ceiling selection, unknown-provider fail-safe. Suite now 150 passed, 1 skipped.
+- `tests/test_preflight.py`: mock never refuses, live-without-ceiling refuses with a fix pointer, live-with-ceiling proceeds, worst-case math and binding-ceiling selection, unknown-provider fail-safe.
+- `tests/test_repo_configs.py`: eleven default-deny posture assertions over the shipped registry and configs. Suite now 161 passed, 1 skipped.
 
 ## 0.5.0 (2026-07-07)
 
