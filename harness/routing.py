@@ -52,6 +52,11 @@ class Route:
         e_idx = EFFORT_LEVELS.index(self.effort)
         if e_idx < len(EFFORT_LEVELS) - 1:
             return Route(self.tier, EFFORT_LEVELS[e_idx + 1])
+        if self.tier not in TIER_ORDER:
+            # Off-ladder tiers (sovereign) never auto-escalate: sovereign is
+            # an exposure class, and escalating past it would move a contained
+            # task onto an exposed tier. Hand to human instead.
+            return None
         t_idx = TIER_ORDER.index(self.tier)
         if t_idx < len(TIER_ORDER) - 1:
             return Route(TIER_ORDER[t_idx + 1], "medium")

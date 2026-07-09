@@ -98,6 +98,14 @@ def test_default_escalation_walk_never_enters_sovereign():
     assert Route("frontier", "max").escalate() is None
 
 
+def test_sovereign_escalation_halts_at_human_not_valueerror():
+    """A sovereign-routed phase that exhausts effort hands to human. Sovereign
+    is off-ladder (exposure class, not capability rung), so escalate() must
+    return None — never raise, and never step onto an exposed tier."""
+    assert Route("sovereign", "medium").escalate() == Route("sovereign", "high")
+    assert Route("sovereign", "max").escalate() is None
+
+
 def test_unknown_tier_still_refused(tmp_path):
     scaffold(tmp_path)
     bad = (tmp_path / "config" / "models.yaml").read_text().replace(

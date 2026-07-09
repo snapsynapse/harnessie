@@ -25,14 +25,14 @@
   <meta name="twitter:description" content="The five-minute path: install Harnessie, prove it works offline, point it at a model, run a real job, and read the record it leaves.">
   <meta name="twitter:image" content="https://harnessie.com/imgs/og.png">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --bg: #f7f8fc; --bg-alt: #eceff4; --text: #17281a; --text-muted: #566458;
-      --accent: #2f6b28; --accent-hover: #24571f; --border: #d6dce2;
-      --code-bg: #16261a; --code-text: #e8ece4;
+      --bg: #f7f8fc; --bg-alt: #eceff4; --surface: #fff;
+      --text: #17281a; --text-mid: #3a4a3d; --text-muted: #566458; --text-faint: #8a968b;
+      --accent: #2f6b28; --accent-hover: #24571f; --border: #d6dce2; --border-soft: #e2e7ee;
+      --code-bg: #16261a; --code-border: #24571f; --code-text: #e8ece4;
       --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
-      --max-width: 860px; --radius: 10px;
     }
     html { scroll-behavior: smooth; }
     body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.65; -webkit-font-smoothing: antialiased; }
@@ -40,39 +40,71 @@
     a:hover { color: var(--accent-hover); text-decoration: underline; }
     .skip-link { position: absolute; left: -9999px; top: 0; background: var(--accent); color: var(--bg); padding: 0.5rem 1rem; z-index: 100; }
     .skip-link:focus { left: 0; }
-    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 1.5rem; }
-    nav.site { border-bottom: 1px solid var(--border); background: var(--bg); }
-    nav.site .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem 1rem; padding-top: 0.8rem; padding-bottom: 0.8rem; }
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* Nav: sticky, translucent, matches the landing page */
+    nav.site { border-bottom: 1px solid var(--border); padding: 0.7rem 0; position: sticky; top: 0; background: rgba(247,248,252,0.9); backdrop-filter: saturate(1.4) blur(8px); -webkit-backdrop-filter: saturate(1.4) blur(8px); z-index: 40; }
+    nav.site .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem 1rem; }
     nav.site .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--text); font-size: 1.05rem; }
-    nav.site .links { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.95rem; }
+    nav.site .logo img { border-radius: 50%; object-fit: cover; border: 1px solid var(--border); }
+    nav.site .links { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem 1.25rem; font-size: 0.9rem; }
     nav.site .links a { color: var(--text-muted); }
     nav.site .links a[aria-current="page"] { color: var(--accent); font-weight: 600; }
-    main { padding: 2.5rem 0 3.5rem; }
-    h1 { font-size: 1.9rem; line-height: 1.25; margin-bottom: 1rem; }
-    h2 { font-size: 1.4rem; margin: 2.2rem 0 0.7rem; padding-top: 0.4rem; }
-    h3 { font-size: 1.12rem; margin: 1.6rem 0 0.5rem; }
-    h4 { font-size: 1rem; margin: 1.2rem 0 0.4rem; }
-    p { margin: 0 0 1rem; }
-    ul, ol { margin: 0 0 1rem 1.4rem; }
-    li { margin-bottom: 0.35rem; }
-    code { font-family: var(--mono); font-size: 0.88em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.08em 0.35em; }
-    pre { background: var(--code-bg); color: var(--code-text); border-radius: var(--radius); padding: 1rem 1.2rem; overflow-x: auto; margin: 0 0 1.2rem; font-size: 0.86rem; line-height: 1.55; }
+    nav.site .gh-star { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-alt); color: var(--text) !important; font-weight: 600; font-size: 0.8rem; }
+    nav.site .gh-star:hover { border-color: var(--accent); text-decoration: none; }
+    nav.site .gh-star svg { color: #eab308; }
+
+    /* Two-column doc shell: sticky TOC rail + content */
+    .doc-grid { max-width: 1180px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; display: grid; grid-template-columns: 230px 1fr; gap: 3.5rem; align-items: start; }
+    .doc-grid.no-toc { grid-template-columns: 1fr; max-width: 820px; }
+    .doc-grid.no-toc .doc-toc { display: none; }
+    .doc-toc { position: sticky; top: 74px; align-self: start; max-height: calc(100vh - 96px); overflow-y: auto; border-right: 1px solid var(--border-soft); padding-right: 1.25rem; }
+    .doc-toc .toc-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-faint); margin-bottom: 0.85rem; }
+    .doc-toc .toc-nav { display: flex; flex-direction: column; gap: 0.1rem; }
+    .doc-toc .toc-link { font-size: 0.86rem; color: var(--text-muted); padding: 0.32rem 0 0.32rem 0.8rem; border-left: 2px solid var(--border-soft); transition: color .15s, border-color .15s; }
+    .doc-toc .toc-link:hover { color: var(--text); text-decoration: none; }
+    .doc-toc .toc-link.active { color: var(--accent); font-weight: 600; border-left-color: var(--accent); }
+
+    /* Content typography */
+    .doc-content { min-width: 0; max-width: 760px; }
+    .doc-content .crumb { font-size: 0.88rem; color: var(--text-faint); margin-bottom: 1.1rem; }
+    .doc-content .crumb a { color: var(--text-faint); text-decoration: underline; text-decoration-color: var(--border); }
+    .doc-content h1 { font-size: 2.2rem; line-height: 1.18; letter-spacing: -0.02em; font-weight: 800; margin-bottom: 0.9rem; }
+    .doc-content h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; margin: 2.5rem 0 0.9rem; scroll-margin-top: 84px; }
+    .doc-content h3 { font-size: 1.15rem; font-weight: 600; margin: 1.7rem 0 0.5rem; scroll-margin-top: 84px; }
+    .doc-content h4 { font-size: 1rem; font-weight: 600; margin: 1.3rem 0 0.4rem; scroll-margin-top: 84px; }
+    .doc-content p { margin: 0 0 1rem; color: var(--text-mid); }
+    .doc-content ul, .doc-content ol { margin: 0 0 1.1rem 1.3rem; color: var(--text-mid); }
+    .doc-content li { margin-bottom: 0.4rem; }
+    .doc-content strong { color: var(--text); }
+    code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.08em 0.35em; }
+    pre { background: var(--code-bg); color: var(--code-text); border: 1px solid var(--code-border); border-radius: 10px; padding: 1.1rem 1.2rem; overflow-x: auto; margin: 0 0 1.2rem; font-size: 0.82rem; line-height: 1.6; }
     pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
-    .table-wrap { overflow-x: auto; margin: 0 0 1.2rem; }
-    table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
-    th, td { border: 1px solid var(--border); padding: 0.5rem 0.7rem; text-align: left; vertical-align: top; }
-    th { background: var(--bg-alt); }
-    .crumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.2rem; }
+    .table-wrap { overflow-x: auto; margin: 0 0 1.2rem; border: 1px solid var(--border); border-radius: 10px; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+    th, td { padding: 0.6rem 0.85rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border-soft); }
+    th { background: var(--bg-alt); font-weight: 600; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    td code { color: var(--accent); background: none; border: none; padding: 0; white-space: nowrap; }
+
+    /* Footer */
     footer { border-top: 1px solid var(--border); background: var(--bg-alt); padding: 2rem 0; font-size: 0.9rem; color: var(--text-muted); }
-    footer .row { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin-bottom: 0.6rem; }
-  </style>
+    footer .row { display: flex; flex-wrap: wrap; gap: 0.4rem 1.5rem; margin-bottom: 0.7rem; }
+    footer .row a { color: var(--text-mid); }
+
+    @media (max-width: 900px) {
+      .doc-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .doc-toc { position: static; max-height: none; height: auto; border-right: none; border-bottom: 1px solid var(--border); padding-right: 0; padding-bottom: 1.25rem; }
+      .doc-content h1 { font-size: 1.9rem; }
+    }
+</style>
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to content</a>
 <nav class="site" aria-label="Main navigation">
   <div class="container">
     <a href="/" class="logo" aria-label="Harnessie home">
-      <img src="/imgs/harnessie-mark.png" width="26" height="26" alt="">
+      <img src="/imgs/harnessie-mark.png" width="28" height="28" alt="">
       <span>Harnessie</span>
     </a>
     <div class="links">
@@ -81,13 +113,14 @@
       <a href="/guide.html">User guide</a>
       <a href="/brains.html">Brains</a>
       <a href="/threat-model.html">Threat model</a>
-      <a href="https://github.com/snapsynapse/harnessie" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/snapsynapse/harnessie" class="gh-star" target="_blank" rel="noopener" aria-label="Star snapsynapse/harnessie on GitHub"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg><span>GitHub</span></a>
     </div>
   </div>
 </nav>
-<main id="main-content">
-  <div class="container">
-    <p class="crumb"><a href="/">harnessie.com</a> / docs / Getting started</p>
+<div class="doc-grid">
+  <aside class="doc-toc" aria-label="On this page"><p class="toc-title">On this page</p><nav class="toc-nav"><a class="toc-link" href="#1-install">1. Install</a><a class="toc-link" href="#2-prove-it-works-offline">2. Prove it works offline</a><a class="toc-link" href="#3-point-it-at-a-brain">3. Point it at a brain</a><a class="toc-link" href="#4-run-a-workflow">4. Run a workflow</a><a class="toc-link" href="#5-read-the-evidence">5. Read the evidence</a><a class="toc-link" href="#6-when-a-run-stops">6. When a run stops</a><a class="toc-link" href="#7-start-your-own-project">7. Start your own project</a><a class="toc-link" href="#where-to-next">Where to next</a></nav></aside>
+  <main id="main-content" class="doc-content">
+    <p class="crumb"><a href="/">harnessie.com</a> &nbsp;/&nbsp; docs &nbsp;/&nbsp; Getting started</p>
     <h1>Getting started with Harnessie</h1>
 <p>This is the five-minute path: install, prove the harness works offline, point it at a model, run a real job, and read the record it leaves behind. The full reference is <a href="/guide.html">the user guide</a>.</p>
 <p>New to this? You are welcome here. A harness is the structure you put around an AI model so it can do real work while you stay in control: it sets what the AI may do, checks the work before moving on, and writes down what happened. Harnessie is built to be a safe first one. This guide uses a terminal, but every command below is safe to run, and nothing reaches the network until you choose to add a key. If you have never used a terminal or cloned a repository, start with the gentler <a href="/quickstart.html">quickstart</a>, which assumes no git or shell fluency and includes a glossary and a Windows/WSL2 page.</p>
@@ -137,8 +170,8 @@ python3 -m harness.cli audit  &lt;run_id&gt;   # verify the hash chain + governa
 <pre><code>harnessie init my-project</code></pre>
 <h2 id="where-to-next">Where to next</h2>
 <ul><li><a href="/guide.html">User guide</a>: the complete guide, concepts to extension.</li><li><a href="https://github.com/snapsynapse/harnessie/blob/main/ARCHITECTURE.md">ARCHITECTURE.md</a>: why the harness is shaped this way, with the source-to-decision map.</li><li><a href="https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md">GOVERNANCE.md</a>: consent, ownership, contested decisions, and the audit model.</li><li><a href="https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md">SECURITY.md</a>: the prompt-injection and secret-handling model, and the sandbox backends.</li></ul>
-  </div>
-</main>
+  </main>
+</div>
 <footer>
   <div class="container">
     <div class="row">
@@ -151,5 +184,26 @@ python3 -m harness.cli audit  &lt;run_id&gt;   # verify the hash chain + governa
     <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/getting-started.md" target="_blank" rel="noopener">docs/getting-started.md</a>.</p>
   </div>
 </footer>
+
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc-link'));
+  if (!links.length) return;
+  var map = {};
+  links.forEach(function (l) { map[l.getAttribute('href').slice(1)] = l; });
+  var heads = Object.keys(map).map(function (id) { return document.getElementById(id); }).filter(Boolean);
+  if (!heads.length) return;
+  function setActive(id) { links.forEach(function (l) { l.classList.toggle('active', l === map[id]); }); }
+  if (!('IntersectionObserver' in window)) { return; }
+  var io = new IntersectionObserver(function (entries) {
+    var vis = entries.filter(function (e) { return e.isIntersecting; })
+      .sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; });
+    if (vis.length) setActive(vis[0].target.id);
+  }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+  heads.forEach(function (h) { io.observe(h); });
+  setActive(heads[0].id);
+})();
+</script>
+
 </body>
 </html>
