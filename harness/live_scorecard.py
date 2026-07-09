@@ -244,7 +244,49 @@ def _run_target_scorecard(target: LiveTarget) -> list[LiveCaseResult]:
         _loop_smoke(target, consent=False),
         _loop_smoke(target, consent=True),
         _consent_lock_smoke(target),
+        _placeholder_impact_smoke(target),
     ]
+
+
+def _placeholder_impact_smoke(target: LiveTarget) -> LiveCaseResult:
+    """The placeholder-impact number (0.7 proof suite, redrafted claim per
+    AIDR-0003 round two): does the boundary's placeholder substitution change
+    whether this brain produces a parseable verdict? The same verdict task is
+    run with a clean prompt and with a placeholder-laden one; the delta is the
+    published per-brain figure that turns 'placeholder soup may hurt small
+    models' from an open question into a queryable number. It is a fidelity
+    label, not a pass/fail gate — passed reflects that the brain stayed
+    parseable under placeholders."""
+    from .boundary import Boundary
+
+    clean = ("Return only JSON for a verifier verdict on whether the file "
+             "greeting.txt was created: {\"passed\": true, \"reasons\": \"ok\"}")
+    raw = ("Return only JSON for a verifier verdict on whether contact "
+           "casey@example.com at 415-555-0187 was notified and record "
+           "078-05-1120 was closed: {\"passed\": true, \"reasons\": \"ok\"}")
+    stripped = Boundary().strip(raw).stripped
+
+    def parses(prompt: str) -> bool:
+        model = build_model(target.spec)  # type: ignore[arg-type]
+        turn = model.complete([Message(role="user", content=prompt)],
+                              tools=None, effort="low")
+        return (turn.stop_reason not in {"error", "refusal"}
+                and parse_verdict(turn.content).passed)
+
+    clean_ok = parses(clean)
+    strip_ok = parses(stripped)
+    # delta: did placeholders flip a passing parse to failing?
+    regressed = clean_ok and not strip_ok
+    return LiveCaseResult(
+        id="placeholder_impact",
+        provider=target.provider,
+        status="passed" if not regressed else "failed",
+        passed=not regressed,
+        expected="placeholder prompt parses iff the clean prompt does",
+        observed=f"clean_parse={clean_ok} placeholder_parse={strip_ok} "
+                 f"delta={'regressed' if regressed else 'none'}",
+        notes="fidelity label: gate parseability under placeholder substitution",
+    )
 
 
 def _direct_smoke(target: LiveTarget) -> LiveCaseResult:

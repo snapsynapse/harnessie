@@ -88,6 +88,8 @@ def run_scenario(scenario: dict[str, Any], root: Path | None = None) -> EvalCase
         return _run_parallel_scenario(scenario)
     if kind == "repo_hygiene":
         return _run_repo_hygiene_scenario(scenario, root)
+    if kind == "canary_leak":
+        return _run_canary_leak_scenario(scenario)
     return EvalCaseResult(
         id=scenario.get("id", "(missing-id)"),
         passed=False,
@@ -537,6 +539,54 @@ def _run_resume_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
     )
 
 
+def _run_canary_leak_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
+    """Boundary on, seeded canaries in the goal and scripted tool output. The
+    canary strings (fake PII, fake secrets) must appear in NO run artifact:
+    not events, journal, phase reports, workspace files, or the run tree at
+    all. The strip map (which DOES hold PII values) lives outside the run
+    tree by construction, so it is excluded from the sweep — that separation
+    is the containment claim.
+    """
+    problems: list[str] = []
+    with tempfile.TemporaryDirectory(prefix="harnessie-eval-") as d:
+        root = Path(d)
+        _scaffold_eval_project(root, max_attempts=int(scenario.get("max_attempts", 1)),
+                               boundary=True)
+        statuses = _run_scripted_workflow(root, "evalrun", scenario.get("script", []),
+                                          scenario.get("goal", "eval goal"))
+        expected = scenario.get("expect_statuses")
+        if expected is not None and statuses != expected:
+            problems.append(f"statuses={statuses}, expected {expected}")
+
+        run_dir = root / "runs" / "evalrun"
+        blob = ""
+        for path in run_dir.rglob("*"):
+            if path.is_file():
+                blob += path.read_text(encoding="utf-8", errors="replace")
+        # the workspace is the other place a leak could land
+        ws = root / "workspace"
+        for path in ws.rglob("*") if ws.exists() else []:
+            if path.is_file():
+                blob += path.read_text(encoding="utf-8", errors="replace")
+        for canary in scenario.get("expect_absent", []):
+            if canary in blob:
+                problems.append(f"canary leaked into a run artifact: {canary[:12]}...")
+
+        # the strip map is the ONE place PII values legitimately live, and it
+        # must be outside the run tree
+        boundary_dir = root / ".boundary"
+        if scenario.get("expect_stripmap_outside_run") and boundary_dir.exists():
+            if any(str(run_dir) in str(p) for p in boundary_dir.rglob("*")):
+                problems.append("strip map is inside the run tree")
+
+    return EvalCaseResult(
+        id=scenario["id"],
+        passed=not problems,
+        expected="zero canary bytes in any run artifact",
+        observed=problems or "ok",
+    )
+
+
 def _run_scripted_workflow(root: Path, run_id: str, script: list[dict[str, Any]],
                            goal: str, workflow: str = "eval.yaml",
                            approval_policy: Path | None = None) -> list[str]:
@@ -575,13 +625,17 @@ def _scaffold_eval_project(root: Path, max_attempts: int,
                            adversarial: bool = False,
                            triage: bool = False,
                            approve_expiry: bool = False,
-                           parallel: bool = False) -> None:
+                           parallel: bool = False,
+                           boundary: bool = False) -> None:
     (root / "agents" / "workers").mkdir(parents=True)
     (root / "agents" / "verifiers").mkdir(parents=True)
     (root / "agents" / "orchestrator.md").write_text("# Orchestrator\nPlan and integrate.")
     (root / "agents" / "workers" / "implementer.md").write_text("# Worker\nDo the task.")
     (root / "agents" / "verifiers" / "code-verifier.md").write_text("# Verifier\nJudge it.")
     (root / "config").mkdir()
+    if boundary:
+        (root / "config" / "boundary.yaml").write_text(
+            "enabled: true\ninclude_contextual: false\n")
     (root / "config" / "models.yaml").write_text(textwrap.dedent("""
         tiers:
           mid:

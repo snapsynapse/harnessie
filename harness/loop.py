@@ -16,6 +16,9 @@ Stop conditions are explicit and enumerated — silence is never success:
   - "refusal":     provider safety pipeline refused; surfaced to the gate so
                    its reformulate-and-escalate ladder (or the operator)
                    decides what happens next — never silently retried
+  - "secret_egress": the containment boundary caught a secret in an egress
+                   payload (task input or a tool result); always a halt,
+                   never a warn (0.7, harness/boundary.py)
 
 Consent (v0.2): when consent_required is set, side-effecting tools are locked
 at dispatch until the agent calls accept_task. Read tools stay live — informed
@@ -29,6 +32,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from .boundary import Boundary, SecretEgressHalt, StripMap
 from .events import EventLog
 from .models.base import AssistantTurn, Message, ModelInterface
 from .routing import Budget
@@ -68,8 +72,37 @@ class AgentLoop:
     # Consent gate: the task packet is an offer. Side effects stay locked until
     # accept_task; decline_task ends the loop with stop="declined".
     consent_required: bool = False
+    # Containment boundary (0.7): when set, structured PII is stripped to
+    # placeholders before content reaches the model, tool results are scrubbed
+    # before they enter context, and a secret surviving to an egress payload
+    # halts the loop (stop="secret_egress"). The strip map accumulates so the
+    # same value keeps one placeholder run-wide. None = boundary off (byte-
+    # identical to pre-0.7 behavior).
+    boundary: Boundary | None = None
+    strip_map: StripMap | None = None
+
+    def _contain(self, text: str) -> str:
+        """Egress chokepoint: strip PII into the run's map, halt on a secret
+        that survived the strip. Raises SecretEgressHalt; callers turn that
+        into stop='secret_egress'."""
+        if self.boundary is None or self.strip_map is None:
+            return text
+        result = self.boundary.guard_egress(text, self.strip_map.mapping)
+        self.strip_map.mapping = result.mapping
+        if result.found:
+            self.events.emit("boundary_strip", role=self.role,
+                             kinds=sorted({k for k, _ in result.found}),
+                             count=len(result.found))
+        return result.stripped
 
     def run(self, system_prompt: str, task: str, effort: str = "medium") -> LoopResult:
+        try:
+            task = self._contain(task)
+        except SecretEgressHalt as halt:
+            self.events.emit("secret_egress_halt", role=self.role,
+                             agent=self.agent_name, kinds=sorted(set(halt.kinds)))
+            return self._finish("secret_egress", str(halt), 0,
+                                [Message(role="system", content=system_prompt)])
         messages: list[Message] = [
             Message(role="system", content=system_prompt),
             Message(role="user", content=task),
@@ -171,6 +204,16 @@ class AgentLoop:
                             step, messages)
                 else:
                     recent_failures.clear()
+                try:
+                    content = self._contain(content)
+                except SecretEgressHalt as halt:
+                    # A tool surfaced a secret (env var, config value). It
+                    # never rides the next model call out: halt here.
+                    self.events.emit("secret_egress_halt", role=self.role,
+                                     agent=self.agent_name, tool=tc.name,
+                                     kinds=sorted(set(halt.kinds)))
+                    return self._finish("secret_egress", str(halt), step,
+                                        messages)
                 messages.append(Message(role="tool", content=content,
                                         tool_call_id=tc.id, name=tc.name))
                 if flags:

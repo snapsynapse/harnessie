@@ -1,0 +1,22 @@
+# Containment boundary (0.7 sovereignty layer; adopted via decisions/AIDR-0004
+# and AIDR-0005). Off by default: with enabled: false (or this file absent) a
+# run behaves byte-identically to 0.6. Turn it on to strip structured PII to
+# placeholders before any content reaches a model, scrub tool results before
+# they enter context, and halt the loop on any secret in an egress payload.
+#
+# The claim this makes is exactly the coverage table in harness/boundary.py:
+# structured PII and secrets are caught here; unstructured free-text PII is
+# NOT caught by the filter and is covered by contained routing (a task
+# declaring a free-text-sensitive data class never egresses past the
+# local/sovereign tier set). Never-egress, not imperfect filtering.
+
+enabled: false
+
+# Include keyword-anchored contextual kinds (routing number, DOB, bank
+# account). Off by default: higher recall, higher false-positive rate.
+include_contextual: false
+
+# Per-tool rehydration grants (the shipped approval-policy grammar: allow/deny
+# by tool and phase, explicit deny wins, no match denies closed). Deny-all
+# when the file is absent — placeholders are the safe default everywhere.
+rehydration_grants: config/rehydration-grants.yaml

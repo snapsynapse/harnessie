@@ -22,6 +22,7 @@ import yaml
 from .adversarial import (PositionRecord, assemble_record, converged,
                           lint_record, parse_objection_response, parse_stance)
 from .approval import ApprovalPolicy, tty_approval
+from .boundary import Boundary, RehydrationGrants, SecretEgressHalt, StripMap
 from .cascade import (CascadePolicy, SIDEWAYS_REASONS, load_cascade_config,
                       validate_against_tiers)
 from .events import EventLog
@@ -144,6 +145,12 @@ class WorkflowRunner:
         self.run_dir = self.root / "runs" / self.run_id
         self.events = EventLog(self.run_dir, echo=echo)
         self.state = RunState.open(self.run_dir)
+        # Containment boundary (0.7): opt-in via config/boundary.yaml. Off by
+        # default, so a project that does not enable it runs byte-identically
+        # to 0.6. When on, PII is stripped and secrets halt at every egress.
+        # After state so a resume can require an existing strip map.
+        self.boundary, self.strip_map, self.rehydration_grants = \
+            self._load_boundary()
         self.memory = ProjectMemory(self.root / "memory")
         self.proofs = ProofStore(self.run_dir)
         self.roles = RoleLibrary.load(self.root / "agents")
@@ -176,7 +183,8 @@ class WorkflowRunner:
                          registry=registry or self.registry, events=self.events,
                          budget=budget or self.budget, max_steps=max_steps,
                          deny_tools=deny_tools, allow_network=allow_network,
-                         agent_name=agent_name, consent_required=consent_required)
+                         agent_name=agent_name, consent_required=consent_required,
+                         boundary=self.boundary, strip_map=self.strip_map)
 
     def _run_role(self, agent_name: str, task: str, route: Route,
                   extra_context: str = "", max_steps: int = 40,
@@ -216,6 +224,20 @@ class WorkflowRunner:
             workflow_ref = str(workflow_path.resolve().relative_to(self.root))
         except ValueError:
             workflow_ref = str(workflow_path)
+        # Contain the goal before it is emitted or substituted anywhere: it is
+        # the first egress surface, inherited by every phase task. With the
+        # boundary off this is a no-op; a secret in the goal halts the whole
+        # run before workflow_start is even logged.
+        if self.boundary is not None and self.strip_map is not None:
+            try:
+                result = self.boundary.guard_egress(goal, self.strip_map.mapping)
+            except SecretEgressHalt as halt:
+                self.events.emit("secret_egress_halt", run_id=self.run_id,
+                                 phase="(goal)", kinds=sorted(set(halt.kinds)))
+                self._persist_strip_map()
+                return [PhaseOutcome("(goal)", "needs_human", str(halt))]
+            self.strip_map.mapping = result.mapping
+            goal = result.stripped
         self.events.emit("workflow_start", name=wf.get("name"), run_id=self.run_id,
                          goal=goal, workflow=workflow_ref)
         outcomes: list[PhaseOutcome] = []
@@ -388,11 +410,26 @@ class WorkflowRunner:
             if outcome.status in HALT_STATUSES:
                 break   # fail closed: later phases would build on unverified work
 
+        self._persist_strip_map()
         self.events.emit("workflow_done", run_id=self.run_id,
                          statuses={o.phase: o.status for o in outcomes},
                          spent_usd=round(self.budget.spent_usd, 4),
                          proofs=self.proofs.listing())
         return outcomes
+
+    def _persist_strip_map(self) -> None:
+        """Save the run's strip map to its operator-boundary home if the
+        boundary is on and the map is intact. A corrupt map is never
+        overwritten (it refuses in save()); its degradation is surfaced as an
+        event so the operator sees rehydration is disabled."""
+        if self.strip_map is None:
+            return
+        notice = self.strip_map.degradation_notice()
+        if notice:
+            self.events.emit("boundary_degraded", run_id=self.run_id,
+                             detail=notice)
+            return
+        self.strip_map.save()
 
     def _run_parallel_group(
         self,
@@ -541,6 +578,29 @@ class WorkflowRunner:
         finally:
             registry.approval_handler = prev_handler
         return PhaseOutcome(name, gres.status, gres.final_report)
+
+    def _load_boundary(self):
+        """Boundary opt-in from config/boundary.yaml. Absent file or
+        `enabled: false` -> boundary off (None), and the run behaves exactly
+        as 0.6. When on, the strip map lives in the run dir's sibling
+        `.boundary/` (outside every run artifact) and rehydration grants load
+        from the named policy (deny-all if unnamed)."""
+        path = self.root / "config" / "boundary.yaml"
+        if not path.exists():
+            return None, None, None
+        import yaml as _yaml
+        cfg = _yaml.safe_load(path.read_text()) or {}
+        if not cfg.get("enabled"):
+            return None, None, None
+        boundary = Boundary(include_contextual=bool(cfg.get("include_contextual")))
+        # A run with journaled steps is a resume: the strip map must already
+        # exist, so its absence fails closed rather than starting fresh.
+        resumed = bool(self.state.completed)
+        strip_map = StripMap.open(self.root, self.run_id, expect_existing=resumed)
+        grants_path = self.root / str(cfg.get("rehydration_grants",
+                                              "config/rehydration-grants.yaml"))
+        grants = RehydrationGrants.load(grants_path)
+        return boundary, strip_map, grants
 
     def _reserved_refusal(self, task_class: str) -> str | None:
         """The reserved pre-gate (0.7, adopted via decisions/AIDR-0004): a
