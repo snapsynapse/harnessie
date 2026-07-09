@@ -11,6 +11,8 @@ The complete guide to running, configuring, and extending Harnessie. If you are 
 - [What governs a run](#what-governs-a-run)
 - [Writing a workflow](#writing-a-workflow)
 - [Configuring brains](#configuring-brains)
+- [Cascade routing and the sovereign tier](#cascade-routing-and-the-sovereign-tier)
+- [The containment boundary](#the-containment-boundary)
 - [Ownership lanes](#ownership-lanes)
 - [Governance: consent, contests, and arbitration](#governance-consent-contests-and-arbitration)
 - [When a run halts](#when-a-run-halts)
@@ -81,8 +83,10 @@ A run's behavior is not in one file. Each decision has exactly one owner. To pre
 
 | Decision | Governed by |
 |---|---|
-| Which model runs each task class, and how to swap brains | `config/models.yaml` (tiers plus the routing table) |
+| Which model runs each task class, and how to swap brains | `config/models.yaml` (tiers, fallbacks, routing table) |
 | Token and dollar ceilings, effort per task class | `config/models.yaml` (budget plus routing) |
+| Containment-aware escalation policy and reserved work classes | `config/cascade.yaml` (opt-in per phase) |
+| PII stripping, secret egress halting, rehydration grants | `config/boundary.yaml` (off by default) |
 | Which phases run, in what order, with which gates and verifiers | the workflow YAML in `workflows/` |
 | Which files each agent may write | `OWNERSHIP.yaml` (lanes plus first-writer claims) |
 | What each role may do (tools, shell allowlist, approval) | the tool registry (`harness/tools/builtin.py`) plus role prompts in `agents/` |
@@ -193,6 +197,70 @@ To run everything on a local open-source model, point the task classes you use a
 
 The escalation ladder walks the tier order. When a phase fails its gate, the harness first reformulates the task with the verifier's evidence, then raises effort, then raises tier, before halting for a human. That ladder is why a cheap worker can carry bulk execution safely: a capable verifier and an automatic escalation stand behind it.
 
+## Cascade routing and the sovereign tier
+
+The default ladder above is the whole story unless a phase opts in to a cascade policy. Cascade policies (introduced in 0.7) are declared, containment-aware routing: instead of a fixed `task_class`, a phase names a policy in `config/cascade.yaml` that decides how it climbs. Phases that do not opt in route exactly as before, byte for byte, so this is additive.
+
+A policy declares a tier ladder, which failure reasons climb it, a maximum climb, and what happens when the ladder is exhausted:
+
+```yaml
+# config/cascade.yaml
+policies:
+  cheap-first:
+    ladder: [local, mid, frontier]
+    escalate_on: [gate_fail, schema_fail]   # what climbs the ladder
+    max_climb: 2
+    on_exhaust: defer                        # reduce_scope | defer, never silent
+  contained-local:
+    ladder: [local, sovereign]               # unexposed tiers only
+    data_classes: [freeform_sensitive]
+    contained: true                          # may never name an exposed tier
+reserved:
+  - arbitration                              # never reaches any model, at any tier
+```
+
+A phase opts in with `cascade: cheap-first` instead of `task_class:`. Three behaviors are worth understanding:
+
+- Sideways before up. A provider refusal or an availability failure (rate limit, overload, error) moves to the tier's next configured `fallbacks:` entry — the same tier, a different provider — never upward. Up-tiering on a refusal would move a contained task onto a more exposed brain, so the harness refuses to. Configure fallbacks under a tier in `config/models.yaml`:
+
+  ```yaml
+  tiers:
+    mid:
+      provider: anthropic
+      model_id: claude-sonnet-5
+      fallbacks:
+        - model_id: some-alternate            # inherits mid's other fields
+        - model_id: another
+          base_url: https://other-provider/v1
+  ```
+
+- Escalation headroom. A climb the policy would allow is refused before dispatch if the remaining budget cannot cover the target tier's worst-case first turn. An escalation can never be the thing that busts your ceiling; when headroom runs out the phase hands to you instead.
+
+- Contained ladders and the sovereign tier. A policy marked `contained: true` may only name unexposed tiers (`local` and `sovereign`). The `sovereign` tier is a fifth slot for any OpenAI-compatible controlled endpoint you operate — self-hosted vLLM, a TEE-hosted deployment, a private cluster — declared like any tier in `config/models.yaml`. It is deliberately off the default escalation walk: nothing auto-escalates into or past a controlled endpoint. Reach it only by naming it in a routing row or a cascade ladder. Work classes listed under `reserved:` never reach any model at all and halt with a named operator action; `arbitration` ships reserved by default.
+
+Every attempt writes a `routing_trace` event (tier, effort, fallback index, model, provider, outcome), so `harnessie audit` shows exactly where each phase ran and why it moved.
+
+## The containment boundary
+
+The containment boundary (0.7) keeps sensitive data from leaving the harness. It is off by default; enable it in `config/boundary.yaml`:
+
+```yaml
+# config/boundary.yaml
+enabled: true
+include_contextual: false        # keyword-anchored kinds (routing #, DOB, bank acct)
+rehydration_grants: config/rehydration-grants.yaml
+```
+
+With it on, the harness makes a specific, bounded claim — a per-data-class coverage table, not "we catch everything":
+
+- Structured PII (emails, phone numbers, SSNs, and a multilingual set of national IDs) is stripped to stable placeholders like `[EMAIL_1]` before any content reaches a model — at the goal, at every phase task, and at every tool result. The model only ever sees placeholders, and no run artifact (events, journal, reports, workspace) carries a raw value. The filter is regex over text with no model in its path, so it cannot be talked into leaking.
+- Secrets (credential-shaped strings) are stricter: they are never placed in the map and never rehydrated, and a secret reaching an egress payload halts the run immediately (`secret_egress`), reporting the kind label only, never the value. There is no warn mode.
+- Unstructured free-text PII is explicitly not caught by the filter — a regex cannot reliably find a sensitive fact written in prose. This is covered instead by contained routing: give the phase a `contained: true` cascade policy and a data class, and the task never egresses past your `local`/`sovereign` tiers. The two halves cover each other: the filter handles what patterns catch, routing handles what they cannot.
+
+The placeholder map (placeholder to original value) is the one place real values live, and it is written outside the run tree, at `.boundary/<run_id>.json` with owner-only permissions. Rehydration — turning placeholders back into values — happens only at the operator boundary, and only for tools you explicitly grant in `rehydration_grants` (the same allow/deny grammar as approval policy, deny-all by default). On resume the map reloads; if it is missing or corrupt, rehydration is disabled fail-closed and the run tells you, rather than guessing.
+
+The boundary was adapted with provenance from PAICE.work PBC production PII code, released under Apache-2.0 (see [NOTICE](../NOTICE)), and adopted through Harnessie's own contested-decision process (`decisions/AIDR-0003` and `AIDR-0004`).
+
 ## Ownership lanes
 
 `OWNERSHIP.yaml` at the project root declares who may write what. It sits outside the workspace jail and no agent can reach it. Three lane kinds:
@@ -230,6 +298,7 @@ Every run ends in a named stop condition, and each maps to one operator action. 
 | `max_steps` | the loop hit its step ceiling without completing | raise `max_steps` for the phase or simplify the task |
 | `model_error` | the provider errored twice in a row | check the endpoint and API key; re-run |
 | `no_action` | the model produced no tool call even after a nudge | usually a role-prompt or model-fit issue; check the role prompt in `agents/` |
+| `secret_egress` | the containment boundary caught a secret in an egress payload (the goal or a tool result) | remove the credential from the input or source it from an environment variable; the boundary reports the kind, never the value; re-run |
 
 ## Security model
 
@@ -241,6 +310,7 @@ Harnessie's guarantees live in code at the tool and registry layer, so no role p
 - OS sandbox. Every child command (shell and gate checks) runs in an OS confinement that denies writes outside the workspace and denies network by default. macOS uses Seatbelt; Linux uses bubblewrap, firejail, or docker. No usable backend means shell fails closed.
 - Quarantine. Tool results and inter-phase reports are scanned for injection patterns and invisible or bidirectional characters; flagged content is stripped of invisibles and fenced as data-not-instructions before a model sees it.
 - Secret handling. Child processes run under a scrubbed environment, so provider keys are never inherited. Shell output is redacted for credential-shaped strings, and writing credential-shaped content into the workspace is refused. Secret detection reports kind labels, never the value.
+- Containment boundary (opt-in). When enabled in `config/boundary.yaml`, structured PII is stripped to placeholders before any egress and a secret in an egress payload halts the run; unstructured sensitive data is kept on your controlled tiers by contained routing. See [The containment boundary](#the-containment-boundary).
 - Structured refusals. Every denial returns a machine-readable refusal (`error`, `boundary`, `detail`, `why`) and emits an audit event, so refusals are actionable data for the model and legible entries for the operator.
 
 The full threat model, the honest limits of each layer, and the per-platform backend table are in [SECURITY.md](../SECURITY.md).

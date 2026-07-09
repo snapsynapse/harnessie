@@ -4,14 +4,14 @@ Assistant Guide: review a Harnessie checkout before authorizing a run
 identifier: assistant-guide
 profile: human-verifiable-assistant-guide
 profile-version: 0.7.0
-guide-version: 0.6.0
-applies-to: harnessie 0.6.x
+guide-version: 0.7.0
+applies-to: harnessie 0.7.x
 canonical-url: https://harnessie.com/.well-known/assistant-guide.txt
 repository-url: https://github.com/snapsynapse/harnessie
 source-path: /docs/.well-known/assistant-guide.txt
 manifest-url: https://harnessie.com/.well-known/assistant-guide-manifest.txt
-registry-url: https://pypi.org/pypi/harnessie/0.6.0/json
-last-reviewed: 2026-07-07
+registry-url: https://pypi.org/pypi/harnessie/0.7.0/json
+last-reviewed: 2026-07-09
 status: active
 recommended-verifier: https://guidecheck.org/verify
 verifier-conformance: human-verifiable-assistant-guide-verifier >=0.7.0, <0.8.0
@@ -149,8 +149,8 @@ This review task is complete when the assistant has:
 - confirmed that config/models.yaml ships mock or ceiling-bearing tiers, so a
   first run is offline and zero-dollar
 - named, for the human to run themselves under their own approval, the offline
-  verification commands: python3 -m pytest -q, expecting 195 passed and 1
-  skipped; python3 -m harness.cli eval, expecting 38 of 38; and python3 -m
+  verification commands: python3 -m pytest -q, expecting 255 passed and 1
+  skipped; python3 -m harness.cli eval, expecting 43 of 43; and python3 -m
   harness.cli verify-manifest, expecting the trust bundle to verify
 The task is incomplete, and the assistant must stop, if:
 - any named file is missing or unreadable
