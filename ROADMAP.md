@@ -66,7 +66,7 @@ Safety (the falsifiable claim):
 
 Acceptance: a non-developer given only the quickstart reaches a green first run without touching a config file; the comparison artifact exists with every row citing code and test; a fresh install on a ceiling-less config refuses a live run; the GuideCheck pair verifies, the Graceful Boundaries status (level or gap list) is cited in a tracked doc, and the live page passes the Siteline bar.
 
-### 0.7.0: Sovereignty cascade routing and the containment boundary
+### 0.7.0: Sovereignty cascade routing and the containment boundary - CODE COMPLETE (release ceremony pending)
 
 Theme: route every task to the least-exposed environment that can complete it, and make containment a mechanical property of the run rather than an operator habit. Extends the existing gate ladder (reformulate, then effort up, then tier up) into declared, containment-aware routing policy. Opens only after the 0.6 launch gate closes, and only after the design passes a contested-decision run recorded as an AIDR: the harness's own governance decides its routing layer. Redrafted 2026-07-07 after `decisions/AIDR-0003` arbitrated "do not adopt as first specified": the containment claim is now a per-data-class coverage table rather than a blanket statement, contained routing explicitly owns the unstructured residual the filter cannot catch, the strip-map lifecycle across resume is designed rather than deferred, and placeholder impact on gate pass rates becomes a published per-brain number.
 

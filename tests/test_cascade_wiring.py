@@ -189,3 +189,63 @@ def test_policy_naming_unconfigured_tier_refuses_at_startup(tmp_path):
     """))
     with pytest.raises(ValueError, match="unconfigured tier"):
         WorkflowRunner(project_root=tmp_path, run_id="casc", echo=False)
+
+
+def test_contained_policy_never_egresses_an_exposed_tier(tmp_path, monkeypatch):
+    """0.7 acceptance, the redrafted claim (AIDR-0003 round two): unstructured
+    free-text PII is proven contained by ROUTING, not by the filter. A phase
+    under a contained policy carries free-text sensitive content and fails
+    every attempt; routing_trace must show it only ever reached contained
+    tiers (local, sovereign) — never an exposed provider. Never-egress is the
+    mechanism, so whatever rode the payload never left operator control."""
+    monkeypatch.setattr(sandbox, "wrap",
+                        lambda argv, workspace, allow_network=False: argv)
+    # local + sovereign only; a contained ladder may name no exposed tier
+    (tmp_path / "agents" / "workers").mkdir(parents=True)
+    (tmp_path / "agents" / "verifiers").mkdir(parents=True)
+    (tmp_path / "agents" / "orchestrator.md").write_text("# Orchestrator\nPlan.")
+    (tmp_path / "agents" / "workers" / "implementer.md").write_text("# Worker\nDo.")
+    (tmp_path / "agents" / "verifiers" / "code-verifier.md").write_text("# V\nJudge.")
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "models.yaml").write_text(textwrap.dedent("""
+        tiers:
+          local: { provider: mock, model_id: mock }
+          sovereign: { provider: mock, model_id: mock }
+          frontier: { provider: mock, model_id: mock }
+        routing:
+          default: { tier: local, effort: max }
+        budget: { max_usd: 5.0, max_tokens: 100000 }
+    """))
+    (tmp_path / "config" / "cascade.yaml").write_text(textwrap.dedent("""
+        policies:
+          contained-freeform:
+            ladder: [local, sovereign]
+            contained: true
+            data_classes: [freeform_sensitive]
+            escalate_on: [gate_fail]
+        reserved: [arbitration]
+    """))
+    (tmp_path / "workflows").mkdir()
+    failing_workflow(tmp_path, extra="cascade: contained-freeform", max_attempts=6)
+
+    runner = WorkflowRunner(project_root=tmp_path, run_id="casc", echo=False)
+    brain = MockModel(ModelSpec(name="m", provider="mock", model_id="mock"),
+                      fn=worker_brain)
+    for tier in ("local", "sovereign", "frontier"):
+        runner._models[tier] = brain
+    # free-text sensitive content rides the goal; the boundary is off, so the
+    # only thing keeping it off an exposed tier is the contained ladder
+    outcomes = runner.run_workflow(tmp_path / "workflows" / "wf.yaml",
+                                   goal="patient note: severe anxiety, see Dr. Roe")
+    events = [json.loads(l) for l in
+              (tmp_path / "runs" / "casc" / "events.jsonl").read_text().splitlines()
+              if l.strip()]
+    trace_tiers = {e["tier"] for e in events if e["kind"] == "routing_trace"}
+
+    assert outcomes[0].status == "needs_human"       # exhausted, handed up
+    assert trace_tiers <= {"local", "sovereign"}     # never an exposed tier
+    assert "frontier" not in trace_tiers             # explicit: no exposed egress
+    # and the climb that was refused was the contained ceiling, not an exposed one
+    climbs = [e for e in events if e["kind"] == "cascade_decision"
+              and e["action"] == "climb"]
+    assert all(e["tier"] in ("local", "sovereign") for e in climbs)
