@@ -22,7 +22,7 @@ Rules name a `tool` and may name a `phase`; explicit deny wins; no match denies 
 - Event logging and budget charging are lock-guarded for concurrent phase execution.
 
 Public surface (LIVE):
-- harnessie.com serves the landing page (v0.6.0), the five generated doc pages (quickstart, getting-started, guide, brains, threat-model), the GuideCheck `.well-known/` trust pair, and the crawler/discovery files.
+- harnessie.com serves the landing page (v0.7.0), the five generated doc pages (quickstart, getting-started, guide, brains, threat-model), the GuideCheck `.well-known/` trust pair, and the crawler/discovery files.
 - The HTML doc pages are generated from the markdown by `scripts/build_docs_html.py`; edit markdown, run the script, commit both.
 - `docs/MANIFEST.yaml` pins 9 files; `tests/test_guide_artifacts.py` enforces guide-artifact sync.
 
