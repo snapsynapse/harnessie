@@ -22,14 +22,18 @@ PAICE.work PBC specifications beyond what their own licenses provide.
 
 PAICE.WORK PBC ORIGINATED CODE
 
-As of this version, no PAICE.work PBC code is vendored into this
-repository. Standing rule: code originating in PAICE.work PBC repositories
-enters Harnessie only under an explicit written grant from PAICE.work PBC,
-recorded in this NOTICE with the grant date, the source, and the scope,
-before the vendored code appears in any public commit. Planned under the
-0.7.0 roadmap: a containment boundary adapted from PAICE.work PBC
-production PII-handling code; that adaptation will not merge before its
-grant line appears here.
+On July 9, 2026, PAICE.work PBC licensed to the public under the Apache
+License, Version 2.0, a snapshot of its production PII detection,
+redaction, and rehydration service (pii_service.py v1.0.0 and its locale
+pattern data, at commit ab9b4109507022d2dca1954dd8481cef82f07d8c of the
+PBC's production repository; sole-director consent on file with PBC
+records). Harnessie vendors an adaptation of that snapshot as
+harness/boundary.py on the same terms available to anyone. The release is
+snapshot-scoped to that revision; PAICE.work PBC retains copyright
+ownership of the original, and no trademark rights are granted. Standing
+rule unchanged: any further PBC-originated code enters Harnessie only under
+a further written action recorded here before it appears in any public
+commit.
 
 THIRD-PARTY MATERIALS
 
