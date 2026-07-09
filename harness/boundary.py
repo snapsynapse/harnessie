@@ -5,9 +5,9 @@ decisions/AIDR-0004).
 PROVENANCE. Adapted from PAICE.work PBC's production PII service
 (pii_service.py v1.0.0 at commit ab9b4109507022d2dca1954dd8481cef82f07d8c,
 2026-04-01) and its locale pattern sets, under the PBC written grant
-recorded in NOTICE. GRANT PENDING: this adaptation exists on a local-only
-branch and must not appear in any public commit before the grant line lands
-in NOTICE (standing rule, NOTICE "PAICE.work PBC originated code").
+recorded in NOTICE: vendored under PAICE.work PBC's public Apache-2.0
+license of July 9, 2026 for the identified snapshot (sole-director consent
+on file with PBC records; same terms available to anyone).
 Adaptations from the source: the third-party `regex` module becomes stdlib
 `re` (unicode-property lookarounds converted to word-boundary forms), the
 locale loader becomes an inlined multilingual pattern set, the
