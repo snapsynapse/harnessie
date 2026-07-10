@@ -4,6 +4,10 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+### Added
+
+- `harnessie verify` now ships as a GitHub Action, published to the Marketplace as [Harnessie Verify](https://github.com/marketplace/actions/harnessie-verify) (repo: [harnessie-verify-action](https://github.com/snapsynapse/harnessie-verify-action), v0.1.0, adopted via `decisions/AIDR-0007`). This repo dogfoods it: `.github/workflows/verify-pr-claims.yml` verifies every PR's claims once the verifier endpoint variables and secret are configured, and skips politely until then.
+
 ## 0.7.1 (2026-07-09)
 
 Theme: the verifier leaves the harness. One addition, adopted through the contested-decision process like everything before it.

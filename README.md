@@ -15,6 +15,8 @@ pip install harnessie                # or: pipx / uv tool install / brew install
 harnessie init my-project            # scaffold + guided readiness check + zero-dollar mock run
 ```
 
+To gate pull requests on claim-by-claim verification without installing anything locally, the standalone verifier also ships as a GitHub Action: [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify) (one workflow file; the PR body is treated as claims to test, and the exit code gates the merge).
+
 Developing on the harness itself, install from source:
 ```bash
 pip install -e ".[dev]"
