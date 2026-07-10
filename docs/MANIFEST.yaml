@@ -12,7 +12,7 @@ files:
   - path: docs/robots.txt
     sha256: 88588b10d194d3d62ad9a4463f05a80f645ed1e7b23c59b10087cb28dd5a57f6
   - path: docs/sitemap.xml
-    sha256: 1c93056e9eab2fc802075214fef70ce646ebb418028e4d901a8bdaed477eb7a6
+    sha256: 81418f1fb3757aad2a07dc48389ff6511d11f5a2537b190b4871a1bb572a2a58
   - path: docs/CNAME
     sha256: 6dc81288045a60be46e3eaf407380328466b8ce98c769fe1e637f69c97d5a97a
   - path: docs/site.webmanifest

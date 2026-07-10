@@ -16,9 +16,11 @@ Harnessie optimizes governance. An independent verifier agent on top of the dete
 
 Same foundation, opposite leans. Ringer goes wide and fast. Harnessie goes careful and accountable.
 
+This division is not only our framing. Declining to ship an official sandbox and credential policy, Ringer's maintainer [drew the same line](https://github.com/NateBJones-Projects/ringer/pull/20#issuecomment-4938695178): "the operator owns the security policy of the runtime they attach." Harnessie is built for the operator's side of that line.
+
 ## How they compose
 
-- A shared standard. Both speak AIDR, the one-file decision-record format: independent positions, preserved dissent, human arbitration. A decision recorded alongside Ringer reads the same as one Harnessie writes.
+- A shared standard. Both speak AIDR, the one-file decision-record format: independent positions, preserved dissent, human arbitration. A decision recorded alongside Ringer reads the same as one Harnessie writes, and AIDR's recipes include a [worked example running a position sweep as a Ringer swarm](https://github.com/snapsynapse/aidr/blob/main/RECIPES.md).
 - Independence, then governance. Ringer's whole model is running a task across independent engines, which is exactly the raw material a governed decision needs: several genuinely independent takes. Harnessie's contested-decision mode turns independent outputs into a decision record with dissent preserved and a human arbitrating. Ringer produces the independence; Harnessie governs it into a call you can defend.
 - Divide the run. Use Ringer for mechanical throughput, and Harnessie for the steps that need a contained boundary, an independent model-verifier, or an audit you can hand to someone else.
 - A verifier in Ringer's own language. `harnessie verify` is a standalone command with Ringer's native contract: exit code zero is the only pass. Point it at a workspace and a claims file; it runs your deterministic checks sandboxed, then a fresh-context model tests each claim against the artifacts. Because it is just an exit code, it drops into a Ringer manifest as a task's `check`:
@@ -31,7 +33,7 @@ Same foundation, opposite leans. Ringer goes wide and fast. Harnessie goes caref
 }
 ```
 
-The worker's own claims stop being the evidence; a model that never saw the worker's reasoning has to reproduce them. Fail-closed: 0 verified, 1 failed, 2 cannot-verify (nothing was observed, so nothing is asserted).
+The worker's own claims stop being the evidence; a model that never saw the worker's reasoning has to reproduce them. Fail-closed: 0 verified, 1 failed, 2 cannot-verify (nothing was observed, so nothing is asserted). For GitHub-hosted repos the same contract ships packaged as a one-file-install Action: [harnessie-verify-action](https://github.com/snapsynapse/harnessie-verify-action).
 
 ## Verifying an agent-produced pull request
 
@@ -42,7 +44,7 @@ harnessie verify --workspace <checkout> --criteria claims.md \
   --check "python3 -m pytest tests/ -q" --models models.yaml
 ```
 
-The report answers claim by claim: reproduced, refuted, or not verifiable in this environment, with the evidence named. The first public run of this recipe refuted a claim in its own author's pull request, which was the point: a verifier that has never failed its own author is a rubber stamp. The decision record behind the feature (four providers' independent positions, preserved dissent, human arbitration) is public: [AIDR-0006](https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0006-standalone-verifier-surface-for-agent-produced-prs.md).
+The report answers claim by claim: reproduced, refuted, or not verifiable in this environment, with the evidence named. The first public run of this recipe [refuted a claim in its own author's pull request](https://github.com/NateBJones-Projects/ringer/pull/4), which was the point: a verifier that has never failed its own author is a rubber stamp. The decision record behind the feature (four providers' independent positions, preserved dissent, human arbitration) is public: [AIDR-0006](https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0006-standalone-verifier-surface-for-agent-produced-prs.md).
 
 ## If you came from Ringer
 
