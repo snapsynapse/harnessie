@@ -6,7 +6,7 @@ Roadmap items are intent, not commitments. Dates are omitted deliberately; miles
 
 ## Released so far
 
-Versions 0.1.0 through 0.7.0 are shipped; the current release is 0.7.0, the sovereignty cascade routing and containment boundary line. This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
+Versions 0.1.0 through 0.7.1 are shipped; the current release is 0.7.1, which took the verification gate standalone (`harnessie verify`, AIDR-0006). This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
 
 ## Guiding priorities
 
@@ -100,6 +100,10 @@ Proof (the claim is eval-shaped, per the eval-first discipline):
 - Proven-brain claims tighten to bundle identity: a scorecard result pins model, provider, endpoint, prompt version, parser version, and sampling, and any component change requires a re-run — change control, not drift monitoring.
 
 Acceptance: a phase under a contained policy completes a real task with zero canary PII or secret bytes in any egress payload or run artifact; the published coverage table names every data class with its owning mechanism, and unstructured-PII canaries are proven contained by routing rather than claimed filtered; a resumed run rehydrates identically to an uninterrupted one, and a missing or corrupt strip map halts rehydration closed rather than guessing; the placeholder-impact delta is a published number for every proven brain; `routing_trace` shows every escalation and fallback with its reason; an escalation without budget headroom is refused before dispatch; a workflow that does not opt into cascade routing produces byte-identical routing behavior to 0.6; the adopting AIDR is on record with human arbitration.
+
+### 0.7.1: The verifier leaves the harness - SHIPPED
+
+Theme: extract the VerificationGate as a standalone surface (`harnessie verify`) consumable by any orchestrator or CI as an exit-code check, first proving ground agent-produced pull requests. Adopted via `decisions/AIDR-0006`. GREEN: fail-closed exit contract (0/1/2) proven by `tests/test_verify_standalone.py`; field-proven same day against the Ringer PR queue including a refutation of its own author's PR.
 
 ### 0.8.0: Write-safety and self-integrity
 
