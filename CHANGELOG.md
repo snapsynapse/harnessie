@@ -4,6 +4,10 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+### Added
+
+- Standalone verification surface `harnessie verify` (`harness/verify_standalone.py`), adopted via `decisions/AIDR-0006` (four-provider position sweep, human-arbitrated): point the VerificationGate's two layers at any workspace plus a claims file with no project scaffold, orchestrator, or run manifest. Deterministic checks run sandboxed and network-denied (opt-in `--allow-network` for artifacts whose own tests bind sockets; the verifier agent stays denied regardless), then a read-only fresh-context verifier tests the criteria claim by claim. Exit contract is scriptable and fail-closed: 0 verified, 1 failed, 2 cannot-verify (missing config, sandbox unavailable, provider error — neither pass nor fail was earned). Single pass by design: a foreign artifact's failure is the answer, not a prompt to reformulate and retry. The report carries the workspace git revision, criteria hash, verifier model, and network mode. First proving ground: independent verification of agent-produced pull requests. Proven by `tests/test_verify_standalone.py`.
+
 ## 0.7.0 (2026-07-09)
 
 Theme: sovereignty cascade routing and the containment boundary. Route every task to the least-exposed environment that can complete it, and make containment a mechanical property of the run rather than an operator habit. The whole milestone — routing layer, boundary, and its eval-shaped proof — was adopted through Harnessie's own contested-decision process: five arbitrated decision records (`decisions/AIDR-0001` through `AIDR-0005`), three of them run on six- and three-model Ollama Cloud panels spanning eight providers. A workflow that does not opt in to any of the new machinery routes byte-identically to 0.6.

@@ -79,6 +79,35 @@ def main(argv: list[str] | None = None) -> int:
         "verify-manifest", help="verify the trust-bundle MANIFEST integrity")
     p_manifest.add_argument("manifest", nargs="?", default="docs/MANIFEST.yaml")
 
+    p_verify = sub.add_parser(
+        "verify", help="standalone verification of a workspace against a "
+                       "claims file (exit 0 verified / 1 failed / 2 cannot verify)")
+    p_verify.add_argument("--workspace", required=True,
+                          help="directory holding the artifacts to verify")
+    p_verify.add_argument("--criteria", required=True,
+                          help="markdown file of acceptance criteria / claims")
+    p_verify.add_argument("--check", action="append", default=[],
+                          metavar="CMD",
+                          help="deterministic check command (repeatable); "
+                               "runs sandboxed in the workspace, exit 0 = pass")
+    p_verify.add_argument("--report-dir",
+                          help="where the report and proofs land "
+                               "(default: ./verify-reports/<timestamp>)")
+    p_verify.add_argument("--models",
+                          help="models.yaml for the verifier brain "
+                               "(default: ./config/models.yaml)")
+    p_verify.add_argument("--tier", default="",
+                          help="route the verifier to this tier explicitly")
+    p_verify.add_argument("--verifier-prompt",
+                          help="override the built-in verifier prompt file")
+    p_verify.add_argument("--no-verifier", action="store_true",
+                          help="deterministic checks only, no verifier agent")
+    p_verify.add_argument("--allow-network", action="store_true",
+                          help="let check commands use the network (checks are "
+                               "network-denied by default; the verifier agent "
+                               "stays denied regardless)")
+    p_verify.add_argument("--max-steps", type=int, default=20)
+
     p_init = sub.add_parser("init", help="scaffold a project and run a guided first run")
     p_init.add_argument("path", nargs="?", default=".", help="target directory")
     p_init.add_argument("--force", action="store_true",
@@ -135,6 +164,27 @@ def main(argv: list[str] | None = None) -> int:
         scorecard = run_eval_suite(root, suite_path=suite)
         print(format_scorecard(scorecard))
         return 0 if scorecard["passed"] == scorecard["total"] else 2
+
+    if args.cmd == "verify":
+        from .verify import Check
+        from .verify_standalone import VerifyRequest, run_standalone_verify
+
+        checks = [Check(name=f"check-{i}", command=cmd)
+                  for i, cmd in enumerate(args.check, start=1)]
+        outcome = run_standalone_verify(VerifyRequest(
+            workspace=Path(args.workspace),
+            criteria_path=Path(args.criteria),
+            checks=checks,
+            report_dir=Path(args.report_dir) if args.report_dir else None,
+            models_path=Path(args.models) if args.models else None,
+            tier=args.tier,
+            verifier_prompt_path=(Path(args.verifier_prompt)
+                                  if args.verifier_prompt else None),
+            no_verifier=args.no_verifier,
+            allow_network=args.allow_network,
+            max_steps=args.max_steps))
+        print(outcome.summary, file=sys.stderr if outcome.exit_code else sys.stdout)
+        return outcome.exit_code
 
     if args.cmd == "verify-manifest":
         from .trust_manifest import verify_manifest
