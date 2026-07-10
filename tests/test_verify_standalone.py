@@ -8,8 +8,15 @@ import json
 
 import pytest
 
+from harness import sandbox
+
 from harness.models.base import AssistantTurn, MockModel, ModelSpec, ToolCall
 from harness.verify import Check
+needs_sandbox = pytest.mark.skipif(
+    not sandbox.available(),
+    reason="no OS sandbox backend: check-executing paths report cannot-verify "
+           "(exit 2) by design; test_no_backend_checks_fail_closed covers that")
+
 from harness.verify_standalone import (
     EXIT_CANNOT_VERIFY,
     EXIT_FAILED,
@@ -82,6 +89,7 @@ def test_missing_models_config_cannot_verify(tmp_path):
 
 # -- deterministic-check layer ------------------------------------------------
 
+@needs_sandbox
 def test_failing_check_fails_without_consulting_verifier(tmp_path):
     req = make_request(tmp_path, checks=[Check(name="lie", command="false")],
                        no_verifier=True)
@@ -92,6 +100,7 @@ def test_failing_check_fails_without_consulting_verifier(tmp_path):
     assert "[FAIL] lie" in report
 
 
+@needs_sandbox
 def test_passing_checks_no_verifier_verifies(tmp_path):
     req = make_request(tmp_path, checks=[Check(name="truth", command="true")],
                        no_verifier=True)
@@ -175,6 +184,7 @@ def test_report_dir_must_not_be_workspace(tmp_path):
 
 # -- CLI wiring ---------------------------------------------------------------
 
+@needs_sandbox
 def test_cli_verify_checks_only(tmp_path, monkeypatch):
     from harness.cli import main
 
@@ -189,6 +199,7 @@ def test_cli_verify_checks_only(tmp_path, monkeypatch):
     assert (tmp_path / "rep" / "report.md").exists()
 
 
+@needs_sandbox
 def test_cli_verify_failing_check(tmp_path):
     from harness.cli import main
 
@@ -200,3 +211,16 @@ def test_cli_verify_failing_check(tmp_path):
                  "--check", "false", "--no-verifier",
                  "--report-dir", str(tmp_path / "rep")])
     assert code == EXIT_FAILED
+
+
+def test_no_backend_checks_fail_closed(tmp_path, monkeypatch):
+    # With no admitted sandbox backend, a check-bearing verify must report
+    # cannot-verify (exit 2), never run the check unsandboxed and never
+    # report pass or fail. This is the contract the CI no-backend job proves.
+    monkeypatch.setattr("harness.sandbox.backend_name", lambda: None)
+    req = make_request(tmp_path, checks=[Check(name="truth", command="true")],
+                       no_verifier=True)
+    out = run_standalone_verify(req)
+    assert out.exit_code == EXIT_CANNOT_VERIFY
+    report = out.report_path.read_text(encoding="utf-8")
+    assert "CANNOT VERIFY" in report
