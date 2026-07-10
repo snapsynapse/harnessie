@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  <title>Harnessie &mdash; a safe harness for working with AI</title>
-  <meta name="description" content="The safe way to put an AI to work: a harness that keeps you in control. Nothing runs unless you allow it, and nothing is done until it is checked.">
+  <title>Harnessie: verifiable multi-agent AI on models you control</title>
+  <meta name="description" content="An open-source harness for multi-agent AI work you can trust in both directions: every result is independently verified, and sensitive data never leaves the models you control.">
   <meta name="keywords" content="harnessie, multi-agent harness, agent orchestration, verification gate, brain-agnostic, model-agnostic agents, agent sandbox, prompt injection defense, agent ownership, audit log, consent-based orchestration, local LLM agents">
   <meta name="author" content="Sam Rogers">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -24,7 +24,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Harnessie">
   <meta property="og:title" content="Harnessie">
-  <meta property="og:description" content="The safe way to put an AI to work: guardrails that let a model do real work while you stay in control.">
+  <meta property="og:description" content="Multi-agent AI work you can trust in both directions: independently verified results, and sensitive data that never leaves the models you control. Open source, Apache-2.0.">
   <meta property="og:image" content="https://harnessie.com/imgs/og.png">
   <meta property="og:image:alt" content="The Harnessie wordmark beside a green Loch Ness monster wearing a harness, rising from a line-art loch.">
   <meta property="og:image:width" content="1200">
@@ -45,7 +45,7 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Harnessie">
-  <meta name="twitter:description" content="The safe way to put an AI to work: guardrails that let a model do real work while you stay in control.">
+  <meta name="twitter:description" content="Multi-agent AI work you can trust in both directions: independently verified results, and sensitive data that never leaves the models you control. Open source, Apache-2.0.">
   <meta name="twitter:image" content="https://harnessie.com/imgs/og.png">
   <meta name="twitter:site" content="@snapsynapse">
   <meta name="twitter:creator" content="@snapsynapse">
@@ -61,13 +61,13 @@
     "@type": "TechArticle",
     "headline": "Harnessie",
     "alternativeHeadline": "A brain-agnostic multi-agent harness",
-    "description": "Harnessie is a multi-agent harness for reliable work from language models. An orchestrator decomposes a goal into task packets, cheap workers execute them inside a jailed workspace, and an independent verifier gates every phase before the next begins. Models are swapped by editing one YAML file; the gates, jails, budgets, ownership rules, and audit log are the same underneath any brain.",
+    "description": "Harnessie is an open-source, brain-agnostic multi-agent harness for work you can trust in both directions. An orchestrator decomposes a goal into task packets, cheap workers execute them inside a jailed workspace, and an independent verifier gates every phase before the next begins, able only to pass or fail it. Sensitive data is contained: structured PII is stripped before any model sees it, secrets halt egress, and free-text-sensitive work stays on the models you control. Models are swapped by editing one YAML file; the gates, jails, budgets, ownership rules, containment boundary, and hash-chained audit log are the same underneath any brain.",
     "inLanguage": "en",
     "url": "https://harnessie.com/",
     "mainEntityOfPage": { "@type": "WebPage", "@id": "https://harnessie.com/" },
     "image": "https://harnessie.com/imgs/og.png",
     "datePublished": "2026-07-06",
-    "dateModified": "2026-07-07",
+    "dateModified": "2026-07-09",
     "author": {
       "@type": "Person",
       "name": "Sam Rogers",
@@ -368,12 +368,12 @@
       <div>
         <div class="pill"><span class="dot"></span> v0.7.0 &middot; live on PyPI &middot; Apache-2.0</div>
         <h1>Put AI to work without giving up control.</h1>
-        <p class="subtitle">The safest, easiest first AI harness: a model does real, multi-step work, and nothing runs unless you allow it; nothing is called done until it's independently checked.</p>
+        <p class="subtitle">An open-source harness for multi-agent work you can trust in both directions: nothing counts as done until an independent verifier passes it, and nothing sensitive leaves the models you control. Run local, private, or frontier brains, swapped by one line.</p>
         <div class="cta-row">
           <a href="#start" class="btn btn-primary">Install &amp; run your first workflow</a>
           <a href="https://github.com/snapsynapse/harnessie" class="btn btn-secondary" target="_blank" rel="noopener">Read the source</a>
         </div>
-        <p class="hero-note">New to this? That's exactly who it's for. You don't trust the AI; you trust the harness around it. Run a small model on your laptop or the most capable one available by changing a single line.</p>
+        <p class="hero-note">The verifier can only pass or fail, never wave work through. Disagreements between agents are recorded, not averaged away. Every model earns its role by passing a scorecard. And because it's Apache-2.0 and self-hostable, the safety is something you can read, not something you take on faith.</p>
       </div>
       <div class="hero-media">
         <img class="still" src="/imgs/og.png" alt="The Harnessie mascot: a green Loch Ness monster wearing a harness, rising from a line-art loch, beside the wordmark Harnessie.">
@@ -391,6 +391,7 @@
       <div class="chip"><b>&#10003;</b> GuideCheck Level&nbsp;4 &middot; <span class="m">0 blocking findings</span></div>
       <div class="chip"><b>8</b> providers &middot; <span class="m">11 models, verified work</span></div>
       <div class="chip"><b>&#10003;</b> Fails closed <span class="m">by default</span></div>
+      <div class="chip"><b>&#10003;</b> Sensitive data <span class="m">stays in models you control</span></div>
       <div class="chip"><b>&#10003;</b> Hash-chained <span class="m">audit log</span></div>
       <div class="chip"><b>&#10003;</b> No network <span class="m">until you add a key</span></div>
     </div>
@@ -536,6 +537,7 @@ routing:
       <div class="enforce-row"><code>ownership</code><span>Agents own the files they create and can't write each other's; operator lanes are locked to every agent.</span></div>
       <div class="enforce-row"><code>sandbox</code><span>Child commands run in OS confinement (Seatbelt / bubblewrap / firejail / docker) that denies writes outside the workspace and denies network. No backend means shell fails closed.</span></div>
       <div class="enforce-row"><code>quarantine</code><span>Tool results and inter-phase reports are scanned for injection and invisible characters, then fenced as data-not-instructions before a model sees them.</span></div>
+      <div class="enforce-row"><code>containment</code><span>Structured PII is stripped to placeholders before any model sees it; a secret in an outbound payload halts the run; free-text-sensitive work stays on the models you control and never reaches an exposed provider.</span></div>
       <div class="enforce-row"><code>refusals</code><span>Every denial is a machine-readable refusal and a logged audit event: actionable for the model, legible for the operator.</span></div>
       <div class="enforce-row"><code>contests</code><span>Decisions fan out to an adversarial panel; dissent halts the run and writes a decision record only a human may arbitrate.</span></div>
     </div>
