@@ -16,6 +16,8 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 ## 2. Version and docs
 
 - [ ] `pyproject.toml` `version` bumped; `description` current.
+- [ ] Landing page version pills (`docs/index.html`) match the new version
+      (enforced by `tests/test_version_sync.py`; a stale pill is a red suite).
 - [ ] `CHANGELOG.md`: cut `Unreleased` into a dated version section; open a
       fresh empty `Unreleased`.
 - [ ] Doc pass for any new surfaces (ARCHITECTURE.md, docs/GUIDE.md); run
