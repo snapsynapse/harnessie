@@ -33,6 +33,11 @@ PAGES = {
         "getting-started.html", "Getting started",
         "The five-minute path: install Harnessie, prove it works offline, "
         "point it at a model, run a real job, and read the record it leaves."),
+    "ladder.md": (
+        "ladder.html", "Modes",
+        "The ease-and-safety ladder: Harnessie's five run modes, from watching "
+        "a mock harness to an agent-mediated run, each stating what is real and "
+        "which risk you accept, with a human-only arbitration invariant across all."),
     "GUIDE.md": (
         "guide.html", "User guide",
         "The complete Harnessie user guide: concepts, CLI, workflow authoring, "

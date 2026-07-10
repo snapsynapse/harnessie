@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>Modes &mdash; Harnessie</title>
+  <meta name="description" content="The ease-and-safety ladder: Harnessie&#x27;s five run modes, from watching a mock harness to an agent-mediated run, each stating what is real and which risk you accept, with a human-only arbitration invariant across all.">
+  <meta name="author" content="Sam Rogers">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <meta name="theme-color" content="#2f6b28">
+  <link rel="canonical" href="https://harnessie.com/ladder.html">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/plain" href="https://harnessie.com/llms.txt" title="LLM-readable summary">
+  <link rel="assistant-guide" href="https://harnessie.com/.well-known/assistant-guide.txt">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Harnessie">
+  <meta property="og:title" content="Modes &mdash; Harnessie">
+  <meta property="og:description" content="The ease-and-safety ladder: Harnessie&#x27;s five run modes, from watching a mock harness to an agent-mediated run, each stating what is real and which risk you accept, with a human-only arbitration invariant across all.">
+  <meta property="og:image" content="https://harnessie.com/imgs/og.png">
+  <meta property="og:url" content="https://harnessie.com/ladder.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Modes &mdash; Harnessie">
+  <meta name="twitter:description" content="The ease-and-safety ladder: Harnessie&#x27;s five run modes, from watching a mock harness to an agent-mediated run, each stating what is real and which risk you accept, with a human-only arbitration invariant across all.">
+  <meta name="twitter:image" content="https://harnessie.com/imgs/og.png">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #f7f8fc; --bg-alt: #eceff4; --surface: #fff;
+      --text: #17281a; --text-mid: #3a4a3d; --text-muted: #566458; --text-faint: #8a968b;
+      --accent: #2f6b28; --accent-hover: #24571f; --border: #d6dce2; --border-soft: #e2e7ee;
+      --code-bg: #16261a; --code-border: #24571f; --code-text: #e8ece4;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.65; -webkit-font-smoothing: antialiased; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+    .skip-link { position: absolute; left: -9999px; top: 0; background: var(--accent); color: var(--bg); padding: 0.5rem 1rem; z-index: 100; }
+    .skip-link:focus { left: 0; }
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* Nav: sticky, translucent, matches the landing page */
+    nav.site { border-bottom: 1px solid var(--border); padding: 0.7rem 0; position: sticky; top: 0; background: rgba(247,248,252,0.9); backdrop-filter: saturate(1.4) blur(8px); -webkit-backdrop-filter: saturate(1.4) blur(8px); z-index: 40; }
+    nav.site .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem 1rem; }
+    nav.site .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--text); font-size: 1.05rem; }
+    nav.site .logo img { border-radius: 50%; object-fit: cover; border: 1px solid var(--border); }
+    nav.site .links { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem 1.25rem; font-size: 0.9rem; }
+    nav.site .links a { color: var(--text-muted); }
+    nav.site .links a[aria-current="page"] { color: var(--accent); font-weight: 600; }
+    nav.site .gh-star { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-alt); color: var(--text) !important; font-weight: 600; font-size: 0.8rem; }
+    nav.site .gh-star:hover { border-color: var(--accent); text-decoration: none; }
+    nav.site .gh-star svg { color: #eab308; }
+
+    /* Two-column doc shell: sticky TOC rail + content */
+    .doc-grid { max-width: 1180px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; display: grid; grid-template-columns: 230px 1fr; gap: 3.5rem; align-items: start; }
+    .doc-grid.no-toc { grid-template-columns: 1fr; max-width: 820px; }
+    .doc-grid.no-toc .doc-toc { display: none; }
+    .doc-toc { position: sticky; top: 74px; align-self: start; max-height: calc(100vh - 96px); overflow-y: auto; border-right: 1px solid var(--border-soft); padding-right: 1.25rem; }
+    .doc-toc .toc-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-faint); margin-bottom: 0.85rem; }
+    .doc-toc .toc-nav { display: flex; flex-direction: column; gap: 0.1rem; }
+    .doc-toc .toc-link { font-size: 0.86rem; color: var(--text-muted); padding: 0.32rem 0 0.32rem 0.8rem; border-left: 2px solid var(--border-soft); transition: color .15s, border-color .15s; }
+    .doc-toc .toc-link:hover { color: var(--text); text-decoration: none; }
+    .doc-toc .toc-link.active { color: var(--accent); font-weight: 600; border-left-color: var(--accent); }
+
+    /* Content typography */
+    .doc-content { min-width: 0; max-width: 760px; }
+    .doc-content .crumb { font-size: 0.88rem; color: var(--text-faint); margin-bottom: 1.1rem; }
+    .doc-content .crumb a { color: var(--text-faint); text-decoration: underline; text-decoration-color: var(--border); }
+    .doc-content h1 { font-size: 2.2rem; line-height: 1.18; letter-spacing: -0.02em; font-weight: 800; margin-bottom: 0.9rem; }
+    .doc-content h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; margin: 2.5rem 0 0.9rem; scroll-margin-top: 84px; }
+    .doc-content h3 { font-size: 1.15rem; font-weight: 600; margin: 1.7rem 0 0.5rem; scroll-margin-top: 84px; }
+    .doc-content h4 { font-size: 1rem; font-weight: 600; margin: 1.3rem 0 0.4rem; scroll-margin-top: 84px; }
+    .doc-content p { margin: 0 0 1rem; color: var(--text-mid); }
+    .doc-content ul, .doc-content ol { margin: 0 0 1.1rem 1.3rem; color: var(--text-mid); }
+    .doc-content li { margin-bottom: 0.4rem; }
+    .doc-content strong { color: var(--text); }
+    code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.08em 0.35em; }
+    pre { background: var(--code-bg); color: var(--code-text); border: 1px solid var(--code-border); border-radius: 10px; padding: 1.1rem 1.2rem; overflow-x: auto; margin: 0 0 1.2rem; font-size: 0.82rem; line-height: 1.6; }
+    pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+    .table-wrap { overflow-x: auto; margin: 0 0 1.2rem; border: 1px solid var(--border); border-radius: 10px; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+    th, td { padding: 0.6rem 0.85rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border-soft); }
+    th { background: var(--bg-alt); font-weight: 600; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    td code { color: var(--accent); background: none; border: none; padding: 0; white-space: nowrap; }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--border); background: var(--bg-alt); padding: 2rem 0; font-size: 0.9rem; color: var(--text-muted); }
+    footer .row { display: flex; flex-wrap: wrap; gap: 0.4rem 1.5rem; margin-bottom: 0.7rem; }
+    footer .row a { color: var(--text-mid); }
+
+    @media (max-width: 900px) {
+      .doc-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .doc-toc { position: static; max-height: none; height: auto; border-right: none; border-bottom: 1px solid var(--border); padding-right: 0; padding-bottom: 1.25rem; }
+      .doc-content h1 { font-size: 1.9rem; }
+    }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="site" aria-label="Main navigation">
+  <div class="container">
+    <a href="/" class="logo" aria-label="Harnessie home">
+      <img src="/imgs/harnessie-mark.png" width="28" height="28" alt="">
+      <span>Harnessie</span>
+    </a>
+    <div class="links">
+      <a href="/quickstart.html">Quickstart</a>
+      <a href="/getting-started.html">Getting started</a>
+      <a href="/ladder.html" aria-current="page">Modes</a>
+      <a href="/guide.html">User guide</a>
+      <a href="/brains.html">Brains</a>
+      <a href="/threat-model.html">Threat model</a>
+      <a href="/compare.html">Compare</a>
+      <a href="/ringer.html">Ringer</a>
+      <a href="https://github.com/snapsynapse/harnessie" class="gh-star" target="_blank" rel="noopener" aria-label="Star snapsynapse/harnessie on GitHub"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg><span>GitHub</span></a>
+    </div>
+  </div>
+</nav>
+<div class="doc-grid">
+  <aside class="doc-toc" aria-label="On this page"><p class="toc-title">On this page</p><nav class="toc-nav"><a class="toc-link" href="#the-trade-off-axis">The trade-off axis</a><a class="toc-link" href="#the-ladder-at-a-glance">The ladder at a glance</a><a class="toc-link" href="#rung-0-watch">Rung 0, Watch</a><a class="toc-link" href="#rung-1-narrate">Rung 1, Narrate</a><a class="toc-link" href="#rung-2-approve-every-step">Rung 2, Approve every step</a><a class="toc-link" href="#rung-3-approve-on-exception">Rung 3, Approve on exception</a><a class="toc-link" href="#rung-4-agent-mediated">Rung 4, Agent-mediated</a><a class="toc-link" href="#the-invariant-that-holds-across-every-rung">The invariant that holds across every rung</a><a class="toc-link" href="#what-exists-today-and-what-does-not">What exists today, and what does not</a></nav></aside>
+  <main id="main-content" class="doc-content">
+    <p class="crumb"><a href="/">harnessie.com</a> &nbsp;/&nbsp; docs &nbsp;/&nbsp; Modes</p>
+    <h1>Modes: the ease and safety ladder</h1>
+<p>An AI harness is easier to watch than to explain, and easier to trust once you can see exactly how much of it is real. Harnessie runs at five named modes. Each one trades ease of use against a single thing: how much a human has their eyes on the code before it runs.</p>
+<p>The point of naming them is choice. Every mode states, in plain language, what is real, what is not, and which risk you are accepting, so you pick the rung on purpose instead of discovering the trade-off after the fact. Start at the bottom and climb at your own pace. Nothing pushes you up a rung.</p>
+<h2 id="the-trade-off-axis">The trade-off axis</h2>
+<p>There is one axis: human eyes on the code. At the bottom, nothing real happens and you simply watch. At the top, real work runs with a human never having read it first, trusting the gates and a delegated agent instead. Neither end is wrong. The lower rungs are safer and slower; the higher rungs are easier and faster and accept more risk. The ladder makes the exchange rate visible.</p>
+<p>Two things never move, no matter how high you climb. Deterministic gates and the sandbox run at every rung. And a contested decision is always arbitrated by a human. The easiest mode still cannot decide a contested question for you.</p>
+<h2 id="the-ladder-at-a-glance">The ladder at a glance</h2>
+<div class="table-wrap"><table><thead><tr><th>Rung</th><th>What is real</th><th>Your role</th><th>Risk you accept</th><th>Status</th></tr></thead><tbody><tr><td>0 Watch</td><td>Nothing. Mock brain, no network, no side effects, zero dollars</td><td>Watch a harness work end to end</td><td>None</td><td>Shipped</td></tr><tr><td>1 Narrate</td><td>Real brains reasoning; side effects disabled</td><td>Watch real agents think and verify</td><td>None of consequence</td><td>Partial</td></tr><tr><td>2 Approve every step</td><td>Full run, halts at every side effect</td><td>Read the diff, approve or decline each one</td><td>Only what you personally approve</td><td>Shipped</td></tr><tr><td>3 Approve on exception</td><td>Full run, halts only at named conditions</td><td>Review the exceptions, not every line</td><td>Code you did not read may run inside the gates</td><td>Shipped</td></tr><tr><td>4 Agent-mediated</td><td>Full run, an agent holds the operator seat</td><td>Supervise in natural language</td><td>A human may never read the code first</td><td>Possible now</td></tr></tbody></table></div>
+<h2 id="rung-0-watch">Rung 0, Watch</h2>
+<p>The gentlest entry. A mock brain, no network, no side effects, and no money spent. You watch a real harness decompose a goal, hand work to workers, and gate results through verifiers, with nothing at stake. This rung exists to make the concept concrete before you touch anything.</p>
+<p>Mechanism: the zero-dollar mock run scaffolded by <code>harnessie init</code>. See <a href="/getting-started.html">Getting started</a>.</p>
+<p>Risk accepted: none. What you are choosing: understand the idea first.</p>
+<h2 id="rung-1-narrate">Rung 1, Narrate</h2>
+<p>Real models reason about your goal, but every side effect is disabled and each gate and disagreement is explained inline. You see genuine cognition, real verification, and real contested decisions, while nothing touches your files or system. This is the honest bridge between watching a mock and running the real thing.</p>
+<p>Risk accepted: none of consequence, because no side effect executes. What you are choosing: see real thinking without real results. This rung is partly present today and is called out as a gap in the <a href="https://github.com/snapsynapse/harnessie/blob/main/INTENT.md">INTENT</a>; it is being built out.</p>
+<h2 id="rung-2-approve-every-step">Rung 2, Approve every step</h2>
+<p>A real run. Every side-effecting phase halts and shows you the command, the diff, and the verifier evidence. Nothing proceeds without your yes. This is maximum eyes-on-code and the true-safety pole of the ladder. It is slower by design, and it is the rung where a newcomer can read real changes with a stop button on every one, so approving something you do not understand is structurally impossible.</p>
+<p>Mechanism: <code>--approve-interactive</code>. The <a href="/guide.html">User guide</a> covers the halt-and-recover table.</p>
+<p>Risk accepted: only what you read and approve. What you are choosing: full control, more of your time.</p>
+<h2 id="rung-3-approve-on-exception">Rung 3, Approve on exception</h2>
+<p>The run proceeds autonomously and halts only at named conditions: a budget ceiling, a verifier failure, a contested decision, or a prompt-injection quarantine. You review the exceptions the harness raises rather than every line. This is faster, and it is honest about its cost.</p>
+<p>Mechanism: a headless approval policy via <code>--approval-policy</code>. The dangerous classes it leans on are documented in the <a href="/threat-model.html">Threat model</a>.</p>
+<p>Risk accepted: code you did not personally read may execute inside the sandbox and gates before you see it; you are trusting the automatic guards to catch the dangerous cases. What you are choosing: speed, with a human on the exceptions.</p>
+<h2 id="rung-4-agent-mediated">Rung 4, Agent-mediated</h2>
+<p>An outer agent holds the operator seat. It edits config, launches runs, approves by the policy you set, and narrates results back to you in plain language. You supervise the supervisor. This is the easiest and most delegated mode, and it accepts the most risk, stated bluntly: a human may never read the code before it runs. You are trusting the gates and a delegated agent operator at once.</p>
+<p>This rung is possible today by pointing any capable agent at the CLI. What makes it safe to offer is the invariant below, plus two audit fields that record who actually held each seat.</p>
+<p>Risk accepted: no human eyes on the code by default. What you are choosing: maximum ease, maximum delegation.</p>
+<h2 id="the-invariant-that-holds-across-every-rung">The invariant that holds across every rung</h2>
+<p>The operator seat and the arbiter seat are different seats. The operator seat, orchestration and approvals, may be occupied by a delegated agent acting on your instruction. The arbiter seat may not. When agents disagree on a contested decision, the harness stops and escalates to a human, even at Rung 4 where an agent is driving everything else. It records the decision as a human arbitration in a hash-chained audit log, and it marks operator-of-record, human or delegated-agent, and arbiter-of-record, always human, as distinct fields so the timeline can prove who held each seat.</p>
+<p>That is why the most delegated mode is still safe to offer. The easiest rung cannot decide a contested question for you. This is design invariant 13; see <a href="https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md">GOVERNANCE</a> and the human-only arbitration rule the harness dogfoods in its own decision records.</p>
+<h2 id="what-exists-today-and-what-does-not">What exists today, and what does not</h2>
+<p>Most of the ladder is already the harness you can install. The mock run, step-by-step approval, and exception-only approval are shipped mechanisms, not promises. The honest gaps, recorded openly, are the Narrate rung, the operator-of-record and arbiter-of-record audit fields, and the plain-language trade-off banner each rung should print before it runs. Where a claim on this page is not yet true in code, it says so. That is the same rule the rest of this site follows: every safety claim points at something you can check.</p>
+  </main>
+</div>
+<footer>
+  <div class="container">
+    <div class="row">
+      <a href="/quickstart.html">Quickstart</a>
+      <a href="/getting-started.html">Getting started</a>
+      <a href="/ladder.html">Modes</a>
+      <a href="/guide.html">User guide</a>
+      <a href="/brains.html">Brains</a>
+      <a href="/threat-model.html">Threat model</a>
+      <a href="/compare.html">Compare</a>
+      <a href="/ringer.html">Ringer</a>
+    </div>
+    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/ladder.md" target="_blank" rel="noopener">docs/ladder.md</a>.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc-link'));
+  if (!links.length) return;
+  var map = {};
+  links.forEach(function (l) { map[l.getAttribute('href').slice(1)] = l; });
+  var heads = Object.keys(map).map(function (id) { return document.getElementById(id); }).filter(Boolean);
+  if (!heads.length) return;
+  function setActive(id) { links.forEach(function (l) { l.classList.toggle('active', l === map[id]); }); }
+  if (!('IntersectionObserver' in window)) { return; }
+  var io = new IntersectionObserver(function (entries) {
+    var vis = entries.filter(function (e) { return e.isIntersecting; })
+      .sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; });
+    if (vis.length) setActive(vis[0].target.id);
+  }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+  heads.forEach(function (h) { io.observe(h); });
+  setActive(heads[0].id);
+})();
+</script>
+
+</body>
+</html>
