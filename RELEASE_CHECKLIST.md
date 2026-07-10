@@ -55,6 +55,12 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 - [ ] OPERATOR: `twine upload dist/*` (irreversible; a PyPI version can be
       yanked but never replaced). Verify a fresh `pip install harnessie`
       from the live index.
+- [ ] OPERATOR: bump the brew tap (snapsynapse/homebrew-tap
+      `Formula/harnessie.rb`): new sdist URL + sha256 from PyPI, local
+      `brew upgrade snapsynapse/tap/harnessie` + `brew test`, then push.
+      The 0.7.1 release shipped with the tap still serving 0.6.0 — README
+      lists brew and pip as equivalent installs, so tap lag is version skew
+      on a public surface.
 - [ ] OPERATOR: update the DNS TXT anchor `_assistant-guide.harnessie.com`
       to `v=1; sha256=<guide-sha256>`, single record, then confirm it
       resolves (DoH) and run the hosted GuideCheck verifier for the Level 4

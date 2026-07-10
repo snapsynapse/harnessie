@@ -1,0 +1,42 @@
+name: verify-pr-claims
+# Dogfood: every PR to harnessie gets claim-by-claim verification by the
+# published action (the repo verifies itself with its own product).
+# Requires two repo settings before it produces verdicts:
+#   vars.VERIFIER_ENDPOINT   e.g. https://api.anthropic.com/v1 or any
+#                            OpenAI-compatible endpoint you control
+#   vars.VERIFIER_MODEL      model id at that endpoint
+#   secrets.VERIFIER_API_KEY the key (never echoed; used only by the verify step)
+# Until those exist the job skips politely instead of failing every PR.
+on:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check verifier configuration
+        id: cfg
+        env:
+          EP: ${{ vars.VERIFIER_ENDPOINT }}
+          MODEL: ${{ vars.VERIFIER_MODEL }}
+        run: |
+          if [ -z "$EP" ] || [ -z "$MODEL" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::verify-pr-claims: VERIFIER_ENDPOINT/VERIFIER_MODEL repo variables not set; skipping (see workflow header)."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.configured == 'true'
+        with:
+          fetch-depth: 0
+      - uses: snapsynapse/harnessie-verify-action@v0
+        if: steps.cfg.outputs.configured == 'true'
+        with:
+          criteria: auto
+          checks: |
+            python3 -m pytest -q
+          models-endpoint: ${{ vars.VERIFIER_ENDPOINT }}
+          models-model: ${{ vars.VERIFIER_MODEL }}
+        env:
+          HARNESSIE_MODEL_API_KEY: ${{ secrets.VERIFIER_API_KEY }}
