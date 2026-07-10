@@ -46,6 +46,11 @@ PAGES = {
         "A falsifiable comparison of Harnessie's structural properties against "
         "the failure modes of prevailing agent harnesses, each row citing the "
         "enforcing code and its test."),
+    "compare.md": (
+        "compare.html", "Compare",
+        "Where Harnessie fits among AI agent frameworks and guardrail tools: "
+        "a category map, an honest native-versus-build-it-yourself table, and "
+        "when to reach for something else instead."),
 }
 
 # md link target -> served path, for links between the docs pages
