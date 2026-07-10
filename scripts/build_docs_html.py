@@ -63,6 +63,11 @@ PAGES = {
         "the recipe for verifying agent-produced pull requests."),
 }
 
+# Pages built and served but deliberately left out of the nav and footer
+# (reachable only by direct link; e.g. the Ringer page is a targeted-promo
+# URL, not a general-discovery surface).
+HIDDEN = {"ringer.md"}
+
 # md link target -> served path, for links between the docs pages
 LINK_MAP = {src: "/" + out for src, (out, _, _) in PAGES.items()}
 
@@ -406,10 +411,10 @@ def build() -> list[Path]:
             f'      <a href="/{o}"'
             + (' aria-current="page"' if o == out_name else "")
             + f">{lbl}</a>"
-            for _, (o, lbl, _) in PAGES.items())
+            for k, (o, lbl, _) in PAGES.items() if k not in HIDDEN)
         footerlinks = "\n".join(
             f'      <a href="/{o}">{lbl}</a>'
-            for _, (o, lbl, _) in PAGES.items())
+            for k, (o, lbl, _) in PAGES.items() if k not in HIDDEN)
         page = TEMPLATE.format(
             title=html.escape(label),
             description=html.escape(description),

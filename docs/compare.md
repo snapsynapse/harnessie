@@ -48,3 +48,5 @@ Nothing here is magic. You could build most of it: take LangGraph for orchestrat
 Harnessie is that assembly, already built, tested, and proven brain-agnostic across eight providers and eleven models, with the safety living at the tool layer where no prompt can switch it off. If the assembly is worth your weeks, build it. If it is worth a `pip install`, that is what this is.
 
 Open source, Apache-2.0. Read every line, self-host it, owe no one.
+
+If you arrived here from Ringer, there is a dedicated page on [how Harnessie and Ringer fit together](ringer.md).
