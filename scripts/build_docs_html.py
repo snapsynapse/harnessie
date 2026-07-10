@@ -51,6 +51,11 @@ PAGES = {
         "Where Harnessie fits among AI agent frameworks and guardrail tools: "
         "a category map, an honest native-versus-build-it-yourself table, and "
         "when to reach for something else instead."),
+    "ringer.md": (
+        "ringer.html", "Ringer",
+        "Harnessie and Ringer share one conviction and lean opposite ways: "
+        "how they compose, wiring harnessie verify as a Ringer check, and "
+        "the recipe for verifying agent-produced pull requests."),
 }
 
 # md link target -> served path, for links between the docs pages

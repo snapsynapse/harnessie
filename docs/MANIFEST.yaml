@@ -2,17 +2,17 @@ kind: harnessie-trust-bundle
 version: 1
 files:
   - path: assistant-guide.txt
-    sha256: 4d79d1b7349abebaa2e9c5661ff141d1a688e411e5cf100b7648a6074e70495c
+    sha256: cf621fdb1adc036e6cbed7845d652fa1295338ebfdee4dc4053c0f32a924038c
   - path: docs/.well-known/assistant-guide.txt
-    sha256: 4d79d1b7349abebaa2e9c5661ff141d1a688e411e5cf100b7648a6074e70495c
+    sha256: cf621fdb1adc036e6cbed7845d652fa1295338ebfdee4dc4053c0f32a924038c
   - path: docs/.well-known/assistant-guide-manifest.txt
-    sha256: e81e51e6f55a334b33043742d8c0e79e4ff38126049b57354520558d627adaaf
+    sha256: 2749ad1bbc363319ae7ec04390f622a2856393206dba25bd92a699ea7b903c95
   - path: docs/llms.txt
-    sha256: 205f170a646964271575f204dd6afee4a70dc3d186086a85a38bfbba998f6326
+    sha256: 2aa2e8d376422e405d30821cf56d24a4cd257008f6a19c805f021a6286416908
   - path: docs/robots.txt
     sha256: 88588b10d194d3d62ad9a4463f05a80f645ed1e7b23c59b10087cb28dd5a57f6
   - path: docs/sitemap.xml
-    sha256: 5f83fea78c3826338c4cd751912873c7602a7790c67fd2ecd71c8c2abbf333ec
+    sha256: 7739600d672a36aa280520bc05e702fa863cae6ba970fb63db948351f69e9e9b
   - path: docs/CNAME
     sha256: 6dc81288045a60be46e3eaf407380328466b8ce98c769fe1e637f69c97d5a97a
   - path: docs/site.webmanifest

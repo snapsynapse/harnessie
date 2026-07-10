@@ -4,6 +4,10 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+## 0.7.1 (2026-07-09)
+
+Theme: the verifier leaves the harness. One addition, adopted through the contested-decision process like everything before it.
+
 ### Added
 
 - Standalone verification surface `harnessie verify` (`harness/verify_standalone.py`), adopted via `decisions/AIDR-0006` (four-provider position sweep, human-arbitrated): point the VerificationGate's two layers at any workspace plus a claims file with no project scaffold, orchestrator, or run manifest. Deterministic checks run sandboxed and network-denied (opt-in `--allow-network` for artifacts whose own tests bind sockets; the verifier agent stays denied regardless), then a read-only fresh-context verifier tests the criteria claim by claim. Exit contract is scriptable and fail-closed: 0 verified, 1 failed, 2 cannot-verify (missing config, sandbox unavailable, provider error — neither pass nor fail was earned). Single pass by design: a foreign artifact's failure is the answer, not a prompt to reformulate and retry. The report carries the workspace git revision, criteria hash, verifier model, and network mode. First proving ground: independent verification of agent-produced pull requests. Proven by `tests/test_verify_standalone.py`.

@@ -29,6 +29,7 @@ pip install harnessie — also available as pipx/uv tool install, and brew insta
 - Getting started: https://harnessie.com/getting-started.html
 - User guide: https://harnessie.com/guide.html
 - Compare (where Harnessie fits among agent frameworks and guardrail tools): https://harnessie.com/compare.html
+- Harnessie and Ringer (composition, verify-as-check wiring, PR verification recipe): https://harnessie.com/ringer.html
 - Architecture: https://github.com/snapsynapse/harnessie/blob/main/ARCHITECTURE.md
 - Governance: https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md
 - Security model: https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md

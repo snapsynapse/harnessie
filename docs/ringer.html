@@ -4,25 +4,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  <title>Compare &mdash; Harnessie</title>
-  <meta name="description" content="Where Harnessie fits among AI agent frameworks and guardrail tools: a category map, an honest native-versus-build-it-yourself table, and when to reach for something else instead.">
+  <title>Ringer &mdash; Harnessie</title>
+  <meta name="description" content="Harnessie and Ringer share one conviction and lean opposite ways: how they compose, wiring harnessie verify as a Ringer check, and the recipe for verifying agent-produced pull requests.">
   <meta name="author" content="Sam Rogers">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
   <meta name="theme-color" content="#2f6b28">
-  <link rel="canonical" href="https://harnessie.com/compare.html">
+  <link rel="canonical" href="https://harnessie.com/ringer.html">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="alternate" type="text/plain" href="https://harnessie.com/llms.txt" title="LLM-readable summary">
   <link rel="assistant-guide" href="https://harnessie.com/.well-known/assistant-guide.txt">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Harnessie">
-  <meta property="og:title" content="Compare &mdash; Harnessie">
-  <meta property="og:description" content="Where Harnessie fits among AI agent frameworks and guardrail tools: a category map, an honest native-versus-build-it-yourself table, and when to reach for something else instead.">
+  <meta property="og:title" content="Ringer &mdash; Harnessie">
+  <meta property="og:description" content="Harnessie and Ringer share one conviction and lean opposite ways: how they compose, wiring harnessie verify as a Ringer check, and the recipe for verifying agent-produced pull requests.">
   <meta property="og:image" content="https://harnessie.com/imgs/og.png">
-  <meta property="og:url" content="https://harnessie.com/compare.html">
+  <meta property="og:url" content="https://harnessie.com/ringer.html">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Compare &mdash; Harnessie">
-  <meta name="twitter:description" content="Where Harnessie fits among AI agent frameworks and guardrail tools: a category map, an honest native-versus-build-it-yourself table, and when to reach for something else instead.">
+  <meta name="twitter:title" content="Ringer &mdash; Harnessie">
+  <meta name="twitter:description" content="Harnessie and Ringer share one conviction and lean opposite ways: how they compose, wiring harnessie verify as a Ringer check, and the recipe for verifying agent-produced pull requests.">
   <meta name="twitter:image" content="https://harnessie.com/imgs/og.png">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -113,35 +113,44 @@
       <a href="/guide.html">User guide</a>
       <a href="/brains.html">Brains</a>
       <a href="/threat-model.html">Threat model</a>
-      <a href="/compare.html" aria-current="page">Compare</a>
-      <a href="/ringer.html">Ringer</a>
+      <a href="/compare.html">Compare</a>
+      <a href="/ringer.html" aria-current="page">Ringer</a>
       <a href="https://github.com/snapsynapse/harnessie" class="gh-star" target="_blank" rel="noopener" aria-label="Star snapsynapse/harnessie on GitHub"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg><span>GitHub</span></a>
     </div>
   </div>
 </nav>
 <div class="doc-grid">
-  <aside class="doc-toc" aria-label="On this page"><p class="toc-title">On this page</p><nav class="toc-nav"><a class="toc-link" href="#three-categories-not-one-race">Three categories, not one race</a><a class="toc-link" href="#what-is-native-and-what-you-build-yourself">What is native, and what you build yourself</a><a class="toc-link" href="#when-to-reach-for-something-else">When to reach for something else</a><a class="toc-link" href="#the-honest-alternative-assemble-it-yourself">The honest alternative: assemble it yourself</a></nav></aside>
+  <aside class="doc-toc" aria-label="On this page"><p class="toc-title">On this page</p><nav class="toc-nav"><a class="toc-link" href="#the-same-conviction">The same conviction</a><a class="toc-link" href="#different-emphasis">Different emphasis</a><a class="toc-link" href="#how-they-compose">How they compose</a><a class="toc-link" href="#verifying-an-agent-produced-pull-request">Verifying an agent-produced pull request</a><a class="toc-link" href="#if-you-came-from-ringer">If you came from Ringer</a><a class="toc-link" href="#see-also">See also</a></nav></aside>
   <main id="main-content" class="doc-content">
-    <p class="crumb"><a href="/">harnessie.com</a> &nbsp;/&nbsp; docs &nbsp;/&nbsp; Compare</p>
-    <h1>How Harnessie compares</h1>
-<p>Harnessie is often mistaken for yet another agent framework. It isn&#x27;t one, and the difference is the whole point.</p>
-<p>Agent frameworks answer one question well: how do several agents work together? Guardrail tools answer a different one: how do I filter a single model&#x27;s output? Harnessie answers a third that neither of the others owns: how do I trust what a group of agents produced, and contain what they were allowed to touch, on models I choose to run?</p>
-<p>You can use Harnessie&#x27;s ideas next to an orchestrator, or use Harnessie as the harness. This page is about where it fits, and where it honestly does not.</p>
-<h2 id="three-categories-not-one-race">Three categories, not one race</h2>
-<ul><li>Orchestration frameworks (LangGraph, CrewAI, AutoGen / AG2, the OpenAI and Claude Agent SDKs). Best at composing multi-agent workflows: handoffs, group chat, hierarchical managers, optional critic and reflection agents. Their collaboration is cooperative by design. Agents help each other converge.</li><li>Guardrail and safety tools (Guardrails AI, NeMo Guardrails, Lakera). Best at wrapping a model with input and output controls: validators, policy rails, prompt-injection defense. They sit around one model, not across a multi-agent result.</li><li>Harnessie. A harness that treats agent work as governed, not merely executed: an independent verifier that can only pass or fail, decisions that preserve dissent for a human to arbitrate, a containment boundary so sensitive data never leaves the models you control, and a hash-chained audit of all of it. Brain-agnostic by test: a model earns a tier by passing a scorecard, not by assertion.</li></ul>
-<p>The categories are complementary. The comparison below is not a scoreboard; it is a map of what each category ships natively versus what it leaves you to build.</p>
-<h2 id="what-is-native-and-what-you-build-yourself">What is native, and what you build yourself</h2>
-<p>As of mid-2026. Frameworks move quickly; verify current capabilities before relying on this.</p>
-<div class="table-wrap"><table><thead><tr><th>Capability</th><th>Orchestration frameworks</th><th>Guardrail tools</th><th>Harnessie</th></tr></thead><tbody><tr><td>Multi-agent orchestration (handoffs, roles, group chat)</td><td>Native, and their core strength</td><td>Not their job</td><td>Native, deliberately minimal (orchestrator / workers / verifier)</td></tr><tr><td>Independent verifier that can only fail-closed, with no access to the worker&#x27;s reasoning, blocking progress until it passes</td><td>You build it (critics are cooperative and share state)</td><td>Output validators, but not a phase gate across a multi-agent run</td><td>Native</td></tr><tr><td>Contested decisions that preserve dissent verbatim and let only a human arbitrate</td><td>You build it (frameworks assume machine consensus)</td><td>Not their job</td><td>Native (AIDR-shaped decision records)</td></tr><tr><td>Structured PII stripped before egress; secrets halt the run; free-text-sensitive work never leaves models you control</td><td>You build it</td><td>Partial: PII and injection validators exist (for example Guardrails AI, Lakera), but as filters on one model, not never-egress routing across the run</td><td>Native (containment boundary plus contained routing)</td></tr><tr><td>Brain-agnostic by scorecard: a model is admitted to a tier only by passing a test</td><td>Model-agnostic by config, but not gated by a passing scorecard</td><td>Not their job</td><td>Native</td></tr><tr><td>Hash-chained, tamper-evident audit of every agent and operator action</td><td>You build it</td><td>Logging, not a verifiable chain</td><td>Native</td></tr><tr><td>Fails closed when a control cannot be enforced (no sandbox backend, no budget ceiling)</td><td>Varies; usually best-effort</td><td>Varies</td><td>Native, by policy</td></tr></tbody></table></div>
-<p>The pattern: orchestration frameworks are excellent at the middle row and leave the rest to you; guardrail tools own a slice of one row; Harnessie ships the whole column and keeps it identical underneath any brain.</p>
-<h2 id="when-to-reach-for-something-else">When to reach for something else</h2>
-<p>A comparison page that only argues for itself is not worth reading. Harnessie is the wrong tool in real cases:</p>
-<ul><li>You need fast multi-agent prototyping and do not need verification, containment, or an audit trail. Reach for CrewAI or LangGraph; they are lighter and have far more examples.</li><li>You only need to validate one model&#x27;s output (schema, toxicity, PII on a single call). Guardrails AI or a provider guardrail is simpler than a whole harness.</li><li>You are all-in on one provider and want that vendor&#x27;s managed tracing and handoffs. The OpenAI or Claude Agent SDK will have less friction.</li><li>You want a large ecosystem, plugins, and a big community today. Harnessie is new and small on purpose; it competes on the mechanisms, not the mindshare.</li></ul>
-<p>Harnessie earns its place only when you need the integrated, verifiable, contained whole, on models you control, and want the guarantees to live in code rather than in a prompt.</p>
-<h2 id="the-honest-alternative-assemble-it-yourself">The honest alternative: assemble it yourself</h2>
-<p>Nothing here is magic. You could build most of it: take LangGraph for orchestration, hand-roll a fresh-context verifier that fails closed, bolt on Guardrails AI for PII, write your own placeholder-based egress boundary, add a hash-chained event log, and maintain a scorecard for every model you swap in.</p>
-<p>Harnessie is that assembly, already built, tested, and proven brain-agnostic across eight providers and eleven models, with the safety living at the tool layer where no prompt can switch it off. If the assembly is worth your weeks, build it. If it is worth a <code>pip install</code>, that is what this is.</p>
-<p>Open source, Apache-2.0. Read every line, self-host it, owe no one.</p>
+    <p class="crumb"><a href="/">harnessie.com</a> &nbsp;/&nbsp; docs &nbsp;/&nbsp; Ringer</p>
+    <h1>Harnessie and Ringer</h1>
+<p>If you found Harnessie through Ringer, you are in the right place. The two are built to fit together.</p>
+<h2 id="the-same-conviction">The same conviction</h2>
+<p>Ringer and Harnessie start from the same belief, reached independently: a frontier model earns its tokens on orchestration and judgment, most execution does not, and the only result worth trusting is one that has been checked by running it, never one an agent claims is done. Ringer says it plainly: the check is the contract, and exit code zero is the only thing it believes. Harnessie holds the identical line at its gate.</p>
+<p>When two tools arrive at the same core conviction on their own, it is usually because the conviction is right. So this is not a rivalry. It is two tools on one foundation, leaning in different directions.</p>
+<h2 id="different-emphasis">Different emphasis</h2>
+<p>Ringer optimizes the swarm. Parallel execution across a set of engines (Codex CLI, Grok Build, OpenCode, or your own), local by default, a live dashboard, throughput. It is the fastest way to get a lot of mechanical, verifiable work done cheaply and in parallel on your own machine.</p>
+<p>Harnessie optimizes governance. An independent verifier agent on top of the deterministic check, decisions that preserve dissent for a human to arbitrate, a containment boundary that lets you reach for a cloud model without letting sensitive data reach it, and a hash-chained audit of every agent and operator action. It is the harness for when the work itself must be governed, not just executed.</p>
+<p>Same foundation, opposite leans. Ringer goes wide and fast. Harnessie goes careful and accountable.</p>
+<h2 id="how-they-compose">How they compose</h2>
+<ul><li>A shared standard. Both speak AIDR, the one-file decision-record format: independent positions, preserved dissent, human arbitration. A decision recorded alongside Ringer reads the same as one Harnessie writes.</li><li>Independence, then governance. Ringer&#x27;s whole model is running a task across independent engines, which is exactly the raw material a governed decision needs: several genuinely independent takes. Harnessie&#x27;s contested-decision mode turns independent outputs into a decision record with dissent preserved and a human arbitrating. Ringer produces the independence; Harnessie governs it into a call you can defend.</li><li>Divide the run. Use Ringer for mechanical throughput, and Harnessie for the steps that need a contained boundary, an independent model-verifier, or an audit you can hand to someone else.</li><li>A verifier in Ringer&#x27;s own language. <code>harnessie verify</code> is a standalone command with Ringer&#x27;s native contract: exit code zero is the only pass. Point it at a workspace and a claims file; it runs your deterministic checks sandboxed, then a fresh-context model tests each claim against the artifacts. Because it is just an exit code, it drops into a Ringer manifest as a task&#x27;s <code>check</code>:</li></ul>
+<pre><code>{
+  &quot;key&quot;: &quot;governed-step&quot;,
+  &quot;spec&quot;: &quot;...task for the worker engine...&quot;,
+  &quot;check&quot;: &quot;harnessie verify --workspace {taskdir} --criteria acceptance.md --models models.yaml&quot;
+}</code></pre>
+<p>The worker&#x27;s own claims stop being the evidence; a model that never saw the worker&#x27;s reasoning has to reproduce them. Fail-closed: 0 verified, 1 failed, 2 cannot-verify (nothing was observed, so nothing is asserted).</p>
+<h2 id="verifying-an-agent-produced-pull-request">Verifying an agent-produced pull request</h2>
+<p>The same command reviews PR-shaped work anywhere. The recipe: check out the PR head, stage its diff alongside it (<code>git diff &lt;base&gt;..HEAD &gt; PR.diff</code>, so the verifier can judge change-surface claims without git), distill the PR body&#x27;s claims into a criteria file, then:</p>
+<pre><code>harnessie verify --workspace &lt;checkout&gt; --criteria claims.md \
+  --check &quot;python3 -m pytest tests/ -q&quot; --models models.yaml</code></pre>
+<p>The report answers claim by claim: reproduced, refuted, or not verifiable in this environment, with the evidence named. The first public run of this recipe refuted a claim in its own author&#x27;s pull request, which was the point: a verifier that has never failed its own author is a rubber stamp. The decision record behind the feature (four providers&#x27; independent positions, preserved dissent, human arbitration) is public: <a href="https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0006-standalone-verifier-surface-for-agent-produced-prs.md">AIDR-0006</a>.</p>
+<h2 id="if-you-came-from-ringer">If you came from Ringer</h2>
+<p>You already have parallel execution and verification-by-check. Harnessie adds four things, for when you need them:</p>
+<ul><li>An independent verifier agent, not only a shell check: a fresh-context model that judges the artifact against your acceptance criteria and can only pass or fail it, never wave it through. Available inside a governed run, or standalone as <code>harnessie verify</code>.</li><li>A containment boundary: PII stripped to placeholders before any model sees it, a secret in an outbound payload halts the run, and free-text-sensitive work stays on the models you control. Use a frontier model without handing it your data.</li><li>Decisions, not only tasks: when a step is a judgment call rather than an implementation, run it as a contested decision with preserved dissent and human arbitration.</li><li>A tamper-evident audit: a hash-chained log of every action, agent and human, that you can verify and hand to a reviewer.</li></ul>
+<p>If you never need those, Ringer alone is the lighter tool, and that is the honest recommendation.</p>
+<h2 id="see-also">See also</h2>
+<ul><li><a href="/compare.html">How Harnessie compares</a> to agent frameworks and guardrail tools, for the wider landscape.</li><li><a href="https://unlock-ai.natebjones.com/guides/ringer">Ringer</a>, by Nate Jones.</li></ul>
   </main>
 </div>
 <footer>
@@ -155,7 +164,7 @@
       <a href="/compare.html">Compare</a>
       <a href="/ringer.html">Ringer</a>
     </div>
-    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/compare.md" target="_blank" rel="noopener">docs/compare.md</a>.</p>
+    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/ringer.md" target="_blank" rel="noopener">docs/ringer.md</a>.</p>
   </div>
 </footer>
 
