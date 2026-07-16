@@ -1,8 +1,9 @@
 ---
 id: AIDR-0008
 title: Operator-side engine-wrapper containment as a Harnessie surface
-status: open
+status: arbitrated
 date: 2026-07-10
+decided: 2026-07-16
 arbiter: Sam Rogers
 tags: [delivery-surface, containment, engine-wrappers, ringer]
 ---
@@ -97,6 +98,14 @@ Docs-only (Option 3) fails the brand test directly. The brief states that Harnes
 Filed after reading all sweep positions. The summary proposes launching the repo "holding the rejected Ringer PR's work as the seed with explicit credit." Concrete failure mode: that code is its author's copyrighted work, submitted to a repo whose license reserves rights to its owner, and its author has not consented to relocation. Credit does not substitute for consent; a repo seeded with their code before they say yes is misappropriation dressed as tribute, and it would poison the exact invitation it is meant to enable. The prose's own framing (reach out with an invitation) is right; the launch sequencing must be: minimal original seed first, invitation second, their work lands only by their own PR under their own name. The positions otherwise agree on shape; the arbiter should fix the seeding order explicitly.
 
 ## Arbitration
+
+- decided_by: Sam Rogers
+- date: 2026-07-16
+- decision: Ship now as a separate probe-gated Apache-2.0 repo. Objection upheld — fresh-authored minimal seed first, invitation second; others' work lands only by their own PR.
+
+Approved. The objection to seeding with the rejected PR's code is upheld. But let's be very generous with crediting ideas to others and rigorously conservative about avoiding use of anyone else's intellectual property. We have clear boundaries around anything that could be construed as needed consent, while openly inviting contributions from other developers. Let's author this fresh with one reference wrapper implementing the public pattern, a deny-list module, then probe harness. Then we can comment and invite as appropriate.
+
+*(Arbitration prose authored by the arbiter directly; metadata lines, the objection-upheld sentence, and a spelling fix transcribed by the session agent at the arbiter's explicit direction, 2026-07-16.)*
 
 ## Evidence
 
