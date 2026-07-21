@@ -2,8 +2,8 @@
 integrate workflow, then the run resumes from its journal without re-running."""
 
 import json
-import time
 import textwrap
+import threading
 
 from harness import sandbox
 from harness.models.base import AssistantTurn, MockModel, ModelSpec, ToolCall
@@ -246,7 +246,7 @@ def test_phase_outcomes_and_events_show_phase_costs(tmp_path, monkeypatch):
     assert all("phase_spent_usd" in e for e in done)
 
 
-def test_parallel_phases_use_independent_workspaces_and_beat_sequential(tmp_path, monkeypatch):
+def test_parallel_phases_use_independent_workspaces_and_run_concurrently(tmp_path, monkeypatch):
     monkeypatch.setattr(sandbox, "wrap",
                         lambda argv, workspace, allow_network=False: argv)
     scaffold_project(tmp_path)
@@ -279,6 +279,8 @@ def test_parallel_phases_use_independent_workspaces_and_beat_sequential(tmp_path
             task: "Summarize {left} and {right}"
     """))
 
+    workers_ready = threading.Barrier(2)
+
     def brain(messages):
         task = messages[1].content
         if messages[-1].name == "accept_task" and "Write left" in task:
@@ -290,12 +292,12 @@ def test_parallel_phases_use_independent_workspaces_and_beat_sequential(tmp_path
         if "Plan for goal" in task:
             return turn_tool("task_complete", {"report": "PLAN"})
         if "Write left" in task:
-            time.sleep(0.2)
+            workers_ready.wait(timeout=5)
             return AssistantTurn(
                 content="", stop_reason="tool_use",
                 tool_calls=[ToolCall(id="l", name="accept_task", arguments={})])
         if "Write right" in task:
-            time.sleep(0.2)
+            workers_ready.wait(timeout=5)
             return AssistantTurn(
                 content="", stop_reason="tool_use",
                 tool_calls=[ToolCall(id="r", name="accept_task", arguments={})])
@@ -306,12 +308,9 @@ def test_parallel_phases_use_independent_workspaces_and_beat_sequential(tmp_path
     runner = WorkflowRunner(project_root=tmp_path, run_id="parallelrun", echo=False)
     runner._models["mid"] = MockModel(
         ModelSpec(name="mid", provider="mock", model_id="mock"), fn=brain)
-    start = time.monotonic()
     outcomes = runner.run_workflow(tmp_path / "workflows" / "parallel.yaml", goal="g")
-    elapsed = time.monotonic() - start
 
     assert [o.status for o in outcomes] == ["passed", "passed", "passed", "passed"]
-    assert elapsed < 0.35
     assert (tmp_path / "workspace" / ".phases" / "left" / "out.txt").read_text() == "left"
     assert (tmp_path / "workspace" / ".phases" / "right" / "out.txt").read_text() == "right"
     assert not (tmp_path / "workspace" / "out.txt").exists()

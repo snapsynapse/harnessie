@@ -35,8 +35,7 @@ Skip counts depend on the available local sandbox and live-provider configuratio
 
 The detailed inventory and relevance assessment is in `audits/handoff-relevance-2026-07-21.md`. In short:
 
-- The 0.3 through 0.5 provider-rotation packets and the site-refresh packet are historical and already delivered.
-- The old position sweep is retired because AIDR-0001 and AIDR-0002 are arbitrated and the tenets are ratified.
+- The delivered 0.3 through 0.5 rotation packets, site-refresh packet and assets, consolidated session log, and retired position sweep were removed after the audit. Tests, evals, decisions, the tracked audit, and git history preserve the durable evidence.
 - `handoffs/HANDOFF-protocol-resistant-mechanisms.md` remains design input, not an executable handoff.
 - `handoffs/skills-inventory-preliminary.md` remains a private standing research task and needs a fresh inventory before any adoption decision.
 - `handoffs/scrub-list.txt` remains an active pre-commit control.

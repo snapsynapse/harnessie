@@ -11,20 +11,20 @@ Most handoffs are historical evidence, not current instructions. GitHub `main` a
 | Artifact | Disposition | Evidence and next action |
 |---|---|---|
 | `NEXT.md` | Active, refreshed | Rewritten to describe GitHub `main` at `eb07488`, the arbitrated AIDR-0008 work, 0.7.1, the 0.8 milestone, current cross-repo state, and current verification. |
-| `handoffs/HANDOFF-CLAUDE.md` | Historical | Its v0.5 verification scope shipped. Current tests and evals supersede its expected counts. Retain only as rotation evidence. |
-| `handoffs/HANDOFF-CODEX.md` | Historical | Its 0.4, 0.5, and 0.6 rungs shipped. Its operator-gate warnings remain useful history but are no longer the current work packet. |
-| `handoffs/HANDOFF-GEMINI.md` | Historical | The 0.4 review lane shipped. No remaining execution item. |
-| `handoffs/CHANGES.md` | Delivered design packet | The split hero, proof strip, video, animated pipeline, and generated-doc side rail are present in the live source. |
-| `handoffs/Screenshot 2026-07-07 at 11.29.47 AM.png` | Historical source asset | Companion design evidence. No current execution item. |
-| `handoffs/flowchart-ai.jpeg` | Historical source asset | Companion design evidence. No current execution item. |
-| `handoffs/codex-session-notes.md` | Historical log | Retain append-only as rotation provenance. Do not use as current state. |
-| `handoffs/v0.3.2-inventory.md` | Historical implementation packet | Its refusal and identifier work shipped. Retain as rationale for exclusions that later code may still depend on. |
-| `handoffs/position-sweep/` | Retired | AIDR-0001 and AIDR-0002 now contain Arbitration, and the tenets are ratified. Do not resume the old sweep. |
+| `handoffs/HANDOFF-CLAUDE.md` | Removed after delivery | Its v0.5 verification scope shipped. Current tests, evals, and git history supersede the packet. |
+| `handoffs/HANDOFF-CODEX.md` | Removed after delivery | Its 0.4, 0.5, and 0.6 rungs shipped. Current governance and tracked handoffs preserve the standing rules. |
+| `handoffs/HANDOFF-GEMINI.md` | Removed after delivery | The 0.4 review lane shipped. No remaining execution item. |
+| `handoffs/CHANGES.md` | Removed after delivery | The split hero, proof strip, video, animated pipeline, and generated-doc side rail are present in the live source. |
+| `handoffs/Screenshot 2026-07-07 at 11.29.47 AM.png` | Removed after delivery | Companion design evidence was no longer needed after the live source shipped. |
+| `handoffs/flowchart-ai.jpeg` | Removed after delivery | Companion design evidence was no longer needed after the live source shipped. |
+| `handoffs/codex-session-notes.md` | Removed after consolidation | Tracked changelog, decisions, audit, and git history now carry the durable record. |
+| `handoffs/v0.3.2-inventory.md` | Removed after delivery | Its refusal and identifier implementation shipped and is test-covered. |
+| `handoffs/position-sweep/` | Removed after retirement | AIDR-0001 and AIDR-0002 contain Arbitration, and the tenets are ratified. Do not resume the old sweep. |
 | `handoffs/HANDOFF-protocol-resistant-mechanisms.md` | Relevant design input, not executable | The concession and real-stakes questions remain open, but the file depends on a source transcript and an unconfirmed Harnessie/Turnfile scope boundary. Route through a new decision or roadmap proposal before implementation. |
 | `handoffs/skills-inventory-preliminary.md` | Relevant standing research, stale inventory | The assessment bar remains sound. Refresh sources and candidates before adopting anything; do not treat the 2026-07-06 shortlist as current. |
 | `handoffs/scrub-list.txt` | Active control | Run its staged-diff check before every public commit. |
 | `ROADMAP-PRIVATE.md` | Active private plan, pruned | The shipped 0.7 license and implementation block was obsolete and has been removed; AIDR-0008 now records the approved separate-repository execution boundary. |
-| `audits/code-review-2026-07-07.md` | Mixed, untracked | Its P0 provenance, boundary wiring, and sovereign escalation findings were fixed before 0.7 shipped. Its parallel ownership, sandbox parity, provider-shape handling, memory-frontmatter, and release-claim drift findings remain relevant. |
+| `audits/code-review-2026-07-07.md` | Removed after triage | Its fixed findings are test-covered. Its remaining sandbox parity, provider-shape handling, memory-frontmatter, and release-gate work is preserved in the hardening backlog below and in `ROADMAP-PRIVATE.md`. |
 
 ## Cross-repo findings
 
