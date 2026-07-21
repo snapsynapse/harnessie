@@ -2,7 +2,7 @@
 
 Ordered build steps. Each step has a done test: a check an operator can run that either passes or fails, in the spirit of "define evaluation before scale". Steps 1 through 10 plus the injection-defense layer, OS sandbox (step 15), and the first deterministic eval scorecard (step 12 foundation) are implemented in this repo; their done tests are encoded in tests/. Remaining steps are the hardening path.
 
-The injection-defense layer (harness/quarantine.py; SECURITY.md) is implemented: ingress filter on quarantine=True tools, loop tripwire, per-phase deny_tools, scrubbed child-process env, shell-output secret redaction, and write-time credential refusal. Done test: tests/test_quarantine.py (8 tests) proves poisoned file content is fenced not obeyed, the tripwire re-asserts the boundary, denied tools are hidden and blocked, child env carries no secrets, and credential-shaped strings are redacted from output and refused on write. The unclosed gap is an OS sandbox (step 15) for full containment of allowlisted interpreters.
+The injection-defense layer (harness/quarantine.py; SECURITY.md) is implemented: ingress filter on quarantine=True tools, loop tripwire, per-phase deny_tools, scrubbed child-process env, shell-output secret redaction, and write-time credential refusal. Done test: tests/test_quarantine.py proves poisoned file content is fenced not obeyed, the tripwire re-asserts the boundary, denied tools are hidden and blocked, child env carries no secrets, and credential-shaped strings are redacted from output and refused on write. OS sandbox enforcement for allowlisted interpreters is implemented in step 15.
 
 ## Phase 1, minimum safe harness (implemented)
 
@@ -63,12 +63,13 @@ The injection-defense layer (harness/quarantine.py; SECURITY.md) is implemented:
 
 14. Parallel workers (implemented)
 - Independent consecutive phases declared with the same `parallel:` label fan out across workers, with per-phase workspaces under `workspace/.phases/<phase>` to prevent write conflicts.
-- Done test: two independent phases run concurrently with disjoint workspaces and both gate independently; total wall-clock beats sequential on a mock brain with latency. Covered by `tests/test_runner.py` and `evals/operability.yaml`.
+- The first 0.8 write-safety slice adds opt-in `writes:` preflight: exact files and directory subtrees are parsed in a deliberately decidable language, every member must declare after any member opts in, and invalid or overlapping declarations refuse before workspace creation or dispatch. Declared ownership lanes remain enforced in each isolated workspace; phase-local first-writer claims remain independent.
+- Done test: two independent phases run concurrently with disjoint workspaces and both gate independently; total wall-clock beats sequential on a mock brain with latency. Dispatch spies prove conflicts start no phase, adversarial parser cases prove portable alias handling, and operator-owned paths remain denied in parallel phases. Covered by `tests/test_runner.py`, `tests/test_write_safety.py`, `tests/test_ownership.py`, and `evals/operability.yaml`.
 
 15. OS sandbox for shell execution (implemented)
 - run_shell and gate checks run inside an OS confinement (harness/sandbox.py; macOS Seatbelt via sandbox-exec) that limits writes to the workspace and denies network by default, closing the interpreter escape that per-role allowlists and the argument jail only narrow. Policy: fail closed everywhere (no backend means shell/checks are blocked, not run unconfined); network is per-phase opt-in via allow_network.
 - Done test: a worker's `python3 -c "open('~/x','w')"` is blocked by the sandbox and the file is never created; the same write into the workspace succeeds; network is denied by default; run_shell and gate checks fail closed when the backend is monkeypatched absent. (tests/test_sandbox.py, 7 tests.)
-- Follow-up: a Linux backend (bubblewrap / firejail / docker); until one is wired, Linux fails closed by design. Scoped as a 0.4.0 milestone (displaced twice from 0.2.0) in [ROADMAP.md](ROADMAP.md) under Platform support.
+- Linux parity shipped in 0.4.0 through bubblewrap, firejail, and docker backends with admission probes; the no-backend path still fails closed. See [ROADMAP.md](ROADMAP.md) under Platform support.
 
 ## Phase 3, extensibility (later, only when earned)
 

@@ -33,7 +33,7 @@ from pathlib import Path
 
 from ..events import EventLog
 from ..memory import FACT_TYPES, ProjectMemory
-from ..ownership import OwnershipLedger
+from ..ownership import IsolatedOwnershipView, OwnershipLedger
 from ..quarantine import find_secrets, redact_secrets
 from ..sandbox import SandboxUnavailable, wrap as sandbox_wrap
 from .registry import Refusal, ToolRefusal, ToolRegistry, ToolSpec
@@ -68,7 +68,7 @@ def _jail(root: Path, rel: str) -> Path:
 
 def register_builtin(reg: ToolRegistry, workspace: Path,
                      shell_allowlists: dict[str, tuple[str, ...]] | None = None,
-                     ledger: OwnershipLedger | None = None,
+                     ledger: OwnershipLedger | IsolatedOwnershipView | None = None,
                      events: EventLog | None = None,
                      memory: ProjectMemory | None = None,
                      provenance: str = "") -> None:

@@ -348,6 +348,14 @@ def _run_parallel_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
     with tempfile.TemporaryDirectory(prefix="harnessie-eval-") as d:
         root = Path(d)
         _scaffold_eval_project(root, max_attempts=1, parallel=True)
+        if scenario.get("declare_same_write"):
+            workflow_path = root / "workflows" / "parallel.yaml"
+            workflow = yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
+            for phase in workflow["phases"]:
+                if phase.get("parallel"):
+                    phase["writes"] = ["out.txt"]
+            workflow_path.write_text(yaml.safe_dump(workflow, sort_keys=False),
+                                     encoding="utf-8")
 
         def brain(messages: list[Message]) -> AssistantTurn:
             task = messages[1].content
@@ -407,6 +415,16 @@ def _run_parallel_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
             ok = verify_chain(root / "runs" / "evalrun")["ok"]
             if ok != bool(scenario["expect_audit_ok"]):
                 problems.append(f"audit chain ok={ok}")
+        if scenario.get("expect_parallel_workspace_absent") and \
+                (root / "workspace" / ".phases").exists():
+            problems.append("parallel workspace exists; expected pre-dispatch refusal")
+        expected_event = scenario.get("expect_event")
+        if expected_event:
+            events_path = root / "runs" / "evalrun" / "events.jsonl"
+            events = [json.loads(line) for line in
+                      events_path.read_text(encoding="utf-8").splitlines()]
+            if not any(event.get("kind") == expected_event for event in events):
+                problems.append(f"expected event missing: {expected_event}")
     return EvalCaseResult(
         id=scenario["id"],
         passed=not problems,

@@ -31,6 +31,7 @@ from .memory import ProjectMemory, ProofStore
 from .models import build_model
 from .models.base import EFFORT_LEVELS, ModelSpec
 from .ownership import OwnershipLedger
+from .write_safety import WriteDeclarationError, parallel_write_conflicts
 from .quarantine import guard_result
 from .roles import RoleLibrary
 from .routing import Budget, Route, Router, VALID_TIERS
@@ -436,6 +437,49 @@ class WorkflowRunner:
         phases: list[dict],
         reports: dict[str, str],
     ) -> list[PhaseOutcome]:
+        try:
+            conflicts = parallel_write_conflicts(phases)
+        except WriteDeclarationError as exc:
+            detail = str(exc)
+            self.events.emit(
+                "parallel_write_declaration_invalid",
+                group=phases[0].get("parallel"),
+                phases=[phase["name"] for phase in phases],
+                detail=detail,
+            )
+            report = (
+                "invalid parallel write declaration: " + detail + "; "
+                "declare a writes list for every phase using exact files or "
+                "directory roots ending in '/'"
+            )
+            return [PhaseOutcome(phase["name"], "needs_human", report)
+                    for phase in phases]
+        if conflicts:
+            first = conflicts[0]
+            involved = sorted({conflict.left_phase for conflict in conflicts} |
+                              {conflict.right_phase for conflict in conflicts})
+            paths = sorted({conflict.left.raw for conflict in conflicts} |
+                           {conflict.right.raw for conflict in conflicts})
+            self.events.emit(
+                "parallel_write_conflict",
+                group=phases[0].get("parallel"),
+                phases=involved,
+                paths=paths,
+                conflicts=[{
+                    "left_phase": conflict.left_phase,
+                    "left": conflict.left.raw,
+                    "right_phase": conflict.right_phase,
+                    "right": conflict.right.raw,
+                } for conflict in conflicts],
+            )
+            report = (
+                "declared write-path conflict: "
+                f"phases {first.left_phase!r} ({first.left.raw!r}) and "
+                f"{first.right_phase!r} ({first.right.raw!r}) overlap; "
+                "make every parallel phase's writes declaration disjoint and resume"
+            )
+            return [PhaseOutcome(phase["name"], "needs_human", report)
+                    for phase in phases]
         snapshot = dict(reports)
         self.events.emit("parallel_group_start",
                          group=phases[0].get("parallel"),
@@ -477,7 +521,7 @@ class WorkflowRunner:
         workspace.mkdir(parents=True, exist_ok=True)
         registry = ToolRegistry()
         register_builtin(registry, workspace=workspace,
-                         ledger=None, events=self.events,
+                         ledger=self.ledger.isolated_view(), events=self.events,
                          memory=self.memory,
                          provenance=f"run {self.run_id}, phase {name}")
         task = self._render_task(phase, reports)

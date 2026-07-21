@@ -84,6 +84,24 @@ def test_ledger_persists_round_trip(tmp_path):
     assert led2.owner_of("a.txt") == "alice"
 
 
+def test_isolated_view_enforces_declared_lanes_without_auto_claims(tmp_path):
+    (tmp_path / "OWNERSHIP.yaml").write_text(
+        "lanes:\n"
+        "  agent:\n"
+        "    alice: ['src/*']\n"
+        "  collaborative: ['shared/*']\n"
+        "  operator: ['frozen/*']\n"
+        "files:\n"
+        "  ordinary.txt: bob\n")
+    view = OwnershipLedger.load(tmp_path / "OWNERSHIP.yaml").isolated_view()
+    assert view.check_write("alice", "src/a.py")[0]
+    assert not view.check_write("bob", "src/a.py")[0]
+    assert not view.check_write("alice", "frozen/config.txt")[0]
+    assert view.check_write("alice", "shared/note.md")[0]
+    assert view.check_write("alice", "ordinary.txt")[0]
+    assert view.claim("alice", "ordinary.txt") is False
+
+
 # -- tool-layer enforcement ----------------------------------------------------
 
 def make_agent_loop(tmp_path, agent, script):

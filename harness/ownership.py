@@ -81,8 +81,14 @@ class OwnershipLedger:
                 return agent
         return self.files.get(rel)
 
-    def check_write(self, agent: str, rel: str) -> tuple[bool, str]:
-        """May `agent` write workspace-relative `rel`? (allowed, reason)."""
+    def declared_write(self, agent: str, rel: str) -> tuple[bool, str] | None:
+        """Evaluate operator/agent/collaborative lanes only.
+
+        `None` means no declared lane matched and the caller may apply its own
+        auto-claim semantics. Isolated parallel workspaces use this seam so
+        declared authority remains enforced without conflating two physically
+        separate `out.txt` files into one first-writer claim.
+        """
         if any(fnmatch(rel, g) for g in self.operator):
             return False, (f"{rel!r} is in an operator-owned lane; no agent may "
                            "write it. This is not negotiable at agent level.")
@@ -95,6 +101,13 @@ class OwnershipLedger:
                                "request_change to record what you need changed.")
         if any(fnmatch(rel, g) for g in self.collaborative):
             return True, "collaborative lane"
+        return None
+
+    def check_write(self, agent: str, rel: str) -> tuple[bool, str]:
+        """May `agent` write workspace-relative `rel`? (allowed, reason)."""
+        declared = self.declared_write(agent, rel)
+        if declared is not None:
+            return declared
         claimed = self.files.get(rel)
         if claimed and claimed != agent:
             return False, (f"{rel!r} is owned by agent {claimed!r} (first "
@@ -114,3 +127,31 @@ class OwnershipLedger:
         self.files[rel] = agent
         self.save()
         return True
+
+    def isolated_view(self) -> "IsolatedOwnershipView":
+        return IsolatedOwnershipView(self)
+
+
+@dataclass(frozen=True)
+class IsolatedOwnershipView:
+    """Declared-lane enforcement for a physically isolated phase workspace.
+
+    Auto-claims are intentionally absent: two phase-local files with the same
+    relative name are different artifacts. Static `writes` preflight owns
+    cross-phase collision prevention when a workflow opts into that 0.8 seam.
+    """
+    ledger: OwnershipLedger
+
+    def owner_of(self, rel: str) -> str | None:
+        for agent, globs in self.ledger.agent_lanes.items():
+            if any(fnmatch(rel, glob) for glob in globs):
+                return agent
+        return None
+
+    def check_write(self, agent: str, rel: str) -> tuple[bool, str]:
+        declared = self.ledger.declared_write(agent, rel)
+        return declared if declared is not None else \
+            (True, "isolated phase workspace")
+
+    def claim(self, agent: str, rel: str) -> bool:
+        return False
