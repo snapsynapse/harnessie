@@ -1,0 +1,50 @@
+schema_version: 1
+project: harnessie
+authority: core
+
+components:
+  core:
+    repo: snapsynapse/harnessie
+    local_dir: harnessie
+    role: product-authority
+    version_source:
+      format: toml
+      path: pyproject.toml
+      key: project.version
+
+  engine_wrappers:
+    repo: snapsynapse/harnessie-engine-wrappers
+    local_dir: harnessie-engine-wrappers
+    role: independent-containment-engines
+    version_source:
+      format: toml
+      path: pyproject.toml
+      key: project.version
+    compatibility: probe-contract
+
+  verify_action:
+    repo: snapsynapse/harnessie-verify-action
+    local_dir: harnessie-verify-action
+    role: github-delivery-adapter
+    core_pin_source:
+      format: yaml
+      path: action.yml
+      key: inputs.harnessie-version.default
+
+  homebrew:
+    repo: snapsynapse/homebrew-tap
+    local_dir: homebrew-tap
+    role: shared-distribution-channel
+    shared: true
+    core_pin_source:
+      format: python-sdist-url
+      path: Formula/harnessie.rb
+      package: harnessie
+
+release_trains:
+  core:
+    order: [core, verify_action, homebrew]
+    close_out: record component versions in Harnessie release notes and NEXT.md
+  engine_wrappers:
+    order: [engine_wrappers]
+    independent_until: Harnessie consumes a versioned verification seam

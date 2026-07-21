@@ -12,6 +12,8 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 - [ ] `python3 -m harness.cli eval` clean; note `K/K`.
 - [ ] `python3 -m harness.cli verify-manifest` passes.
 - [ ] `git diff --check` clean.
+- [ ] `python3 scripts/ecosystem_status.py --validate` passes and
+      `ECOSYSTEM.md` still describes the intended dependency direction.
 
 ## 2. Version and docs
 
@@ -55,12 +57,20 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 - [ ] OPERATOR: `twine upload dist/*` (irreversible; a PyPI version can be
       yanked but never replaced). Verify a fresh `pip install harnessie`
       from the live index.
+- [ ] OPERATOR: test the released core version in
+      `snapsynapse/harnessie-verify-action`, update the default
+      `harnessie-version` pin in `action.yml`, run its full CI, and release a
+      new action version plus stable-major tag when the pin changes.
 - [ ] OPERATOR: bump the brew tap (snapsynapse/homebrew-tap
       `Formula/harnessie.rb`): new sdist URL + sha256 from PyPI, local
       `brew upgrade snapsynapse/tap/harnessie` + `brew test`, then push.
       The 0.7.1 release shipped with the tap still serving 0.6.0 — README
       lists brew and pip as equivalent installs, so tap lag is version skew
       on a public surface.
+- [ ] Do not bump `harnessie-engine-wrappers` merely because core released.
+      It has an independent probe-gated train until Harnessie consumes a
+      versioned verification seam. If that seam changed, run the wrapper's
+      live platform probe and release checklist independently.
 - [ ] OPERATOR: update the DNS TXT anchor `_assistant-guide.harnessie.com`
       to `v=1; sha256=<guide-sha256>`, single record, then confirm it
       resolves (DoH) and run the hosted GuideCheck verifier for the Level 4
@@ -70,3 +80,8 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 
 - [ ] `NEXT.md` current state reflects the shipped version.
 - [ ] `ROADMAP.md` milestone marked shipped.
+- [ ] `python3 scripts/ecosystem_status.py` reports the action and Homebrew
+      core pins matching the released version, or `NEXT.md` names the
+      intentional lag, owning repository, and follow-up pull request.
+- [ ] Release notes record the core, verify-action, Homebrew formula, and
+      engine-wrapper versions observed at close-out.

@@ -10,11 +10,13 @@ The next public milestone is 0.8.0, write-safety and self-integrity. Its four ro
 
 The first 0.8 slice is implemented on `agent/handoff-and-write-safety`: opt-in parallel `writes` declarations refuse invalid or overlapping groups before dispatch, and declared ownership lanes now remain enforced inside isolated parallel workspaces. Blast-radius ceilings, the inward manifest, and the maiden-voyage rule remain.
 
+Cross-repo authority, dependency direction, and release propagation are defined in `ECOSYSTEM.md` and `ecosystem.yaml`. `python3 scripts/ecosystem_status.py` provides the offline local status view; use its optional `--github` mode only for non-authoritative release and pull-request observations.
+
 ## Verified baseline
 
 Verified locally on 2026-07-21:
 
-- `python3 -m pytest -q`: 288 passed, 8 skipped.
+- `python3 -m pytest -q`: 293 passed, 8 skipped.
 - `python3 -m harness.cli eval`: 44/44 passed.
 - `python3 -m harness.cli verify-manifest`: passed, 9 files.
 - `git diff --check`: clean before this handoff refresh.
