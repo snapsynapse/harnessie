@@ -70,3 +70,10 @@ scenarios:
     expect_files:
       left/out.txt: left
       right/out.txt: right
+
+  - id: parallel_declared_write_conflict_refuses_before_dispatch
+    kind: parallel
+    declare_same_write: true
+    expect_statuses: [passed, needs_human, needs_human]
+    expect_parallel_workspace_absent: true
+    expect_event: parallel_write_conflict

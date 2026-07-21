@@ -346,6 +346,96 @@ def test_parallel_phase_refuses_when_run_budget_already_exhausted(tmp_path, monk
     assert not (tmp_path / "workspace" / ".phases").exists()
 
 
+def test_parallel_declared_write_conflict_refuses_before_dispatch(tmp_path, monkeypatch):
+    """0.8 red case: static overlap must refuse the whole group before any
+    phase workspace or model dispatch exists."""
+    monkeypatch.setattr(sandbox, "wrap",
+                        lambda argv, workspace, allow_network=False: argv)
+    scaffold_project(tmp_path)
+    (tmp_path / "workflows" / "conflict.yaml").write_text(textwrap.dedent("""
+        name: conflict
+        phases:
+          - name: left
+            parallel: workers
+            agent: implementer
+            task: "Write left"
+            writes: [shared.txt]
+          - name: right
+            parallel: workers
+            agent: implementer
+            task: "Write right"
+            writes: [shared.txt]
+    """))
+    runner = WorkflowRunner(project_root=tmp_path, run_id="conflict", echo=False)
+    brain = MockModel(ModelSpec(name="mid", provider="mock", model_id="mock"))
+    runner._models["mid"] = brain
+
+    outcomes = runner.run_workflow(tmp_path / "workflows" / "conflict.yaml")
+
+    assert [o.status for o in outcomes] == ["needs_human", "needs_human"]
+    assert all("declared write-path conflict" in o.report for o in outcomes)
+    assert brain.calls == []
+    assert not (tmp_path / "workspace" / ".phases").exists()
+    events = [json.loads(line) for line in
+              (tmp_path / "runs" / "conflict" / "events.jsonl").read_text().splitlines()]
+    conflicts = [event for event in events
+                 if event["kind"] == "parallel_write_conflict"]
+    assert len(conflicts) == 1
+    assert conflicts[0]["phases"] == ["left", "right"]
+
+
+def test_parallel_phase_enforces_operator_ownership_lane(tmp_path, monkeypatch):
+    """Parallel isolation must not erase operator-owned lane enforcement."""
+    monkeypatch.setattr(sandbox, "wrap",
+                        lambda argv, workspace, allow_network=False: argv)
+    scaffold_project(tmp_path)
+    (tmp_path / "OWNERSHIP.yaml").write_text(textwrap.dedent("""
+        lanes:
+          agent: {}
+          collaborative: []
+          operator: ['frozen/*']
+        files: {}
+    """))
+    (tmp_path / "workflows" / "ownership-parallel.yaml").write_text(textwrap.dedent("""
+        name: ownership-parallel
+        phases:
+          - name: blocked
+            parallel: workers
+            agent: implementer
+            task: "Write blocked"
+          - name: allowed
+            parallel: workers
+            agent: implementer
+            task: "Write allowed"
+    """))
+
+    def brain(messages):
+        task = messages[1].content
+        last = messages[-1].name
+        if last == "accept_task" and "blocked" in task:
+            return turn_tool("write_file", {"path": "frozen/config.txt", "content": "no"})
+        if last == "accept_task" and "allowed" in task:
+            return turn_tool("write_file", {"path": "result.txt", "content": "yes"})
+        if last == "write_file":
+            return turn_tool("task_complete", {"report": "attempted"})
+        return turn_tool("accept_task", {})
+
+    runner = WorkflowRunner(project_root=tmp_path, run_id="ownership-parallel", echo=False)
+    runner._models["mid"] = MockModel(
+        ModelSpec(name="mid", provider="mock", model_id="mock"), fn=brain)
+    outcomes = runner.run_workflow(
+        tmp_path / "workflows" / "ownership-parallel.yaml")
+
+    assert [o.status for o in outcomes] == ["passed", "passed"]
+    phases = tmp_path / "workspace" / ".phases"
+    assert not (phases / "blocked" / "frozen" / "config.txt").exists()
+    assert (phases / "allowed" / "result.txt").read_text() == "yes"
+    events = [json.loads(line) for line in
+              (tmp_path / "runs" / "ownership-parallel" / "events.jsonl").read_text().splitlines()]
+    assert any(event["kind"] == "ownership_denied" and
+               event["path"] == "frozen/config.txt" for event in events)
+
+
 def test_parallel_spend_flows_to_run_budget_without_double_count(tmp_path, monkeypatch):
     monkeypatch.setattr(sandbox, "wrap",
                         lambda argv, workspace, allow_network=False: argv)

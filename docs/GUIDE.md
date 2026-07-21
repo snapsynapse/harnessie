@@ -147,8 +147,11 @@ Phase fields:
 - `inject_memory_status`: prepend a deterministic memory-and-prior-run digest to the task.
 - `approve_tools`: operator-recorded pre-approval for approval-gated tools, scoped to this phase.
 - `parallel`: phases with the same label and placed consecutively run concurrently in separate workspaces under `workspace/.phases/<phase>`.
+- `writes`: optional static write declaration for a parallel phase. An exact path such as `reports/result.json` declares one file; a trailing slash such as `dist/` declares that directory and all descendants. Globs, absolute paths, traversal, backslashes, and ambiguous path segments are rejected. Once one phase in a parallel group uses `writes`, every phase in that group must declare it; `writes: []` is the explicit read-only form. Invalid or overlapping declarations refuse the entire group before workspace creation or model dispatch. Groups with no `writes` key retain the 0.7 behavior.
 
 Prior-phase reports are treated as untrusted model output: before substitution they pass through the same quarantine filter that scans tool results, so injection attempts inside a report are fenced as data rather than followed. The operator's `goal` is never fenced.
+
+Parallel workspace isolation does not suspend declared ownership. Operator-owned paths remain unwritable, agent lanes remain exclusive to the named agent, and collaborative lanes remain shared. First-writer auto-claims are not shared between phase workspaces because two equal relative names identify physically separate artifacts; cross-phase collision prevention is the static `writes` preflight when a workflow opts into it.
 
 Adversarial phases. A phase with `mode: adversarial` runs a panel instead of a single worker. Each `positions` entry is an agent on a task class (choose different task classes to get genuinely different brains, which is what earns the record its independent-positions claim). After `rebuttal_rounds` of objections, `arbitration: convergence` passes only on unanimous agreement with zero open objections; anything else halts as `needs_arbitration` with a decision record. See [Governance](#governance-consent-contests-and-arbitration).
 

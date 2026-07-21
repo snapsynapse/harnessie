@@ -6,7 +6,10 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ### Added
 
+- The first 0.8 write-safety slice: parallel phases may declare exact files and directory subtrees with `writes`. Once a group opts in, every member must declare its writes, including `writes: []` for read-only work; malformed, partial, case/Unicode-aliased, or overlapping declarations refuse the whole group before workspace creation or model dispatch and emit a structured event. Declared ownership lanes now remain enforced inside isolated parallel workspaces without treating physically separate phase-local files as one first-writer claim. Proven by parser adversarial tests, runner dispatch-spy tests, ownership tests, and a new operability eval.
+- AIDR-0008 has been executed in the separate Apache-2.0 [harnessie-engine-wrappers](https://github.com/snapsynapse/harnessie-engine-wrappers) repository. Its fresh-authored v0.1.0 macOS Seatbelt reference wrapper admits the backend only after a deny/allow/symlink probe, fails closed on unsupported or unavailable engines, and was release-gated by a live macOS-14 CI probe.
 - `harnessie verify` now ships as a GitHub Action, published to the Marketplace as [Harnessie Verify](https://github.com/marketplace/actions/harnessie-verify) (repo: [harnessie-verify-action](https://github.com/snapsynapse/harnessie-verify-action), v0.1.0, adopted via `decisions/AIDR-0007`). This repo dogfoods it: `.github/workflows/verify-pr-claims.yml` verifies every PR's claims once the verifier endpoint variables and secret are configured, and skips politely until then.
+- A current handoff-relevance audit classifies every private rotation packet, retires the completed position sweep, reconciles the Homebrew tap and verify-action release channels, incorporates the arbitrated AIDR-0008 separate-repository work, and scopes the 0.8 work order. `NEXT.md` now carries only current state and executable next work; the stewardship eval checks that contract instead of requiring shipped 0.6 headings.
 
 ## 0.7.1 (2026-07-09)
 

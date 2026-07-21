@@ -21,9 +21,10 @@ scenarios:
       - NEXT.md
     require_contains:
       - "Current state"
-      - "Verification status"
-      - "Operator-attended steps"
-      - "Non-goals standing"
+      - "Verified baseline"
+      - "Current cross-repo state"
+      - "Recommended work order"
+      - "Operator-attended or external checks"
       - "python3 -m pytest -q"
       - "python3 -m harness.cli eval"
-      - "0.6.0 headless subset"
+      - "0.8.0"
