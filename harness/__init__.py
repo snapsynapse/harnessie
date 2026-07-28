@@ -12,6 +12,7 @@ Subsystem map (each module is one explicit boundary):
     roles.py      Role definitions (orchestrator / worker / verifier) loaded from agents/
     quarantine.py Prompt-injection ingress filter + secret detection/redaction
     sandbox.py    OS confinement of child commands (workspace-only writes, network deny)
+    blast_radius.py Artifact-volume ceilings with atomic rollback and resume counters
     ownership.py  Ownership lanes: agents own their files, never each other's
     adversarial.py Contested phases: positions, objections, decision records, lint
     audit.py      Hash-chain verification + governance timeline for any run

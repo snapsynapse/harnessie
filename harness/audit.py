@@ -23,6 +23,8 @@ GOVERNANCE_KINDS = frozenset({
     "ownership_claimed", "ownership_denied", "change_request",
     "refusal",
     "injection_flag",
+    "blast_radius_usage", "blast_radius_exceeded",
+    "blast_radius_config_invalid",
     "gate_verdict", "check",
     "position_recorded", "objection_recorded",
     "decision_assembled", "decision_converged", "needs_arbitration",

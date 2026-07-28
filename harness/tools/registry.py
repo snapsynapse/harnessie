@@ -90,6 +90,9 @@ class ToolResult:
 @dataclass
 class ToolRegistry:
     tools: dict[str, ToolSpec] = field(default_factory=dict)
+    # Set by the runner for the active phase. Built-ins consult it at call
+    # time so the shared sequential registry can enforce phase-local limits.
+    blast_radius: Any = None
     # approval_handler decides interactive approvals. Default denies, so a
     # misconfigured headless run fails closed instead of mutating silently.
     approval_handler: Callable[[str, dict], bool] = field(

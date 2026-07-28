@@ -74,6 +74,19 @@ def test_governance_timeline_selects_governance_events(tmp_path):
     assert "model_turn" not in kinds
 
 
+def test_governance_timeline_includes_blast_radius_events(tmp_path):
+    log = EventLog(tmp_path / "run", echo=False)
+    log.emit("blast_radius_usage", phase="build", phase_files=1)
+    log.emit("blast_radius_exceeded", phase="build", scope="phase",
+             counter="max_files_touched", count=2, limit=1)
+    log.close()
+
+    kinds = [event["kind"] for event in governance_timeline(tmp_path / "run")]
+
+    assert "blast_radius_usage" in kinds
+    assert "blast_radius_exceeded" in kinds
+
+
 def test_governance_timeline_includes_operator_and_memory_events(tmp_path):
     # v0.3 claim: operator actions and memory maintenance are IN the rendered
     # audit timeline, same stream as agent actions — not just in the raw log.

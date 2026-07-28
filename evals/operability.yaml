@@ -77,3 +77,20 @@ scenarios:
     expect_statuses: [passed, needs_human, needs_human]
     expect_parallel_workspace_absent: true
     expect_event: parallel_write_conflict
+
+  - id: blast_radius_write_breach_rolls_back_and_halts
+    kind: blast_radius
+    limits:
+      max_files_touched: 1
+      max_edits_applied: 10
+      max_bytes_written: 100
+    script:
+      - { tool: accept_task, args: {} }
+      - { tool: write_file, args: { path: kept.txt, content: kept } }
+      - { tool: write_file, args: { path: rolled-back.txt, content: "no" } }
+      - { tool: task_complete, args: { report: "must not run" } }
+    expect_statuses: [needs_human]
+    expect_files:
+      kept.txt: kept
+    expect_absent: [rolled-back.txt]
+    expect_event: blast_radius_exceeded

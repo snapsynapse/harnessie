@@ -191,6 +191,9 @@ class AgentLoop:
                                      boundary=res.refusal.boundary,
                                      detail=res.refusal.detail[:300],
                                      why=res.refusal.why[:300])
+                    if res.refusal.error == "blast_radius_exceeded":
+                        return self._finish(
+                            "blast_radius", res.refusal.detail, step, messages)
                 # Refusals count toward the stuck streak regardless of the ok
                 # flag: run_shell denials stay ok=True observations, but a
                 # model repeating the same refused call is not making progress.

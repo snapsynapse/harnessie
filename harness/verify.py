@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 
+from .blast_radius import BlastRadiusExceeded, PhaseBlastRadius
 from .events import EventLog
 from .loop import LoopResult
 from .memory import ProofStore
@@ -45,6 +46,7 @@ class CheckResult:
     name: str
     passed: bool
     output: str
+    terminal: bool = False
 
 
 # Version of the verifier-verdict parsing contract (parse_verdict: last JSON
@@ -63,7 +65,8 @@ class Verdict:
 
 def run_checks(checks: list[Check], workspace: Path, proofs: ProofStore,
                events: EventLog, attempt: int,
-               allow_network: bool = False) -> list[CheckResult]:
+               allow_network: bool = False,
+               blast_radius: PhaseBlastRadius | None = None) -> list[CheckResult]:
     from .sandbox import SandboxUnavailable, wrap as sandbox_wrap
     from .tools.builtin import scrubbed_env
     results = []
@@ -73,9 +76,12 @@ def run_checks(checks: list[Check], workspace: Path, proofs: ProofStore,
             # they are sandboxed exactly like run_shell and fail closed with it.
             sandboxed = sandbox_wrap(shlex.split(check.command), workspace,
                                      allow_network=allow_network)
-            proc = subprocess.run(sandboxed, cwd=workspace,
-                                  capture_output=True, text=True,
-                                  timeout=check.timeout, env=scrubbed_env())
+            def apply_check():
+                return subprocess.run(
+                    sandboxed, cwd=workspace, capture_output=True, text=True,
+                    timeout=check.timeout, env=scrubbed_env())
+            proc = (blast_radius.apply(f"check:{check.name}", apply_check)
+                    if blast_radius is not None else apply_check())
             output = (proc.stdout + proc.stderr)[:50_000]
             if proc.returncode == 71 and "sandbox_apply" in output:
                 passed = False
@@ -84,12 +90,21 @@ def run_checks(checks: list[Check], workspace: Path, proofs: ProofStore,
                 passed = proc.returncode == 0
         except SandboxUnavailable as e:
             passed, output = False, f"sandbox unavailable, check blocked (fail-closed): {e}"
+            terminal = False
+        except BlastRadiusExceeded as e:
+            passed, output = False, e.detail
+            terminal = True
         except (subprocess.TimeoutExpired, FileNotFoundError, ValueError) as e:
             passed, output = False, f"check failed to run: {e}"
+            terminal = False
+        else:
+            terminal = False
         proofs.save(f"check-{check.name}-attempt{attempt}.txt",
                     f"$ {check.command}\npassed={passed}\n\n{output}")
         events.emit("check", name=check.name, passed=passed, attempt=attempt)
-        results.append(CheckResult(check.name, passed, output))
+        results.append(CheckResult(check.name, passed, output, terminal=terminal))
+        if terminal:
+            break
     return results
 
 
@@ -168,6 +183,7 @@ class VerificationGate:
         # when the ladder is exhausted. Phases that do not opt in get the
         # default — byte-identical to the pre-cascade ladder.
         escalate_fn: Callable[[Route, "Verdict"], Route | None] | None = None,
+        blast_radius: PhaseBlastRadius | None = None,
     ) -> GateResult:
         verdicts: list[Verdict] = []
         current_task, current_route = task, route
@@ -200,13 +216,39 @@ class VerificationGate:
                     continue
                 return GateResult("needs_human", len(verdicts),
                                   f"task declined by agent: {reason}", verdicts)
+            if work.stop == "blast_radius":
+                verdict = Verdict(
+                    False, f"blast radius exceeded: {work.report}", "gate")
+                verdicts.append(verdict)
+                self.events.emit(
+                    "gate_verdict", attempt=attempt, passed=False,
+                    source="gate", terminal=True,
+                    route={"tier": current_route.tier,
+                           "effort": current_route.effort})
+                return GateResult(
+                    "needs_human", attempt, work.report, verdicts)
             if not work.ok:
                 verdict = Verdict(False, f"worker loop stopped: {work.stop}: "
                                          f"{work.report[:500]}", "gate")
             else:
                 check_results = run_checks(checks, self.workspace, self.proofs,
                                            self.events, attempt,
-                                           allow_network=allow_network)
+                                           allow_network=allow_network,
+                                           blast_radius=blast_radius)
+                terminal = next(
+                    (result for result in check_results if result.terminal), None)
+                if terminal is not None:
+                    verdict = Verdict(
+                        False, f"blast radius exceeded: {terminal.output}",
+                        "checks")
+                    verdicts.append(verdict)
+                    self.events.emit(
+                        "gate_verdict", attempt=attempt, passed=False,
+                        source="checks", terminal=True,
+                        route={"tier": current_route.tier,
+                               "effort": current_route.effort})
+                    return GateResult(
+                        "needs_human", attempt, terminal.output, verdicts)
                 for hc in (harness_checks or []):
                     result = hc(attempt)
                     self.proofs.save(f"check-{result.name}-attempt{attempt}.txt",

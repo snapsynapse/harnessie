@@ -22,6 +22,13 @@ import yaml
 from .adversarial import (PositionRecord, assemble_record, converged,
                           lint_record, parse_objection_response, parse_stance)
 from .approval import ApprovalPolicy, tty_approval
+from .blast_radius import (
+    BlastRadiusConfigError,
+    BlastRadiusLimits,
+    PhaseBlastRadius,
+    RunBlastRadius,
+    parse_limits,
+)
 from .boundary import Boundary, RehydrationGrants, SecretEgressHalt, StripMap
 from .cascade import (CascadePolicy, SIDEWAYS_REASONS, load_cascade_config,
                       validate_against_tiers)
@@ -222,6 +229,12 @@ class WorkflowRunner:
     def run_workflow(self, workflow_path: Path, goal: str = "") -> list[PhaseOutcome]:
         wf = yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
         try:
+            self._configure_blast_radius(wf)
+        except BlastRadiusConfigError as exc:
+            detail = f"invalid blast_radius configuration: {exc}"
+            self.events.emit("blast_radius_config_invalid", detail=str(exc))
+            return [PhaseOutcome("(workflow)", "needs_human", detail)]
+        try:
             workflow_ref = str(workflow_path.resolve().relative_to(self.root))
         except ValueError:
             workflow_ref = str(workflow_path)
@@ -325,78 +338,10 @@ class WorkflowRunner:
                     break
                 continue
 
-            task_class = phase.get("task_class", "default")
-            cascade_refusal = self._reserved_refusal(task_class)
-            if not cascade_refusal:
-                route, escalate_fn, cascade_refusal = self._resolve_cascade(
-                    phase, self.router.route(task_class))
-            if cascade_refusal:
-                outcome = PhaseOutcome(name, "needs_human", cascade_refusal)
-                self.state.record(f"phase:{name}",
-                                  {"status": outcome.status,
-                                   "report": outcome.report})
-                reports[name] = outcome.report
-                outcomes.append(outcome)
-                self.events.emit("phase_done", phase=name,
-                                 status=outcome.status,
-                                 spent_usd=round(self.budget.spent_usd, 4),
-                                 spent_tokens=self.budget.spent_tokens)
-                break   # fail closed: an unroutable phase halts the run
-            checks = [Check(**c) for c in phase.get("verify", {}).get("checks", [])]
-            verifier_name = phase.get("verify", {}).get("verifier")
-            agent_name = phase.get("agent", "orchestrator")
-            max_steps = int(phase.get("max_steps", 40))
-            deny_tools = frozenset(phase.get("deny_tools", []))
-            allow_network = bool(phase.get("allow_network", False))
-
-            if self.roles.get(agent_name).kind == "orchestrator":
-                # Orchestrator phases (planning/integration) are not gated by a
-                # verifier — their output is a plan consumed by gated phases —
-                # but they are still journaled and budgeted.
-                result = self._run_role(agent_name, task, route, max_steps=max_steps,
-                                        deny_tools=deny_tools, allow_network=allow_network)
-                outcome = PhaseOutcome(
-                    name, "passed" if result.ok else "needs_human", result.report)
-            else:
-                # Consent is the default for worker phases (task packets are
-                # offers, not commands); a phase opts out explicitly for the
-                # degenerate single-agent case.
-                consent_required = bool(phase.get("consent", True))
-                gate = VerificationGate(
-                    workspace=self.root / "workspace", proofs=self.proofs,
-                    events=self.events,
-                    max_attempts=int(phase.get("verify", {}).get("max_attempts", 3)))
-                # approve_tools is the operator's RECORDED pre-approval,
-                # scoped to this phase: granted through the workflow file the
-                # operator owns, journaled as approval events, and restored to
-                # default-deny the moment the phase ends.
-                prev_handler = self.registry.approval_handler
-                self.registry.approval_handler = self._approval_handler_for(
-                    name, frozenset(phase.get("approve_tools", [])))
-                try:
-                    gres: GateResult = gate.run(
-                        task=task,
-                        attempt_fn=lambda t, r: self._run_role(agent_name, t, r,
-                                                               max_steps=max_steps,
-                                                               deny_tools=deny_tools,
-                                                               allow_network=allow_network,
-                                                               consent_required=consent_required),
-                        verify_fn=(
-                            (lambda worker_report: self._run_role(
-                                verifier_name,
-                                self._verifier_task(task, phase, worker_report),
-                                self.router.route(
-                                    phase.get("verify", {}).get("task_class", "verify")),
-                                max_steps=20))    # verifier stays network-denied
-                            if verifier_name else None),
-                        checks=checks,
-                        route=route,
-                        allow_network=allow_network,
-                        harness_checks=self._harness_checks(phase),
-                        escalate_fn=escalate_fn)
-                finally:
-                    self.registry.approval_handler = prev_handler
-                outcome = PhaseOutcome(name, gres.status, gres.final_report)
+            workspace = self.root / "workspace"
+            outcome = self._execute_standard_phase(
+                phase, task, workspace=workspace, registry=self.registry,
+                blast_radius=self._phase_blast_radius(phase, workspace))
 
             self._stamp_phase_cost(outcome, phase_start_usd, phase_start_tokens)
             self.state.record(f"phase:{name}",
@@ -417,6 +362,49 @@ class WorkflowRunner:
                          spent_usd=round(self.budget.spent_usd, 4),
                          proofs=self.proofs.listing())
         return outcomes
+
+    def _event_history(self) -> list[dict]:
+        path = self.run_dir / "events.jsonl"
+        if not path.exists():
+            return []
+        history = []
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            try:
+                history.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+        return history
+
+    def _configure_blast_radius(self, workflow: dict) -> None:
+        self._blast_history = self._event_history()
+        self._blast_run_limits = parse_limits(
+            workflow.get("blast_radius"), "workflow")
+        self._blast_phase_limits = {}
+        for phase in workflow.get("phases", []):
+            name = str(phase.get("name", "(unnamed)"))
+            self._blast_phase_limits[name] = parse_limits(
+                phase.get("blast_radius"), f"phase {name!r}")
+        self._run_blast_radius = RunBlastRadius.from_events(
+            self._blast_run_limits, self._blast_history)
+
+    def _phase_blast_radius(
+        self, phase: dict, workspace: Path,
+    ) -> PhaseBlastRadius | None:
+        limits: BlastRadiusLimits = self._blast_phase_limits[phase["name"]]
+        if not limits.active and not self._blast_run_limits.active:
+            return None
+        workspace_root = self.root / "workspace"
+        try:
+            relative = workspace.resolve().relative_to(workspace_root.resolve())
+            namespace = ("workspace" if relative == Path(".")
+                         else relative.as_posix())
+        except ValueError:
+            namespace = workspace.resolve().as_posix()
+        return PhaseBlastRadius.from_events(
+            phase["name"], namespace, workspace, limits, self._run_blast_radius,
+            self.events, self._blast_history)
 
     def _persist_strip_map(self) -> None:
         """Save the run's strip map to its operator-boundary home if the
@@ -519,15 +507,17 @@ class WorkflowRunner:
                 "the run")
         workspace = self.root / "workspace" / ".phases" / name
         workspace.mkdir(parents=True, exist_ok=True)
+        blast_radius = self._phase_blast_radius(phase, workspace)
         registry = ToolRegistry()
         register_builtin(registry, workspace=workspace,
                          ledger=self.ledger.isolated_view(), events=self.events,
                          memory=self.memory,
-                         provenance=f"run {self.run_id}, phase {name}")
+                         provenance=f"run {self.run_id}, phase {name}",
+                         blast_radius=blast_radius)
         task = self._render_task(phase, reports)
         outcome = self._execute_standard_phase(
             phase, task, workspace=workspace, registry=registry,
-            budget=phase_budget)
+            budget=phase_budget, blast_radius=blast_radius)
         outcome.spent_usd = round(phase_budget.spent_usd, 6)
         outcome.spent_tokens = phase_budget.spent_tokens
         # charges flowed to self.budget live via the child budget; no merge here
@@ -556,6 +546,23 @@ class WorkflowRunner:
         return task
 
     def _execute_standard_phase(
+        self,
+        phase: dict,
+        task: str,
+        workspace: Path,
+        registry: ToolRegistry,
+        budget: Budget | None = None,
+        blast_radius: PhaseBlastRadius | None = None,
+    ) -> PhaseOutcome:
+        previous = registry.blast_radius
+        registry.blast_radius = blast_radius
+        try:
+            return self._execute_standard_phase_inner(
+                phase, task, workspace, registry, budget)
+        finally:
+            registry.blast_radius = previous
+
+    def _execute_standard_phase_inner(
         self,
         phase: dict,
         task: str,
@@ -618,7 +625,8 @@ class WorkflowRunner:
                 route=route,
                 allow_network=allow_network,
                 harness_checks=self._harness_checks(phase),
-                escalate_fn=escalate_fn)
+                escalate_fn=escalate_fn,
+                blast_radius=registry.blast_radius)
         finally:
             registry.approval_handler = prev_handler
         return PhaseOutcome(name, gres.status, gres.final_report)

@@ -31,6 +31,7 @@ import shlex
 import subprocess
 from pathlib import Path
 
+from ..blast_radius import BlastRadiusExceeded, PhaseBlastRadius
 from ..events import EventLog
 from ..memory import FACT_TYPES, ProjectMemory
 from ..ownership import IsolatedOwnershipView, OwnershipLedger
@@ -71,7 +72,8 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
                      ledger: OwnershipLedger | IsolatedOwnershipView | None = None,
                      events: EventLog | None = None,
                      memory: ProjectMemory | None = None,
-                     provenance: str = "") -> None:
+                     provenance: str = "",
+                     blast_radius: PhaseBlastRadius | None = None) -> None:
     ws = workspace.resolve()
     allowlists = shell_allowlists or DEFAULT_SHELL_ALLOWLISTS
 
@@ -108,8 +110,20 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
                     error, "ownership",
                     reason,
                     "Ownership lanes keep agents from mutating files outside their authority.")
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(content, encoding="utf-8")
+        def apply_write() -> None:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(content, encoding="utf-8")
+        try:
+            meter = blast_radius or reg.blast_radius
+            if meter is not None:
+                meter.apply("write_file", apply_write)
+            else:
+                apply_write()
+        except BlastRadiusExceeded as e:
+            raise ToolRefusal(
+                "blast_radius_exceeded", "blast_radius", e.detail,
+                "Artifact-volume ceilings stop a phase before workspace damage "
+                "can exceed the operator's declared bound.") from e
         if ledger is not None and ledger.claim(_agent or _role, rel):
             _emit("ownership_claimed", agent=_agent or _role, path=rel)
         return f"wrote {len(content)} chars to {rel}"
@@ -143,8 +157,19 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
                 "sandbox_unavailable", "sandbox",
                 f"Sandbox unavailable; shell blocked fail-closed: {e}",
                 "Shell commands require OS confinement before execution.")
-        proc = subprocess.run(sandboxed, cwd=ws, capture_output=True, text=True,
-                              timeout=300, env=scrubbed_env())
+        def apply_shell():
+            return subprocess.run(
+                sandboxed, cwd=ws, capture_output=True, text=True,
+                timeout=300, env=scrubbed_env())
+        try:
+            meter = blast_radius or reg.blast_radius
+            proc = (meter.apply("run_shell", apply_shell)
+                    if meter is not None else apply_shell())
+        except BlastRadiusExceeded as e:
+            raise ToolRefusal(
+                "blast_radius_exceeded", "blast_radius", e.detail,
+                "Artifact-volume ceilings stop a phase before workspace damage "
+                "can exceed the operator's declared bound.") from e
         out, n_redacted = redact_secrets((proc.stdout + proc.stderr)[:20_000])
         if proc.returncode == 71 and "sandbox_apply" in out:
             return Refusal(

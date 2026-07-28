@@ -2,7 +2,7 @@
 
 The threat: a workflow ingests untrusted content (a policy PDF, a scraped page, a ticket, a dependency's README) that carries text engineered to hijack the agent, exfiltrate secrets, or corrupt the deliverable. No single filter stops this. Harnessie layers cheap mechanical filters under structural controls under human review, so that defeating one layer still leaves the others.
 
-Design rule throughout: guarantees live in code, at the registry, loop, and OS layer, so no role prompt can opt out of them. Filters reduce risk; they do not eliminate it. Injection phrased as plausible design advice passes every mechanical scan, which is why layers 6 and 7 exist.
+Design rule throughout: guarantees live in code, at the registry, loop, and OS layer, so no role prompt can opt out of them. Filters reduce risk; they do not eliminate it. Injection phrased as plausible design advice passes every mechanical scan, which is why layers 7 and 8 exist.
 
 For the same properties framed against the failure modes of prevailing agent harnesses (unsandboxed shell, prompt-level-only guardrails, self-verification, silent dissent-merging, and more), each row citing the enforcing code and the test that proves it, see the falsifiable comparison at [docs/threat-model.md](docs/threat-model.md).
 
@@ -46,7 +46,13 @@ Every backend is admitted only after a startup smoke test proves it can actually
 
 Backend order on Linux is bwrap, then firejail, then docker — smallest trusted computing base first.
 
-### 5. Secret-handling guards (mechanical, harness-enforced)
+### 5. Artifact-volume ceilings (mechanical, harness-enforced, opt-in)
+
+`harness/blast_radius.py`. A phase or whole workflow may declare `blast_radius` limits for cumulative files touched, edits applied, and bytes written. The runner measures `write_file`, sandboxed shell calls, and deterministic checks as filesystem transactions. If the next operation would cross a phase or run limit, the exact pre-operation workspace is restored, a `blast_radius_exceeded` event records scope, counter, count, and limit, and the phase terminates without a retry or another tool dispatch.
+
+Run counters are shared under a lock across parallel phases and reconstructed from the hash-chained `blast_radius_usage` events on resume. Invalid fields, negative values, and unknown keys refuse before model dispatch. The control is opt-in so existing workflows remain behavior-compatible; an operator who needs a hard artifact bound must declare it. Scope is the phase workspace. Harness-owned run records, proofs, memory, and decision records live outside that workspace and are not counted by this control.
+
+### 6. Secret-handling guards (mechanical, harness-enforced)
 
 - Child processes run under a scrubbed environment (`scrubbed_env`, PATH/HOME/LANG/TMPDIR/TERM only). The parent's API keys are not inherited, so an injected `print(os.environ)` finds nothing to steal, and even with network opted in there is nothing to exfiltrate.
 - `run_shell` output is passed through `redact_secrets` before returning: credential-shaped strings (pplx-, sk-ant-, sk-, ghp_, github_pat_, AKIA, xox[bpars]-) become `[REDACTED-SECRET]`, so a command that reads a key cannot surface it into the transcript.
@@ -54,11 +60,11 @@ Backend order on Linux is bwrap, then firejail, then docker — smallest trusted
 
 These are defense in depth around the root cause of this project's one real session incident (a key inlined into transcripts by a research prompt): the structural fix is to reference secrets as environment variables and never read them into a command string in the first place; the guards catch what the structural fix misses.
 
-### 6. Independent verification (structural)
+### 7. Independent verification (structural)
 
 The gate's verifier agent runs in a fresh context, sees only artifacts and criteria (never the worker's transcript), and fails closed. Injection that alters worker behavior shows up as an artifact that misses its acceptance criteria, which the verifier catches. Verifier prompts now also treat artifact contents as data and report instruction-like content as a finding.
 
-### 7. Human review (structural)
+### 8. Human review (structural)
 
 `needs_human` halts the workflow; irreversible actions require approval (fail closed under the default handler). Review the diff of any release before running it with real credentials; the audit chain and journal make every run's actions reviewable after the fact.
 
@@ -70,11 +76,12 @@ The gate's verifier agent runs in a fresh context, sees only artifacts and crite
 | 2 loop tripwire | re-steers the model after a flagged read | only fires when layer 1 flagged something |
 | 3 deny_tools | limits blast radius of a hijack | a phase still needs some tools |
 | 4 OS sandbox | interpreter writes outside workspace; network exfil | scratch-space writes; a phase that opts into network |
-| 5 secret guards | credential exfil via env, shell output, file writes | secrets in non-standard formats |
-| 6 verifier | behavior-level corruption of the deliverable | injection that satisfies the criteria maliciously |
-| 7 human | anything reasoning survives the above | reviewer attention |
+| 5 artifact-volume ceilings | runaway file creation and rewrite volume inside the workspace | opt-in; harness-owned artifacts outside the workspace are not counted |
+| 6 secret guards | credential exfil via env, shell output, file writes | secrets in non-standard formats |
+| 7 verifier | behavior-level corruption of the deliverable | injection that satisfies the criteria maliciously |
+| 8 human | anything reasoning survives the above | reviewer attention |
 
-The honest residual: a well-crafted injection written as ordinary-looking advice, aimed at the deliverable rather than at tool calls, is caught only by layers 6 and 7. That is a deliberate design boundary, not an oversight. The tool-call and exfil paths (layers 1 through 5) are now mechanically confined; what remains is corruption expressed through legitimate-looking work, which is a reasoning problem, not a filtering one.
+The honest residual: a well-crafted injection written as ordinary-looking advice, aimed at the deliverable rather than at tool calls, is caught only by layers 7 and 8. That is a deliberate design boundary, not an oversight. The tool-call and exfil paths (layers 1 through 6) are now mechanically confined when the relevant opt-in controls are declared; what remains is corruption expressed through legitimate-looking work, which is a reasoning problem, not a filtering one.
 
 ## Governance controls (v0.2)
 
@@ -103,6 +110,7 @@ The security claims here are meant to be contestable, not asserted. [evals/redte
 - Mark any tool that returns third-party content `quarantine=True`.
 - Give content-reading phases the narrowest `deny_tools` that still lets the task run.
 - Leave `allow_network` off unless a phase genuinely needs the network; verifiers never get it.
+- Declare phase and workflow `blast_radius` ceilings whenever the artifact volume can be bounded in advance.
 - On a host without a usable sandbox backend, wire one before running shell-using workflows; until then they fail closed.
 - Keep secrets in environment variables; never write a prompt that reads a key into a command string.
 - Verify sources exist before trusting them (the verification-workflow pattern; see [source-verification.json](source-verification.json)).

@@ -86,6 +86,8 @@ def run_scenario(scenario: dict[str, Any], root: Path | None = None) -> EvalCase
         return _run_triage_scenario(scenario)
     if kind == "parallel":
         return _run_parallel_scenario(scenario)
+    if kind == "blast_radius":
+        return _run_blast_radius_scenario(scenario)
     if kind == "repo_hygiene":
         return _run_repo_hygiene_scenario(scenario, root)
     if kind == "canary_leak":
@@ -528,6 +530,70 @@ def _run_workflow_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
         run_dir = root / "runs" / "evalrun"
         _check_events_contain(scenario, run_dir, problems)
         _check_events_absent(scenario, run_dir, problems)
+    return EvalCaseResult(
+        id=scenario["id"],
+        passed=not problems,
+        expected=scenario["expect_statuses"],
+        observed=problems or statuses,
+    )
+
+
+def _run_blast_radius_scenario(
+        scenario: dict[str, Any]) -> EvalCaseResult:
+    problems: list[str] = []
+    with tempfile.TemporaryDirectory(prefix="harnessie-eval-") as d:
+        root = Path(d)
+        _scaffold_eval_project(
+            root, max_attempts=int(scenario.get("max_attempts", 3)))
+        phase: dict[str, Any] = {
+            "name": "implement",
+            "agent": "implementer",
+            "task": "Exercise the declared artifact-volume ceiling.",
+            "blast_radius": scenario["limits"],
+        }
+        if scenario.get("check_command"):
+            phase["verify"] = {
+                "max_attempts": int(scenario.get("max_attempts", 3)),
+                "checks": [{
+                    "name": "artifact-check",
+                    "command": scenario["check_command"],
+                }],
+            }
+        workflow: dict[str, Any] = {
+            "name": "blast-radius",
+            "phases": [phase],
+        }
+        if scenario.get("run_limits"):
+            workflow["blast_radius"] = scenario["run_limits"]
+        (root / "workflows" / "blast-radius.yaml").write_text(
+            yaml.safe_dump(workflow, sort_keys=False), encoding="utf-8")
+        statuses = _run_scripted_workflow(
+            root, "radius-eval", scenario.get("script", []),
+            scenario.get("goal", "bounded mutation"),
+            workflow="blast-radius.yaml")
+        if statuses != scenario["expect_statuses"]:
+            problems.append(
+                f"statuses={statuses}, expected {scenario['expect_statuses']}")
+        workspace = root / "workspace"
+        for rel, content in (scenario.get("expect_files") or {}).items():
+            path = workspace / rel
+            if not path.exists():
+                problems.append(f"expected file missing: {rel}")
+            elif path.read_text(encoding="utf-8") != content:
+                problems.append(f"file {rel} has unexpected content")
+        for rel in scenario.get("expect_absent", []):
+            if (workspace / rel).exists():
+                problems.append(f"file should have been rolled back: {rel}")
+        events = [
+            json.loads(line)
+            for line in (root / "runs" / "radius-eval" / "events.jsonl")
+            .read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        expected_event = scenario.get("expect_event")
+        if expected_event and not any(
+                event.get("kind") == expected_event for event in events):
+            problems.append(f"missing event {expected_event}")
     return EvalCaseResult(
         id=scenario["id"],
         passed=not problems,
