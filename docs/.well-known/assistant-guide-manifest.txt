@@ -1,5 +1,5 @@
 guide-path: /.well-known/assistant-guide.txt
 guide-version: 0.7.1
-guide-sha256: cf621fdb1adc036e6cbed7845d652fa1295338ebfdee4dc4053c0f32a924038c
+guide-sha256: 09bcd115024ed7c2213f7ed8b6b31050c23ae7a56aa27dc10a37cc72f10fbb7d
 guide-bytes: 7677
 immutable-release-url: https://github.com/snapsynapse/harnessie/releases/tag/v0.7.1

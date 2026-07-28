@@ -9,11 +9,14 @@ converter handles exactly the constructs these docs use (ATX headings, fenced
 code, pipe tables, ul/ol lists, inline code/bold/links) and fails loudly on
 anything else rather than guessing.
 
-Usage: python3 scripts/build_docs_html.py
+Usage:
+  python3 scripts/build_docs_html.py
+  python3 scripts/build_docs_html.py --check
 """
 
 from __future__ import annotations
 
+import argparse
 import html
 import re
 from pathlib import Path
@@ -399,8 +402,8 @@ _CONTENTS_RE = re.compile(
     r'<h2 id="contents">Contents</h2>\s*<(ul|ol)>.*?</\1>', re.DOTALL)
 
 
-def build() -> list[Path]:
-    written = []
+def render_pages() -> dict[Path, str]:
+    rendered = {}
     for src, (out_name, label, description) in PAGES.items():
         md = (DOCS / src).read_text(encoding="utf-8")
         body, h1, headings = convert(md)
@@ -432,11 +435,42 @@ def build() -> list[Path]:
             srcname=f"docs/{src}",
         )
         target = DOCS / out_name
+        rendered[target] = page
+    return rendered
+
+
+def build() -> list[Path]:
+    rendered = render_pages()
+    for target, page in rendered.items():
         target.write_text(page, encoding="utf-8")
-        written.append(target)
-    return written
+    return list(rendered)
+
+
+def check() -> list[Path]:
+    stale = []
+    for target, expected in render_pages().items():
+        try:
+            actual = target.read_text(encoding="utf-8")
+        except FileNotFoundError:
+            actual = ""
+        if actual != expected:
+            stale.append(target)
+    return stale
 
 
 if __name__ == "__main__":
-    for path in build():
-        print(f"wrote {path.relative_to(ROOT)}")
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--check", action="store_true",
+        help="fail if generated HTML differs without writing files")
+    args = parser.parse_args()
+    if args.check:
+        stale = check()
+        if stale:
+            for path in stale:
+                print(f"stale {path.relative_to(ROOT)}")
+            raise SystemExit(1)
+        print(f"generated docs OK: {len(PAGES)} page(s)")
+    else:
+        for path in build():
+            print(f"wrote {path.relative_to(ROOT)}")

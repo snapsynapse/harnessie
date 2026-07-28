@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,7 +8,8 @@ version = "0.7.1"
 description = "Harnessie: a brain-agnostic multi-agent harness (orchestrator / workers / verifiers) with verification gates, consent-based orchestration, ownership lanes, adversarial decision records, containment-aware cascade routing, a PII/secret containment boundary, and a tamper-evident audit log."
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Sam Rogers", email = "subscriptions@snapsynapse.com" }]
 dependencies = [
     "pyyaml>=6.0",
@@ -23,7 +24,7 @@ Assistant-Guide = "https://harnessie.com/.well-known/assistant-guide.txt"
 harnessie = "harness.cli:main"
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0"]
+dev = ["build>=1.2", "pytest>=8.0", "twine>=6.0"]
 
 [tool.setuptools.packages.find]
 include = ["harness*"]

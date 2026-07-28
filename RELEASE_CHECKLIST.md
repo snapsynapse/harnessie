@@ -7,6 +7,10 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 
 ## 1. Land the release content
 
+- [ ] `python3 scripts/release_gate.py` passes. This composes the source
+      checks below with generated-doc verification, an isolated wheel/sdist
+      build, metadata and private-surface inspection, and a fresh-venv CLI
+      smoke test.
 - [ ] All milestone acceptance criteria green (`ROADMAP.md` for the version).
 - [ ] `python3 -m pytest -q` clean; note the exact `N passed / M skipped`.
 - [ ] `python3 -m harness.cli eval` clean; note `K/K`.
@@ -40,10 +44,11 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 
 ## 4. Build and verify artifacts
 
-- [ ] `rm -rf dist build harnessie.egg-info && pyproject-build`.
+- [ ] Build the final artifacts from the exact release commit into an empty
+      `dist/` with `python3 -m build`.
 - [ ] `twine check dist/*` PASSED for wheel and sdist.
 - [ ] Sweep the sdist for private paths and scrub-list terms:
-      `tar tzf dist/*.tar.gz | grep -iE 'ROADMAP-PRIVATE|handoffs|runs/|workspace/|\.env'`
+      `tar tzf dist/*.tar.gz | grep -iE 'ROADMAP-PRIVATE|handoffs|runs/|workspace/|\.maiden/|\.env'`
       returns nothing, and the artifact bytes contain no scrub-list term.
 - [ ] LICENSE and NOTICE present in both artifacts; metadata `Version` correct.
 - [ ] Fresh-venv install smoke: import the package and run `harnessie --help`.

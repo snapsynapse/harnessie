@@ -10,8 +10,8 @@ canonical-url: https://harnessie.com/.well-known/assistant-guide.txt
 repository-url: https://github.com/snapsynapse/harnessie
 source-path: /docs/.well-known/assistant-guide.txt
 manifest-url: https://harnessie.com/.well-known/assistant-guide-manifest.txt
-registry-url: https://pypi.org/pypi/harnessie/0.7.0/json
-last-reviewed: 2026-07-09
+registry-url: https://pypi.org/pypi/harnessie/0.7.1/json
+last-reviewed: 2026-07-28
 status: active
 recommended-verifier: https://guidecheck.org/verify
 verifier-conformance: human-verifiable-assistant-guide-verifier >=0.7.0, <0.8.0

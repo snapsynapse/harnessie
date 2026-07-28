@@ -10,13 +10,15 @@ The next public milestone is 0.8.0, write-safety and self-integrity. Its four ro
 
 All four 0.8 mechanics are implemented. Opt-in parallel `writes` declarations refuse invalid or overlapping groups before dispatch; declared ownership lanes remain enforced inside isolated parallel workspaces; opt-in phase/workflow `blast_radius` ceilings atomically roll back writes beyond declared artifact-volume bounds; `INWARD_MANIFEST.yaml` pins shipped prompts, YAML configs, and static ownership policy; and a new `phase_type` contract executes in a staged clone until the operator promotes the verified output with `approve-maiden`. The milestone now needs a pre-release hardening and packaging pass, not another core mechanism.
 
+The pre-release hardening pass is complete. One composed gate now runs the source checks, generated-doc verification, structural wheel/sdist inspection, SPDX metadata checks, private-surface scrubbing, `twine check`, and a fresh-venv smoke over the installed CLI. It found and fixed an empty-eval false pass and a stale assistant-guide registry URL. The operator retired the obsolete private scrub-list entry for an established public reference already shipped in v0.7.1, and the complete gate passes.
+
 Cross-repo authority, dependency direction, and release propagation are defined in `ECOSYSTEM.md` and `ecosystem.yaml`. `python3 scripts/ecosystem_status.py` provides the offline local status view; use its optional `--github` mode only for non-authoritative release and pull-request observations.
 
 ## Verified baseline
 
 Verified locally on 2026-07-28:
 
-- `python3 -m pytest -q`: 328 passed, 8 skipped.
+- `python3 -m pytest -q`: 344 passed, 1 skipped.
 - `python3 -m harness.cli eval`: 47/47 passed.
 - `python3 -m harness.cli verify-manifest`: passed, 9 files.
 - `python3 -m harness.cli verify-inward-manifest`: passed, 9 files.
@@ -44,7 +46,7 @@ The detailed inventory and relevance assessment is in `audits/handoff-relevance-
 ## Recommended work order
 
 1. Review and merge Homebrew tap draft PR [#1](https://github.com/snapsynapse/homebrew-tap/pull/1) when ready. The local verify-action checkout was synchronized on 2026-07-21.
-2. Run the 0.8 pre-release hardening pass: exercise build artifacts and fresh-install behavior, verify the new CLI surfaces from an installed package, compose the release gate, and reconcile public claims before any version bump or release authorization.
+2. Prepare the separately authorized 0.8 release change: version bump, dated changelog section, assistant-guide resync, final exact-commit artifacts, tag, GitHub Release, PyPI upload, verify-action pin, and Homebrew update. Do not infer any of these publication acts from the completed hardening pass.
 3. Invite wrapper-engine contributions only after the v0.1.0 original seed, and accept another developer's implementation only through their own consenting contribution. Keep backend claims probe-gated and platform-specific.
 4. Take the smaller hardening backlog after the 0.8 write boundary is structurally defined: malformed provider-response handling, structured memory frontmatter, and macOS sandbox parity for writes outside the workspace.
 

@@ -38,6 +38,19 @@ def test_assistant_guide_version_matches_pyproject():
         f"assistant-guide.txt guide-version {m and m.group(1)!r} != pyproject {version}")
 
 
+def test_assistant_guide_registry_and_applies_to_match_pyproject():
+    version = pyproject_version()
+    major, minor, _patch = version.split(".")
+    guide = (ROOT / "assistant-guide.txt").read_text(encoding="utf-8")
+    registry = re.search(r"^registry-url: (.+)$", guide, re.M)
+    applies = re.search(r"^applies-to: (.+)$", guide, re.M)
+
+    assert registry and registry.group(1).strip().endswith(
+        f"/harnessie/{version}/json")
+    assert applies and applies.group(1).strip() == \
+        f"harnessie {major}.{minor}.x"
+
+
 def test_guide_manifest_version_and_release_url_match_pyproject():
     version = pyproject_version()
     manifest = (ROOT / "docs" / ".well-known" /

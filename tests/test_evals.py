@@ -59,6 +59,15 @@ def test_cli_eval_reports_scorecard(capsys):
     assert "recovery_second_attempt_passes" in out
 
 
+def test_cli_eval_refuses_empty_suite_discovery(tmp_path, capsys):
+    code = main(["--root", str(tmp_path), "eval"])
+    captured = capsys.readouterr()
+
+    assert code == 2
+    assert "no eval suites found" in captured.err
+    assert "0/0 passed" not in captured.out
+
+
 def test_cli_live_eval_skips_without_opt_in(capsys, monkeypatch):
     monkeypatch.delenv("HARNESSIE_LIVE", raising=False)
 

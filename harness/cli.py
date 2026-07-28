@@ -174,6 +174,13 @@ def main(argv: list[str] | None = None) -> int:
 
         suite = (root / args.suite).resolve() if args.suite else None
         scorecard = run_eval_suite(root, suite_path=suite)
+        if scorecard["total"] == 0:
+            location = str(suite) if suite is not None else str(root / "evals")
+            print(
+                f"no eval suites found at {location}; refusing a vacuous pass",
+                file=sys.stderr,
+            )
+            return 2
         print(format_scorecard(scorecard))
         return 0 if scorecard["passed"] == scorecard["total"] else 2
 
