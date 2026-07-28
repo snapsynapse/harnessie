@@ -12,6 +12,7 @@ def test_plain_status_translates_known_statuses():
     assert plain_status("passed") == "completed"
     assert plain_status("needs_human") == "stopped and is waiting for you"
     assert plain_status("needs_arbitration").startswith("stopped")
+    assert plain_status("needs_approval").startswith("stopped")
     # unknown status passes through rather than raising
     assert plain_status("weird") == "weird"
 
@@ -27,6 +28,13 @@ def test_halt_next_action_points_at_the_decision_record_for_arbitration():
     action = halt_next_action("needs_arbitration", "R1", "workflows/x.yaml", "decide")
     assert "runs/R1/decisions/" in action
     assert "arbitrated" in action
+    assert "harnessie resume R1 workflows/x.yaml" in action
+
+
+def test_halt_next_action_names_maiden_approval_command():
+    action = halt_next_action(
+        "needs_approval", "R1", "workflows/x.yaml", "build")
+    assert "harnessie approve-maiden R1 build" in action
     assert "harnessie resume R1 workflows/x.yaml" in action
 
 

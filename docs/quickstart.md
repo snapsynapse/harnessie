@@ -61,7 +61,7 @@ cd my-first-project
 harnessie run workflows/build-and-verify.yaml --goal "a to-do list saved to a text file"
 ```
 
-Before it starts, Harnessie prints a cost preview. Because the scaffold uses the mock model, it will say `MOCK (zero-dollar, nothing is billed)`. The run then prints a plain summary at the end. Every run gets an id; note it down, or copy it from the summary.
+Before it starts, Harnessie prints a cost preview. Because the scaffold uses the mock model, it will say `MOCK (zero-dollar, nothing is billed)`. The built-in worker is new automation, so its first run is a maiden voyage: Harnessie makes and checks the proposed files under the ignored `.maiden/` runtime directory but does not change `workspace/`. The summary reports `needs_approval`, names the staged path, and gives the exact `harnessie approve-maiden <run_id> implement` command. Inspect the staged files, approve them, then resume with the same workflow and goal. Later runs of the unchanged phase contract write normally.
 
 To use a real, paid AI model later, you edit one file (`config/models.yaml`) and set the model's key as an environment variable in your terminal. You never paste a key into a file. Harnessie refuses to start a paid run that has no spending ceiling, so you cannot accidentally run up a bill.
 
@@ -81,6 +81,7 @@ Silence is never treated as success. A run ends in a named condition, and each o
 
 - Completed: the goal was met and every check passed. Nothing to do.
 - Stopped and waiting for you (`needs_human`): a check did not pass. Read the report, fix what it points at, and run the `harnessie resume ...` command it gives you.
+- Verified maiden output needs approval (`needs_approval`): inspect the `.maiden/` path named in the report, run the reported `approve-maiden` command, then resume.
 - A contested decision needs your call (`needs_arbitration`): the agents disagreed and did not paper over it. The report names the exact decision file to edit; record your decision there, then resume.
 
 Re-running is safe: a resume only re-does the steps that did not already pass.

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from .inward_manifest import render_inward_manifest
+
 
 FILES = {
     "agents/orchestrator.md": "# Role: Orchestrator\n\nPlan scoped tasks and integrate gated results.\n",
@@ -33,6 +35,7 @@ phases:
     task_class: plan
     task: "Plan for goal: {goal}"
   - name: implement
+    phase_type: artifact-builder
     agent: implementer
     task_class: implement
     task: "Implement this plan: {plan}"
@@ -79,5 +82,10 @@ def init_project(root: Path, force: bool = False) -> list[Path]:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding="utf-8")
         written.append(path)
+    manifest = root / "INWARD_MANIFEST.yaml"
+    if force or not manifest.exists():
+        manifest.write_text(
+            render_inward_manifest(root, policy="refuse"), encoding="utf-8")
+        written.append(manifest)
     (root / "workspace").mkdir(exist_ok=True)
     return written

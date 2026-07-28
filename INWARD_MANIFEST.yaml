@@ -1,0 +1,23 @@
+kind: harnessie-inward-manifest
+version: 1
+on_divergence: refuse
+files:
+- path: OWNERSHIP.yaml
+  scope: policy
+  sha256: 0decec2afc05237f1ac9ec02b5f46e87acd277a20682ef10e548353b4d4e266d
+- path: agents/orchestrator.md
+  sha256: 8be0a9386470320364394baa18591b15795792d9c0b339b4eadeff7da2917322
+- path: agents/verifiers/claims-verifier.md
+  sha256: 3875641ed7df460428f6eb6cc0f1bd304798cf5616f3c57ab269be6e711c3ba6
+- path: agents/verifiers/code-verifier.md
+  sha256: e347168bc486153a02b6126ff5771682a058ac5363c883cf008b49d375bfde0e
+- path: agents/workers/implementer.md
+  sha256: e3b9b9504835fdfa06000b350ef66a2e4b9df7dc22528a11e7b2044e3cfef9a1
+- path: agents/workers/researcher.md
+  sha256: f608fef67da3521740c3caca722e9bf8d463f3634593365823b279e50cc248c5
+- path: config/boundary.yaml
+  sha256: 362feb3eadcdf5a3a5c0ce5dbb3230f481e4da877b53fe4a699d5add743b9bb0
+- path: config/cascade.yaml
+  sha256: 3563d8b0afdfb1d81daea58630f62e592acdaf94b18b5115f653a9731c57024d
+- path: config/models.yaml
+  sha256: d2652c8e927afa2ef1f8d1d3c3884cff8cb0b680e135397ac45c0150a9710611

@@ -42,6 +42,7 @@ class OwnershipLedger:
     collaborative: list[str] = field(default_factory=list)
     operator: list[str] = field(default_factory=list)
     files: dict[str, str] = field(default_factory=dict)   # rel path -> owner
+    claim_event: str = "ownership_claimed"
 
     @classmethod
     def load(cls, path: Path) -> "OwnershipLedger":

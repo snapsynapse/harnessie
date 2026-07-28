@@ -67,6 +67,8 @@ python3 -m harness.cli run workflows/build-and-verify.yaml \
 
 Every run gets an id. The command prints it, and the run's artifacts land under `runs/<run_id>/`.
 
+The built-in worker is a declared `phase_type`, so its first exact contract is a maiden voyage. Harnessie runs and verifies it in the ignored `.maiden/` runtime directory without changing `workspace/`, then reports `needs_approval`. Inspect the staged path named in the report, run `harnessie approve-maiden <run_id> implement`, and resume with the same workflow and goal. Later runs of that unchanged contract write normally.
+
 For a worked, data-backed example (assessing a policy against a list of obligations, with a verifier that catches fabricated citations) see [examples/policy-compliance/README.md](../examples/policy-compliance/README.md).
 
 ## 5. Read the evidence
@@ -86,6 +88,7 @@ Silence is never success. Every run ends in a named stop condition, and each map
 
 - `complete`: the goal was met and every gate passed. Nothing to do.
 - `needs_human`: a gate failed after the retry ladder was exhausted. Read the proofs under `runs/<id>/proofs/`, fix the task or the acceptance criteria, and re-run.
+- `needs_approval`: a new phase contract produced verified staged output. Inspect the `.maiden/` path named in the report, run the reported `approve-maiden` command, then resume.
 - `needs_arbitration`: a contested decision produced dissent. Open `runs/<id>/decisions/DR-<phase>.md`, record your decision in it, and re-run.
 - `budget` or `max_steps`: the run hit a ceiling. Raise it in `config/models.yaml` or the phase, or narrow the goal.
 

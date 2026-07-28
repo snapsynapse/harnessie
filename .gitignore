@@ -27,6 +27,7 @@ working/
 # Harnessie run output: per-run journals, proofs, workspaces (never committed)
 runs/
 workspace/
+.maiden/
 
 # Secrets: keys live in env vars, never in the repo
 *.key

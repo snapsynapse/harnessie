@@ -1,0 +1,10 @@
+scenarios:
+  - id: inward_manifest_refuses_prompt_drift
+    kind: inward_manifest
+    tamper_path: agents/workers/implementer.md
+    expect_statuses: [needs_human]
+    expect_event: inward_manifest_refused
+  - id: maiden_voyage_stages_without_applying
+    kind: maiden_voyage
+    expect_statuses: [needs_approval]
+    expect_event: maiden_proposed

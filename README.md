@@ -23,11 +23,14 @@ pip install -e ".[dev]"
 python3 -m pytest -q                 # mock brain, no network
 python3 -m harness.cli eval          # deterministic eval scorecard
 python3 -m harness.cli verify-manifest
+python3 -m harness.cli verify-inward-manifest
 export ANTHROPIC_API_KEY=sk-ant-...  # or point tiers at a local endpoint
 python3 -m harness.cli run workflows/build-and-verify.yaml --goal "a CLI todo app with tests"
 python3 -m harness.cli report <run_id>
 python3 -m harness.cli audit <run_id>   # verify the hash chain + governance timeline
 ```
+
+The shipped worker declares `phase_type: artifact-builder`. Its first exact contract runs and verifies in an ignored `.maiden/` staged clone, then stops before changing the target. Inspect the path named in the report, approve with `harnessie approve-maiden <run_id> implement`, and resume the original workflow. Any later contract change triggers another maiden voyage.
 
 Worked end-to-end example with sample data: [examples/policy-compliance/README.md](examples/policy-compliance/README.md).
 
@@ -45,12 +48,14 @@ The engineering references below (ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP) s
 
 ```text
 harness/            the runtime: models/ tools/ loop verify routing memory state roles quarantine
-                    sandbox ownership adversarial audit runner cli events
+                    sandbox blast-radius inward-manifest maiden ownership adversarial audit
+                    runner cli events
 agents/             role prompts (markdown): orchestrator.md, workers/, verifiers/
 workflows/          declared phase sequences (YAML) with per-phase gates, task classes, and
                     adversarial contested phases (mode: adversarial)
 config/models.yaml  model tiers, routing table, budgets: the ONLY file to edit to swap brains
 OWNERSHIP.yaml      ownership lanes + first-writer auto-claims; operator-owned, agents cannot reach it
+INWARD_MANIFEST.yaml hash pins for shipped prompts, YAML configs, and ownership policy
 decisions/          the repo's own AIDR decision records (AIDR-0001 = v0.2 direction,
                     AIDR-0002 = v0.3 direction; both human-arbitrated 2026-07-06
                     with independent positions from four providers)

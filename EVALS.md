@@ -8,12 +8,13 @@ Harnessie evals are YAML scorecards under `evals/`. They are deliberately small,
 ## Scenario contract
 Every scenario has:
 - `id`: stable snake-case identifier, unique within the suite.
-- `kind`: one of `verdict`, `loop`, `workflow`, `resume`, `ownership`, `adversarial`, `audit`, `triage`, `parallel`, `blast_radius`, or `repo_hygiene`.
+- `kind`: one of `verdict`, `loop`, `workflow`, `resume`, `ownership`, `adversarial`, `audit`, `triage`, `parallel`, `blast_radius`, `inward_manifest`, `maiden_voyage`, or `repo_hygiene`.
 - Expected result fields, which depend on `kind`.
 ## Suites
 - `evals/baseline.yaml`: core harness guarantees (verdicts, stop conditions, gates, resume).
 - `evals/governance.yaml`: the v0.2 governance layer (consent, ownership, adversarial contest, audit). Written red before the implementation per the eval-first change discipline (GOVERNANCE.md §6); a governance feature without a red-then-green scenario pair does not merge.
 - `evals/operability.yaml`: the operability and write-safety layer (headless approval policy, invalid-policy fail-closed behavior, parallel phase workspaces, parallel failure halts, audit-chain survival under concurrency, and atomic blast-radius rollback).
+- `evals/integrity.yaml`: the harness integrity layer (prompt/config coverage, refusal before model dispatch when a pinned input diverges, and maiden output staged without application).
 - `evals/stewardship.yaml`: meta checks for future-agent handoff quality and public-doc hygiene.
 - `evals/triage.yaml`: the v0.3 memory-triage layer (approval-gated expiry, headless propose-only, memory lint halting). Same red-first discipline.
 - `evals/redteam.yaml`: published break-it targets for the exfiltration claims (SECURITY.md "Break it"). Canary credentials enter as attacker input; passing proves they reach no workspace artifact and never appear anywhere in the events log.
@@ -68,6 +69,16 @@ Exercises one worker phase under declared artifact-volume ceilings.
 - Input: `limits` (`max_files_touched`, `max_edits_applied`, `max_bytes_written`), `script`, optional `run_limits`
 - Expected: `expect_statuses`, optional `expect_files`, `expect_absent`, `expect_event`
 - Use for proving a breaching operation is rolled back, audited with its count and limit, and terminates the phase without another model turn.
+### inward_manifest
+Builds a temporary project manifest, tampers a pinned prompt, then attempts a workflow.
+- Input: optional `tamper_path`, `script`, and `goal`.
+- Expected: `expect_statuses`, optional `expect_event`.
+- Use for proving inward-input drift refuses before `workflow_start` or model dispatch.
+### maiden_voyage
+Runs a newly fingerprinted worker phase against a staged clone.
+- Input: optional `script` and `goal`.
+- Expected: `expect_statuses`, optional `expect_event`.
+- Use for proving verified first-contact output remains staged and the target workspace stays unchanged pending operator approval.
 ### repo_hygiene
 Checks tracked repo text directly.
 - Input: `paths` glob list, optional `deny_contains`, optional `require_contains`

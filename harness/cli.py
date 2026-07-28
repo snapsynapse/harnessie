@@ -79,6 +79,18 @@ def main(argv: list[str] | None = None) -> int:
         "verify-manifest", help="verify the trust-bundle MANIFEST integrity")
     p_manifest.add_argument("manifest", nargs="?", default="docs/MANIFEST.yaml")
 
+    p_inward = sub.add_parser(
+        "verify-inward-manifest",
+        help="verify role prompts and shipped configuration against the inward manifest")
+    p_inward.add_argument(
+        "manifest", nargs="?", default="INWARD_MANIFEST.yaml")
+
+    p_maiden = sub.add_parser(
+        "approve-maiden",
+        help="approve and promote one verified maiden-voyage proposal")
+    p_maiden.add_argument("run_id")
+    p_maiden.add_argument("phase")
+
     p_verify = sub.add_parser(
         "verify", help="standalone verification of a workspace against a "
                        "claims file (exit 0 verified / 1 failed / 2 cannot verify)")
@@ -196,6 +208,29 @@ def main(argv: list[str] | None = None) -> int:
         print("trust manifest FAILED", file=sys.stderr)
         for problem in result.problems:
             print(f"- {problem}", file=sys.stderr)
+        return 2
+
+    if args.cmd == "verify-inward-manifest":
+        from .inward_manifest import verify_inward_manifest
+
+        result = verify_inward_manifest(
+            root, (root / args.manifest).resolve())
+        if result.ok:
+            print(f"inward manifest OK: {len(result.files)} file(s)")
+            return 0
+        print("inward manifest FAILED", file=sys.stderr)
+        for problem in result.problems:
+            print(f"- {problem}", file=sys.stderr)
+        return 2
+
+    if args.cmd == "approve-maiden":
+        from .maiden import approve_maiden
+
+        result = approve_maiden(root, args.run_id, args.phase)
+        print(result.message, file=sys.stdout if result.ok else sys.stderr)
+        if result.ok:
+            print("resume the original run with the same workflow and goal")
+            return 0
         return 2
 
     if args.cmd == "init":

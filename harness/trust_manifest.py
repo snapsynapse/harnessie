@@ -54,13 +54,13 @@ def verify_manifest(root: Path, manifest_path: Path) -> ManifestResult:
         if not target.is_file():
             problems.append(f"manifest file missing: {rel}")
             continue
-        actual = _sha256(target)
+        actual = sha256_file(target)
         if actual != expected:
             problems.append(f"sha256 mismatch for {rel}: expected {expected}, got {actual}")
     return ManifestResult(ok=not problems, files=files, problems=problems)
 
 
-def _sha256(path: Path) -> str:
+def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
         for chunk in iter(lambda: f.read(1024 * 1024), b""):
@@ -68,4 +68,4 @@ def _sha256(path: Path) -> str:
     return h.hexdigest()
 
 
-__all__ = ["ManifestResult", "verify_manifest"]
+__all__ = ["ManifestResult", "sha256_file", "verify_manifest"]

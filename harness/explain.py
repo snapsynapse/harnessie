@@ -16,13 +16,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-HALT_STATUSES = ("needs_human", "needs_arbitration")
+HALT_STATUSES = ("needs_human", "needs_arbitration", "needs_approval")
 
 STATUS_PLAIN = {
     "passed": "completed",
     "skipped_resume": "already done, skipped on resume",
     "needs_human": "stopped and is waiting for you",
     "needs_arbitration": "stopped: a contested decision needs your call",
+    "needs_approval": "stopped: verified maiden output needs your approval",
 }
 
 _WORKFLOW_PLACEHOLDER = "<your workflow file>"
@@ -53,6 +54,13 @@ def halt_next_action(status: str, run_id: str, workflow_ref: str,
             f"the agents. Open the decision record under runs/{run_id}/decisions/ "
             f"and, in its Arbitration section, set status: arbitrated with a "
             f"decided: date and your decision. Then resume:\n"
+            f"  harnessie resume {run_id} {workflow_ref}"
+        )
+    if status == "needs_approval":
+        return (
+            f'What to do: inspect the staged maiden output for "{phase}" at '
+            f".maiden/{run_id}/, approve that exact output, then resume:\n"
+            f"  harnessie approve-maiden {run_id} {phase}\n"
             f"  harnessie resume {run_id} {workflow_ref}"
         )
     return None

@@ -76,6 +76,8 @@ All commands are subcommands of `python3 -m harness.cli` (or `harnessie` once in
 | `eval --live` | Run opt-in live provider scorecards; skipped visibly unless `HARNESSIE_LIVE=1` and provider configuration are present. |
 | `verify <flags>` | Standalone verification of any workspace against a claims file, no project scaffold required: `--workspace <dir> --criteria <claims.md> [--check "<cmd>" ...] [--models <models.yaml>] [--report-dir <dir>] [--tier <tier>] [--allow-network] [--no-verifier]`. Deterministic checks run sandboxed (network-denied unless `--allow-network`; the verifier agent stays denied regardless), then a read-only fresh-context verifier tests each claim against the artifacts. Exit 0 verified, 1 failed, 2 cannot-verify, fail closed. Single pass, no retry ladder. The report records the workspace git revision, criteria hash, verifier model, and network mode. Adopted via `decisions/AIDR-0006`. |
 | `verify-manifest [manifest]` | Verify the trust-bundle manifest. Defaults to `docs/MANIFEST.yaml`. |
+| `verify-inward-manifest [manifest]` | Verify the harness input manifest. Defaults to `INWARD_MANIFEST.yaml`; exit 2 on malformed content, hash drift, or incomplete coverage. |
+| `approve-maiden <run_id> <phase>` | Promote one verified maiden-voyage proposal after checking the audit chain, staged hashes, and unchanged target. Exit 2 on any drift. |
 | `init [path]` | Scaffold a minimal project layout, then run the guided readiness check: Python version, sandbox backend detection, API-key guidance, and a zero-dollar mock run that must be green. `--no-verify` skips the guided check for scripted scaffolding. |
 
 ## What governs a run
@@ -109,6 +111,7 @@ phases:
       Produce an implementation plan: subtasks with acceptance criteria,
       inputs, and out-of-scope fences. Inspect first; do not write files.
   - name: implement
+    phase_type: artifact-builder
     agent: implementer
     task_class: implement
     max_steps: 40
@@ -140,6 +143,7 @@ Phase fields:
 - `agent`: the role to run. `orchestrator`, or a worker or verifier defined under `agents/`.
 - `task_class`: the routing key. Looked up in `config/models.yaml` to pick tier and effort.
 - `task`: the task template. `{goal}` is the operator's goal; `{phase_name}` is a prior phase's report.
+- `phase_type`: optional stable label for a worker artifact contract. The complete normalized phase mapping is fingerprinted. A new fingerprint runs and verifies in a staged clone, then halts as `needs_approval` until `approve-maiden` promotes that exact output. Changing any phase behavior requires another maiden voyage. Network-enabled, parallel, and adversarial phases cannot use this field.
 - `max_steps`: the loop's step ceiling for this phase.
 - `verify`: the gate (worker phases). `checks` are shell commands that must exit 0; `verifier` names an independent judge in `agents/verifiers/`; `max_attempts` bounds the reformulate-and-retry loop; `criteria` is what the verifier judges against.
 - `deny_tools`: tools removed from this phase, narrowing the blast radius of untrusted content.
@@ -152,13 +156,17 @@ Phase fields:
 
 Prior-phase reports are treated as untrusted model output: before substitution they pass through the same quarantine filter that scans tool results, so injection attempts inside a report are fenced as data rather than followed. The operator's `goal` is never fenced.
 
+Harness input integrity. When `INWARD_MANIFEST.yaml` is present, Harnessie verifies all shipped role prompts, YAML configs, and the static policy portion of `OWNERSHIP.yaml` before model dispatch. Auto-maintained first-writer claims are excluded. Exact coverage means adding a new file under those surfaces without pinning it is also divergence. The shipped `on_divergence: refuse` policy halts with `needs_human`; `record` emits an audited divergence and continues for intentional local development. Clean runs emit `inward_manifest_verified`, and `workflow_start` records the selected workflow's SHA-256. A missing manifest preserves legacy downstream behavior. A present malformed manifest fails closed.
+
+Maiden voyages. The shipped build workflow marks its worker with `phase_type: artifact-builder`. On the first run, Harnessie clones the current workspace into the ignored `.maiden/` runtime directory, runs the worker and its gate there, disables network and non-workspace mutation, and leaves the target unchanged. Only hashed proposal metadata enters `runs/`. A green proposal halts as `needs_approval`. Inspect the staged directory named in the report, run `harnessie approve-maiden <run_id> <phase>`, then resume the original run. Promotion refuses if either side changed after verification. Approval is stored in the hash-chained run history; the exact fingerprint writes normally in future runs, while any phase-contract edit requires a new maiden voyage.
+
 Parallel workspace isolation does not suspend declared ownership. Operator-owned paths remain unwritable, agent lanes remain exclusive to the named agent, and collaborative lanes remain shared. First-writer auto-claims are not shared between phase workspaces because two equal relative names identify physically separate artifacts; cross-phase collision prevention is the static `writes` preflight when a workflow opts into it.
 
 Adversarial phases. A phase with `mode: adversarial` runs a panel instead of a single worker. Each `positions` entry is an agent on a task class (choose different task classes to get genuinely different brains, which is what earns the record its independent-positions claim). After `rebuttal_rounds` of objections, `arbitration: convergence` passes only on unanimous agreement with zero open objections; anything else halts as `needs_arbitration` with a decision record. See [Governance](#governance-consent-contests-and-arbitration).
 
 Approval policy. Approval-gated tools deny closed unless authorized. A workflow may use `approve_tools` for phase-local recorded pre-approval, or an operator can pass `--approval-policy approvals.yaml` with `allow` and `deny` lists. Each rule names a `tool` and may name a `phase`; explicit deny wins. `--approve-interactive` prompts on a TTY when no policy rule matches.
 
-Verification options. Start with the offline deterministic path: `pytest`, `harnessie eval`, and `harnessie verify-manifest`. When a local OpenAI-compatible endpoint such as Ollama is already running, `HARNESSIE_LIVE=1 HARNESSIE_OPENAI_COMPAT_BASE_URL=http://localhost:11434/v1 harnessie eval --live` gives a live-local scorecard without external provider calls. External provider scorecards are attended operations. CLI fan-out, local model review, or a separate model-family review can strengthen a change, but it is review evidence; the merge proof remains the repo's tests, evals, manifests, and audit records.
+Verification options. Start with the offline deterministic path: `pytest`, `harnessie eval`, `harnessie verify-manifest`, and `harnessie verify-inward-manifest`. When a local OpenAI-compatible endpoint such as Ollama is already running, `HARNESSIE_LIVE=1 HARNESSIE_OPENAI_COMPAT_BASE_URL=http://localhost:11434/v1 harnessie eval --live` gives a live-local scorecard without external provider calls. External provider scorecards are attended operations. CLI fan-out, local model review, or a separate model-family review can strengthen a change, but it is review evidence; the merge proof remains the repo's tests, evals, manifests, and audit records.
 
 ## Configuring brains
 
@@ -297,6 +305,7 @@ Every run ends in a named stop condition, and each maps to one operator action. 
 | `complete` / phase `passed` | task done, gate satisfied | nothing; the next phase proceeds |
 | `declined` | the worker declined the offered task packet | read the counter-proposal in the report; revise the packet or accept the objection, then re-run |
 | `needs_human` | a gate's checks or verifier failed after the retry ladder exhausted | read the proofs under `runs/<id>/proofs/` and the report; fix the task or the acceptance criteria; re-run |
+| `needs_approval` | a new or changed `phase_type` produced verified staged output | inspect the `.maiden/` path named in the report, run `harnessie approve-maiden <run_id> <phase>`, then resume |
 | `needs_arbitration` | a contested phase produced dissent | open `runs/<id>/decisions/DR-<phase>.md`, record your decision, then re-run (resume keys on that record) |
 | `stuck` | the model repeated an identical failing or refused call | inspect the refusal via `harnessie audit <id>`; fix the tool grant, allowlist, or task; re-run |
 | `budget` | the run hit its token or dollar ceiling | raise the ceiling in `config/models.yaml` or narrow the goal; re-run |
@@ -311,6 +320,7 @@ Harnessie's guarantees live in code at the tool and registry layer, so no role p
 
 - Role permissions. The registry enforces which role may call which tool at dispatch time. A model never sees a tool its role cannot use, and a disallowed call is refused, not executed.
 - Consent lock. Side-effecting tools stay locked until the worker accepts the task.
+- Maiden voyage. A newly fingerprinted worker contract writes only to a staged clone until the operator approves the verified snapshot.
 - Workspace jail. File tools resolve and confine paths to the workspace subtree; a path escape is refused.
 - OS sandbox. Every child command (shell and gate checks) runs in an OS confinement that denies writes outside the workspace and denies network by default. macOS uses Seatbelt; Linux uses bubblewrap, firejail, or docker. No usable backend means shell fails closed.
 - Quarantine. Tool results and inter-phase reports are scanned for injection patterns and invisible or bidirectional characters; flagged content is stripped of invisibles and fenced as data-not-instructions before a model sees it.

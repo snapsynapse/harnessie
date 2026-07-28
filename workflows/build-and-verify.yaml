@@ -17,6 +17,7 @@ phases:
       your read tools. Do not write any files.
 
   - name: implement
+    phase_type: artifact-builder
     agent: implementer
     task_class: implement
     max_steps: 40

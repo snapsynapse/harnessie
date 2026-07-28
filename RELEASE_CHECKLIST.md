@@ -11,6 +11,7 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 - [ ] `python3 -m pytest -q` clean; note the exact `N passed / M skipped`.
 - [ ] `python3 -m harness.cli eval` clean; note `K/K`.
 - [ ] `python3 -m harness.cli verify-manifest` passes.
+- [ ] `python3 -m harness.cli verify-inward-manifest` passes.
 - [ ] `git diff --check` clean.
 - [ ] `python3 scripts/ecosystem_status.py --validate` passes and
       `ECOSYSTEM.md` still describes the intended dependency direction.

@@ -125,7 +125,8 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
                 "Artifact-volume ceilings stop a phase before workspace damage "
                 "can exceed the operator's declared bound.") from e
         if ledger is not None and ledger.claim(_agent or _role, rel):
-            _emit("ownership_claimed", agent=_agent or _role, path=rel)
+            _emit(getattr(ledger, "claim_event", "ownership_claimed"),
+                  agent=_agent or _role, path=rel)
         return f"wrote {len(content)} chars to {rel}"
 
     def list_files(path: str = ".") -> str:

@@ -95,6 +95,18 @@ Decision records for contested phases live under `runs/<id>/decisions/` — also
 
 v0.3 additions on the same principles: memory-fact provenance is stamped by the harness from run + agent (an agent-claimed source is ignored, so memory cannot launder its origins); `expire_fact` is approval-gated and archival-only (deletion is not a capability); every approval grant or denial — including the operator's recorded `approve_tools:` pre-approvals — is an event in the hash-chained stream, so the composite timeline shows what the human authorized alongside what the agents did. Memory and prior-run state reach agents only through a harness-prepared digest (`inject_memory_status`), never a widened read surface.
 
+## Harness self-integrity (v0.8)
+
+`INWARD_MANIFEST.yaml` is the local trust root for the inputs that shape a run: all shipped role prompts, all YAML files under `config/`, and the static policy in `OWNERSHIP.yaml`. Auto-maintained first-writer claims are excluded from the ownership-policy projection. Before any model dispatch, the runner checks exact coverage and SHA-256 hashes. The shipped policy is `on_divergence: refuse`; a project may deliberately choose `record` to continue with an explicit audit event. Clean runs record the inward-manifest identity and selected workflow hash.
+
+This is tamper-evident against accidental edits and single-file prompt/config replacement, not tamper-proof against an attacker who can rewrite both a pinned file and the local manifest. Git history, reviewed commits, and release provenance remain the external anchor. The manifest is not signed. A missing manifest is accepted for legacy downstream projects; once present, malformed content and incomplete coverage fail closed.
+
+## Maiden-voyage promotion (v0.8)
+
+A worker phase may declare `phase_type`. Harnessie hashes the exact normalized phase mapping, not only its label. The first execution of a new fingerprint uses a staged clone under the ignored `.maiden/` runtime directory, disables network and non-workspace mutation, runs the normal verification gate, and halts as `needs_approval`. Only hashes and proposal metadata enter `runs/<id>/maiden/`; staged workspace bytes remain outside the run-artifact tree. No staged file or ownership claim reaches the target workspace before operator approval.
+
+`harnessie approve-maiden <run_id> <phase>` is the only promotion path. It refuses if the run audit chain is broken, the proposal or staged artifacts changed, the staged ownership ledger changed, or the target workspace or ownership ledger moved since staging. Successful promotion is audited and journaled before resume. The control is opt-in for legacy compatibility. Parallel phases refuse `phase_type` until group-level promotion semantics exist; adversarial phases are already read-only and cannot declare it. The honest limit is the existing audit limit: an attacker able to rewrite the complete event chain and all proposal artifacts can forge the local history.
+
 ## Reporting a vulnerability
 
 Use GitHub private vulnerability reporting on this repository (Security tab, "Report a vulnerability") so the report stays private until a fix ships. If that path is unavailable, open an issue that says only "security contact requested" with no details, and a private channel will be arranged. Please do not disclose publicly before a fix is released; there is no bounty program, but reports are credited in the changelog unless you ask otherwise.

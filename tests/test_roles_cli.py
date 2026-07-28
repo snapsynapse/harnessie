@@ -62,6 +62,7 @@ def test_cli_init_scaffolds_project(tmp_path, capsys):
     assert (tmp_path / "agents" / "orchestrator.md").exists()
     assert (tmp_path / "config" / "models.yaml").exists()
     assert (tmp_path / "evals" / "baseline.yaml").exists()
+    assert (tmp_path / "INWARD_MANIFEST.yaml").exists()
 
 
 def test_cli_init_does_not_overwrite_by_default(tmp_path, capsys):

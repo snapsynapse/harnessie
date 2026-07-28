@@ -33,7 +33,18 @@ from .boundary import Boundary, RehydrationGrants, SecretEgressHalt, StripMap
 from .cascade import (CascadePolicy, SIDEWAYS_REASONS, load_cascade_config,
                       validate_against_tiers)
 from .events import EventLog
+from .inward_manifest import verify_inward_manifest
 from .loop import AgentLoop, LoopResult
+from .maiden import (
+    MaidenConfigError,
+    approved_fingerprints,
+    clone_workspace,
+    phase_fingerprint,
+    proposal_paths,
+    text_sha256,
+    workspace_sha256,
+    write_proposal,
+)
 from .memory import ProjectMemory, ProofStore
 from .models import build_model
 from .models.base import EFFORT_LEVELS, ModelSpec
@@ -46,6 +57,7 @@ from .state import RunState, new_run_id
 from .tools.builtin import register_builtin
 from .tools.registry import ToolRegistry
 from .verify import Check, GateResult, VerificationGate
+from .trust_manifest import sha256_file
 
 
 def _escalation_reason(verdict) -> str:
@@ -126,12 +138,12 @@ def _validate_models_config(
 @dataclass
 class PhaseOutcome:
     phase: str
-    status: str  # "passed" | "needs_human" | "needs_arbitration" | "skipped_resume"
+    status: str  # passed | needs_human | needs_arbitration | needs_approval | skipped_resume
     report: str
     spent_usd: float = 0.0
     spent_tokens: int = 0
 
-HALT_STATUSES = ("needs_human", "needs_arbitration")
+HALT_STATUSES = ("needs_human", "needs_arbitration", "needs_approval")
 
 
 class WorkflowRunner:
@@ -228,6 +240,16 @@ class WorkflowRunner:
 
     def run_workflow(self, workflow_path: Path, goal: str = "") -> list[PhaseOutcome]:
         wf = yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
+        integrity_outcome = self._check_inward_manifest()
+        if integrity_outcome is not None:
+            return [integrity_outcome]
+        try:
+            self._configure_maiden_voyages(wf)
+        except MaidenConfigError as exc:
+            self.events.emit("maiden_config_invalid", detail=str(exc))
+            return [PhaseOutcome(
+                "(workflow)", "needs_human",
+                f"invalid maiden-voyage configuration: {exc}")]
         try:
             self._configure_blast_radius(wf)
         except BlastRadiusConfigError as exc:
@@ -238,6 +260,8 @@ class WorkflowRunner:
             workflow_ref = str(workflow_path.resolve().relative_to(self.root))
         except ValueError:
             workflow_ref = str(workflow_path)
+        self._workflow_ref = workflow_ref
+        self._workflow_sha256 = sha256_file(workflow_path)
         # Contain the goal before it is emitted or substituted anywhere: it is
         # the first egress surface, inherited by every phase task. With the
         # boundary off this is a no-op; a secret in the goal halts the whole
@@ -253,7 +277,8 @@ class WorkflowRunner:
             self.strip_map.mapping = result.mapping
             goal = result.stripped
         self.events.emit("workflow_start", name=wf.get("name"), run_id=self.run_id,
-                         goal=goal, workflow=workflow_ref)
+                         goal=goal, workflow=workflow_ref,
+                         workflow_sha256=self._workflow_sha256)
         outcomes: list[PhaseOutcome] = []
         reports: dict[str, str] = {"goal": goal}
 
@@ -339,9 +364,14 @@ class WorkflowRunner:
                 continue
 
             workspace = self.root / "workspace"
-            outcome = self._execute_standard_phase(
-                phase, task, workspace=workspace, registry=self.registry,
-                blast_radius=self._phase_blast_radius(phase, workspace))
+            fingerprint = self._maiden_fingerprints.get(name)
+            if fingerprint and fingerprint not in self._approved_maiden:
+                outcome = self._run_maiden_phase(
+                    phase, task, workspace, fingerprint)
+            else:
+                outcome = self._execute_standard_phase(
+                    phase, task, workspace=workspace, registry=self.registry,
+                    blast_radius=self._phase_blast_radius(phase, workspace))
 
             self._stamp_phase_cost(outcome, phase_start_usd, phase_start_tokens)
             self.state.record(f"phase:{name}",
@@ -362,6 +392,164 @@ class WorkflowRunner:
                          spent_usd=round(self.budget.spent_usd, 4),
                          proofs=self.proofs.listing())
         return outcomes
+
+    def _configure_maiden_voyages(self, workflow: dict) -> None:
+        self._maiden_fingerprints: dict[str, str] = {}
+        self._approved_maiden = approved_fingerprints(self.root)
+        for phase in workflow.get("phases", []):
+            if "phase_type" not in phase:
+                continue
+            name = str(phase.get("name", "(unnamed)"))
+            if phase.get("parallel"):
+                raise MaidenConfigError(
+                    f"phase {name!r}: phase_type is not supported in a "
+                    "parallel group; stage that workflow sequentially first")
+            if phase.get("mode") == "adversarial":
+                raise MaidenConfigError(
+                    f"phase {name!r}: adversarial phases are read-only "
+                    "decision protocols and cannot declare phase_type")
+            if phase.get("allow_network"):
+                raise MaidenConfigError(
+                    f"phase {name!r}: a maiden phase cannot allow network "
+                    "because remote side effects cannot be staged or undone")
+            agent_name = phase.get("agent", "orchestrator")
+            if self.roles.get(agent_name).kind != "worker":
+                raise MaidenConfigError(
+                    f"phase {name!r}: phase_type is supported only on worker "
+                    "phases with workspace artifacts")
+            _phase_type, fingerprint = phase_fingerprint(phase)
+            self._maiden_fingerprints[name] = fingerprint
+
+    def _run_maiden_phase(
+        self,
+        phase: dict,
+        task: str,
+        workspace: Path,
+        fingerprint: str,
+    ) -> PhaseOutcome:
+        name = phase["name"]
+        phase_type = str(phase["phase_type"])
+        _proposal_dir, staged_workspace, _proposal_path = proposal_paths(
+            self.root, self.run_dir, fingerprint)
+        baseline_sha = workspace_sha256(workspace)
+        clone_workspace(workspace, staged_workspace)
+
+        proposal_ledger = OwnershipLedger(
+            path=staged_workspace.parent / "OWNERSHIP.yaml",
+            agent_lanes={
+                agent: list(globs)
+                for agent, globs in self.ledger.agent_lanes.items()
+            },
+            collaborative=list(self.ledger.collaborative),
+            operator=list(self.ledger.operator),
+            files=dict(self.ledger.files),
+            claim_event="ownership_proposed",
+        )
+        proposal_ledger.save()
+        registry = ToolRegistry()
+        blast_radius = self._phase_blast_radius(phase, staged_workspace)
+        register_builtin(
+            registry,
+            workspace=staged_workspace,
+            ledger=proposal_ledger,
+            events=self.events,
+            memory=None,
+            provenance=f"run {self.run_id}, maiden phase {name}",
+            blast_radius=blast_radius,
+        )
+        staged_phase = dict(phase)
+        staged_phase["deny_tools"] = sorted(
+            set(phase.get("deny_tools", []))
+            | {"save_fact", "expire_fact", "request_change"})
+        outcome = self._execute_standard_phase(
+            staged_phase,
+            task,
+            workspace=staged_workspace,
+            registry=registry,
+            blast_radius=blast_radius,
+        )
+        if outcome.status != "passed":
+            self.events.emit(
+                "maiden_failed",
+                phase=name,
+                phase_type=phase_type,
+                fingerprint=fingerprint,
+                status=outcome.status,
+            )
+            return outcome
+
+        staged_sha = workspace_sha256(staged_workspace)
+        ownership_sha = (
+            sha256_file(self.ledger.path)
+            if self.ledger.path.is_file() else "")
+        proposed_ownership_sha = sha256_file(proposal_ledger.path)
+        proposal_path = write_proposal(
+            self.root,
+            self.run_dir,
+            phase,
+            fingerprint,
+            baseline_sha,
+            staged_sha,
+            outcome.report,
+            self._workflow_ref,
+            self._workflow_sha256,
+            ownership_sha,
+            proposed_ownership_sha,
+        )
+        self.events.emit(
+            "maiden_proposed",
+            phase=name,
+            phase_type=phase_type,
+            fingerprint=fingerprint,
+            proposal=str(proposal_path.relative_to(self.root)),
+            staged_workspace=str(staged_workspace.relative_to(self.root)),
+            baseline_sha256=baseline_sha,
+            staged_sha256=staged_sha,
+            workflow_sha256=self._workflow_sha256,
+            ownership_sha256=ownership_sha,
+            proposed_ownership_sha256=proposed_ownership_sha,
+            report_sha256=text_sha256(outcome.report),
+        )
+        return PhaseOutcome(
+            name,
+            "needs_approval",
+            f"maiden output staged at "
+            f"{staged_workspace.parent.relative_to(self.root)}; inspect it, then "
+            f"run: harnessie approve-maiden {self.run_id} {name}",
+        )
+
+    def _check_inward_manifest(self) -> PhaseOutcome | None:
+        manifest_path = self.root / "INWARD_MANIFEST.yaml"
+        if not manifest_path.exists():
+            return None
+        result = verify_inward_manifest(self.root, manifest_path)
+        event_data = {
+            "manifest": "INWARD_MANIFEST.yaml",
+            "manifest_sha256": result.manifest_sha256,
+            "files": len(result.files),
+        }
+        if result.ok:
+            self.events.emit("inward_manifest_verified", **event_data)
+            return None
+        problems = result.problems[:20]
+        if result.policy == "record":
+            self.events.emit(
+                "inward_manifest_divergence",
+                **event_data,
+                policy="record",
+                problems=problems,
+            )
+            return None
+        self.events.emit(
+            "inward_manifest_refused",
+            **event_data,
+            policy="refuse",
+            problems=problems,
+        )
+        return PhaseOutcome(
+            "(integrity)", "needs_human",
+            "inward manifest divergence; run refused before model dispatch: "
+            + "; ".join(problems[:5]))
 
     def _event_history(self) -> list[dict]:
         path = self.run_dir / "events.jsonl"
