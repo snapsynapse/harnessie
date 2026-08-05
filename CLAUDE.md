@@ -16,7 +16,7 @@ harness structure carries the quality floor, the model carries the ceiling.
 
 ## Stack
 
-- Python 3.11+ (packaged as `harnessie`, current version 0.7.1, Apache-2.0).
+- Python 3.11+ (packaged as `harnessie`, current version 0.8.0, Apache-2.0).
 - Runtime dependency: PyYAML only. Model adapters are stdlib-only (no vendor SDK).
 - Dev dependency: pytest 8+. Console entry point: `harnessie = harness.cli:main`.
 - OS sandbox: macOS `sandbox-exec` (Seatbelt); Linux bubblewrap / firejail / docker.
@@ -89,14 +89,13 @@ PyPI promotion and live-provider calls are deliberate operator acts, never headl
 
 ## Current state (2026-08-04)
 
-- Version 0.7.1 is shipped. GitHub `main` is `50068e8`; its CI and Pages checks pass,
-  and the release channels currently pin 0.7.1.
+- Version 0.8.0 is shipped on GitHub and PyPI. The separately owned verify action and
+  Homebrew formula still pin 0.7.1; `NEXT.md` records that intentional propagation lag.
 - All four 0.8 write-safety and self-integrity mechanics plus the composed package
-  release gate are implemented. The full candidate gate passes with 351 tests, one
-  skip, 47/47 evals, both manifests, built-artifact inspection, and fresh install.
-- The remaining pre-release item is the public Siteline 90+ gate. A local candidate
-  adds truthful security, change-discovery, agent-boundary, and local CLI resources;
-  it still needs deployment and a live rescan before the roadmap item can turn green.
+  release gate pass with 352 tests, one environment-dependent skip, 47/47 evals, both
+  manifests, built-artifact inspection, and a fresh install.
+- The public Siteline follow-up is green. A fresh live rubric 2.3.0 scan on 2026-08-05
+  UTC scored the deployed site A, 97/100, with Level 4 machine enablement at 16/18.
 - AIDR-0008 was arbitrated and executed as the separately released, probe-gated
   `harnessie-engine-wrappers` repository. Its release train remains independent.
 - CI (`.github/workflows/ci.yml`) proves Linux bubblewrap, macOS, Linux no-backend

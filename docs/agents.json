@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "product": {
     "name": "Harnessie",
-    "version": "0.7.1",
+    "version": "0.8.0",
     "type": "local Python library and CLI",
     "description": "A brain-agnostic multi-agent harness with consent, workspace confinement, independent verification, human-only arbitration, and tamper-evident audit records.",
     "url": "https://harnessie.com/",

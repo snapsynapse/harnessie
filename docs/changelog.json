@@ -7,12 +7,18 @@
     "source": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md#unreleased"
   },
   "current": {
-    "version": "0.7.1",
-    "released": "2026-07-09",
-    "summary": "The verification gate became a standalone local and CI surface through harnessie verify.",
-    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v0.7.1"
+    "version": "0.8.0",
+    "released": "2026-08-04",
+    "summary": "Write-safety ceilings, declared parallel write paths, maiden-voyage staging, inward integrity, hardened release gates, and truthful public machine handoffs.",
+    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v0.8.0"
   },
   "history": [
+    {
+      "version": "0.8.0",
+      "released": "2026-08-04",
+      "summary": "Write-safety and self-integrity controls plus hardened packaging and truthful public machine handoffs.",
+      "release": "https://github.com/snapsynapse/harnessie/releases/tag/v0.8.0"
+    },
     {
       "version": "0.7.1",
       "released": "2026-07-09",

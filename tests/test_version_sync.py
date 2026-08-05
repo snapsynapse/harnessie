@@ -11,6 +11,8 @@ runs before anything is tagged.
 import re
 from pathlib import Path
 
+from harness import __version__
+
 ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -28,6 +30,10 @@ def test_landing_page_version_pills_match_pyproject():
     assert not stale, (
         f"docs/index.html claims version(s) {sorted(set(stale))} "
         f"but pyproject says {version}")
+
+
+def test_package_version_matches_pyproject():
+    assert __version__ == pyproject_version()
 
 
 def test_assistant_guide_version_matches_pyproject():

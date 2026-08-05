@@ -6,7 +6,7 @@ Roadmap items are intent, not commitments. Dates are omitted deliberately; miles
 
 ## Released so far
 
-Versions 0.1.0 through 0.7.1 are shipped; the current release is 0.7.1, which took the verification gate standalone (`harnessie verify`, AIDR-0006). This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
+Versions 0.1.0 through 0.8.0 are shipped; the current release is 0.8.0, which bounds write damage and pins the harness inputs that define a run. This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
 
 ## Guiding priorities
 
@@ -57,7 +57,7 @@ Ease (the first-run path):
 Standards adoption (the credited specs become checkable claims):
 - GuideCheck: rewrite the shipped `assistant-guide.txt` from the current minimal unstructured guide to a conformable Level 3+ profile; add the byte-identical `.well-known/assistant-guide.txt` plus manifest sidecar (the trust-anchored pair) and verify the hash match; link it from the landing page footer and README so it is discoverable, not just present. The `.well-known/` half is only verifiable end-to-end once Pages is live; the content rewrite and manifest need not wait. GREEN: `assistant-guide.txt` is a conforming GuideCheck Level 3 profile (bounded review task; verified by the reference verifier at Level 3, zero findings), with a byte-identical `docs/.well-known/assistant-guide.txt`, a sidecar provenance manifest, `docs/.nojekyll` so Pages serves the dot-directory, discovery from the landing page, README, `llms.txt`, and `pyproject` `[project.urls]`, and all three files pinned in the trust manifest. Level 4 CONFIRMED end-to-end 2026-07-07 by the hosted fetching verifier (guidecheck-hosted 0.7.0: achieved level 4, zero blocking findings) against the live `.well-known/` pair, the sidecar manifest, and an independent DNS TXT anchor at `_assistant-guide.harnessie.com` (registrar control plane, resolved via DoH). The two remaining warnings are response headers GitHub Pages cannot set (nosniff, HSTS).
 - Graceful Boundaries: check the shipped v0.3.2 refusal grammar against GB's conformance criteria across all 16 enumerated denial sites; cite the achieved level (or a named gap list) in `SECURITY.md` or `GOVERNANCE.md`; update `INTENT.md` §7 from lesson-import to the real adopted status. GREEN: adopted transport-adapted (Level 1 grammar met, Action Boundaries vocabulary aligned, SC-16 met; HTTP Levels 2-4 N/A). Cited in [GOVERNANCE.md](GOVERNANCE.md) §8; `INTENT.md` §7 moved to adopted.
-- Siteline: the live canonical page (harnessie.com) scores 90 or above on a `siteline-scan`, complementing the already-clean axe-core WCAG pass. Requires the site live; restated from the go-live steps so it is a gate, not an assumption.
+- Siteline: GREEN. A fresh live rubric 2.3.0 scan on 2026-08-05 UTC scored the deployed canonical site A, 97/100, with Level 4 machine enablement at 16/18. The captured external response provenance and the result-store residual are recorded in [the release-gate audit](audits/siteline-live-result-2026-08-05.json).
 
 Safety (the falsifiable claim):
 - A published threat-model comparison artifact: SECURITY.md properties mapped against the failure modes of prevailing harness patterns (unsandboxed shell, prompt-level-only guardrails, self-verification, silent dissent-merging), each row citing the enforcing code and its test. This is the artifact the "safest" headline points at. GREEN ([docs/threat-model.md](docs/threat-model.md); every row cites a passing test).
@@ -105,7 +105,7 @@ Acceptance: a phase under a contained policy completes a real task with zero can
 
 Theme: extract the VerificationGate as a standalone surface (`harnessie verify`) consumable by any orchestrator or CI as an exit-code check, first proving ground agent-produced pull requests. Adopted via `decisions/AIDR-0006`. GREEN: fail-closed exit contract (0/1/2) proven by `tests/test_verify_standalone.py`; field-proven same day against the Ringer PR queue including a refutation of its own author's PR.
 
-### 0.8.0: Write-safety and self-integrity
+### 0.8.0: Write-safety and self-integrity - SHIPPED
 
 Theme: bound what a run may change, the way 0.7 bounds what a run may expose. 0.7's containment boundary limits data leaving the harness; this milestone limits damage inside it, and extends the same integrity discipline to the harness's own configuration. These mechanisms are independent of the routing engine and the containment boundary, which is why they ship as their own claim rather than riding the sovereignty milestone.
 

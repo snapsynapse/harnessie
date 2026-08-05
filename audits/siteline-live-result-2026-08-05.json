@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "kind": "captured_external_release_gate",
+  "target": "https://harnessie.com/",
+  "source": "https://siteline.to/api/scan",
+  "request": {
+    "method": "GET",
+    "fresh_rescan": true,
+    "debug_provenance": true
+  },
+  "response": {
+    "http_status": 200,
+    "cache": "MISS",
+    "request_id": "scan_msfl4xyl_7a0n4s",
+    "result_id": "harnessie-com-20260805",
+    "scanned_at": "2026-08-05T04:26:51.228Z",
+    "grade": "A",
+    "score": 97,
+    "raw_score": 97,
+    "rubric_version": "2.3.0",
+    "scanner_version": "2.0.0",
+    "source_response_bytes": 44114,
+    "source_response_sha256": "b1b230b08ddf9b1de6152110f6143d828e5f5c12259f3685554f66074624247f"
+  },
+  "agentic_enablement": {
+    "level": 4,
+    "quality": 16,
+    "maximum": 18,
+    "machine_policy": 2,
+    "content_discovery": 2,
+    "change_tracking": 2,
+    "llm_context": 2,
+    "agent_capabilities": 2,
+    "api_description": 2,
+    "mcp_discovery": 0,
+    "security_contact": 2,
+    "transactability": 2
+  },
+  "fetched_release_resources": [
+    "https://harnessie.com/",
+    "https://harnessie.com/robots.txt",
+    "https://harnessie.com/llms.txt",
+    "https://harnessie.com/agents.json",
+    "https://harnessie.com/.well-known/security.txt",
+    "https://harnessie.com/api/v1/index.json",
+    "https://harnessie.com/changelog.json",
+    "https://harnessie.com/sitemap.xml",
+    "https://harnessie.com/quickstart.html",
+    "https://harnessie.com/getting-started.html"
+  ],
+  "result_store": {
+    "lookup": "https://siteline.to/api/result?id=harnessie-com-20260805",
+    "status_at_capture": 404,
+    "note": "Siteline returned the fresh scan successfully but did not retain it in the public result store. This tracked extract records the external response and its hash; it is not an independently signed attestation."
+  }
+}
