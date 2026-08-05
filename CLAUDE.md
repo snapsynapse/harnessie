@@ -87,15 +87,18 @@ Live provider scorecards are opt-in and never part of the default suite; without
 `HARNESSIE_LIVE=1` plus provider config they report `SKIP` and exit clean. Pages/DNS/
 PyPI promotion and live-provider calls are deliberate operator acts, never headless.
 
-## Current state (2026-07-12)
+## Current state (2026-08-04)
 
-- Branch `main`, clean working tree, level with `origin/main` (0 ahead / 0 behind).
-- Version 0.7.1 shipped 2026-07-09 (standalone `harnessie verify` surface). Post-release
-  surfaces live: harnessie-verify-action v0.1.0 on the GitHub Marketplace, Homebrew tap
-  current, dogfood PR-verification workflow armed. Last verification at ship: 269 passed
-  / 1 skipped, 43/43 eval, manifest OK.
-- CI (`.github/workflows/ci.yml`): three jobs — Linux bubblewrap (portability proof),
-  macOS, and Linux no-backend (fail-closed proof). Plus `verify-pr-claims.yml` dogfooding
-  the standalone verifier on PR bodies.
-- Open item: AIDR-0008 (operator-side engine-wrapper containment) awaiting arbitration.
-  See NEXT.md for the full handoff and operator-attended step list.
+- Version 0.7.1 is shipped. GitHub `main` is `50068e8`; its CI and Pages checks pass,
+  and the release channels currently pin 0.7.1.
+- All four 0.8 write-safety and self-integrity mechanics plus the composed package
+  release gate are implemented. The full candidate gate passes with 351 tests, one
+  skip, 47/47 evals, both manifests, built-artifact inspection, and fresh install.
+- The remaining pre-release item is the public Siteline 90+ gate. A local candidate
+  adds truthful security, change-discovery, agent-boundary, and local CLI resources;
+  it still needs deployment and a live rescan before the roadmap item can turn green.
+- AIDR-0008 was arbitrated and executed as the separately released, probe-gated
+  `harnessie-engine-wrappers` repository. Its release train remains independent.
+- CI (`.github/workflows/ci.yml`) proves Linux bubblewrap, macOS, Linux no-backend
+  fail-closed behavior, package artifacts, and fresh installation. See NEXT.md for
+  the full handoff, current worktree status, and operator-attended steps.

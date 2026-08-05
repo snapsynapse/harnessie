@@ -7,12 +7,20 @@ files:
     sha256: 09bcd115024ed7c2213f7ed8b6b31050c23ae7a56aa27dc10a37cc72f10fbb7d
   - path: docs/.well-known/assistant-guide-manifest.txt
     sha256: 965e5d8f27c97bf022e8cf16473fc9f49aa25b5c2121044755380f51330f7ffb
+  - path: docs/.well-known/security.txt
+    sha256: 8987609c662c5b80d92843e8cb00489c281470a091e808bd7a1cee5aa0fe1387
+  - path: docs/agents.json
+    sha256: 935530a7f1336f833ca5430330778365b882a0ec2d678aeff6122c6c4fe66730
+  - path: docs/api/v1/index.json
+    sha256: 0030373dc225ca6df5574952cc0d53bafcf758e3d89366c3430a534ad575c186
+  - path: docs/changelog.json
+    sha256: 2aff029ed9103e7ae062aa7a57a09c6a995d1c48b51a5c6e3e37889369a84413
   - path: docs/llms.txt
-    sha256: 028aaf3a7a0c7176eb805964ddcb955a00cdbebf4415595168c28f0000df72ce
+    sha256: 4651c4539213370150c9a578ba956c020e9a818dbd908143d84860f9d3758067
   - path: docs/robots.txt
     sha256: 88588b10d194d3d62ad9a4463f05a80f645ed1e7b23c59b10087cb28dd5a57f6
   - path: docs/sitemap.xml
-    sha256: e88b260f5db7abc6d7c4c1490a3200422e53f978e802bf42a05385eadc10bd2e
+    sha256: 8c339c4299d7f700310aadfe401a51a51499ee9584e400849f2e625e2554def4
   - path: docs/CNAME
     sha256: 6dc81288045a60be46e3eaf407380328466b8ce98c769fe1e637f69c97d5a97a
   - path: docs/site.webmanifest

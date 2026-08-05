@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "project": "Harnessie",
+  "canonical": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md",
+  "unreleased": {
+    "status": "development",
+    "source": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md#unreleased"
+  },
+  "current": {
+    "version": "0.7.1",
+    "released": "2026-07-09",
+    "summary": "The verification gate became a standalone local and CI surface through harnessie verify.",
+    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v0.7.1"
+  },
+  "history": [
+    {
+      "version": "0.7.1",
+      "released": "2026-07-09",
+      "summary": "Standalone verification surface for local artifacts and agent-produced pull requests.",
+      "release": "https://github.com/snapsynapse/harnessie/releases/tag/v0.7.1"
+    },
+    {
+      "version": "0.7.0",
+      "released": "2026-07-09",
+      "summary": "Containment-aware cascade routing, PII and secret boundaries, routing traces, and eval-shaped proof.",
+      "release": "https://github.com/snapsynapse/harnessie/releases/tag/v0.7.0"
+    },
+    {
+      "version": "0.6.0",
+      "released": "2026-07-07",
+      "summary": "First-harness readiness, guided initialization, public packaging, plain-language operation, and falsifiable safety claims.",
+      "release": "https://github.com/snapsynapse/harnessie/releases/tag/v0.6.0"
+    }
+  ],
+  "last_updated": "2026-08-04"
+}

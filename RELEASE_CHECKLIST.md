@@ -12,6 +12,9 @@ are marked OPERATOR. Everything else is a working-tree change committed on
       build, metadata and private-surface inspection, and a fresh-venv CLI
       smoke test.
 - [ ] All milestone acceptance criteria green (`ROADMAP.md` for the version).
+- [ ] Any earlier roadmap follow-up still marked open is green or has an
+      arbitrated replacement. The current Siteline 90+ gate requires a dated
+      live result, not a local scoring prediction.
 - [ ] `python3 -m pytest -q` clean; note the exact `N passed / M skipped`.
 - [ ] `python3 -m harness.cli eval` clean; note `K/K`.
 - [ ] `python3 -m harness.cli verify-manifest` passes.

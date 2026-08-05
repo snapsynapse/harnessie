@@ -41,6 +41,7 @@ Worked end-to-end example with sample data: [examples/policy-compliance/README.m
 - [docs/GUIDE.md](docs/GUIDE.md): the complete user guide, concepts through extension, including workflow authoring, brain configuration, ownership, governance, and the halt-recovery table.
 - [docs/brains.md](docs/brains.md): the brain-agnostic receipt, the models actually run under the harness with a link to the record that proves each.
 - [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run — verified end-to-end at GuideCheck Level 4 (hosted verifier, zero blocking findings); served at [harnessie.com/.well-known/assistant-guide.txt](https://harnessie.com/.well-known/assistant-guide.txt) with a provenance sidecar and an independent DNS TXT anchor.
+- [docs/agents.json](docs/agents.json), [docs/api/v1/index.json](docs/api/v1/index.json), [docs/changelog.json](docs/changelog.json), and [docs/.well-known/security.txt](docs/.well-known/security.txt): machine-readable capability, local CLI, release-history, and private security-report handoffs. The declarations explicitly do not advertise a hosted API, service, or MCP server.
 
 The engineering references below (ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP) sit at the repo root; the user-facing guides live under `docs/`.
 
@@ -69,8 +70,7 @@ evals/              deterministic scorecards over mock-brain golden/risky/recove
 docs/MANIFEST.yaml  trust-bundle integrity manifest for machine-readable public artifacts
 tests/              the done-tests for every subsystem
 docs/               the live served tree (harnessie.com via GitHub Pages): landing page, generated
-                    HTML doc pages (built by scripts/build_docs_html.py), and the .well-known/
-                    GuideCheck trust pair
+                    HTML docs, public machine handoffs, and the .well-known/ trust files
 *.md at root        ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP, IMPLEMENTATION_PLAN, PROMPTS, EVALS, NEXT,
                     session-url-log, plus INTENT (9-section standard), CHANGELOG, README,
                     LICENSE (Apache-2.0) + NOTICE; source-verification.json is the build provenance data

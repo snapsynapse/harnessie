@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "product": {
+    "name": "Harnessie",
+    "version": "0.7.1",
+    "type": "local Python library and CLI",
+    "description": "A brain-agnostic multi-agent harness with consent, workspace confinement, independent verification, human-only arbitration, and tamper-evident audit records.",
+    "url": "https://harnessie.com/",
+    "repository": "https://github.com/snapsynapse/harnessie",
+    "publisher": {
+      "name": "Snap Synapse LLC",
+      "url": "https://snapsynapse.com/"
+    }
+  },
+  "capabilities": [
+    {
+      "id": "review-checkout",
+      "name": "Review a Harnessie checkout",
+      "type": "assistant-guided review",
+      "status": "live",
+      "entrypoint": "https://harnessie.com/.well-known/assistant-guide.txt",
+      "description": "A bounded GuideCheck guide for inspecting a checkout and reporting evidence before a human authorizes any action.",
+      "human_approval_required": true,
+      "side_effects": "none before explicit human approval"
+    },
+    {
+      "id": "verify-claims",
+      "name": "Verify claims about a local artifact",
+      "type": "local CLI",
+      "status": "live",
+      "command": "harnessie verify",
+      "description": "Runs deterministic checks before an independent fresh-context verifier and exits fail-closed when a verdict cannot be earned.",
+      "network_default": "denied",
+      "exit_codes": {
+        "0": "verified",
+        "1": "failed",
+        "2": "could not verify"
+      }
+    },
+    {
+      "id": "run-workflow",
+      "name": "Run a governed local workflow",
+      "type": "local CLI",
+      "status": "live",
+      "command": "harnessie run",
+      "description": "Runs consented task packets with declared budgets, ownership lanes, OS-sandboxed shell work, verification gates, and audited stop conditions.",
+      "operator_consent_required": true,
+      "human_arbitration_required": true,
+      "network_default": "denied"
+    }
+  ],
+  "discovery": {
+    "assistant_guide": "https://harnessie.com/.well-known/assistant-guide.txt",
+    "llms_txt": "https://harnessie.com/llms.txt",
+    "cli_manifest": "https://harnessie.com/api/v1/index.json",
+    "changelog": "https://harnessie.com/changelog.json",
+    "security": "https://harnessie.com/.well-known/security.txt",
+    "documentation": "https://harnessie.com/guide.html",
+    "quickstart": "https://harnessie.com/quickstart.html"
+  },
+  "support": {
+    "issues": "https://github.com/snapsynapse/harnessie/issues",
+    "security_reports": "https://github.com/snapsynapse/harnessie/security/advisories/new",
+    "security_policy": "https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md"
+  },
+  "boundaries": {
+    "hosted_api": false,
+    "hosted_service": false,
+    "mcp_server": false,
+    "autonomous_remote_agent": false,
+    "note": "Harnessie is installed and run locally. These declarations describe its shipped CLI and review surfaces; they do not advertise a hosted agent, API, or MCP server."
+  },
+  "last_updated": "2026-08-04"
+}

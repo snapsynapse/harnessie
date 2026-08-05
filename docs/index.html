@@ -18,7 +18,11 @@
   <link rel="manifest" href="/site.webmanifest">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="alternate" type="text/plain" href="https://harnessie.com/llms.txt" title="LLM-readable summary">
+  <link rel="alternate" type="application/json" href="https://harnessie.com/agents.json" title="Agent capability and boundary declaration">
+  <link rel="alternate" type="application/json" href="https://harnessie.com/api/v1/index.json" title="Local CLI interface manifest">
+  <link rel="alternate" type="application/json" href="https://harnessie.com/changelog.json" title="Machine-readable release history">
   <link rel="assistant-guide" href="https://harnessie.com/.well-known/assistant-guide.txt">
+  <link rel="security" href="https://harnessie.com/.well-known/security.txt">
 
   <!-- Open Graph -->
   <meta property="og:type" content="article">
@@ -32,7 +36,7 @@
   <meta property="og:url" content="https://harnessie.com/">
   <meta property="og:locale" content="en_US">
   <meta property="article:published_time" content="2026-07-06T00:00:00Z">
-  <meta property="article:modified_time" content="2026-07-07T00:00:00Z">
+  <meta property="article:modified_time" content="2026-08-04T00:00:00Z">
   <meta property="article:author" content="Sam Rogers">
   <meta property="article:publisher" content="https://snapsynapse.com/">
   <meta property="article:section" content="Developer Tools">
@@ -52,7 +56,7 @@
 
   <!-- Identity verification (IndieWeb rel=me) -->
   <link rel="me" href="https://github.com/snapsynapse">
-  <link rel="me" href="https://www.linkedin.com/in/samrogers">
+  <link rel="me" href="https://linkedin.com/in/samrogers">
 
   <!-- JSON-LD: TechArticle -->
   <script type="application/ld+json">
@@ -67,7 +71,7 @@
     "mainEntityOfPage": { "@type": "WebPage", "@id": "https://harnessie.com/" },
     "image": "https://harnessie.com/imgs/og.png",
     "datePublished": "2026-07-06",
-    "dateModified": "2026-07-09",
+    "dateModified": "2026-08-04",
     "author": {
       "@type": "Person",
       "name": "Sam Rogers",
@@ -76,7 +80,12 @@
     "publisher": {
       "@type": "Organization",
       "name": "Snap Synapse",
-      "url": "https://snapsynapse.com/"
+      "url": "https://snapsynapse.com/",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "technical support",
+        "url": "https://github.com/snapsynapse/harnessie/issues"
+      }
     },
     "keywords": ["harnessie", "multi-agent harness", "agent orchestration", "verification gate", "brain-agnostic", "agent sandbox", "prompt-injection defense", "audit log"],
     "license": "https://github.com/snapsynapse/harnessie/blob/main/LICENSE",
@@ -568,7 +577,7 @@ routing:
       <div class="footer-brand">
         <a href="/" class="brand"><img src="/imgs/harnessie-mark.png" width="26" height="26" alt=""><span>Harnessie</span></a>
         <p>v0.7.1 &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a></p>
-        <p>A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project by <a href="https://www.linkedin.com/in/samrogers" target="_blank" rel="noopener author">Sam Rogers</a>.</p>
+        <p>A <a href="https://snapsynapse.com/" target="_blank" rel="noopener">Snap Synapse</a> project by <a href="https://linkedin.com/in/samrogers" target="_blank" rel="noopener author">Sam Rogers</a>.</p>
         <p style="margin-top:0.65rem; font-size:0.8rem;">Builds on: <a href="https://guidecheck.org/" target="_blank" rel="noopener">GuideCheck</a> &middot; <a href="https://gracefulboundaries.dev/" target="_blank" rel="noopener">Graceful Boundaries</a> &middot; <a href="https://aidr.work/" target="_blank" rel="noopener">AIDR</a></p>
       </div>
       <div class="foot-col">
@@ -584,11 +593,17 @@ routing:
         <a href="/brains.html">Brains: the receipts</a>
         <a href="/threat-model.html">Threat model</a>
         <a href="https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+        <a href="/changelog.json">Machine-readable changes</a>
+        <a href="/api/v1/index.json">CLI interface manifest</a>
       </div>
       <div class="foot-col">
         <span class="head">Project</span>
         <a href="https://github.com/snapsynapse/harnessie" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/snapsynapse/harnessie/issues" target="_blank" rel="noopener">Contact support</a>
+        <a href="https://github.com/snapsynapse/harnessie/security/advisories/new" target="_blank" rel="noopener">Report a vulnerability</a>
         <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">License (Apache-2.0)</a>
+        <a href="/agents.json">agents.json</a>
+        <a href="/.well-known/security.txt">security.txt</a>
         <a href="/llms.txt">llms.txt</a>
         <a href="/.well-known/assistant-guide.txt">assistant-guide.txt</a>
       </div>

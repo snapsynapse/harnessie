@@ -1,0 +1,9 @@
+# Harnessie security contact
+# https://harnessie.com/.well-known/security.txt
+
+Contact: https://github.com/snapsynapse/harnessie/security/advisories/new
+Expires: 2027-08-01T00:00:00Z
+Preferred-Languages: en
+Canonical: https://harnessie.com/.well-known/security.txt
+Policy: https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md
+Acknowledgments: https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md

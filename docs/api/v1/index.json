@@ -1,0 +1,83 @@
+{
+  "schema_version": "1.0",
+  "interface": {
+    "name": "Harnessie CLI",
+    "kind": "local process interface",
+    "transport": "command line",
+    "hosted": false,
+    "network_service": false,
+    "description": "Machine-readable synopsis of the local CLI shipped by the harnessie Python package. This is not a hosted HTTP API."
+  },
+  "package": {
+    "name": "harnessie",
+    "version": "0.7.1",
+    "registry": "https://pypi.org/project/harnessie/",
+    "source": "https://github.com/snapsynapse/harnessie"
+  },
+  "global_options": {
+    "--root": "Project root; defaults to the current working directory."
+  },
+  "paths": {
+    "init": {
+      "synopsis": "harnessie init [path] [--force] [--no-verify]",
+      "purpose": "Scaffold a local project and, by default, run the zero-dollar guided readiness check.",
+      "side_effects": "Writes scaffold files below the selected project root; refuses overwrite unless --force is explicit."
+    },
+    "run": {
+      "synopsis": "harnessie run WORKFLOW [--goal GOAL] [--approval-policy FILE] [--approve-interactive]",
+      "purpose": "Run a governed workflow under declared budgets, ownership, sandbox, and verification policy.",
+      "side_effects": "Side-effecting tools remain consent and policy gated; network is denied unless a phase explicitly allows it."
+    },
+    "resume": {
+      "synopsis": "harnessie resume RUN_ID WORKFLOW [--goal GOAL] [--approval-policy FILE] [--approve-interactive]",
+      "purpose": "Resume from the audited journal while skipping already verified phases.",
+      "side_effects": "Uses the same consent, ownership, sandbox, budget, and verification gates as run."
+    },
+    "report": {
+      "synopsis": "harnessie report RUN_ID [--raw]",
+      "purpose": "Render a plain-language local run summary and its next operator action.",
+      "side_effects": "Read-only."
+    },
+    "audit": {
+      "synopsis": "harnessie audit RUN_ID",
+      "purpose": "Verify the local event hash chain and render the governance timeline.",
+      "side_effects": "Read-only."
+    },
+    "eval": {
+      "synopsis": "harnessie eval [SUITE] [--live]",
+      "purpose": "Run deterministic scorecards; --live is a separate explicit provider opt-in.",
+      "side_effects": "Default suite is network-free; --live may call configured providers."
+    },
+    "verify-manifest": {
+      "synopsis": "harnessie verify-manifest [MANIFEST]",
+      "purpose": "Verify hashes in the outward public trust bundle.",
+      "side_effects": "Read-only."
+    },
+    "verify-inward-manifest": {
+      "synopsis": "harnessie verify-inward-manifest [MANIFEST]",
+      "purpose": "Verify shipped prompts, configuration, and ownership policy against the inward manifest.",
+      "side_effects": "Read-only."
+    },
+    "approve-maiden": {
+      "synopsis": "harnessie approve-maiden RUN_ID PHASE",
+      "purpose": "Promote a previously staged maiden-voyage proposal after audit, ownership, artifact, and target hashes verify.",
+      "side_effects": "Explicit operator action that writes only the verified staged proposal to an unchanged target."
+    },
+    "verify": {
+      "synopsis": "harnessie verify --workspace DIR --criteria FILE [--check CMD] [--report-dir DIR] [--models FILE] [--tier TIER] [--verifier-prompt FILE] [--no-verifier] [--allow-network] [--max-steps N]",
+      "purpose": "Verify a local artifact with deterministic checks followed by an optional independent verifier.",
+      "side_effects": "Checks are sandboxed and network-denied by default; the verifier is read-only."
+    }
+  },
+  "governance": {
+    "human_approval": "Required where declared policy gates a side effect.",
+    "human_arbitration": "Always required for contested decisions.",
+    "unknown_or_unenforceable_control": "Fails closed."
+  },
+  "stability": {
+    "status": "pre-1.0",
+    "policy": "The CLI is shipped and tested, but its frozen schema and deprecation policy remain a 1.0 gate."
+  },
+  "canonical": "https://harnessie.com/api/v1/index.json",
+  "last_updated": "2026-08-04"
+}
