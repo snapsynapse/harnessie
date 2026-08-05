@@ -89,8 +89,9 @@ PyPI promotion and live-provider calls are deliberate operator acts, never headl
 
 ## Current state (2026-08-04)
 
-- Version 0.8.0 is shipped on GitHub and PyPI. The separately owned verify action and
-  Homebrew formula still pin 0.7.1; `NEXT.md` records that intentional propagation lag.
+- Version 0.8.0 is shipped on GitHub and PyPI. The separately owned Verify Action
+  v0.1.1 and Homebrew formula both pin 0.8.0; `NEXT.md` records the completed release
+  train and remaining forward work.
 - All four 0.8 write-safety and self-integrity mechanics plus the composed package
   release gate pass with 352 tests, one environment-dependent skip, 47/47 evals, both
   manifests, built-artifact inspection, and a fresh install.

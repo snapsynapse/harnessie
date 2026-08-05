@@ -2,7 +2,7 @@
 
 ## Current state
 
-Harnessie 0.8.0 is shipped on PyPI and GitHub. The standalone `harnessie verify` surface remains published as `snapsynapse/harnessie-verify-action@v0` and listed in the GitHub Marketplace, but that separately owned action and the Homebrew formula still pin 0.7.1 pending explicit propagation work.
+Harnessie 0.8.0 is shipped on PyPI and GitHub, and its downstream release train is complete. Harnessie Verify v0.1.1 and stable `snapsynapse/harnessie-verify-action@v0` pin Harnessie 0.8.0; the public Homebrew formula also installs 0.8.0. `python3 scripts/ecosystem_status.py` reports both downstream pins matching core.
 
 The next public milestone is 1.0.0, extensibility earned. Its admission bar remains strict: stable configuration and workflow schemas with a deprecation policy, plugin dispatch that cannot bypass the registry, and per-lane sandbox profiles must preserve every shipped fail-closed guarantee.
 
@@ -30,10 +30,17 @@ Verified locally on 2026-08-04:
 
 Skip counts depend on the available local sandbox and live-provider configuration. Treat the commands and outcomes as the contract, not a permanently fixed test count.
 
+Downstream propagation was verified during the 2026-08-04 MDT closeout:
+
+- Harnessie Verify exact-commit CI passed all four Ubuntu jobs, including the previously skipped unsafe-trigger guard; `v0.1.1` and `v0` resolve to release commit `7d22949`.
+- A clean consumer fetch of `snapsynapse/harnessie-verify-action@v0` installed Harnessie 0.8.0.
+- The Homebrew formula upgraded an installed 0.7.1 to 0.8.0 from source, then passed strict online audit, formula test, linkage, and installed-metadata checks.
+- Local and public formula bytes matched, and ecosystem status reported both downstream pins as `match`.
+
 ## Current cross-repo state
 
-- `snapsynapse/harnessie-verify-action`: the local checkout at `~/Git/harnessie-verify-action` is clean and synchronized with remote `main` at `3a2f1bb`. The published action remains v0.1.0 and pins Harnessie 0.7.1.
-- `snapsynapse/homebrew-tap`: remote `main` is `f3cd9a9`; the live formula serves Harnessie 0.7.1 with the correct PyPI sdist hash. The clean local checkout is two unrelated Agentlink commits behind remote. Draft PR [#1](https://github.com/snapsynapse/homebrew-tap/pull/1) remains open and adds Harnessie to the README formula list and install example; the formula itself is unchanged.
+- `snapsynapse/harnessie-verify-action`: the clean local checkout and remote `main` are at `7d22949`. Release v0.1.1 is Latest, stable `v0` resolves to the same commit, and the default core pin is 0.8.0. The observed non-blocking residual is GitHub's Node 20 deprecation warning for `actions/checkout@v4`; that dependency update is owned by the action repository.
+- `snapsynapse/homebrew-tap`: the clean local checkout and remote `main` are at `2d64648`. The public formula installs Harnessie 0.8.0 from the immutable PyPI sdist with SHA-256 `c9caffef61a8b1f9569cee36ede59f59c3dc8c66a47e500ecc090d445111f5e7`, declares the audited `libyaml` dependency, and has no open pull request.
 - `snapsynapse/harnessie-engine-wrappers`: v0.1.0 is released from `ad3d759`. CI passed its real macOS-14 containment probe and its Ubuntu unsupported-platform refusal; release archives, wheel, and `SHA256SUMS` are attached.
 - This repo dogfoods `snapsynapse/harnessie-verify-action@v0` in `.github/workflows/verify-pr-claims.yml`. A live verdict still depends on the repository verifier endpoint/model variables and API-key secret.
 - GitHub `main` carries the v0.8.0 release commit, and v0.8.0 is the latest release. Exact-commit CI, Pages, wheel, sdist, and fresh-install checks passed before publication. There were no open pull requests or issues at release preparation.
@@ -49,14 +56,11 @@ The detailed inventory and relevance assessment is in `audits/handoff-relevance-
 
 ## Recommended work order
 
-1. Under separately authorized adjacent-repository scope, test Harnessie 0.8.0 in `harnessie-verify-action`, update its default core pin, run CI, and release the action using its own train.
-2. Under separately authorized adjacent-repository scope, update the Homebrew formula to the immutable PyPI 0.8.0 sdist and hash, run its install and test checks, and reconcile draft PR [#1](https://github.com/snapsynapse/homebrew-tap/pull/1).
-3. Before opening 1.0 implementation, choose the smallest acceptance-complete slice. Typed configuration validation and the written schema/deprecation contract are the natural first candidate because they define the stable extension boundary.
-4. Keep engine-wrapper contributions consent-based and probe-gated. The smaller core backlog remains malformed provider-response handling, structured memory frontmatter, and macOS sandbox parity for non-workspace temporary writes.
+1. Before opening 1.0 implementation, choose the smallest acceptance-complete slice. Typed configuration validation and the written schema/deprecation contract are the natural first candidate because they define the stable extension boundary.
+2. Keep engine-wrapper contributions consent-based and probe-gated. The smaller core backlog remains malformed provider-response handling, structured memory frontmatter, and macOS sandbox parity for non-workspace temporary writes.
 
 ## Operator-attended or external checks
 
-- Propagate core 0.8.0 through the separately owned verify-action and Homebrew release trains when those repositories are explicitly in scope.
 - Configure the dogfood verifier repository variables and secret if live PR verdicts are desired.
 - Live provider scorecards remain explicit opt-in operations via `HARNESSIE_LIVE=1`.
 

@@ -38,6 +38,7 @@ workspace/
 # Local agent-runtime wrappers: never staged without an explicit operator decision
 .agents/
 .codex/
+.playwright-mcp/
 
 # Private roadmap: operator-only planning notes (unreleased scope, portfolio
 # integration candidates not yet ready to name publicly). Sibling to the

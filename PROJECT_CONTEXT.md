@@ -51,10 +51,9 @@ trademark and PAICE.work PBC spec/code carveouts recorded in NOTICE.
 
 ## Current status (2026-08-04)
 
-Active and healthy. v0.8.0 is live on PyPI and GitHub; the separately owned Homebrew
-formula and Marketplace action still pin 0.7.1 pending explicit propagation work. The
-docs site is live, and a fresh Siteline scan scored it A, 97/100. Public-facing doc pages
-under `docs/` are generated from markdown via `scripts/build_docs_html.py` (edit markdown,
-rebuild, commit both). AIDR-0008 is arbitrated and executed in the independent
-engine-wrappers release train. See NEXT.md for the live session handoff and CHANGELOG.md
-for release history.
+Active and healthy. v0.8.0 is live on PyPI and GitHub; the separately owned Verify
+Action v0.1.1 and Homebrew formula both pin 0.8.0. The docs site is live, and a fresh
+Siteline scan scored it A, 97/100. Public-facing doc pages under `docs/` are generated
+from markdown via `scripts/build_docs_html.py` (edit markdown, rebuild, commit both).
+AIDR-0008 is arbitrated and executed in the independent engine-wrappers release train.
+See NEXT.md for the live session handoff and CHANGELOG.md for release history.
