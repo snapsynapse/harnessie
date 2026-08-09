@@ -31,6 +31,8 @@
 #      - model_id: third-choice
 #        base_url: https://other-provider/v1
 
+schema_version: 1
+
 tiers:
   frontier:
     provider: anthropic

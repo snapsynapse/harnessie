@@ -23,6 +23,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
+SCHEMAS = ROOT / "harness" / "schemas" / "v1"
 SITE = "https://harnessie.com"
 GITHUB = "https://github.com/snapsynapse/harnessie/blob/main"
 
@@ -436,12 +437,16 @@ def render_pages() -> dict[Path, str]:
         )
         target = DOCS / out_name
         rendered[target] = page
+    for source in sorted(SCHEMAS.glob("*.json")):
+        rendered[DOCS / "schemas" / "v1" / source.name] = source.read_text(
+            encoding="utf-8")
     return rendered
 
 
 def build() -> list[Path]:
     rendered = render_pages()
     for target, page in rendered.items():
+        target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(page, encoding="utf-8")
     return list(rendered)
 

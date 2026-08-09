@@ -4,7 +4,7 @@ on_divergence: refuse
 files:
 - path: OWNERSHIP.yaml
   scope: policy
-  sha256: 0decec2afc05237f1ac9ec02b5f46e87acd277a20682ef10e548353b4d4e266d
+  sha256: 1b864cdecbde0e6ffe0a45296bee0ca46453327e7918d66e77b47903e77ed402
 - path: agents/orchestrator.md
   sha256: 8be0a9386470320364394baa18591b15795792d9c0b339b4eadeff7da2917322
 - path: agents/verifiers/claims-verifier.md
@@ -16,8 +16,20 @@ files:
 - path: agents/workers/researcher.md
   sha256: f608fef67da3521740c3caca722e9bf8d463f3634593365823b279e50cc248c5
 - path: config/boundary.yaml
-  sha256: 362feb3eadcdf5a3a5c0ce5dbb3230f481e4da877b53fe4a699d5add743b9bb0
+  sha256: 85a6009d1c9e0c1924317cedebec1a0dae4876a956c11cb6acc86ae790931599
 - path: config/cascade.yaml
-  sha256: 3563d8b0afdfb1d81daea58630f62e592acdaf94b18b5115f653a9731c57024d
+  sha256: 7573d03747c2bbc050174d3db2afe73110c903529d899b4c9bcf1e66d568928a
 - path: config/models.yaml
-  sha256: d2652c8e927afa2ef1f8d1d3c3884cff8cb0b680e135397ac45c0150a9710611
+  sha256: 7035c2c3c410270984aa8d29494a31aa42873ae7104905330e05d37c2738a2ba
+- path: harness/schemas/v1/approval-policy.schema.json
+  sha256: 3caaa9fa6ca60710908d778d3db394f508f79f9235b21986b6009a6680f238c9
+- path: harness/schemas/v1/boundary.schema.json
+  sha256: 1a4cebc8d795b8153474ce0c474492a03c9402c5df3505be44e0667ffc74e2c6
+- path: harness/schemas/v1/cascade.schema.json
+  sha256: 55029ca611439f8d72881087d261a0071045f596cd7fd81483d220d7ddf68da2
+- path: harness/schemas/v1/models.schema.json
+  sha256: ebb3c9bc4876cd5833c66cdf6c2d79e65cb81fcd6aac7387db2404e2acb0c67a
+- path: harness/schemas/v1/ownership.schema.json
+  sha256: ee1bf26278290a838a3e70ec52d4f6c840b93e433aa1f958ec2d7d8fd12582de
+- path: harness/schemas/v1/workflow.schema.json
+  sha256: 0797501a99b1b4d1086ddca1987fb674775eb3f6975905f4d863bb3f08966a76

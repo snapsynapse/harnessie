@@ -40,6 +40,7 @@ def main() -> int:
             for command in (
                 [sys.executable, "-m", "pytest", "-q"],
                 [sys.executable, "-m", "harness.cli", "eval"],
+                [sys.executable, "-m", "harness.cli", "validate"],
                 [sys.executable, "-m", "harness.cli", "verify-manifest"],
                 [sys.executable, "-m", "harness.cli",
                  "verify-inward-manifest"],

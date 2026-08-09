@@ -75,6 +75,15 @@ def main(argv: list[str] | None = None) -> int:
     p_eval.add_argument("--live", action="store_true",
                         help="run opt-in live provider scorecards")
 
+    p_validate = sub.add_parser(
+        "validate", help="validate configuration and workflows without starting a run")
+    p_validate.add_argument(
+        "paths", nargs="*", help="optional documents (default: project authoring surfaces)")
+    p_validate.add_argument(
+        "--kind", choices=("models", "cascade", "boundary", "approval-policy",
+                            "ownership", "workflow"),
+        help="schema kind for one explicitly named document")
+
     p_manifest = sub.add_parser(
         "verify-manifest", help="verify the trust-bundle MANIFEST integrity")
     p_manifest.add_argument("manifest", nargs="?", default="docs/MANIFEST.yaml")
@@ -129,6 +138,26 @@ def main(argv: list[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
     root = Path(args.root).resolve()
+
+    if args.cmd == "validate":
+        from .schema import (ConfigurationError, ValidationReport, format_report,
+                             read_document, validate_project)
+
+        if args.kind:
+            if len(args.paths) != 1:
+                print("validate --kind requires exactly one path", file=sys.stderr)
+                return 2
+            path = Path(args.paths[0])
+            path = path if path.is_absolute() else root / path
+            try:
+                read_document(path, args.kind)
+                report = ValidationReport(documents=1)
+            except ConfigurationError as exc:
+                report = ValidationReport(problems=exc.problems)
+        else:
+            report = validate_project(root, [Path(path) for path in args.paths])
+        print(format_report(report), file=sys.stdout if report.ok else sys.stderr)
+        return 0 if report.ok else 2
 
     if args.cmd == "report":
         from .explain import format_report

@@ -1,5 +1,6 @@
 # Build-and-verify: the plan -> build -> verify -> gate pattern for code work.
 # Invoke: harnessie run workflows/build-and-verify.yaml --goal "<what to build>"
+schema_version: 1
 name: build-and-verify
 description: Plan a code change, implement it, and gate it on tests plus an independent code verifier.
 

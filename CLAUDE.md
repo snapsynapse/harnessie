@@ -17,7 +17,7 @@ harness structure carries the quality floor, the model carries the ceiling.
 ## Stack
 
 - Python 3.11+ (packaged as `harnessie`, current version 0.8.0, Apache-2.0).
-- Runtime dependency: PyYAML only. Model adapters are stdlib-only (no vendor SDK).
+- Runtime dependencies: PyYAML and jsonschema. Model adapters remain stdlib-only (no vendor SDK).
 - Dev dependency: pytest 8+. Console entry point: `harnessie = harness.cli:main`.
 - OS sandbox: macOS `sandbox-exec` (Seatbelt); Linux bubblewrap / firejail / docker.
   Backends are admitted only after a startup smoke test; no usable backend fails closed
@@ -35,6 +35,8 @@ harness structure carries the quality floor, the model carries the ceiling.
 - `agents/` — role prompts (markdown): `orchestrator.md`, `workers/`, `verifiers/`.
 - `workflows/` — declared phase sequences (YAML) with per-phase gates and adversarial
   (`mode: adversarial`) contested phases.
+- `harness/schemas/v1/` — packaged Draft 2020-12 authoring contracts; public copies
+  are generated into `docs/schemas/v1/` and must remain byte-identical.
 - `config/` — `models.yaml` (tiers + routing + budgets: the ONLY file to edit to swap
   brains), `cascade.yaml`, `boundary.yaml`.
 - `OWNERSHIP.yaml` — ownership lanes + first-writer auto-claims; operator-owned.
@@ -78,6 +80,7 @@ pip install -e ".[dev]"                 # dev install from source
 python3 -m pytest -q                    # unit + integration, mock brain, no network
 python3 -m harness.cli eval             # deterministic eval scorecards
 python3 -m harness.cli verify-manifest  # trust-bundle integrity (pins ~9 files)
+python3 -m harness.cli validate         # authoring schemas + cross-document references
 python3 -m harness.cli run workflows/build-and-verify.yaml --goal "..."
 python3 -m harness.cli report <run_id>  # plain-language run summary
 python3 -m harness.cli audit <run_id>   # verify the hash chain + governance timeline
@@ -87,7 +90,7 @@ Live provider scorecards are opt-in and never part of the default suite; without
 `HARNESSIE_LIVE=1` plus provider config they report `SKIP` and exit clean. Pages/DNS/
 PyPI promotion and live-provider calls are deliberate operator acts, never headless.
 
-## Current state (2026-08-04)
+## Current state (2026-08-09)
 
 - Version 0.8.0 is shipped on GitHub and PyPI. The separately owned Verify Action
   v0.1.1 and Homebrew formula both pin 0.8.0; `NEXT.md` records the completed release
@@ -95,6 +98,10 @@ PyPI promotion and live-provider calls are deliberate operator acts, never headl
 - All four 0.8 write-safety and self-integrity mechanics plus the composed package
   release gate pass with 352 tests, one environment-dependent skip, 47/47 evals, both
   manifests, built-artifact inspection, and a fresh install.
+- The first 1.0 development slice freezes six v1 authoring schemas, validates them
+  without starting a run, and preserves schema-less 0.8 documents as implicit v1.
+- The composed gate passes 387 tests with one environment-dependent skip, 47/47
+  evals, authoring validation, both manifests, artifact inspection, and fresh install.
 - The public Siteline follow-up is green. A fresh live rubric 2.3.0 scan on 2026-08-05
   UTC scored the deployed site A, 97/100, with Level 4 machine enablement at 16/18.
 - AIDR-0008 was arbitrated and executed as the separately released, probe-gated

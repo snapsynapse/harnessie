@@ -28,6 +28,13 @@ FORBIDDEN_NAMES = frozenset({"roadmap-private.md"})
 REQUIRED_PACKAGE_FILES = frozenset({
     "harness/inward_manifest.py",
     "harness/maiden.py",
+    "harness/schema.py",
+    "harness/schemas/v1/models.schema.json",
+    "harness/schemas/v1/cascade.schema.json",
+    "harness/schemas/v1/boundary.schema.json",
+    "harness/schemas/v1/approval-policy.schema.json",
+    "harness/schemas/v1/ownership.schema.json",
+    "harness/schemas/v1/workflow.schema.json",
 })
 MAX_FILES = 5_000
 MAX_MEMBER_BYTES = 10 * 1024 * 1024

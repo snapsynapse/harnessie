@@ -7,7 +7,7 @@ Entity decision (2026-07-06, Sam): Harnessie releases as a Snap Synapse LLC proj
 
 Positioning (2026-07-06, Sam): the public claim is "the safest and easiest first AI harness for people". Two audiences, ordered: developers are the GitHub audience and get the falsifiable version first (the security model, fail-closed invariants, independent verification, the threat model in SECURITY.md); the non-developer on-ramp is the design story inside that, not an unverifiable headline. Every safety superlative on a public surface must point at a checkable artifact.
 
-This document follows the portfolio Repo Standards INTENT.md section template. Harnessie is not yet a portfolio component; this INTENT is pre-applied so a later promotion is clean.
+This document follows the portfolio Repo Standards INTENT.md section template while recording Harnessie's deliberate status as a public Snap Synapse tool rather than a PAICE portfolio component.
 
 ## 1. What this is
 
@@ -45,7 +45,7 @@ N/A because harnessie is a tool, not an open standard. It makes no external conf
 
 ## 6. Admission criteria for changes
 
-N/A as a formal open-spec gate. The working change discipline is: the full test suite stays green; no documented security invariant (`SECURITY.md`) is weakened without a recorded rationale; the affected docs and `CHANGELOG.md` are updated in the same change; shipped configs and workflows still parse (`tests/test_repo_configs.py`).
+N/A as a formal open-spec gate. The working change discipline is: the full test suite stays green; no documented security invariant (`SECURITY.md`) is weakened without a recorded rationale; the affected docs and `CHANGELOG.md` are updated in the same change; and `harnessie validate` accepts every shipped authoring document while strict schema and cross-document tests remain green.
 
 ## 7. Relationships to other PAICE standards
 
@@ -53,10 +53,9 @@ Harnessie is not a PAICE portfolio component and will not become one: it release
 
 ## 8. Exceptions to Repo Standards
 
-- Tier is personal-utility (private, not in `portfolio.yaml`), so hosted, open-spec, agent-facing, and commercial matrix rows are N/A. Trajectory is public/portfolio; promotion will trigger those rows via `repo-standards-audit` plus `repo-polish`.
+- Harnessie is a public Snap Synapse tool, not a PAICE portfolio component or open spec. Hosted-product and commercial-service rows remain N/A; public-tool, agent-facing, release, security, and documentation controls apply.
 - `.claude/` is gitignored as a full directory per the all-tier rule. Consequence recorded for maintainers: the repo is dogfooded under Claude Code via a local, untracked `.claude/` (worker and verifier subagent wrappers, a `/run-workflow` command, and a PostToolUse pytest hook). The canonical, tracked source for those role prompts is `agents/`; the CLI (`python3 -m harness.cli`) is the primary interface and needs no `.claude/`.
-- `INTENT.md` is present although the personal-utility tier does not require it, pre-applied for the public/portfolio trajectory.
-- Recorded exception (2026-07-06, operator default): the tracked `assistant-guide.txt` would classify this repo agent-facing under portfolio Repo Standards v0.7; the repo remains personal-utility tier until public promotion, at which point annotated tags, `RELEASE_CHECKLIST.md`, and CI-gate-before-tag are adopted via the standard promotion path. Until then, versions are commits-not-releases by deliberate choice.
+- `INTENT.md` records the entity boundary, public-tool admission criteria, and adopted standards without implying PAICE ownership.
 - Recorded exception (2026-07-06, operator default): the Turnfile adoption row ("repo runs multi-agent collaboration sessions") is not adopted. Harnessie is one-process orchestration under a single operator, not cross-runtime peer sessions; Turnfile interop is declared out of scope in `GOVERNANCE.md` and would be a deliberate 0.5-era decision, not a conformance default.
 - `docs/` is the live public served tree (https://harnessie.com/, GitHub Pages from `main` `/docs` per the portfolio Repo Standards docs/-publish rule): the landing page, the generated HTML doc pages (`scripts/build_docs_html.py`), and the `.well-known/` GuideCheck trust pair. Internal engineering and planning docs (ARCHITECTURE, SECURITY, ROADMAP, IMPLEMENTATION_PLAN, PROMPTS, session-url-log, source-verification.json) live at the repo root and are not served, though the repo itself is public.
 

@@ -4,10 +4,20 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+### Added
+
+- Six stable Draft 2020-12 authoring schemas now cover models, cascade, boundary, approval-policy, ownership, and workflow documents. `harnessie validate` checks one document or a complete project without starting a run, reports deterministic path and code diagnostics, and performs cross-document checks for roles, tiers, cascade policies, phase references, and placeholders.
+- Runtime loaders use the same strict validation contract and fail closed before model dispatch. Project scaffolds and shipped documents declare `schema_version: 1`; schema-less 0.8 documents remain implicit v1 throughout 1.x under the compatibility and deprecation rules in `SCHEMA_COMPATIBILITY.md`.
+- Schema JSON ships inside the Python package, is pinned by the inward manifest, and is served byte-identically from `/schemas/v1/` under the public trust manifest. Release artifact checks require the validator and all six packaged schemas.
+
 ### Fixed
 
 - Anthropic and OpenAI-compatible adapters now validate provider response envelopes, tool calls, stop reasons, and usage counters before constructing a turn. Invalid JSON or structurally malformed responses become non-echoing `stop_reason="error"` turns instead of raising into the run, while OpenAI-compatible content-filter finishes normalize to the existing refusal stop.
 - Adversarial rebuttal rounds now receive each peer position in full and exclude the reviewing agent's own position by value. This removes the 2,000-character clipping that previously made a complete position appear truncated and could create a spurious standing objection.
+
+### Verified
+
+- The composed release gate passes 387 tests with one environment-dependent skip, 47/47 deterministic evals, side-effect-free authoring validation, both manifests, ecosystem and generated-doc validation, isolated wheel and source builds, `twine check`, packaged-schema inspection, and a fresh-install smoke.
 
 ## 0.8.0 (2026-08-04)
 

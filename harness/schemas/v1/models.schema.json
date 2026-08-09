@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harnessie.com/schemas/v1/models.schema.json",
+  "title": "Harnessie models configuration v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tiers"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "tiers": {
+      "type": "object", "minProperties": 1,
+      "propertyNames": {"enum": ["local", "cheap", "mid", "frontier", "sovereign"]},
+      "additionalProperties": {"$ref": "#/$defs/model"}
+    },
+    "routing": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/route"}
+    },
+    "budget": {"$ref": "#/$defs/budget"}
+  },
+  "$defs": {
+    "baseModelFields": {
+      "provider": {"enum": ["anthropic", "openai-compat", "mock"]},
+      "model_id": {"type": "string", "minLength": 1},
+      "base_url": {"type": "string", "default": ""},
+      "api_key_env": {"type": "string", "default": ""},
+      "max_tokens": {"type": "integer", "minimum": 1, "default": 8192},
+      "supports_effort": {"type": "boolean", "default": true},
+      "cost_per_mtok_in": {"type": "number", "minimum": 0, "default": 0},
+      "cost_per_mtok_out": {"type": "number", "minimum": 0, "default": 0},
+      "extra": {"type": "object", "default": {}}
+    },
+    "fallback": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "provider": {"$ref": "#/$defs/baseModelFields/provider"},
+        "model_id": {"$ref": "#/$defs/baseModelFields/model_id"},
+        "base_url": {"$ref": "#/$defs/baseModelFields/base_url"},
+        "api_key_env": {"$ref": "#/$defs/baseModelFields/api_key_env"},
+        "max_tokens": {"$ref": "#/$defs/baseModelFields/max_tokens"},
+        "supports_effort": {"$ref": "#/$defs/baseModelFields/supports_effort"},
+        "cost_per_mtok_in": {"$ref": "#/$defs/baseModelFields/cost_per_mtok_in"},
+        "cost_per_mtok_out": {"$ref": "#/$defs/baseModelFields/cost_per_mtok_out"},
+        "extra": {"$ref": "#/$defs/baseModelFields/extra"}
+      }
+    },
+    "model": {
+      "type": "object", "additionalProperties": false,
+      "required": ["provider", "model_id"],
+      "properties": {
+        "provider": {"$ref": "#/$defs/baseModelFields/provider"},
+        "model_id": {"$ref": "#/$defs/baseModelFields/model_id"},
+        "base_url": {"$ref": "#/$defs/baseModelFields/base_url"},
+        "api_key_env": {"$ref": "#/$defs/baseModelFields/api_key_env"},
+        "max_tokens": {"$ref": "#/$defs/baseModelFields/max_tokens"},
+        "supports_effort": {"$ref": "#/$defs/baseModelFields/supports_effort"},
+        "cost_per_mtok_in": {"$ref": "#/$defs/baseModelFields/cost_per_mtok_in"},
+        "cost_per_mtok_out": {"$ref": "#/$defs/baseModelFields/cost_per_mtok_out"},
+        "extra": {"$ref": "#/$defs/baseModelFields/extra"},
+        "fallbacks": {"type": "array", "items": {"$ref": "#/$defs/fallback"}}
+      }
+    },
+    "route": {
+      "type": "object", "additionalProperties": false,
+      "required": ["tier", "effort"],
+      "properties": {
+        "tier": {"enum": ["local", "cheap", "mid", "frontier", "sovereign"]},
+        "effort": {"enum": ["low", "medium", "high", "xhigh", "max"]}
+      }
+    },
+    "budget": {
+      "type": "object", "additionalProperties": false,
+      "required": ["max_usd", "max_tokens"],
+      "properties": {
+        "max_usd": {"type": "number", "exclusiveMinimum": 0},
+        "max_tokens": {"type": "integer", "minimum": 1}
+      }
+    }
+  }
+}

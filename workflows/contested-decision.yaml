@@ -3,6 +3,7 @@
 # other's, and either converge or halt for human arbitration. The decision
 # record lands in runs/<id>/decisions/ with AIDR-style earned claims.
 # Invoke: harnessie run workflows/contested-decision.yaml --goal "<the question>"
+schema_version: 1
 name: contested-decision
 description: Independent positions -> objections -> decision record -> convergence or human arbitration.
 

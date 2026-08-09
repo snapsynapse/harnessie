@@ -277,7 +277,7 @@ def test_invalid_phase_type_refuses_before_model_dispatch(tmp_path):
     assert [outcome.status for outcome in outcomes] == ["needs_human"]
     assert brain.calls == []
     assert any(
-        event["kind"] == "maiden_config_invalid"
+        event["kind"] == "workflow_config_invalid"
         for event in _events(tmp_path, "invalid"))
 
 

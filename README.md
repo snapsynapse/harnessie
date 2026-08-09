@@ -22,6 +22,7 @@ Developing on the harness itself, install from source:
 pip install -e ".[dev]"
 python3 -m pytest -q                 # mock brain, no network
 python3 -m harness.cli eval          # deterministic eval scorecard
+python3 -m harness.cli validate      # schemas + cross-document references, no run
 python3 -m harness.cli verify-manifest
 python3 -m harness.cli verify-inward-manifest
 export ANTHROPIC_API_KEY=sk-ant-...  # or point tiers at a local endpoint
@@ -80,7 +81,7 @@ Dogfooding this repo under Claude Code uses a local `.claude/` (subagent defs, a
 
 ## Requirements
 
-Python 3.11+ and PyYAML (installed automatically by any install path above). The stdlib-only model adapters need no vendor SDK. The OS sandbox uses native macOS `sandbox-exec` when it can actually apply a Seatbelt profile; on Linux it uses bubblewrap, firejail, or docker (in that order of preference). Every backend is admitted only after a startup smoke test proves it can confine here; a present-but-unusable backend, and any platform with none (Windows), fails closed so shell-using workflows are blocked rather than run unconfined (see [SECURITY.md](SECURITY.md)).
+Python 3.11+, PyYAML, and the Python JSON Schema validator are installed automatically by any install path above. The model adapters remain stdlib-only and need no vendor SDK. The OS sandbox uses native macOS `sandbox-exec` when it can actually apply a Seatbelt profile; on Linux it uses bubblewrap, firejail, or docker (in that order of preference). Every backend is admitted only after a startup smoke test proves it can confine here; a present-but-unusable backend, and any platform with none (Windows), fails closed so shell-using workflows are blocked rather than run unconfined (see [SECURITY.md](SECURITY.md)).
 
 Live provider scorecards are opt-in and never part of the default no-network suite. With credentials and a local endpoint configured, run:
 ```bash
@@ -118,6 +119,7 @@ A run's behavior is not in one file; each decision has one owner. To predict or 
 | Token and dollar ceilings, effort per task class | `config/models.yaml` (budget + routing) |
 | Which phases run, in what order, with which gates and verifiers | the workflow YAML in `workflows/` |
 | Which files each agent may write | `OWNERSHIP.yaml` (lanes + first-writer claims) |
+| Stable authoring schemas and compatibility rules | `SCHEMA_COMPATIBILITY.md` and `harness/schemas/v1/` |
 | What each role may do (tools, shell allowlist, approval) | the tool registry (`harness/tools/builtin.py`) + role prompts in `agents/` |
 
 ## When a run halts

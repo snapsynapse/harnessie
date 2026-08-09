@@ -108,16 +108,16 @@ def test_load_parses_policies_and_reserved(tmp_path):
 def test_load_refuses_unknown_keys_and_shapes(tmp_path):
     f = tmp_path / "cascade.yaml"
     f.write_text("policies:\n  p:\n    ladder: [local]\n    max_clib: 2\n")
-    with pytest.raises(ValueError, match="unknown key.*max_clib"):
+    with pytest.raises(ValueError, match="additionalProperties.*max_clib"):
         load_cascade_config(f)
     f.write_text("policies:\n  p:\n    escalate_on: [gate_fail]\n")
-    with pytest.raises(ValueError, match="missing ladder"):
+    with pytest.raises(ValueError, match="schema.required.*ladder"):
         load_cascade_config(f)
     f.write_text("surprise: true\n")
-    with pytest.raises(ValueError, match="unknown top-level"):
+    with pytest.raises(ValueError, match="schema.additionalProperties.*surprise"):
         load_cascade_config(f)
     f.write_text("reserved: arbitration\n")
-    with pytest.raises(ValueError, match="reserved must be a list"):
+    with pytest.raises(ValueError, match=r"reserved.*schema\.type"):
         load_cascade_config(f)
 
 

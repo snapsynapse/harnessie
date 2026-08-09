@@ -53,6 +53,8 @@ from .write_safety import WriteDeclarationError, parallel_write_conflicts
 from .quarantine import guard_result
 from .roles import RoleLibrary
 from .routing import Budget, Route, Router, VALID_TIERS
+from .schema import (ConfigurationError, read_document,
+                     workflow_cross_checks)
 from .state import RunState, new_run_id
 from .tools.builtin import register_builtin
 from .tools.registry import ToolRegistry
@@ -91,7 +93,7 @@ def _climb_cost_estimate(spec: ModelSpec) -> float:
 def load_models_config(
     path: Path,
 ) -> tuple[dict[str, ModelSpec], dict, dict, dict[str, list[ModelSpec]]]:
-    cfg = yaml.safe_load(path.read_text(encoding="utf-8"))
+    cfg = read_document(path, "models")
     tiers: dict[str, ModelSpec] = {}
     fallbacks: dict[str, list[ModelSpec]] = {}
     for name, spec in cfg.get("tiers", {}).items():
@@ -239,7 +241,20 @@ class WorkflowRunner:
     # -- workflow execution --------------------------------------------------
 
     def run_workflow(self, workflow_path: Path, goal: str = "") -> list[PhaseOutcome]:
-        wf = yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
+        try:
+            wf = read_document(workflow_path, "workflow")
+            cross_problems = workflow_cross_checks(
+                wf, workflow_path,
+                tiers=set(self.router.tiers),
+                policies=set(self.cascade.policies),
+                roles=set(self.roles.roles),
+            )
+            if cross_problems:
+                raise ConfigurationError(cross_problems)
+        except ConfigurationError as exc:
+            detail = f"invalid workflow configuration: {exc}"
+            self.events.emit("workflow_config_invalid", detail=str(exc))
+            return [PhaseOutcome("(workflow)", "needs_human", detail)]
         integrity_outcome = self._check_inward_manifest()
         if integrity_outcome is not None:
             return [integrity_outcome]
@@ -436,6 +451,7 @@ class WorkflowRunner:
 
         proposal_ledger = OwnershipLedger(
             path=staged_workspace.parent / "OWNERSHIP.yaml",
+            schema_version=self.ledger.schema_version,
             agent_lanes={
                 agent: list(globs)
                 for agent, globs in self.ledger.agent_lanes.items()
@@ -828,8 +844,7 @@ class WorkflowRunner:
         path = self.root / "config" / "boundary.yaml"
         if not path.exists():
             return None, None, None
-        import yaml as _yaml
-        cfg = _yaml.safe_load(path.read_text()) or {}
+        cfg = read_document(path, "boundary")
         if not cfg.get("enabled"):
             return None, None, None
         boundary = Boundary(include_contextual=bool(cfg.get("include_contextual")))

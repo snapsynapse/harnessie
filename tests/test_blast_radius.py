@@ -212,7 +212,8 @@ def test_invalid_ceiling_refuses_before_model_dispatch(tmp_path):
     outcomes = runner.run_workflow(tmp_path / "workflows" / "radius.yaml")
 
     assert [o.status for o in outcomes] == ["needs_human"]
-    assert "invalid blast_radius" in outcomes[0].report
+    assert "invalid workflow configuration" in outcomes[0].report
+    assert "$.phases[0].blast_radius.max_files_touched" in outcomes[0].report
     assert brain.calls == []
 
 

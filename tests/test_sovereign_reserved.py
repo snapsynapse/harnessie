@@ -111,7 +111,7 @@ def test_unknown_tier_still_refused(tmp_path):
     bad = (tmp_path / "config" / "models.yaml").read_text().replace(
         "  mid:", "  imperial:")
     (tmp_path / "config" / "models.yaml").write_text(bad)
-    with pytest.raises(ValueError, match="unknown tier names.*imperial"):
+    with pytest.raises(ValueError, match="schema.enum.*imperial"):
         load_models_config(tmp_path / "config" / "models.yaml")
 
 

@@ -4,7 +4,9 @@
 
 Harnessie 0.8.0 is shipped on PyPI and GitHub, and its downstream release train is complete. Harnessie Verify v0.1.1 and stable `snapsynapse/harnessie-verify-action@v0` pin Harnessie 0.8.0; the public Homebrew formula also installs 0.8.0. `python3 scripts/ecosystem_status.py` reports both downstream pins matching core.
 
-The next public milestone is 1.0.0, extensibility earned. Its admission bar remains strict: stable configuration and workflow schemas with a deprecation policy, plugin dispatch that cannot bypass the registry, and per-lane sandbox profiles must preserve every shipped fail-closed guarantee.
+The next public milestone is 1.0.0, extensibility earned. Its first acceptance-complete slice is implemented on the development head: six stable Draft 2020-12 authoring schemas, a side-effect-free `harnessie validate` command, runtime startup validation, cross-document checks, explicit v1 scaffolds, packaged and served schema artifacts, and the compatibility and deprecation contract in `SCHEMA_COMPATIBILITY.md`. Schema-less 0.8 documents remain implicit v1 throughout 1.x.
+
+The remaining 1.0 admission bar stays strict: per-lane sandbox profiles must close the ownership layer's honest confinement limit before general plugin admission, and the plugin trust boundary must preserve every shipped fail-closed guarantee.
 
 The pre-1.0 correctness packet is complete on the current development head. Anthropic and OpenAI-compatible adapters now turn invalid JSON, malformed envelopes, invalid tool calls, and invalid usage counters into non-echoing provider error turns. Adversarial rebuttal agents now receive each peer position in full and exclude their own position by value, removing the truncation that previously produced a spurious objection.
 
@@ -20,7 +22,7 @@ Cross-repo authority, dependency direction, and release propagation are defined 
 
 ## Verified baseline
 
-Verified on the current development head on 2026-08-09: the composed release gate passed with 377 tests, one environment-dependent skip, 47/47 evals, both manifests, ecosystem and generated-doc validation, isolated wheel and sdist inspection, `twine check`, and a fresh-install smoke.
+Verified on the current development head on 2026-08-09: the composed release gate passed with 387 tests, one environment-dependent skip, 47/47 evals, all six shipped authoring contracts, both manifests, ecosystem and generated-doc validation, isolated wheel and sdist inspection, `twine check`, and a fresh-install smoke.
 
 Verified locally on 2026-08-04:
 
@@ -60,12 +62,11 @@ The detailed inventory and relevance assessment is in `audits/handoff-relevance-
 
 ## Recommended work order
 
-1. Refine the first acceptance-complete 1.0 slice: inventory every user-authored configuration and workflow surface, define versioned strict schemas, specify compatibility and deprecation behavior, add validation that does not start a run, and preserve current 0.8 inputs as explicit fixtures.
-2. Reconcile `IMPLEMENTATION_PLAN.md` with that contract and clean the stale pre-public exceptions in `INTENT.md` during the planning slice so the roadmap, implementation order, and project status agree.
-3. Close per-lane confinement before general plugin admission. An interpreter or plugin must not write outside its assigned lane merely because the path remains inside the workspace; unsupported profiles fail closed.
-4. Define the plugin trust boundary before coding its loader. Trusted installed extensions may run in process while their tool invocations remain registry-mediated; untrusted extension code requires out-of-process confinement. Choose one extension mechanism rather than leaving Python package entry points and discovered `tools/*.py` ambiguous.
-5. Keep multi-orchestrator handoffs deferred unless a documented real job proves a single orchestrator insufficient; it is not an unconditional 1.0 gate. Keep engine-wrapper contributions consent-based and probe-gated.
-6. The smaller remaining core backlog is structured memory frontmatter and macOS sandbox parity for non-workspace temporary writes.
+1. Close per-lane confinement before general plugin admission. An interpreter or plugin must not write outside its assigned lane merely because the path remains inside the workspace; unsupported profiles fail closed.
+2. Define the plugin trust boundary before coding its loader. Trusted installed extensions may run in process while their tool invocations remain registry-mediated; untrusted extension code requires out-of-process confinement. Choose one extension mechanism rather than leaving Python package entry points and discovered `tools/*.py` ambiguous.
+3. Keep the six v1 authoring contracts frozen while the remaining 1.0 slices develop. Additive schema changes require explicit defaults and compatibility fixtures; breaking changes require a new major schema version and migration path.
+4. Keep multi-orchestrator handoffs deferred unless a documented real job proves a single orchestrator insufficient; it is not an unconditional 1.0 gate. Keep engine-wrapper contributions consent-based and probe-gated.
+5. The smaller remaining core backlog is structured memory frontmatter and macOS sandbox parity for non-workspace temporary writes.
 
 ## Operator-attended or external checks
 

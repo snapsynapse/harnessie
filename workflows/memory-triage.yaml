@@ -9,6 +9,7 @@
 # The triage brain routes to the local tier by design (task_class: mechanical):
 # maintenance is mechanical work, and a local model inside these gates cannot
 # delete anything regardless of what it decides.
+schema_version: 1
 name: memory-triage
 description: Harvest run lessons into facts, surface stale facts, archive only under recorded approval.
 

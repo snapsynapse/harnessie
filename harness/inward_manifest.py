@@ -41,6 +41,9 @@ def discover_inward_files(root: Path) -> list[str]:
     if config.exists():
         paths.extend(path for path in config.rglob("*.yaml") if path.is_file())
         paths.extend(path for path in config.rglob("*.yml") if path.is_file())
+    schemas = root / "harness" / "schemas" / "v1"
+    if schemas.exists():
+        paths.extend(path for path in schemas.glob("*.json") if path.is_file())
     ownership = root / "OWNERSHIP.yaml"
     if ownership.is_file():
         paths.append(ownership)

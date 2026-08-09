@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harnessie.com/schemas/v1/boundary.schema.json",
+  "title": "Harnessie boundary configuration v1",
+  "type": "object", "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "enabled": {"type": "boolean", "default": false},
+    "include_contextual": {"type": "boolean", "default": false},
+    "rehydration_grants": {"type": "string", "minLength": 1, "default": "config/rehydration-grants.yaml"}
+  }
+}

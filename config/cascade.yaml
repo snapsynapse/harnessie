@@ -13,6 +13,8 @@
 # with a named operator action. Arbitration is reserved by default — the
 # standing human-only rule, enforced as config rather than convention.
 
+schema_version: 1
+
 policies:
   # Example: spend as little as possible, climb only on verified failure,
   # and hand to the operator rather than silently burning frontier tokens.

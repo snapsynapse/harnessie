@@ -1,0 +1,1 @@
+"""Packaged Harnessie authoring schemas."""

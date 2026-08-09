@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harnessie.com/schemas/v1/cascade.schema.json",
+  "title": "Harnessie cascade configuration v1",
+  "type": "object", "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "policies": {
+      "type": ["object", "null"],
+      "default": {},
+      "additionalProperties": {
+        "type": "object", "additionalProperties": false,
+        "required": ["ladder"],
+        "properties": {
+          "ladder": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["local", "cheap", "mid", "frontier", "sovereign"]}},
+          "escalate_on": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["gate_fail", "schema_fail", "refusal", "tool_contract"]}, "default": ["gate_fail"]},
+          "max_climb": {"type": "integer", "minimum": -1, "default": -1},
+          "on_exhaust": {"enum": ["reduce_scope", "defer"], "default": "defer"},
+          "data_classes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}, "default": []},
+          "contained": {"type": "boolean", "default": false}
+        }
+      }
+    },
+    "reserved": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}, "default": []}
+  }
+}

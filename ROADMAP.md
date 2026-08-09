@@ -120,7 +120,7 @@ Acceptance: a phase that exceeds a declared volume ceiling fails with the count 
 
 Theme: stable surfaces and pluggability, only after the core is proven.
 
-- Stable, versioned configuration and workflow schemas with a written compatibility and deprecation policy. Validation is strict and available without starting a run; the current 0.8 surfaces remain accepted through explicit compatibility fixtures. This is the first 1.0 slice because every later extension depends on a stable contract.
+- Stable, versioned configuration and workflow schemas with a written compatibility and deprecation policy: GREEN on the development head. Six strict Draft 2020-12 schemas cover every user-authored models, cascade, boundary, approval-policy, ownership, and workflow surface. `harnessie validate` is side-effect-free, runtime startup uses the same validator, cross-document references fail closed, public schema bytes match the packaged contracts, and schema-less 0.8 documents remain implicit v1 throughout 1.x. `SCHEMA_COMPATIBILITY.md` defines compatibility and deprecation behavior.
 - Per-lane sandbox profiles close the ownership layer's honest limit before general plugin admission: interpreter and plugin writes outside the assigned lane are blocked, and a backend that cannot enforce the profile fails closed.
 - Tool plugins load through one named extension mechanism and declare effects, roles, approvals, and provenance before registry admission. The trust boundary must be explicit: either installed plugin code is operator-trusted and every tool invocation remains registry-mediated, or untrusted plugin code executes out of process under confinement. An in-process Python import cannot truthfully be described as unable to bypass the registry.
 

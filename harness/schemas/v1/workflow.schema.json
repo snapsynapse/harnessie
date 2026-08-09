@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harnessie.com/schemas/v1/workflow.schema.json",
+  "title": "Harnessie workflow v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["name", "phases"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "name": {"$ref": "#/$defs/name"},
+    "description": {"type": "string"},
+    "blast_radius": {"$ref": "#/$defs/blastRadius"},
+    "phases": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/phase"}}
+  },
+  "$defs": {
+    "name": {"type": "string", "minLength": 1, "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"},
+    "stringList": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "blastRadius": {
+      "type": "object", "additionalProperties": false, "minProperties": 1,
+      "properties": {
+        "max_files_touched": {"type": "integer", "minimum": 0},
+        "max_edits_applied": {"type": "integer", "minimum": 0},
+        "max_bytes_written": {"type": "integer", "minimum": 0}
+      }
+    },
+    "check": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "command"],
+      "properties": {"name": {"$ref": "#/$defs/name"}, "command": {"type": "string", "minLength": 1}}
+    },
+    "verify": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "max_attempts": {"type": "integer", "minimum": 1},
+        "checks": {"type": "array", "items": {"$ref": "#/$defs/check"}},
+        "verifier": {"$ref": "#/$defs/name"},
+        "task_class": {"$ref": "#/$defs/name"},
+        "criteria": {"type": "string"},
+        "memory_lint": {"type": "boolean"}
+      }
+    },
+    "position": {
+      "type": "object", "additionalProperties": false,
+      "properties": {"agent": {"$ref": "#/$defs/name"}, "task_class": {"$ref": "#/$defs/name"}}
+    },
+    "phase": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "task"],
+      "properties": {
+        "name": {"$ref": "#/$defs/name"},
+        "task": {"type": "string", "minLength": 1},
+        "agent": {"$ref": "#/$defs/name"},
+        "task_class": {"$ref": "#/$defs/name"},
+        "max_steps": {"type": "integer", "minimum": 1, "default": 40},
+        "consent": {"type": "boolean"},
+        "deny_tools": {"$ref": "#/$defs/stringList"},
+        "allow_network": {"type": "boolean", "default": false},
+        "inject_memory_status": {"type": "boolean", "default": false},
+        "approve_tools": {"$ref": "#/$defs/stringList"},
+        "parallel": {"$ref": "#/$defs/name"},
+        "writes": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "blast_radius": {"$ref": "#/$defs/blastRadius"},
+        "phase_type": {"$ref": "#/$defs/name"},
+        "cascade": {"$ref": "#/$defs/name"},
+        "verify": {"$ref": "#/$defs/verify"},
+        "mode": {"enum": ["adversarial"]},
+        "positions": {"type": "array", "minItems": 2, "items": {"$ref": "#/$defs/position"}},
+        "rebuttal_rounds": {"type": "integer", "minimum": 1},
+        "arbitration": {"enum": ["convergence", "human"]},
+        "arbiter": {"type": "string", "minLength": 1}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"mode": {"const": "adversarial"}}, "required": ["mode"]},
+          "then": {"required": ["positions"], "not": {"anyOf": [{"required": ["verify"]}, {"required": ["phase_type"]}, {"required": ["parallel"]}, {"required": ["writes"]}]}}
+        }
+      ]
+    }
+  }
+}

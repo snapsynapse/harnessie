@@ -13,6 +13,7 @@ license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Sam Rogers", email = "subscriptions@snapsynapse.com" }]
 dependencies = [
     "pyyaml>=6.0",
+    "jsonschema>=4.23,<5",
 ]
 
 [project.urls]
@@ -28,6 +29,9 @@ dev = ["build>=1.2", "pytest>=8.0", "twine>=6.0"]
 
 [tool.setuptools.packages.find]
 include = ["harness*"]
+
+[tool.setuptools.package-data]
+"harness.schemas.v1" = ["*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

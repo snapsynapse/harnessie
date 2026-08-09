@@ -38,6 +38,16 @@
       }
     },
     {
+      "id": "validate-project",
+      "name": "Validate Harnessie authoring contracts",
+      "type": "local CLI",
+      "status": "live",
+      "command": "harnessie validate",
+      "description": "Validates stable v1 configuration and workflow schemas plus cross-document references without starting a run.",
+      "network_default": "not used",
+      "side_effects": "read-only"
+    },
+    {
       "id": "run-workflow",
       "name": "Run a governed local workflow",
       "type": "local CLI",
@@ -56,6 +66,7 @@
     "changelog": "https://harnessie.com/changelog.json",
     "security": "https://harnessie.com/.well-known/security.txt",
     "documentation": "https://harnessie.com/guide.html",
+    "workflow_schema": "https://harnessie.com/schemas/v1/workflow.schema.json",
     "quickstart": "https://harnessie.com/quickstart.html"
   },
   "support": {
@@ -70,5 +81,5 @@
     "autonomous_remote_agent": false,
     "note": "Harnessie is installed and run locally. These declarations describe its shipped CLI and review surfaces; they do not advertise a hosted agent, API, or MCP server."
   },
-  "last_updated": "2026-08-04"
+  "last_updated": "2026-08-09"
 }

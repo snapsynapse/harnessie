@@ -4,6 +4,7 @@
 # obligations list at workspace/obligations.md, then:
 #   harnessie run workflows/policy-compliance.yaml --goal "Assess ACME's AI usage
 #   policy in policies/ against the obligations in obligations.md"
+schema_version: 1
 name: policy-compliance
 description: Analyze policy documents against a set of obligations; produce a verified compliance assessment with per-claim provenance.
 

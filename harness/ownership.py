@@ -34,10 +34,13 @@ from pathlib import Path
 
 import yaml
 
+from .schema import read_document
+
 
 @dataclass
 class OwnershipLedger:
     path: Path
+    schema_version: int | None = None
     agent_lanes: dict[str, list[str]] = field(default_factory=dict)
     collaborative: list[str] = field(default_factory=list)
     operator: list[str] = field(default_factory=list)
@@ -48,7 +51,8 @@ class OwnershipLedger:
     def load(cls, path: Path) -> "OwnershipLedger":
         led = cls(path=Path(path))
         if led.path.exists():
-            data = yaml.safe_load(led.path.read_text(encoding="utf-8")) or {}
+            data = read_document(led.path, "ownership")
+            led.schema_version = data.get("schema_version")
             lanes = data.get("lanes", {}) or {}
             led.agent_lanes = {a: list(g) for a, g in (lanes.get("agent") or {}).items()}
             led.collaborative = list(lanes.get("collaborative") or [])
@@ -65,6 +69,8 @@ class OwnershipLedger:
             },
             "files": self.files,
         }
+        if self.schema_version is not None:
+            data = {"schema_version": self.schema_version, **data}
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.path.write_text(
             "# Ownership ledger — operator-owned. lanes: are declared by the\n"

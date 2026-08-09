@@ -14,7 +14,8 @@ FILES = {
         "# Role: Code verifier\n\n"
         "Verify artifacts against criteria. End with a JSON verdict object.\n"
     ),
-    "config/models.yaml": """tiers:
+    "config/models.yaml": """schema_version: 1
+tiers:
   mid:
     provider: mock
     model_id: mock
@@ -28,7 +29,8 @@ budget:
   max_usd: 5.0
   max_tokens: 100000
 """,
-    "workflows/build-and-verify.yaml": """name: build-and-verify
+    "workflows/build-and-verify.yaml": """schema_version: 1
+name: build-and-verify
 phases:
   - name: plan
     agent: orchestrator
@@ -64,6 +66,7 @@ scenarios:
     "OWNERSHIP.yaml": """# Ownership ledger — operator-owned; agents cannot reach this file.
 # lanes: are declared by you and always win; files: are first-writer
 # auto-claims maintained by the harness. Edit lanes to reassign ownership.
+schema_version: 1
 lanes:
   agent: {}
   collaborative: []

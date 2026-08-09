@@ -10,15 +10,27 @@ files:
   - path: docs/.well-known/security.txt
     sha256: 8987609c662c5b80d92843e8cb00489c281470a091e808bd7a1cee5aa0fe1387
   - path: docs/agents.json
-    sha256: e8159d3ac1ee77284d13d722003554882e2783af8c6279cd100577bec1255ee2
+    sha256: e0ce109435e220119b8ee298837e861fa23c68007675304b5d4105f5269c0813
   - path: docs/api/v1/index.json
-    sha256: e7333509244487c9a0a03a578f5cf2b5a2c1b0aeba54e0baa8163394a1a8a9be
+    sha256: 217b2d0b0e975662b1a37ded594089c071d4071e00691fafafeea27b52b8774f
   - path: docs/changelog.json
     sha256: 6cc1515804ab0d18102e0478509e284968a346d4ee3aedddf8b4c18f8dabea74
   - path: docs/llms.txt
-    sha256: 4651c4539213370150c9a578ba956c020e9a818dbd908143d84860f9d3758067
+    sha256: c27f8687ca754d832785e66f5fd160a8e97b6e532223ab82d4ef86e28319f3e9
   - path: docs/robots.txt
     sha256: 88588b10d194d3d62ad9a4463f05a80f645ed1e7b23c59b10087cb28dd5a57f6
+  - path: docs/schemas/v1/approval-policy.schema.json
+    sha256: 3caaa9fa6ca60710908d778d3db394f508f79f9235b21986b6009a6680f238c9
+  - path: docs/schemas/v1/boundary.schema.json
+    sha256: 1a4cebc8d795b8153474ce0c474492a03c9402c5df3505be44e0667ffc74e2c6
+  - path: docs/schemas/v1/cascade.schema.json
+    sha256: 55029ca611439f8d72881087d261a0071045f596cd7fd81483d220d7ddf68da2
+  - path: docs/schemas/v1/models.schema.json
+    sha256: ebb3c9bc4876cd5833c66cdf6c2d79e65cb81fcd6aac7387db2404e2acb0c67a
+  - path: docs/schemas/v1/ownership.schema.json
+    sha256: ee1bf26278290a838a3e70ec52d4f6c840b93e433aa1f958ec2d7d8fd12582de
+  - path: docs/schemas/v1/workflow.schema.json
+    sha256: 0797501a99b1b4d1086ddca1987fb674775eb3f6975905f4d863bb3f08966a76
   - path: docs/sitemap.xml
     sha256: 8c339c4299d7f700310aadfe401a51a51499ee9584e400849f2e625e2554def4
   - path: docs/CNAME

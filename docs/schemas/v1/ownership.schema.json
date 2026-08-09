@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harnessie.com/schemas/v1/ownership.schema.json",
+  "title": "Harnessie ownership policy v1",
+  "type": "object", "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "lanes": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "agent": {"type": "object", "additionalProperties": {"$ref": "#/$defs/paths"}},
+        "collaborative": {"$ref": "#/$defs/paths"},
+        "operator": {"$ref": "#/$defs/paths"}
+      }
+    },
+    "files": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1}}
+  },
+  "$defs": {
+    "paths": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  }
+}

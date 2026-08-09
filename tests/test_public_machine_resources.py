@@ -54,7 +54,7 @@ def test_agents_json_describes_only_shipped_local_surfaces():
     assert data["product"]["version"] == _project_version()
     assert data["product"]["type"] == "local Python library and CLI"
     assert {item["id"] for item in data["capabilities"]} == {
-        "review-checkout", "verify-claims", "run-workflow"}
+        "review-checkout", "verify-claims", "validate-project", "run-workflow"}
     assert data["boundaries"] == {
         "hosted_api": False,
         "hosted_service": False,
@@ -62,8 +62,9 @@ def test_agents_json_describes_only_shipped_local_surfaces():
         "autonomous_remote_agent": False,
         "note": data["boundaries"]["note"],
     }
-    assert data["capabilities"][0]["human_approval_required"] is True
-    assert data["capabilities"][2]["human_arbitration_required"] is True
+    capabilities = {item["id"]: item for item in data["capabilities"]}
+    assert capabilities["review-checkout"]["human_approval_required"] is True
+    assert capabilities["run-workflow"]["human_arbitration_required"] is True
 
 
 def test_machine_resource_urls_follow_public_url_policy():
@@ -91,7 +92,7 @@ def test_cli_manifest_is_complete_and_explicitly_not_hosted():
     assert data["interface"]["network_service"] is False
     assert set(data["paths"]) == {
         "run", "resume", "report", "audit", "eval", "verify-manifest",
-        "verify-inward-manifest", "approve-maiden", "verify", "init",
+        "verify-inward-manifest", "approve-maiden", "verify", "init", "validate",
     }
     for command, contract in data["paths"].items():
         assert contract["synopsis"].startswith(f"harnessie {command}")

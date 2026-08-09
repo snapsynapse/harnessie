@@ -74,9 +74,15 @@ The injection-defense layer (harness/quarantine.py; SECURITY.md) is implemented:
 - Done test: a worker's `python3 -c "open('~/x','w')"` is blocked by the sandbox and the file is never created; the same write into the workspace succeeds; network is denied by default; run_shell and gate checks fail closed when the backend is monkeypatched absent. (tests/test_sandbox.py, 7 tests.)
 - Linux parity shipped in 0.4.0 through bubblewrap, firejail, and docker backends with admission probes; the no-backend path still fails closed. See [ROADMAP.md](ROADMAP.md) under Platform support.
 
-## Phase 3, extensibility (later, only when earned)
+## Phase 3, extensibility (active, acceptance-gated)
 
-16. Tool plugins: load extra ToolSpecs from tools/*.py entry points with declared effects and roles; a plugin can never bypass registry dispatch.
-17. Multi-orchestrator handoffs (only if a single orchestrator demonstrably cannot hold a job): explicit handoff packets with state ownership rules.
+16. Stable authoring contracts (implemented): six strict Draft 2020-12 schemas cover models, cascade, boundary, approval policy, ownership, and workflow documents. `harnessie validate` checks them without starting a run, runtime loaders fail closed on the same contract, schema-less 0.8 documents remain implicit v1 through the 1.x line, and packaged schemas are served byte-identically from `/schemas/v1/`.
+- Done test: all shipped authoring documents validate; malformed types and unknown keys fail with deterministic path and code diagnostics; unsupported versions fail before other validation; cross-document role, tier, cascade, phase, and placeholder references are checked; project initialization emits explicit v1; validation creates no run or model dispatch. Covered by `tests/test_schema.py` and `SCHEMA_COMPATIBILITY.md`.
 
-Working-set rule: do not start Phase 3 while any Phase 2 done test is red.
+17. Per-lane sandbox profiles: extend OS confinement so interpreter and plugin writes outside the assigned ownership lane are blocked even when the path remains inside the workspace; unsupported profiles fail closed.
+
+18. Tool plugins: choose one extension mechanism and trust model. Installed in-process code is operator-trusted but every tool invocation remains registry-mediated; untrusted code requires out-of-process confinement. Plugins declare effects, roles, approvals, and provenance before admission.
+
+19. Multi-orchestrator handoffs (only if a real job demonstrates that a single orchestrator cannot hold it): explicit handoff packets with state ownership rules.
+
+Working-set rule: do not start a later Phase 3 slice while any earlier slice or Phase 2 done test is red.

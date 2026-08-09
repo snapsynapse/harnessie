@@ -20,6 +20,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .schema import read_document
+
 # Failure reasons that may climb a ladder. Availability failures and provider
 # refusals deliberately do NOT appear here as climb triggers in contained
 # ladders' spirit: up-tiering on refusal is a containment leak; those move
@@ -153,11 +155,10 @@ def load_cascade_config(path: Path | str) -> CascadeConfig:
     path = Path(path)
     if not path.exists():
         return CascadeConfig()
-    import yaml
-    raw = yaml.safe_load(path.read_text()) or {}
+    raw = read_document(path, "cascade")
     if not isinstance(raw, dict):
         raise ValueError(f"{path}: top level must be a mapping")
-    unknown_top = set(raw) - {"policies", "reserved"}
+    unknown_top = set(raw) - {"schema_version", "policies", "reserved"}
     if unknown_top:
         raise ValueError(
             f"{path}: unknown top-level key(s) {sorted(unknown_top)}")

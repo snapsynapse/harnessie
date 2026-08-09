@@ -45,7 +45,7 @@ Audit. Every run writes a hash-chained event log. `harnessie audit` re-verifies 
 
 ## Installation and requirements
 
-Python 3.11 or newer and PyYAML. Install from PyPI:
+Python 3.11 or newer. PyYAML and jsonschema install with Harnessie. Install from PyPI:
 
 ```bash
 pip install harnessie   # or: pipx install harnessie / uv tool install harnessie
@@ -74,6 +74,7 @@ All commands are subcommands of `python3 -m harness.cli` (or `harnessie` once in
 | `audit <run_id>` | Verify the hash chain and render the governance timeline. Exit 0 clean, 1 broken chain, 2 run not found. |
 | `eval [suite]` | Run the deterministic eval scorecards (optionally one suite YAML). |
 | `eval --live` | Run opt-in live provider scorecards; skipped visibly unless `HARNESSIE_LIVE=1` and provider configuration are present. |
+| `validate [paths...]` | Validate the six v1 authoring contracts without model calls, network, sandbox admission, run-state creation, or workspace writes. Use `--kind` when validating one document whose filename does not identify its contract. Exit 0 valid, 2 invalid. |
 | `verify <flags>` | Standalone verification of any workspace against a claims file, no project scaffold required: `--workspace <dir> --criteria <claims.md> [--check "<cmd>" ...] [--models <models.yaml>] [--report-dir <dir>] [--tier <tier>] [--allow-network] [--no-verifier]`. Deterministic checks run sandboxed (network-denied unless `--allow-network`; the verifier agent stays denied regardless), then a read-only fresh-context verifier tests each claim against the artifacts. Exit 0 verified, 1 failed, 2 cannot-verify, fail closed. Single pass, no retry ladder. The report records the workspace git revision, criteria hash, verifier model, and network mode. Adopted via `decisions/AIDR-0006`. |
 | `verify-manifest [manifest]` | Verify the trust-bundle manifest. Defaults to `docs/MANIFEST.yaml`. |
 | `verify-inward-manifest [manifest]` | Verify the harness input manifest. Defaults to `INWARD_MANIFEST.yaml`; exit 2 on malformed content, hash drift, or incomplete coverage. |
@@ -92,11 +93,12 @@ A run's behavior is not in one file. Each decision has exactly one owner. To pre
 | PII stripping, secret egress halting, rehydration grants | `config/boundary.yaml` (off by default) |
 | Which phases run, in what order, with which gates and verifiers | the workflow YAML in `workflows/` |
 | Which files each agent may write | `OWNERSHIP.yaml` (lanes plus first-writer claims) |
+| Stable schema versions and compatibility | `SCHEMA_COMPATIBILITY.md` plus the served `/schemas/v1/` JSON Schemas |
 | What each role may do (tools, shell allowlist, approval) | the tool registry (`harness/tools/builtin.py`) plus role prompts in `agents/` |
 
 ## Writing a workflow
 
-A workflow is a YAML file with a name, a description, and an ordered list of phases. Here is the built-in `build-and-verify` workflow, annotated.
+A workflow is a YAML file with `schema_version: 1`, a name, a description, and an ordered list of phases. Documents from 0.8 without `schema_version` remain implicit v1 throughout the 1.x line. Here is the built-in `build-and-verify` workflow, annotated.
 
 ```yaml
 name: build-and-verify

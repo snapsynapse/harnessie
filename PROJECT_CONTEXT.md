@@ -49,7 +49,7 @@ ships standalone as a GitHub Action (Harnessie Verify) for gating PRs.
 Copyright Snap Synapse LLC (author Sam Rogers, subscriptions@snapsynapse.com), with
 trademark and PAICE.work PBC spec/code carveouts recorded in NOTICE.
 
-## Current status (2026-08-04)
+## Current status (2026-08-09)
 
 Active and healthy. v0.8.0 is live on PyPI and GitHub; the separately owned Verify
 Action v0.1.1 and Homebrew formula both pin 0.8.0. The docs site is live, and a fresh
@@ -57,3 +57,8 @@ Siteline scan scored it A, 97/100. Public-facing doc pages under `docs/` are gen
 from markdown via `scripts/build_docs_html.py` (edit markdown, rebuild, commit both).
 AIDR-0008 is arbitrated and executed in the independent engine-wrappers release train.
 See NEXT.md for the live session handoff and CHANGELOG.md for release history.
+
+The first 1.0 development slice is implemented: six stable v1 authoring schemas,
+side-effect-free validation, runtime startup enforcement, cross-document checks, and a
+written compatibility and deprecation policy. Per-lane confinement and the plugin trust
+boundary remain the next 1.0 work.

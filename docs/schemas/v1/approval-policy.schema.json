@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harnessie.com/schemas/v1/approval-policy.schema.json",
+  "title": "Harnessie approval policy v1",
+  "type": "object", "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "allow": {"$ref": "#/$defs/rules", "default": []},
+    "deny": {"$ref": "#/$defs/rules", "default": []}
+  },
+  "$defs": {
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["tool"],
+        "properties": {
+          "tool": {"type": "string", "minLength": 1},
+          "phase": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

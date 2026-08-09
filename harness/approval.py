@@ -13,6 +13,8 @@ from typing import TextIO
 
 import yaml
 
+from .schema import validate_data
+
 
 @dataclass(frozen=True)
 class ApprovalRule:
@@ -37,8 +39,15 @@ class ApprovalPolicy:
             data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
         except FileNotFoundError:
             return cls(source="policy-file", problems=[f"policy missing: {path}"])
+        except (UnicodeError, yaml.YAMLError) as exc:
+            return cls(source="policy-file", problems=[
+                f"invalid YAML: {type(exc).__name__}"])
         if not isinstance(data, dict):
             return cls(source="policy-file", problems=["policy root must be a mapping"])
+        schema_problems = validate_data(data, "approval-policy", str(path))
+        if schema_problems:
+            return cls(source="policy-file", problems=[
+                problem.render() for problem in schema_problems])
         return cls(
             allow=_rules(data.get("allow"), "allow", problems),
             deny=_rules(data.get("deny"), "deny", problems),

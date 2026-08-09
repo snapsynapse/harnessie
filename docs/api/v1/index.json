@@ -48,6 +48,11 @@
       "purpose": "Run deterministic scorecards; --live is a separate explicit provider opt-in.",
       "side_effects": "Default suite is network-free; --live may call configured providers."
     },
+    "validate": {
+      "synopsis": "harnessie validate [PATH ...] [--kind KIND]",
+      "purpose": "Validate the six stable v1 authoring contracts and their cross-document references without starting a run.",
+      "side_effects": "Read-only; no model calls, network, sandbox admission, run-state creation, or workspace writes."
+    },
     "verify-manifest": {
       "synopsis": "harnessie verify-manifest [MANIFEST]",
       "purpose": "Verify hashes in the outward public trust bundle.",
@@ -76,8 +81,8 @@
   },
   "stability": {
     "status": "pre-1.0",
-    "policy": "The CLI is shipped and tested, but its frozen schema and deprecation policy remain a 1.0 gate."
+    "policy": "The CLI remains pre-1.0. The six v1 authoring schemas and their compatibility and deprecation policy are frozen as the first 1.0 development slice."
   },
   "canonical": "https://harnessie.com/api/v1/index.json",
-  "last_updated": "2026-08-04"
+  "last_updated": "2026-08-09"
 }

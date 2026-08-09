@@ -2,6 +2,7 @@
 # one more independent brain. Position three routes through the `research`
 # task class (cheap tier), so three positions draw three distinct brains.
 # Invoke: harnessie run workflows/contested-decision-3panel.yaml --goal "<question>"
+schema_version: 1
 name: contested-decision-3panel
 description: Three independent positions -> objections -> decision record -> convergence or human arbitration.
 
