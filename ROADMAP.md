@@ -120,12 +120,11 @@ Acceptance: a phase that exceeds a declared volume ceiling fails with the count 
 
 Theme: stable surfaces and pluggability, only after the core is proven.
 
-- Tool plugins loaded from entry points with declared effects and roles; a plugin can never bypass registry dispatch. Implementation step 16.
-- Multi-orchestrator handoffs, only if a single orchestrator is demonstrably unable to hold a job. Implementation step 17.
-- Per-lane sandbox profiles, closing the ownership layer's honest limit (interpreter writes bypass the per-file check today).
-- Frozen config and workflow schema with a written deprecation policy.
+- Stable, versioned configuration and workflow schemas with a written compatibility and deprecation policy. Validation is strict and available without starting a run; the current 0.8 surfaces remain accepted through explicit compatibility fixtures. This is the first 1.0 slice because every later extension depends on a stable contract.
+- Per-lane sandbox profiles close the ownership layer's honest limit before general plugin admission: interpreter and plugin writes outside the assigned lane are blocked, and a backend that cannot enforce the profile fails closed.
+- Tool plugins load through one named extension mechanism and declare effects, roles, approvals, and provenance before registry admission. The trust boundary must be explicit: either installed plugin code is operator-trusted and every tool invocation remains registry-mediated, or untrusted plugin code executes out of process under confinement. An in-process Python import cannot truthfully be described as unable to bypass the registry.
 
-Gate: no 1.0 while any 0.3, 0.4, 0.5, 0.6, 0.7, or 0.8 acceptance criterion is red.
+Gate: no 1.0 while any 0.3, 0.4, 0.5, 0.6, 0.7, or 0.8 acceptance criterion is red; no stable plugin surface before the schema and per-lane confinement slices are green.
 
 ### Post-1.0 candidates
 
@@ -133,6 +132,7 @@ Deliberately after 1.0, not before:
 
 - Official Docker image. The complication is that the sandbox story inverts inside a container: the docker sandbox backend needs a daemon the container does not have, so an image must either nest a backend (bwrap inside the container), document a reduced-confinement mode honestly, or treat the container boundary itself as the sandbox with the fail-closed rules re-derived for that topology. That is a security-docs problem as much as a packaging problem, which is why it waits for the stable 1.0 surfaces. Acceptance when it lands: the image's confinement posture is stated in SECURITY.md with the same fail-closed honesty as the bare-metal table, and the threat-model artifact gains a container row citing enforcing config and test.
 - conda-forge feedstock, if data-science users ask; the review process is external and the PyPI package already serves `pip`/`pipx`/`uv`.
+- Multi-orchestrator handoffs, only if a documented real job demonstrates that a single orchestrator cannot hold it. In the absence of that evidence this is not a 1.0 requirement.
 
 ## Platform support
 

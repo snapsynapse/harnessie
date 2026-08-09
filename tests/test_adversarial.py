@@ -213,6 +213,25 @@ def test_dissent_halts_needs_arbitration(tmp_path):
     assert re.search(r"^ref: DR-[0-9ACDFGHJKMNPRUWY]{6}$", text, re.MULTILINE)
 
 
+def test_rebuttal_receives_full_peer_position_and_excludes_own(tmp_path):
+    _scaffold(tmp_path)
+    first = ("FIRST_POSITION_ONLY\n" +
+             '{"stance": "recommend", "summary": "First."}')
+    second = ("x" * 2100 + "SECOND_POSITION_TAIL\n" +
+              '{"stance": "recommend", "summary": "Second."}')
+    runner, outcomes = _run(tmp_path, "r-full-rebuttal", [
+        _complete(first, 1),
+        _complete(second, 2),
+        _complete(NO_OBJ, 3),
+        _complete(NO_OBJ, 4),
+    ])
+    assert [o.status for o in outcomes] == ["passed"]
+    brain = runner._models["mid"]
+    first_rebuttal_task = brain.calls[2]["messages"][1].content
+    assert "SECOND_POSITION_TAIL" in first_rebuttal_task
+    assert "FIRST_POSITION_ONLY" not in first_rebuttal_task
+
+
 def test_position_agents_are_read_only(tmp_path):
     _scaffold(tmp_path)
     write = AssistantTurn(content="", stop_reason="tool_use",

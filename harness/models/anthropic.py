@@ -55,32 +55,77 @@ class AnthropicModel(ModelInterface):
         )
         try:
             with urllib.request.urlopen(req, timeout=600) as resp:
-                data = json.loads(resp.read())
+                payload = resp.read()
         except urllib.error.HTTPError as e:
             detail = e.read().decode(errors="replace")[:500]
             return AssistantTurn(content=f"provider_error {e.code}: {detail}",
                                  stop_reason="error", raw=detail)
-        except (urllib.error.URLError, TimeoutError) as e:
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
             return AssistantTurn(content=f"network_error: {e}", stop_reason="error")
 
-        text_parts: list[str] = []
-        tool_calls: list[ToolCall] = []
-        for block in data.get("content", []):
-            if block.get("type") == "text":
-                text_parts.append(block["text"])
-            elif block.get("type") == "tool_use":
-                tool_calls.append(ToolCall(id=block["id"], name=block["name"],
-                                           arguments=block.get("input") or {}))
-        usage = data.get("usage", {})
-        stop = data.get("stop_reason") or "end_turn"
+        try:
+            data = json.loads(payload)
+            if not isinstance(data, dict):
+                raise TypeError("top level must be an object")
+
+            blocks = data.get("content", [])
+            if not isinstance(blocks, list):
+                raise TypeError("content must be an array")
+            text_parts: list[str] = []
+            tool_calls: list[ToolCall] = []
+            for block in blocks:
+                if not isinstance(block, dict):
+                    raise TypeError("content blocks must be objects")
+                if block.get("type") == "text":
+                    if not isinstance(block.get("text"), str):
+                        raise TypeError("text block text must be a string")
+                    text_parts.append(block["text"])
+                elif block.get("type") == "tool_use":
+                    if not isinstance(block.get("id"), str) or not block["id"]:
+                        raise TypeError("tool_use id must be a non-empty string")
+                    if not isinstance(block.get("name"), str) or not block["name"]:
+                        raise TypeError("tool_use name must be a non-empty string")
+                    arguments = block.get("input")
+                    if arguments is None:
+                        arguments = {}
+                    if not isinstance(arguments, dict):
+                        raise TypeError("tool_use input must be an object")
+                    tool_calls.append(ToolCall(id=block["id"], name=block["name"],
+                                               arguments=arguments))
+            usage = data.get("usage")
+            if usage is None:
+                usage = {}
+            if not isinstance(usage, dict):
+                raise TypeError("usage must be an object")
+            input_tokens = self._usage_count(usage, "input_tokens")
+            output_tokens = self._usage_count(usage, "output_tokens")
+            stop = data.get("stop_reason") or "end_turn"
+            if not isinstance(stop, str):
+                raise TypeError("stop_reason must be a string")
+            stop = {"stop_sequence": "end_turn"}.get(stop, stop)
+            if stop not in {"end_turn", "max_tokens", "tool_use", "refusal"}:
+                raise ValueError("unsupported stop_reason")
+        except (json.JSONDecodeError, UnicodeDecodeError, KeyError, TypeError,
+                ValueError, AttributeError) as e:
+            return AssistantTurn(
+                content=("provider_response_error: malformed Anthropic response "
+                         f"({type(e).__name__})"),
+                stop_reason="error")
         return AssistantTurn(
             content="\n".join(text_parts),
             tool_calls=tool_calls,
             stop_reason="tool_use" if tool_calls else stop,
-            input_tokens=usage.get("input_tokens", 0),
-            output_tokens=usage.get("output_tokens", 0),
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
             raw=data,
         )
+
+    @staticmethod
+    def _usage_count(usage: dict, field: str) -> int:
+        value = usage.get(field, 0)
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise ValueError(f"usage.{field} must be a non-negative integer")
+        return value
 
     @staticmethod
     def _to_wire(messages: list[Message]) -> tuple[str, list[dict]]:

@@ -51,36 +51,89 @@ class OpenAICompatModel(ModelInterface):
                                      data=json.dumps(body).encode(), headers=headers)
         try:
             with urllib.request.urlopen(req, timeout=600) as resp:
-                data = json.loads(resp.read())
+                payload = resp.read()
         except urllib.error.HTTPError as e:
             detail = e.read().decode(errors="replace")[:500]
             return AssistantTurn(content=f"provider_error {e.code}: {detail}",
                                  stop_reason="error", raw=detail)
-        except (urllib.error.URLError, TimeoutError) as e:
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
             return AssistantTurn(content=f"network_error: {e}", stop_reason="error")
 
-        choice = (data.get("choices") or [{}])[0]
-        msg = choice.get("message", {})
-        tool_calls = [
-            ToolCall(
-                id=tc.get("id", f"call_{i}"),
-                name=tc["function"]["name"],
-                arguments=self._parse_args(tc["function"].get("arguments")),
-            )
-            for i, tc in enumerate(msg.get("tool_calls") or [])
-        ]
-        usage = data.get("usage", {})
-        finish = choice.get("finish_reason") or "stop"
-        stop = {"stop": "end_turn", "tool_calls": "tool_use",
-                "length": "max_tokens"}.get(finish, finish)
+        try:
+            data = json.loads(payload)
+            if not isinstance(data, dict):
+                raise TypeError("top level must be an object")
+            choices = data.get("choices")
+            if not isinstance(choices, list) or not choices:
+                raise TypeError("choices must be a non-empty array")
+            choice = choices[0]
+            if not isinstance(choice, dict):
+                raise TypeError("choice must be an object")
+            msg = choice.get("message")
+            if not isinstance(msg, dict):
+                raise TypeError("choice.message must be an object")
+            content = msg.get("content")
+            if content is None:
+                content = ""
+            if not isinstance(content, str):
+                raise TypeError("message.content must be a string or null")
+            raw_tool_calls = msg.get("tool_calls")
+            if raw_tool_calls is None:
+                raw_tool_calls = []
+            if not isinstance(raw_tool_calls, list):
+                raise TypeError("message.tool_calls must be an array")
+            tool_calls: list[ToolCall] = []
+            for i, tc in enumerate(raw_tool_calls):
+                if not isinstance(tc, dict) or not isinstance(tc.get("function"), dict):
+                    raise TypeError("tool calls must contain function objects")
+                function = tc["function"]
+                name = function.get("name")
+                if not isinstance(name, str) or not name:
+                    raise TypeError("tool function name must be a non-empty string")
+                call_id = tc.get("id", f"call_{i}")
+                if not isinstance(call_id, str) or not call_id:
+                    raise TypeError("tool call id must be a non-empty string")
+                tool_calls.append(ToolCall(
+                    id=call_id,
+                    name=name,
+                    arguments=self._parse_args(function.get("arguments")),
+                ))
+            usage = data.get("usage")
+            if usage is None:
+                usage = {}
+            if not isinstance(usage, dict):
+                raise TypeError("usage must be an object")
+            input_tokens = self._usage_count(usage, "prompt_tokens")
+            output_tokens = self._usage_count(usage, "completion_tokens")
+            finish = choice.get("finish_reason") or "stop"
+            if not isinstance(finish, str):
+                raise TypeError("finish_reason must be a string or null")
+            stop = {"stop": "end_turn", "tool_calls": "tool_use",
+                    "length": "max_tokens", "content_filter": "refusal"}.get(
+                        finish, finish)
+            if stop not in {"end_turn", "max_tokens", "tool_use", "refusal"}:
+                raise ValueError("unsupported finish_reason")
+        except (json.JSONDecodeError, UnicodeDecodeError, KeyError, TypeError,
+                ValueError, AttributeError) as e:
+            return AssistantTurn(
+                content=("provider_response_error: malformed OpenAI-compatible "
+                         f"response ({type(e).__name__})"),
+                stop_reason="error")
         return AssistantTurn(
-            content=msg.get("content") or "",
+            content=content,
             tool_calls=tool_calls,
             stop_reason="tool_use" if tool_calls else stop,
-            input_tokens=usage.get("prompt_tokens", 0),
-            output_tokens=usage.get("completion_tokens", 0),
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
             raw=data,
         )
+
+    @staticmethod
+    def _usage_count(usage: dict, field: str) -> int:
+        value = usage.get(field, 0)
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise ValueError(f"usage.{field} must be a non-negative integer")
+        return value
 
     @staticmethod
     def _parse_args(raw) -> dict:

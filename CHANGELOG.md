@@ -4,6 +4,11 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+### Fixed
+
+- Anthropic and OpenAI-compatible adapters now validate provider response envelopes, tool calls, stop reasons, and usage counters before constructing a turn. Invalid JSON or structurally malformed responses become non-echoing `stop_reason="error"` turns instead of raising into the run, while OpenAI-compatible content-filter finishes normalize to the existing refusal stop.
+- Adversarial rebuttal rounds now receive each peer position in full and exclude the reviewing agent's own position by value. This removes the 2,000-character clipping that previously made a complete position appear truncated and could create a spurious standing objection.
+
 ## 0.8.0 (2026-08-04)
 
 Theme: bound what a governed run may change and pin the harness inputs that define its behavior. This release completes the four 0.8 write-safety and self-integrity mechanics, hardens the package gate, and publishes truthful machine handoffs.

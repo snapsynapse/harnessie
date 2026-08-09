@@ -1127,8 +1127,8 @@ class WorkflowRunner:
             for pos, route in zip(positions, routes):
                 others = "\n\n".join(
                     f"### {p.label} — stance: {p.stance}\nsummary: {p.summary}\n"
-                    f"{p.prose[:2000]}"
-                    for p in positions if p.label is not pos.label)
+                    f"{p.prose}"
+                    for p in positions if p.label != pos.label)
                 standing = "\n".join(f"- {o['by']}: {o['text']}" for o in objections)
                 obj_task = (
                     f"{task}\n\n## Objection round\n"
