@@ -10,7 +10,7 @@ You can use Harnessie's ideas next to an orchestrator, or use Harnessie as the h
 
 - Orchestration frameworks (LangGraph, CrewAI, AutoGen / AG2, the OpenAI and Claude Agent SDKs). Best at composing multi-agent workflows: handoffs, group chat, hierarchical managers, optional critic and reflection agents. Their collaboration is cooperative by design. Agents help each other converge.
 - Guardrail and safety tools (Guardrails AI, NeMo Guardrails, Lakera). Best at wrapping a model with input and output controls: validators, policy rails, prompt-injection defense. They sit around one model, not across a multi-agent result.
-- Harnessie. A harness that treats agent work as governed, not merely executed: an independent verifier that can only pass or fail, decisions that preserve dissent for a human to arbitrate, a containment boundary so sensitive data never leaves the models you control, and a hash-chained audit of all of it. Brain-agnostic by test: a model earns a tier by passing a scorecard, not by assertion.
+- Harnessie. A harness that treats agent work as governed, not merely executed: an independent verifier that fails closed, decisions that preserve dissent for a human to arbitrate, an opt-in containment boundary plus contained routing, and a hash-chained audit of all of it. Brain-agnostic evidence is separate from configuration: runtime records and scorecard bundles earn a public “proven” label.
 
 The categories are complementary. The comparison below is not a scoreboard; it is a map of what each category ships natively versus what it leaves you to build.
 
@@ -23,8 +23,8 @@ As of mid-2026. Frameworks move quickly; verify current capabilities before rely
 | Multi-agent orchestration (handoffs, roles, group chat) | Native, and their core strength | Not their job | Native, deliberately minimal (orchestrator / workers / verifier) |
 | Independent verifier that can only fail-closed, with no access to the worker's reasoning, blocking progress until it passes | You build it (critics are cooperative and share state) | Output validators, but not a phase gate across a multi-agent run | Native |
 | Contested decisions that preserve dissent verbatim and let only a human arbitrate | You build it (frameworks assume machine consensus) | Not their job | Native (AIDR-shaped decision records) |
-| Structured PII stripped before egress; secrets halt the run; free-text-sensitive work never leaves models you control | You build it | Partial: PII and injection validators exist (for example Guardrails AI, Lakera), but as filters on one model, not never-egress routing across the run | Native (containment boundary plus contained routing) |
-| Brain-agnostic by scorecard: a model is admitted to a tier only by passing a test | Model-agnostic by config, but not gated by a passing scorecard | Not their job | Native |
+| Structured PII stripped before egress; secrets halt the run; free-text-sensitive work stays on controlled tiers | You build it | Partial: PII and injection validators exist (for example Guardrails AI, Lakera), but as filters on one model, not never-egress routing across the run | Native but opt-in (boundary plus contained routing) |
+| Brain-agnostic evidence tied to model, provider, endpoint, prompt, parser, and sampling identity | Model-agnostic by config; evidence varies | Not their job | Native scorecard bundles and runtime records; configuration does not enforce prior passage |
 | Hash-chained, tamper-evident audit of every agent and operator action | You build it | Logging, not a verifiable chain | Native |
 | Fails closed when a control cannot be enforced (no sandbox backend, no budget ceiling) | Varies; usually best-effort | Varies | Native, by policy |
 
@@ -45,6 +45,6 @@ Harnessie earns its place only when you need the integrated, verifiable, contain
 
 Nothing here is magic. You could build most of it: take LangGraph for orchestration, hand-roll a fresh-context verifier that fails closed, bolt on Guardrails AI for PII, write your own placeholder-based egress boundary, add a hash-chained event log, and maintain a scorecard for every model you swap in.
 
-Harnessie is that assembly, already built, tested, and proven brain-agnostic across eight providers and eleven models, with the safety living at the tool layer where no prompt can switch it off. If the assembly is worth your weeks, build it. If it is worth a `pip install`, that is what this is.
+Harnessie is that assembly, already built and tested, with runtime decision records spanning eight providers and eleven models. Core registry, sandbox, gate, and audit controls live below prompts; optional containment must be enabled, and admitted plugin code remains operator-trusted in process. If the assembly is worth your weeks, build it. If it is worth a `pip install`, that is what this is.
 
 Open source, Apache-2.0. Read every line, self-host it, owe no one.

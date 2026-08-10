@@ -4,7 +4,8 @@
   "canonical": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md",
   "unreleased": {
     "status": "development",
-    "source": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md#unreleased"
+    "source": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md#unreleased",
+    "summary": "Documentation and public agent-surface corrections after the 1.0.0 release, including current trust-anchor, installation, containment, operating-mode, and roadmap status."
   },
   "current": {
     "version": "1.0.0",

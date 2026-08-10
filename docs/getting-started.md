@@ -2,19 +2,21 @@
 
 This is the five-minute path: install, prove the harness works offline, point it at a model, run a real job, and read the record it leaves behind. The full reference is [the user guide](GUIDE.md).
 
-New to this? You are welcome here. A harness is the structure you put around an AI model so it can do real work while you stay in control: it sets what the AI may do, checks the work before moving on, and writes down what happened. Harnessie is built to be a safe first one. This guide uses a terminal, but every command below is safe to run, and nothing reaches the network until you choose to add a key. If you have never used a terminal or cloned a repository, start with the gentler [quickstart](quickstart.md), which assumes no git or shell fluency and includes a glossary and a Windows/WSL2 page.
+New to this? You are welcome here. A harness is the structure you put around an AI model so it can do real work while you stay in control: it sets what the AI may do, checks the work before moving on, and writes down what happened. Harnessie is built to be a safe first one. Installation reaches the package index, but the offline verification commands and guided mock run call no AI provider. Provider access begins only when you configure and opt into it. If you have never used a terminal or cloned a repository, start with the gentler [quickstart](quickstart.md), which assumes no git or shell fluency and includes a glossary and a Windows/WSL2 page.
 
 In more technical terms: Harnessie is a brain-agnostic multi-agent harness. An orchestrator decomposes a goal into task packets, cheap workers execute them inside a jailed workspace, and an independent verifier gates every phase before the next one starts. The structure carries the quality floor; the model carries the ceiling. You swap models by editing one YAML file.
 
 ## 1. Install
 
-Requires Python 3.11 or newer. The only runtime dependency is PyYAML; the model adapters are standard-library, so no vendor SDK is needed.
+Requires Python 3.11 or newer. PyYAML and jsonschema install automatically; the model adapters are standard-library, so no vendor SDK is needed.
 
 ```bash
-pip install harnessie          # or: pipx / uv tool install / brew install snapsynapse/tap/harnessie
+pip install harnessie          # or: pipx install / uv tool install
 harnessie init my-project      # scaffold + guided readiness check + zero-dollar mock run
 cd my-project
 ```
+
+The separately maintained Homebrew formula still installs Harnessie 0.8.0. Use PyPI for the current 1.0.0 core release until the Homebrew release train catches up.
 
 Working on Harnessie itself (or wanting the test suite)? Install from source instead:
 
@@ -92,7 +94,7 @@ Silence is never success. Every run ends in a named stop condition, and each map
 - `needs_arbitration`: a contested decision produced dissent. Open `runs/<id>/decisions/DR-<phase>.md`, record your decision in it, and re-run.
 - `budget` or `max_steps`: the run hit a ceiling. Raise it in `config/models.yaml` or the phase, or narrow the goal.
 
-Re-running is safe: resume re-runs only the phases that did not pass. The full table is in [the user guide](GUIDE.md#when-a-run-halts).
+Resume with `harnessie resume <run_id> <workflow> --goal "..."`. It re-runs only the phases that did not pass. The full table is in [the user guide](GUIDE.md#when-a-run-halts).
 
 ## 7. Start your own project
 

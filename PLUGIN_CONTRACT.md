@@ -1,6 +1,6 @@
 # Plugin contract
 
-Status: 1.0 development contract. The extension surface is versioned separately from the Harnessie package.
+Status: stable for the Harnessie 1.x line. The extension surface is versioned separately from the Harnessie package.
 
 ## One extension mechanism
 

@@ -4,6 +4,13 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+### Fixed
+
+- Documentation and public agent surfaces now distinguish shipped core 1.0.0 from the still-lagging Homebrew and Verify Action release trains, use the actual `harnessie resume` syntax, name both runtime dependencies, and mark the plugin contract stable for 1.x.
+- Current-guide trust copy no longer claims end-to-end GuideCheck Level 4 while the external DNS TXT anchor still names the prior guide hash. Public and machine-readable surfaces distinguish byte-identical served provenance from pending independent re-anchoring.
+- Website safety copy now scopes the containment boundary as opt-in, distinguishes configured models from models with earned evidence, and removes unsupported claims that every side effect is interactively approved or that an external delegated operator can be authenticated as human or agent.
+- Roadmap, eval-count, sitemap, generated-doc inventory, canonical URL, and website metadata drift were reconciled with the shipped 1.0.0 surfaces.
+
 ## 1.0.0 (2026-08-09)
 
 Theme: extensibility earned. Harnessie freezes its authoring contracts, closes the interpreter ownership gap, and admits installed tool extensions through one explicit trust boundary.

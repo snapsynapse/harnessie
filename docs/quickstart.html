@@ -124,7 +124,7 @@
   <main id="main-content" class="doc-content">
     <p class="crumb"><a href="/">harnessie.com</a> &nbsp;/&nbsp; docs &nbsp;/&nbsp; Quickstart</p>
     <h1>Quickstart for people, not just developers</h1>
-<p>This is the gentlest path into Harnessie. It assumes you have never cloned a repository, never written YAML, and are not sure what a terminal is for. That is fine. Every command here is safe, nothing reaches the internet or spends money until you decide it should, and the tool checks your machine for you before anything runs.</p>
+<p>This is the gentlest path into Harnessie. It assumes you have never cloned a repository, never written YAML, and are not sure what a terminal is for. That is fine. Installing the package reaches the package index and creates local files. After installation, the guided mock run calls no AI provider and spends no model money, and the tool checks your machine before a workflow runs.</p>
 <p>If you are already comfortable in a terminal, the faster five-minute path is <a href="/getting-started.html">Getting started</a>, and the full reference is <a href="/guide.html">the user guide</a>.</p>
 <h2 id="what-harnessie-is-in-one-breath">What Harnessie is, in one breath</h2>
 <p>A harness is the structure you put around an AI model so it can do real work while you stay in control. It decides what the AI is allowed to do, checks the work before moving on, and writes down everything that happened so you can read it back. Harnessie is built to be a safe first one: it runs on your own machine, and its first run costs nothing because it uses a pretend &quot;mock&quot; model instead of a paid one.</p>
@@ -135,7 +135,7 @@
 <h2 id="step-1-get-harnessie">Step 1: Get Harnessie</h2>
 <p>One line installs the <code>harnessie</code> command from the Python package index:</p>
 <pre><code>pip install harnessie</code></pre>
-<p>If <code>pip</code> is not found, try <code>python3 -m pip install harnessie</code>. If you use pipx, uv, or Homebrew, <code>pipx install harnessie</code>, <code>uv tool install harnessie</code>, and <code>brew install snapsynapse/tap/harnessie</code> work the same way. You do not need to download or clone anything.</p>
+<p>If <code>pip</code> is not found, try <code>python3 -m pip install harnessie</code>. <code>pipx install harnessie</code> and <code>uv tool install harnessie</code> install the same current package without cloning the repository. The separately maintained Homebrew formula still installs Harnessie 0.8.0, so use PyPI for the current 1.0.0 release until that release train catches up.</p>
 <h2 id="step-2-let-the-tool-check-your-machine">Step 2: Let the tool check your machine</h2>
 <p>Create your own project and let Harnessie tell you whether everything is ready:</p>
 <pre><code>harnessie init my-first-project</code></pre>
@@ -166,7 +166,7 @@ harnessie run workflows/build-and-verify.yaml --goal &quot;a to-do list saved to
 <p>Re-running is safe: a resume only re-does the steps that did not already pass.</p>
 <h2 id="running-on-windows">Running on Windows</h2>
 <p>Harnessie&#x27;s safety depends on an operating-system sandbox that confines any command the AI runs. macOS and Linux provide one. Bare Windows (the Command Prompt or PowerShell) does not provide one that Harnessie can use, so on bare Windows the harness fails closed: any workflow step that runs a shell command is blocked rather than run without a cage. That is deliberate. An unconfined command is exactly the risk the sandbox exists to remove, so running without one would quietly break the core safety promise.</p>
-<p>The supported path on Windows is WSL2 (Windows Subsystem for Linux), which gives you a real Linux environment inside Windows:</p>
+<p>The supported path on Windows is WSL2 (Windows Subsystem for Linux), which gives you a Linux environment inside Windows:</p>
 <ol><li>Open PowerShell as Administrator and run <code>wsl --install</code>. Restart when asked.</li><li>Launch the installed Ubuntu app and finish its first-time setup.</li><li>Inside that Ubuntu window, follow this quickstart from <a href="#step-1-get-harnessie">Step 1</a>. It is now a Linux machine, and the Linux sandbox (bubblewrap) applies.</li></ol>
 <p>Everything mock and offline works on bare Windows too (the checks, the eval baseline, reading reports), because none of it runs a sandboxed shell command. It is only shell-using workflow steps that require WSL2. If you are only exploring, you can start on bare Windows and move to WSL2 when you want to run a real workflow.</p>
 <h2 id="glossary">Glossary</h2>
@@ -187,7 +187,7 @@ harnessie run workflows/build-and-verify.yaml --goal &quot;a to-do list saved to
       <a href="/threat-model.html">Threat model</a>
       <a href="/compare.html">Compare</a>
     </div>
-    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/quickstart.md" target="_blank" rel="noopener">docs/quickstart.md</a>.</p>
+    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com/" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/quickstart.md" target="_blank" rel="noopener">docs/quickstart.md</a>.</p>
   </div>
 </footer>
 

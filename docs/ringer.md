@@ -12,7 +12,7 @@ When two tools arrive at the same core conviction on their own, it is usually be
 
 Ringer optimizes the swarm. Parallel execution across a set of engines (Codex CLI, Grok Build, OpenCode, or your own), local by default, a live dashboard, throughput. It is the fastest way to get a lot of mechanical, verifiable work done cheaply and in parallel on your own machine.
 
-Harnessie optimizes governance. An independent verifier agent on top of the deterministic check, decisions that preserve dissent for a human to arbitrate, a containment boundary that lets you reach for a cloud model without letting sensitive data reach it, and a hash-chained audit of every agent and operator action. It is the harness for when the work itself must be governed, not just executed.
+Harnessie optimizes governance. An independent verifier agent sits on top of deterministic checks, decisions preserve dissent for an operator to arbitrate, and agent and operator events enter a hash-chained audit. Its optional containment boundary and contained routing can keep declared sensitive work from exposed providers when explicitly configured. It is the harness for when the work itself must be governed, not just executed.
 
 Same foundation, opposite leans. Ringer goes wide and fast. Harnessie goes careful and accountable.
 
@@ -51,7 +51,7 @@ The report answers claim by claim: reproduced, refuted, or not verifiable in thi
 You already have parallel execution and verification-by-check. Harnessie adds four things, for when you need them:
 
 - An independent verifier agent, not only a shell check: a fresh-context model that judges the artifact against your acceptance criteria and can only pass or fail it, never wave it through. Available inside a governed run, or standalone as `harnessie verify`.
-- A containment boundary: PII stripped to placeholders before any model sees it, a secret in an outbound payload halts the run, and free-text-sensitive work stays on the models you control. Use a frontier model without handing it your data.
+- An opt-in containment boundary: when enabled, structured PII is stripped to placeholders, a secret in an outbound payload halts the run, and declared free-text-sensitive work stays on controlled tiers. The default is off, and the coverage is deliberately per data class rather than total.
 - Decisions, not only tasks: when a step is a judgment call rather than an implementation, run it as a contested decision with preserved dissent and human arbitration.
 - A tamper-evident audit: a hash-chained log of every action, agent and human, that you can verify and hand to a reviewer.
 

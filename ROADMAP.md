@@ -6,12 +6,12 @@ Roadmap items are intent, not commitments. Dates are omitted deliberately; miles
 
 ## Released so far
 
-Versions 0.1.0 through 0.8.0 are shipped; the current release is 0.8.0, which bounds write damage and pins the harness inputs that define a run. This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
+Versions 0.1.0 through 1.0.0 are shipped; the current core release is 1.0.0, which freezes six authoring contracts, kernel-enforces per-agent child-process ownership lanes, and admits installed tool plugins through one explicit operator-trusted boundary. This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
 
 ## Guiding priorities
 
 - Correctness and safety land before features; no milestone opens while a prior acceptance criterion is red.
-- Brain-agnosticism must be a testable claim, not a slogan: a brain is admitted to a tier by passing a scorecard, not by assertion.
+- Brain-agnosticism must be a testable claim, not a slogan: configuration proves swappability, while a public “proven” label requires a scorecard bundle or runtime decision record.
 - Portability never weakens a guarantee: an unsupported platform fails closed rather than running a control unenforced.
 - Lean and solo-operable: complexity is added only when a real threshold is crossed.
 
@@ -44,7 +44,7 @@ Acceptance: a requires_approval tool blocks headless by default and proceeds onl
 
 ### 0.6.0: First-harness readiness (public launch gate) - SHIPPED
 
-Theme: make "the safest and easiest first AI harness for people" true for someone who has never identified as a developer, and make the safety claim falsifiable for the developers who will audit it. This milestone gated the public launch; it does not displace 0.4 portability or 0.5 operability, both of which it depends on. Released 2026-07-07; the repo and canonical page are public. GuideCheck Level 4 is confirmed end to end, and the Siteline live-page bar is green.
+Theme: make "the safest and easiest first AI harness for people" true for someone who has never identified as a developer, and make the safety claim falsifiable for the developers who will audit it. This milestone gated the public launch; it does not displace 0.4 portability or 0.5 operability, both of which it depends on. Released 2026-07-07; the repo and canonical page are public. The then-current guide earned GuideCheck Level 4 end to end, and the Siteline live-page bar was green. Each changed guide must independently re-earn that status.
 
 Ease (the first-run path):
 - PyPI packaging: `pip install harnessie` (or `pipx install harnessie`) replaces clone-and-editable-install as the documented entry; signed, tagged releases use `RELEASE_CHECKLIST.md` per the repo-standards promotion path. GREEN: Harnessie 0.6.0 shipped on PyPI and as a tagged GitHub release; subsequent 0.7.0, 0.7.1, and 0.8.0 releases use the same ceremony. A fresh install from the live index reaches the guided init's green zero-dollar run, with source installation kept for development.
@@ -133,6 +133,7 @@ Deliberately after 1.0, not before:
 - Official Docker image. The complication is that the sandbox story inverts inside a container: the docker sandbox backend needs a daemon the container does not have, so an image must either nest a backend (bwrap inside the container), document a reduced-confinement mode honestly, or treat the container boundary itself as the sandbox with the fail-closed rules re-derived for that topology. That is a security-docs problem as much as a packaging problem, which is why it waits for the stable 1.0 surfaces. Acceptance when it lands: the image's confinement posture is stated in SECURITY.md with the same fail-closed honesty as the bare-metal table, and the threat-model artifact gains a container row citing enforcing config and test.
 - conda-forge feedstock, if data-science users ask; the review process is external and the PyPI package already serves `pip`/`pipx`/`uv`.
 - Multi-orchestrator handoffs, only if a documented real job demonstrates that a single orchestrator cannot hold it. In the absence of that evidence this is not a 1.0 requirement.
+- Truthful operating-mode controls. The current `--approve-interactive` handler covers only tools declared `requires_approval`; it is not an every-side-effect approval mode. A future such mode must mediate every write and execute tool structurally. Delegated external operators also remain outside Harnessie's human-vs-agent identity proof until the audit contract can authenticate those seats.
 
 ## Platform support
 
@@ -176,8 +177,8 @@ The pure-Python harness logic runs on Windows, but shell and gate checks fail cl
 ## Non-goals (all platforms)
 
 - Multi-agent coordination beyond orchestrator / worker / verifier until a single orchestrator is provably insufficient for a real job.
-- A plugin system before the core primitives are stable; gated behind 1.0.
-- Hosted-service conventions (robots.txt, sitemaps, and similar): Harnessie is a library and CLI, not a site.
+- Automatic, local-file, or untrusted plugin loading. Version 1 supports only explicit operator-trusted `harnessie.tools.v1` entry points; an untrusted mode requires a separately versioned out-of-process design.
+- A hosted Harnessie API, MCP server, or autonomous remote agent. The public website and its discovery files document the local package and CLI; they do not turn Harnessie into a hosted service.
 
 ## How the planning docs relate
 

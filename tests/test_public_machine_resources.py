@@ -4,6 +4,7 @@ import re
 import subprocess
 import sys
 import tomllib
+import xml.etree.ElementTree as ET
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -64,6 +65,9 @@ def test_agents_json_describes_only_shipped_local_surfaces():
     }
     capabilities = {item["id"]: item for item in data["capabilities"]}
     assert capabilities["review-checkout"]["human_approval_required"] is True
+    guide_status = capabilities["review-checkout"]["integrity_status"]
+    assert "pending rotation" in guide_status["external_anchor"]
+    assert guide_status["current_end_to_end_level"].startswith("not re-verified")
     assert capabilities["run-workflow"]["human_arbitration_required"] is True
 
 
@@ -134,6 +138,22 @@ def test_public_discovery_links_expose_support_and_machine_resources():
         assert f"https://harnessie.com{path}" in llms
     assert "Contact support" in html
     assert "Report a vulnerability" in html
+    assert "GuideCheck Level&nbsp;4" not in html
+    assert "DNS re-anchor pending" in html
+    assert "opt-in containment" in html.lower()
+    assert "operator-trusted in-process code" in html
+    assert "Homebrew currently remains on 0.8.0" in html
+
+    sitemap = ET.parse(DOCS / "sitemap.xml")
+    namespace = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    locations = {
+        item.text for item in sitemap.findall("sm:url/sm:loc", namespace)
+    }
+    for page in (
+        "quickstart.html", "getting-started.html", "ladder.html", "guide.html",
+        "brains.html", "threat-model.html", "compare.html", "ringer.html",
+    ):
+        assert f"https://harnessie.com/{page}" in locations
 
 
 def test_trust_bundle_pins_all_machine_resources():

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <title>Harnessie: verifiable multi-agent AI on models you control</title>
-  <meta name="description" content="An open-source harness for multi-agent AI work you can trust in both directions: every result is independently verified, and sensitive data never leaves the models you control.">
+  <meta name="description" content="An open-source harness for governed multi-agent AI work: side-effecting worker phases are independently gated, child commands are confined, and opt-in containment keeps declared sensitive work on models you control.">
   <meta name="keywords" content="harnessie, multi-agent harness, agent orchestration, verification gate, brain-agnostic, model-agnostic agents, agent sandbox, prompt injection defense, agent ownership, audit log, consent-based orchestration, local LLM agents">
   <meta name="author" content="Sam Rogers">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -28,7 +28,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Harnessie">
   <meta property="og:title" content="Harnessie">
-  <meta property="og:description" content="Multi-agent AI work you can trust in both directions: independently verified results, and sensitive data that never leaves the models you control. Open source, Apache-2.0.">
+  <meta property="og:description" content="Governed multi-agent AI work with independent worker gates, confined child commands, human arbitration, and opt-in sensitive-data containment. Open source, Apache-2.0.">
   <meta property="og:image" content="https://harnessie.com/imgs/og.png">
   <meta property="og:image:alt" content="The Harnessie wordmark beside a green Loch Ness monster wearing a harness, rising from a line-art loch.">
   <meta property="og:image:width" content="1200">
@@ -36,7 +36,7 @@
   <meta property="og:url" content="https://harnessie.com/">
   <meta property="og:locale" content="en_US">
   <meta property="article:published_time" content="2026-07-06T00:00:00Z">
-  <meta property="article:modified_time" content="2026-08-04T00:00:00Z">
+  <meta property="article:modified_time" content="2026-08-09T00:00:00Z">
   <meta property="article:author" content="Sam Rogers">
   <meta property="article:publisher" content="https://snapsynapse.com/">
   <meta property="article:section" content="Developer Tools">
@@ -49,7 +49,7 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Harnessie">
-  <meta name="twitter:description" content="Multi-agent AI work you can trust in both directions: independently verified results, and sensitive data that never leaves the models you control. Open source, Apache-2.0.">
+  <meta name="twitter:description" content="Governed multi-agent AI work with independent worker gates, confined child commands, human arbitration, and opt-in sensitive-data containment. Open source, Apache-2.0.">
   <meta name="twitter:image" content="https://harnessie.com/imgs/og.png">
   <meta name="twitter:site" content="@snapsynapse">
   <meta name="twitter:creator" content="@snapsynapse">
@@ -65,13 +65,13 @@
     "@type": "TechArticle",
     "headline": "Harnessie",
     "alternativeHeadline": "A brain-agnostic multi-agent harness",
-    "description": "Harnessie is an open-source, brain-agnostic multi-agent harness for work you can trust in both directions. An orchestrator decomposes a goal into task packets, cheap workers execute them inside a jailed workspace, and an independent verifier gates every phase before the next begins, able only to pass or fail it. Sensitive data is contained: structured PII is stripped before any model sees it, secrets halt egress, and free-text-sensitive work stays on the models you control. Models are swapped by editing one YAML file; the gates, jails, budgets, ownership rules, containment boundary, and hash-chained audit log are the same underneath any brain.",
+    "description": "Harnessie is an open-source, brain-agnostic multi-agent harness. An orchestrator decomposes a goal into task packets, workers execute inside a jailed workspace, and deterministic checks plus an independent verifier gate side-effecting worker phases. Human-only in-run arbitration, declared budgets, ownership rules, and a hash-chained audit log stay consistent across configured models. The optional containment boundary strips structured PII and blocks secret egress; contained routing keeps declared free-text-sensitive work on controlled tiers.",
     "inLanguage": "en",
     "url": "https://harnessie.com/",
     "mainEntityOfPage": { "@type": "WebPage", "@id": "https://harnessie.com/" },
     "image": "https://harnessie.com/imgs/og.png",
     "datePublished": "2026-07-06",
-    "dateModified": "2026-08-04",
+    "dateModified": "2026-08-09",
     "author": {
       "@type": "Person",
       "name": "Sam Rogers",
@@ -355,6 +355,7 @@
         <div class="docs-menu">
           <a class="docs-item" href="/quickstart.html"><strong>Quickstart</strong><span>Never cloned a repo? Start here.</span></a>
           <a class="docs-item" href="/getting-started.html"><strong>Getting started</strong><span>Install to a green run in five minutes.</span></a>
+          <a class="docs-item" href="/ladder.html"><strong>Operating modes</strong><span>What is shipped, partial, experimental, or not yet implemented.</span></a>
           <a class="docs-item" href="/guide.html"><strong>User guide</strong><span>Concepts through extension.</span></a>
           <a class="docs-item" href="/compare.html"><strong>Compare</strong><span>Where Harnessie fits, and where it doesn't.</span></a>
           <a class="docs-item" href="/brains.html"><strong>Brains: the receipts</strong><span>Models proven under the harness.</span></a>
@@ -378,12 +379,12 @@
       <div>
         <div class="pill"><span class="dot"></span> v1.0.0 &middot; stable &middot; Apache-2.0</div>
         <h1>Put AI to work without giving up control.</h1>
-        <p class="subtitle">An open-source harness for multi-agent work you can trust in both directions: nothing counts as done until an independent verifier passes it, and nothing sensitive leaves the models you control. Run local, private, or frontier brains, swapped by one line.</p>
+        <p class="subtitle">An open-source harness for governed multi-agent work: side-effecting worker phases pass deterministic checks and an independent verifier, child commands run confined, and opt-in containment keeps declared sensitive work on models you control. Run local, private, or frontier brains, swapped by one line.</p>
         <div class="cta-row">
           <a href="#start" class="btn btn-primary">Install &amp; run your first workflow</a>
           <a href="https://github.com/snapsynapse/harnessie" class="btn btn-secondary" target="_blank" rel="noopener">Read the source</a>
         </div>
-        <p class="hero-note">The verifier can only pass or fail, never wave work through. Disagreements between agents are recorded, not averaged away. Every model earns its role by passing a scorecard. And because it's Apache-2.0 and self-hostable, the safety is something you can read, not something you take on faith.</p>
+        <p class="hero-note">A verifier cannot waive a failed gate. Disagreements between agents are recorded, not averaged away. Configured models are swappable; scorecard bundles and runtime records separately earn public evidence. Because Harnessie is Apache-2.0 and self-hostable, the mechanisms are available to inspect.</p>
       </div>
       <div class="hero-media">
         <img class="still" src="/imgs/og.png" alt="The Harnessie mascot: a green Loch Ness monster wearing a harness, rising from a line-art loch, beside the wordmark Harnessie.">
@@ -398,12 +399,12 @@
     </div>
 
     <div class="proof-strip">
-      <div class="chip"><b>&#10003;</b> GuideCheck Level&nbsp;4 &middot; <span class="m">0 blocking findings</span></div>
+      <div class="chip"><b>!</b> Guide bytes verified &middot; <span class="m">DNS re-anchor pending</span></div>
       <div class="chip"><b>8</b> providers &middot; <span class="m">11 models, verified work</span></div>
       <div class="chip"><b>&#10003;</b> Fails closed <span class="m">by default</span></div>
-      <div class="chip"><b>&#10003;</b> Sensitive data <span class="m">stays in models you control</span></div>
+      <div class="chip"><b>&#10003;</b> Opt-in containment <span class="m">keeps declared sensitive work controlled</span></div>
       <div class="chip"><b>&#10003;</b> Hash-chained <span class="m">audit log</span></div>
-      <div class="chip"><b>&#10003;</b> No network <span class="m">until you add a key</span></div>
+      <div class="chip"><b>&#10003;</b> Child network <span class="m">denied by default</span></div>
     </div>
   </div>
 </section>
@@ -421,10 +422,10 @@
       <div>
         <p class="eyebrow">What you can count on, every run</p>
         <div class="count-grid">
-          <div class="card"><h4>It asks first</h4><p>The AI can't change a file or run a command until you allow it. A declined offer is recorded, not overridden.</p></div>
+          <div class="card"><h4>It scopes first</h4><p>You authorize the run; a worker must accept its task packet before side-effecting tools unlock. Role, ownership, sandbox, and approval policy still mediate each call.</p></div>
           <div class="card"><h4>It checks its work</h4><p>Nothing is done until a separate, independent step confirms it. "It said it worked" is never enough.</p></div>
           <div class="card"><h4>You have the final say</h4><p>On a real judgment call the run stops and waits for a person. The machine never decides for you.</p></div>
-          <div class="card"><h4>It keeps the receipts</h4><p>Every action, AI or human, is written to a record you can read back and can't quietly alter.</p></div>
+          <div class="card"><h4>It keeps the receipts</h4><p>Agent and operator events enter a hash-chained record. Edits to existing history break verification; preventing a complete history rewrite requires an external anchor.</p></div>
         </div>
       </div>
     </div>
@@ -436,7 +437,7 @@
   <div class="container">
     <h2 style="margin-bottom:1rem;">How it works</h2>
     <div class="two-col" style="align-items:center; margin-bottom:2rem;">
-      <p class="lede">Harnessie splits a job across three kinds of agent and puts a checkpoint between every step. An orchestrator plans; workers do the tasks one at a time in a sealed workspace; a verifier checks each result on its own, without seeing how the worker got there, and can only pass or fail it, never wave it through. Here's a real run, start to finish:</p>
+      <p class="lede">Harnessie splits a job across three kinds of agent and puts a checkpoint after side-effecting worker phases. An orchestrator plans; workers do scoped tasks in a confined workspace; deterministic checks and a fresh-context verifier independently gate each worker result. Here is an illustrative run:</p>
       <div class="terminal">
         <div class="bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="t">harnessie &middot; run</span></div>
         <div class="body">
@@ -477,31 +478,31 @@
 <section id="start">
   <div class="container">
     <h2 style="margin-bottom:1rem;">Quick start</h2>
-    <p class="lede" style="max-width:760px; margin-bottom:1.75rem;">Two ways in. The safest starts with an AI assistant you already use, because it has to verify Harnessie and get your explicit yes before it touches anything. That's the whole idea, working before you've installed a thing.</p>
+    <p class="lede" style="max-width:760px; margin-bottom:1.75rem;">Two ways to review and install. The assistant guide authorizes only bounded read-only inspection. Installation, execution, or mutation is a separate task that still requires your explicit approval.</p>
 
     <div class="install-featured">
-      <div class="featured-badge"><span class="dot"></span> The Easiest Way now made Safer</div>
-      <h3>Let an AI assistant install it, under a guide it must verify first</h3>
-      <p class="lede">Already working with an AI assistant? Don't let it improvise an install from a web search. Point it at Harnessie's assistant guide:</p>
+      <div class="featured-badge"><span class="dot"></span> Read-only assistant review</div>
+      <h3>Let an AI assistant inspect the evidence before you install</h3>
+      <p class="lede">Already working with an AI assistant? Point it at Harnessie's bounded review guide before deciding whether to install:</p>
       <div class="cmd-row">
         <code class="cmd"><span class="p">&rsaquo;</span> Fetch and follow https://harnessie.com/.well-known/assistant-guide.txt</code>
         <button type="button" class="copy-btn" data-copy="Fetch and follow https://harnessie.com/.well-known/assistant-guide.txt">Copy prompt</button>
       </div>
-      <p class="lede" style="font-size:0.86rem; max-width:720px; margin-bottom:1rem;">It's a <a href="https://guidecheck.org/" target="_blank" rel="noopener">GuideCheck</a> Level&nbsp;4 plain-text file: the bytes your assistant reads are the bytes you read, with no hidden instructions a web page could smuggle past you. It must verify the guide (reporting conformance level and SHA-256, cross-checked against a DNS-published hash), then ask your explicit approval before acting.</p>
+      <p class="lede" style="font-size:0.86rem; max-width:720px; margin-bottom:1rem;">The 1.0.0 plain-text guide is byte-identical across the repository and served copy, and its sidecar reports the same SHA-256. The independent DNS anchor still names the prior guide hash, so current end-to-end <a href="https://guidecheck.org/" target="_blank" rel="noopener">GuideCheck</a> Level&nbsp;4 is pending re-verification. The guide requires the assistant to report the achieved level and hash, then get approval before its read-only review. It authorizes no install or run.</p>
       <div class="trust-chips">
         <span class="trust-chip"><b>&#10003;</b> Verifies before it acts</span>
         <span class="trust-chip"><b>&#10003;</b> Read-only until you approve</span>
-        <span class="trust-chip"><b>&#10003;</b> Nothing installs, runs, or spends without your yes</span>
+        <span class="trust-chip"><b>&#10003;</b> Install and execution remain separate approvals</span>
       </div>
     </div>
 
     <h3 class="sub-head">Or install it yourself</h3>
-    <p class="muted" style="max-width:760px; margin-bottom:1.25rem;">Requires Python 3.11+ and PyYAML. The model adapters are standard-library, with no vendor SDK. The test suite and eval scorecard run against a deterministic mock brain with no network, so you can prove the harness works before any API key is involved.</p>
+    <p class="muted" style="max-width:760px; margin-bottom:1.25rem;">Requires Python 3.11+; PyYAML and jsonschema install automatically. The model adapters are standard-library, with no vendor SDK. The test suite and eval scorecard use a deterministic mock brain with no provider calls.</p>
 
     <div class="install-line">
       <code class="oneliner"><span class="p">$</span> pip install harnessie</code>
       <button type="button" class="copy-btn ghost" data-copy="pip install harnessie">Copy</button>
-      <span class="muted">&hellip; or pipx / uv / brew</span>
+      <span class="muted">&hellip; or pipx / uv. Homebrew currently remains on 0.8.0.</span>
     </div>
 
     <div class="two-col code-grid">
@@ -540,7 +541,7 @@ routing:
 <section id="trust" class="alt">
   <div class="container">
     <h2 style="margin-bottom:1rem;">Guarantees, enforced in code, not policy</h2>
-    <p class="lede" style="max-width:760px; margin-bottom:1.5rem;">Every promise above lives at the tool layer, where no prompt can switch it off. The mechanisms are the product, not a wrapper around it.</p>
+    <p class="lede" style="max-width:760px; margin-bottom:1.5rem;">Core registry, gate, sandbox, ownership, and audit controls live below prompts. Optional containment must be enabled, and admitted plugin implementations are operator-trusted in-process code outside child-process confinement.</p>
 
     <div class="enforce-grid">
       <div class="enforce-row"><code>consent</code><span>Task packets are offers. Side-effecting tools stay locked until a worker accepts; declining is first-class and never punished.</span></div>
@@ -584,6 +585,7 @@ routing:
         <span class="head">Get started</span>
         <a href="/quickstart.html">Quickstart</a>
         <a href="/getting-started.html">Getting started</a>
+        <a href="/ladder.html">Operating modes</a>
         <a href="#start">Install</a>
         <a href="#how">How it works</a>
       </div>
@@ -595,6 +597,8 @@ routing:
         <a href="https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
         <a href="/changelog.json">Machine-readable changes</a>
         <a href="/api/v1/index.json">CLI interface manifest</a>
+        <a href="https://github.com/snapsynapse/harnessie/blob/main/SCHEMA_COMPATIBILITY.md" target="_blank" rel="noopener">Schema compatibility</a>
+        <a href="https://github.com/snapsynapse/harnessie/blob/main/PLUGIN_CONTRACT.md" target="_blank" rel="noopener">Plugin contract</a>
       </div>
       <div class="foot-col">
         <span class="head">Project</span>

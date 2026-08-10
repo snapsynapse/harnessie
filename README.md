@@ -11,9 +11,11 @@ Beneath that thesis sit five engineering habits, each proven separately in the a
 ## Quick start
 
 ```bash
-pip install harnessie                # or: pipx / uv tool install / brew install snapsynapse/tap/harnessie
+pip install harnessie                # or: pipx install / uv tool install
 harnessie init my-project            # scaffold + guided readiness check + zero-dollar mock run
 ```
+
+PyPI carries the current 1.0.0 core release. The separately maintained Homebrew formula still installs 0.8.0 until its own release train is completed; see [NEXT.md](NEXT.md) for current downstream status.
 
 To gate pull requests on claim-by-claim verification without installing anything locally, the standalone verifier also ships as a GitHub Action: [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify) (one workflow file; the PR body is treated as claims to test, and the exit code gates the merge).
 
@@ -42,7 +44,7 @@ Worked end-to-end example with sample data: [examples/policy-compliance/README.m
 - [docs/GUIDE.md](docs/GUIDE.md): the complete user guide, concepts through extension, including workflow authoring, brain configuration, ownership, governance, and the halt-recovery table.
 - [PLUGIN_CONTRACT.md](PLUGIN_CONTRACT.md): the versioned, opt-in tool extension contract and its explicit in-process trust boundary.
 - [docs/brains.md](docs/brains.md): the brain-agnostic receipt, the models actually run under the harness with a link to the record that proves each.
-- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run — verified end-to-end at GuideCheck Level 4 (hosted verifier, zero blocking findings); served at [harnessie.com/.well-known/assistant-guide.txt](https://harnessie.com/.well-known/assistant-guide.txt) with a provenance sidecar and an independent DNS TXT anchor.
+- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run. The served 1.0.0 guide and provenance sidecar agree, but the independent DNS TXT anchor still names the prior guide hash, so the current guide has not yet re-earned end-to-end GuideCheck Level 4.
 - [docs/agents.json](docs/agents.json), [docs/api/v1/index.json](docs/api/v1/index.json), [docs/changelog.json](docs/changelog.json), and [docs/.well-known/security.txt](docs/.well-known/security.txt): machine-readable capability, local CLI, release-history, and private security-report handoffs. The declarations explicitly do not advertise a hosted API, service, or MCP server.
 
 The engineering references below (ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP) sit at the repo root; the user-facing guides live under `docs/`.
@@ -125,7 +127,7 @@ A run's behavior is not in one file; each decision has one owner. To predict or 
 
 ## When a run halts
 
-Silence is never success: every run ends in a named stop condition, and each maps to one operator action. Resuming is `harnessie run <same workflow> --goal ...` with the same run id: resume re-runs only phases that did not pass, so fixing the cause and re-running is safe.
+Silence is never success: every run ends in a named stop condition, and each maps to one operator action. Resume with `harnessie resume <run_id> <same workflow> --goal ...`; it re-runs only phases that did not pass, so fixing the cause and resuming is safe.
 
 | Stop condition | What it means | What to do |
 |---|---|---|

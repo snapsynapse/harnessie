@@ -39,9 +39,8 @@ PAGES = {
         "point it at a model, run a real job, and read the record it leaves."),
     "ladder.md": (
         "ladder.html", "Modes",
-        "The ease-and-safety ladder: Harnessie's five run modes, from watching "
-        "a mock harness to an agent-mediated run, each stating what is real and "
-        "which risk you accept, with a human-only arbitration invariant across all."),
+        "Harnessie's operating-mode ladder, with shipped, partial, unshipped, "
+        "and experimental states distinguished from product intent."),
     "GUIDE.md": (
         "guide.html", "User guide",
         "The complete Harnessie user guide: concepts, CLI, workflow authoring, "
@@ -373,7 +372,7 @@ TEMPLATE = """<!DOCTYPE html>
     <div class="row">
 {footerlinks}
     </div>
-    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="{srcurl}" target="_blank" rel="noopener">{srcname}</a>.</p>
+    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com/" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="{srcurl}" target="_blank" rel="noopener">{srcname}</a>.</p>
   </div>
 </footer>
 {script}

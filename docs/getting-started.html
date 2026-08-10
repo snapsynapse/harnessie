@@ -125,13 +125,14 @@
     <p class="crumb"><a href="/">harnessie.com</a> &nbsp;/&nbsp; docs &nbsp;/&nbsp; Getting started</p>
     <h1>Getting started with Harnessie</h1>
 <p>This is the five-minute path: install, prove the harness works offline, point it at a model, run a real job, and read the record it leaves behind. The full reference is <a href="/guide.html">the user guide</a>.</p>
-<p>New to this? You are welcome here. A harness is the structure you put around an AI model so it can do real work while you stay in control: it sets what the AI may do, checks the work before moving on, and writes down what happened. Harnessie is built to be a safe first one. This guide uses a terminal, but every command below is safe to run, and nothing reaches the network until you choose to add a key. If you have never used a terminal or cloned a repository, start with the gentler <a href="/quickstart.html">quickstart</a>, which assumes no git or shell fluency and includes a glossary and a Windows/WSL2 page.</p>
+<p>New to this? You are welcome here. A harness is the structure you put around an AI model so it can do real work while you stay in control: it sets what the AI may do, checks the work before moving on, and writes down what happened. Harnessie is built to be a safe first one. Installation reaches the package index, but the offline verification commands and guided mock run call no AI provider. Provider access begins only when you configure and opt into it. If you have never used a terminal or cloned a repository, start with the gentler <a href="/quickstart.html">quickstart</a>, which assumes no git or shell fluency and includes a glossary and a Windows/WSL2 page.</p>
 <p>In more technical terms: Harnessie is a brain-agnostic multi-agent harness. An orchestrator decomposes a goal into task packets, cheap workers execute them inside a jailed workspace, and an independent verifier gates every phase before the next one starts. The structure carries the quality floor; the model carries the ceiling. You swap models by editing one YAML file.</p>
 <h2 id="1-install">1. Install</h2>
-<p>Requires Python 3.11 or newer. The only runtime dependency is PyYAML; the model adapters are standard-library, so no vendor SDK is needed.</p>
-<pre><code>pip install harnessie          # or: pipx / uv tool install / brew install snapsynapse/tap/harnessie
+<p>Requires Python 3.11 or newer. PyYAML and jsonschema install automatically; the model adapters are standard-library, so no vendor SDK is needed.</p>
+<pre><code>pip install harnessie          # or: pipx install / uv tool install
 harnessie init my-project      # scaffold + guided readiness check + zero-dollar mock run
 cd my-project</code></pre>
+<p>The separately maintained Homebrew formula still installs Harnessie 0.8.0. Use PyPI for the current 1.0.0 core release until the Homebrew release train catches up.</p>
 <p>Working on Harnessie itself (or wanting the test suite)? Install from source instead:</p>
 <pre><code>git clone https://github.com/snapsynapse/harnessie.git
 cd harnessie
@@ -167,7 +168,7 @@ python3 -m harness.cli audit  &lt;run_id&gt;   # verify the hash chain + governa
 <h2 id="6-when-a-run-stops">6. When a run stops</h2>
 <p>Silence is never success. Every run ends in a named stop condition, and each maps to one operator action. The common ones:</p>
 <ul><li><code>complete</code>: the goal was met and every gate passed. Nothing to do.</li><li><code>needs_human</code>: a gate failed after the retry ladder was exhausted. Read the proofs under <code>runs/&lt;id&gt;/proofs/</code>, fix the task or the acceptance criteria, and re-run.</li><li><code>needs_approval</code>: a new phase contract produced verified staged output. Inspect the <code>.maiden/</code> path named in the report, run the reported <code>approve-maiden</code> command, then resume.</li><li><code>needs_arbitration</code>: a contested decision produced dissent. Open <code>runs/&lt;id&gt;/decisions/DR-&lt;phase&gt;.md</code>, record your decision in it, and re-run.</li><li><code>budget</code> or <code>max_steps</code>: the run hit a ceiling. Raise it in <code>config/models.yaml</code> or the phase, or narrow the goal.</li></ul>
-<p>Re-running is safe: resume re-runs only the phases that did not pass. The full table is in <a href="/guide.html#when-a-run-halts">the user guide</a>.</p>
+<p>Resume with <code>harnessie resume &lt;run_id&gt; &lt;workflow&gt; --goal &quot;...&quot;</code>. It re-runs only the phases that did not pass. The full table is in <a href="/guide.html#when-a-run-halts">the user guide</a>.</p>
 <h2 id="7-start-your-own-project">7. Start your own project</h2>
 <p>To scaffold a fresh project layout (config, workflows, agents, ownership) rather than working inside this repo:</p>
 <pre><code>harnessie init my-project</code></pre>
@@ -186,7 +187,7 @@ python3 -m harness.cli audit  &lt;run_id&gt;   # verify the hash chain + governa
       <a href="/threat-model.html">Threat model</a>
       <a href="/compare.html">Compare</a>
     </div>
-    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/getting-started.md" target="_blank" rel="noopener">docs/getting-started.md</a>.</p>
+    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com/" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/getting-started.md" target="_blank" rel="noopener">docs/getting-started.md</a>.</p>
   </div>
 </footer>
 

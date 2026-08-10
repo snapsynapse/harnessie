@@ -21,7 +21,12 @@
       "entrypoint": "https://harnessie.com/.well-known/assistant-guide.txt",
       "description": "A bounded GuideCheck guide for inspecting a checkout and reporting evidence before a human authorizes any action.",
       "human_approval_required": true,
-      "side_effects": "none before explicit human approval"
+      "side_effects": "The guide authorizes read-only inspection only. Installation, code execution, and mutation require a separate human-approved task.",
+      "integrity_status": {
+        "served_copy": "byte-identical to the repository guide and provenance sidecar",
+        "external_anchor": "pending rotation: DNS still names the prior guide hash",
+        "current_end_to_end_level": "not re-verified for guide 1.0.0"
+      }
     },
     {
       "id": "verify-claims",
@@ -68,6 +73,8 @@
     "security": "https://harnessie.com/.well-known/security.txt",
     "documentation": "https://harnessie.com/guide.html",
     "workflow_schema": "https://harnessie.com/schemas/v1/workflow.schema.json",
+    "schema_compatibility": "https://github.com/snapsynapse/harnessie/blob/main/SCHEMA_COMPATIBILITY.md",
+    "plugin_contract": "https://github.com/snapsynapse/harnessie/blob/main/PLUGIN_CONTRACT.md",
     "quickstart": "https://harnessie.com/quickstart.html"
   },
   "support": {

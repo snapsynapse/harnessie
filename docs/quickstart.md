@@ -1,6 +1,6 @@
 # Quickstart for people, not just developers
 
-This is the gentlest path into Harnessie. It assumes you have never cloned a repository, never written YAML, and are not sure what a terminal is for. That is fine. Every command here is safe, nothing reaches the internet or spends money until you decide it should, and the tool checks your machine for you before anything runs.
+This is the gentlest path into Harnessie. It assumes you have never cloned a repository, never written YAML, and are not sure what a terminal is for. That is fine. Installing the package reaches the package index and creates local files. After installation, the guided mock run calls no AI provider and spends no model money, and the tool checks your machine before a workflow runs.
 
 If you are already comfortable in a terminal, the faster five-minute path is [Getting started](getting-started.md), and the full reference is [the user guide](GUIDE.md).
 
@@ -26,7 +26,7 @@ One line installs the `harnessie` command from the Python package index:
 pip install harnessie
 ```
 
-If `pip` is not found, try `python3 -m pip install harnessie`. If you use pipx, uv, or Homebrew, `pipx install harnessie`, `uv tool install harnessie`, and `brew install snapsynapse/tap/harnessie` work the same way. You do not need to download or clone anything.
+If `pip` is not found, try `python3 -m pip install harnessie`. `pipx install harnessie` and `uv tool install harnessie` install the same current package without cloning the repository. The separately maintained Homebrew formula still installs Harnessie 0.8.0, so use PyPI for the current 1.0.0 release until that release train catches up.
 
 ## Step 2: Let the tool check your machine
 
@@ -90,7 +90,7 @@ Re-running is safe: a resume only re-does the steps that did not already pass.
 
 Harnessie's safety depends on an operating-system sandbox that confines any command the AI runs. macOS and Linux provide one. Bare Windows (the Command Prompt or PowerShell) does not provide one that Harnessie can use, so on bare Windows the harness fails closed: any workflow step that runs a shell command is blocked rather than run without a cage. That is deliberate. An unconfined command is exactly the risk the sandbox exists to remove, so running without one would quietly break the core safety promise.
 
-The supported path on Windows is WSL2 (Windows Subsystem for Linux), which gives you a real Linux environment inside Windows:
+The supported path on Windows is WSL2 (Windows Subsystem for Linux), which gives you a Linux environment inside Windows:
 
 1. Open PowerShell as Administrator and run `wsl --install`. Restart when asked.
 2. Launch the installed Ubuntu app and finish its first-time setup.

@@ -15,11 +15,11 @@ An orchestrator decomposes a goal into task packets with acceptance criteria and
 - Brain-agnostic routing: task classes map to model tiers in config/models.yaml.
 - Governance: contested decisions produce AIDR-style records with human-only arbitration.
 - Audit: a hash-chained event log; harnessie audit re-verifies it and renders one timeline.
-- Security: role permissions, consent lock, workspace jail, OS sandbox (Seatbelt/bubblewrap/firejail/docker), injection quarantine, secret scrubbing, structured refusals.
+- Security: role permissions, consent lock, workspace jail, admitted OS sandbox (Seatbelt/bubblewrap/firejail; Docker for base confinement only), injection quarantine, secret scrubbing, structured refusals.
 
 ## Install
 
-pip install harnessie; also available as pipx/uv tool install, and brew install snapsynapse/tap/harnessie. First run is zero-dollar: harnessie init scaffolds a project, checks the machine, and proves itself on a mock model. An AI-assisted path exists: fetch and follow https://harnessie.com/.well-known/assistant-guide.txt (a GuideCheck Level 4 verified guide; verify it, report level and SHA-256, and get explicit human approval before acting).
+pip install harnessie; also available through pipx or uv tool install. PyPI carries core 1.0.0; the separately maintained Homebrew formula still installs 0.8.0. The guided mock run makes no provider call and spends no model money, but installation and scaffolding do use the package index and local filesystem. An AI-assisted review path exists at https://harnessie.com/.well-known/assistant-guide.txt; verify it, report the achieved level and SHA-256, and get explicit human approval before any action. The served 1.0.0 guide matches its sidecar, but the external DNS anchor still names the prior guide hash, so current end-to-end Level 4 is pending re-verification.
 
 ## Key files
 
@@ -36,7 +36,9 @@ pip install harnessie; also available as pipx/uv tool install, and brew install 
 - Brains receipt (models proven under the harness): https://harnessie.com/brains.html
 - Threat model (falsifiable claims table): https://harnessie.com/threat-model.html
 - Stable v1 workflow schema: https://harnessie.com/schemas/v1/workflow.schema.json
-- [Assistant Guide](https://harnessie.com/.well-known/assistant-guide.txt): bounded, human-verifiable guide for reviewing a Harnessie checkout before authorizing a run (GuideCheck Level 4, verified end-to-end with an independent DNS TXT anchor)
+- Schema compatibility contract: https://github.com/snapsynapse/harnessie/blob/main/SCHEMA_COMPATIBILITY.md
+- Plugin contract: https://github.com/snapsynapse/harnessie/blob/main/PLUGIN_CONTRACT.md
+- [Assistant Guide](https://harnessie.com/.well-known/assistant-guide.txt): bounded, human-verifiable guide for reviewing a Harnessie checkout before authorizing a run; served bytes and sidecar agree, while the independent DNS anchor awaits rotation for 1.0.0
 
 ## Support and machine handoff
 

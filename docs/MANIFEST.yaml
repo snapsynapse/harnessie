@@ -10,13 +10,13 @@ files:
   - path: docs/.well-known/security.txt
     sha256: 8987609c662c5b80d92843e8cb00489c281470a091e808bd7a1cee5aa0fe1387
   - path: docs/agents.json
-    sha256: e83e97a44d20bd6abbfdd51402e79977e9d026034be2d44528d077032bb65d7c
+    sha256: ac927f89d93ab2a692a0ef6300ac1ec6d4ed7af72aa2c524510b067a26f6b2a0
   - path: docs/api/v1/index.json
     sha256: 6258a67a9aecab5c8fb4a2335e763b5b520025bc0b0a679791ae99eeb17bc2e7
   - path: docs/changelog.json
-    sha256: b3911381eff376b6b4fc3e6ea37e214dd5bc74ee4e606e1890f3ed1de813cc19
+    sha256: b3b47ff5a1f09225c77d498210b3ad5f6cff4c1d0f3a4c28c1669db3ae80e971
   - path: docs/llms.txt
-    sha256: c27f8687ca754d832785e66f5fd160a8e97b6e532223ab82d4ef86e28319f3e9
+    sha256: 69149b58a8f718b6db0e9382b1baca341788b5303b484ae4565cdf47a64274f6
   - path: docs/robots.txt
     sha256: 88588b10d194d3d62ad9a4463f05a80f645ed1e7b23c59b10087cb28dd5a57f6
   - path: docs/schemas/v1/approval-policy.schema.json
@@ -32,7 +32,7 @@ files:
   - path: docs/schemas/v1/workflow.schema.json
     sha256: 0797501a99b1b4d1086ddca1987fb674775eb3f6975905f4d863bb3f08966a76
   - path: docs/sitemap.xml
-    sha256: 8c339c4299d7f700310aadfe401a51a51499ee9584e400849f2e625e2554def4
+    sha256: a312dbd1b4feeed7cfa45fe54c155a4f6b5200cfeb8678f8e31df9f8e221ffdd
   - path: docs/CNAME
     sha256: 6dc81288045a60be46e3eaf407380328466b8ce98c769fe1e637f69c97d5a97a
   - path: docs/site.webmanifest
