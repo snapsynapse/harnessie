@@ -68,6 +68,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Verify generated docs and offline search contract
+        run: |
+          python scripts/build_docs_html.py --check
+          node scripts/check-search.mjs
       - run: python -m pip install -e ".[dev]"
       - name: Build, inspect, and fresh-install release artifacts
         run: python scripts/release_gate.py --skip-core

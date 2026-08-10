@@ -1,0 +1,62 @@
+{
+  "$schema": "portfolio-search-indexing-audit/v2",
+  "contractVersion": 2,
+  "canonicalOrigin": "https://harnessie.com/",
+  "outputDir": "docs",
+  "sitemaps": [
+    "sitemap.xml"
+  ],
+  "minimumWords": 120,
+  "thinPageExemptions": [],
+  "expectedNoindex": [
+    "/404.html"
+  ],
+  "requireJsonLd": true,
+  "internalSourceRules": [],
+  "requiredFiles": [
+    {
+      "path": "robots.txt",
+      "contentTypes": [
+        "text/plain"
+      ],
+      "contains": [
+        "Sitemap: https://harnessie.com/sitemap.xml"
+      ]
+    },
+    {
+      "path": "sitemap.xml",
+      "contentTypes": [
+        "xml"
+      ],
+      "contains": []
+    },
+    {
+      "path": "favicon.svg",
+      "contentTypes": [
+        "image",
+        "svg",
+        "octet-stream"
+      ],
+      "contains": []
+    }
+  ],
+  "redirects": [
+    {
+      "from": "http://harnessie.com/",
+      "to": "https://harnessie.com/"
+    },
+    {
+      "from": "https://www.harnessie.com/",
+      "to": "https://harnessie.com/"
+    },
+    {
+      "from": "http://www.harnessie.com/",
+      "to": "https://harnessie.com/"
+    }
+  ],
+  "hosted404Patterns": [
+    "There isn't a GitHub Pages site here",
+    "<title>Page not found",
+    "404 File not found"
+  ]
+}

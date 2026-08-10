@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import html
+import json
 import re
 from pathlib import Path
 
@@ -343,6 +344,7 @@ TEMPLATE = """<!DOCTYPE html>
   <meta name="twitter:title" content="{title} &mdash; Harnessie">
   <meta name="twitter:description" content="{description}">
   <meta name="twitter:image" content="https://harnessie.com/imgs/og.png">
+  <script type="application/ld+json">{json_ld}</script>
   <style>{styles}</style>
 </head>
 <body>
@@ -418,10 +420,48 @@ def render_pages() -> dict[Path, str]:
         footerlinks = "\n".join(
             f'      <a href="/{o}">{lbl}</a>'
             for k, (o, lbl, _) in PAGES.items() if k not in HIDDEN)
+        canonical = f"{SITE}/{out_name}"
+        json_ld = {
+            "@context": "https://schema.org",
+            "@graph": [
+                {
+                    "@type": "WebPage",
+                    "@id": canonical,
+                    "url": canonical,
+                    "name": f"{label} - Harnessie",
+                    "description": description,
+                    "isPartOf": {
+                        "@type": "WebSite",
+                        "@id": f"{SITE}/#website",
+                        "url": f"{SITE}/",
+                        "name": "Harnessie",
+                    },
+                    "inLanguage": "en",
+                },
+                {
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        {
+                            "@type": "ListItem",
+                            "position": 1,
+                            "name": "Harnessie",
+                            "item": f"{SITE}/",
+                        },
+                        {
+                            "@type": "ListItem",
+                            "position": 2,
+                            "name": label,
+                            "item": canonical,
+                        },
+                    ],
+                },
+            ],
+        }
         page = TEMPLATE.format(
             title=html.escape(label),
             description=html.escape(description),
-            canonical=f"{SITE}/{out_name}",
+            canonical=canonical,
+            json_ld=json.dumps(json_ld, ensure_ascii=False, separators=(",", ":")),
             styles=STYLES,
             navlinks=navlinks,
             footerlinks=footerlinks,

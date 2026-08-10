@@ -6,6 +6,7 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ### Fixed
 
+- Search indexing now has repository-owned offline and production contracts, CI checks generated search output, all nine canonical pages carry valid structured data and crawl-visible discovery, and the dated Google Search Console baseline distinguishes intentional redirects and decorative-video noise from defects.
 - Documentation and public agent surfaces now distinguish shipped core 1.0.0 from the still-lagging Homebrew and Verify Action release trains, use the actual `harnessie resume` syntax, name both runtime dependencies, and mark the plugin contract stable for 1.x.
 - Current-guide trust copy no longer claims end-to-end GuideCheck Level 4 while the external DNS TXT anchor still names the prior guide hash. Public and machine-readable surfaces distinguish byte-identical served provenance from pending independent re-anchoring.
 - Website safety copy now scopes the containment boundary as opt-in, distinguishes configured models from models with earned evidence, and removes unsupported claims that every side effect is interactively approved or that an external delegated operator can be authenticated as human or agent.

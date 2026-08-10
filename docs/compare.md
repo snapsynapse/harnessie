@@ -6,6 +6,8 @@ Agent frameworks answer one question well: how do several agents work together? 
 
 You can use Harnessie's ideas next to an orchestrator, or use Harnessie as the harness. This page is about where it fits, and where it honestly does not.
 
+For one concrete pairing, see how [Harnessie and Ringer](ringer.md) combine Ringer's parallel execution with Harnessie's governance and independent verification.
+
 ## Three categories, not one race
 
 - Orchestration frameworks (LangGraph, CrewAI, AutoGen / AG2, the OpenAI and Claude Agent SDKs). Best at composing multi-agent workflows: handoffs, group chat, hierarchical managers, optional critic and reflection agents. Their collaboration is cooperative by design. Agents help each other converge.
