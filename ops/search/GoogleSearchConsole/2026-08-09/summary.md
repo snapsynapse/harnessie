@@ -26,8 +26,11 @@ Indexed examples and last crawl dates:
 
 ## Sitemaps
 
-- Submitted sitemaps: none.
-- Required follow-up: after the repaired production contract passes, submit `https://harnessie.com/sitemap.xml`.
+- `https://harnessie.com/sitemap.xml` submitted 2026-08-09.
+- Last read: 2026-08-09.
+- Status: `Success`.
+- Discovered pages: 9.
+- Discovered videos: 0.
 
 ## Video indexing
 
@@ -51,9 +54,16 @@ Report last update: 2026-08-05
 - Production during the audit: the sitemap moved from 8 to 9 pages after commit `b1fb1c7`; all 9 routes and canonical redirects were healthy, but the 8 generated documentation pages still lacked the new JSON-LD.
 - Console discovery predates the 9-page sitemap and reports only 5 canonical indexed pages plus 3 intentional redirects.
 
-## Pending sequence
+## Completed actions
 
-1. Deploy the JSON-LD, internal-discovery, and deterministic search-contract changes.
-2. Run `node scripts/check-production-search.mjs` until production reports 9 pages and 0 defects.
-3. Submit `https://harnessie.com/sitemap.xml` in GSC.
-4. Inspect the four canonical pages absent from the 2026-08-06 Page indexing report and request indexing only where the live inspection is eligible.
+1. Deployed the JSON-LD, internal-discovery, and deterministic search-contract changes in commit `47f7ec3`.
+2. Verified production at 9 sitemap pages, 0 defects, and 0 infrastructure failures.
+3. Submitted `https://harnessie.com/sitemap.xml`; GSC read it successfully and discovered all 9 pages.
+4. Inspected `/guide.html`, `/ladder.html`, `/brains.html`, and `/ringer.html`. Each was `Discovered - currently not indexed`, had no prior crawl, and was eligible for indexing.
+5. Requested indexing for all four pages; GSC confirmed that each entered the priority crawl queue.
+
+## Remaining state
+
+- Wait for Google to crawl and adjudicate the four requested canonical pages.
+- Do not repeatedly request indexing; repeated submissions do not change queue priority.
+- Recheck after the Page indexing report updates beyond 2026-08-06. A delayed report is pending recrawl, not a current site defect.

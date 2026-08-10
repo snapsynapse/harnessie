@@ -6,7 +6,7 @@ status: active
 updated: 2026-08-09
 owner: "Harnessie maintainers"
 open_tasks:
-  - "Deploy the local search repair, verify production, and submit the sitemap in Google Search Console."
+  - "Monitor the four requested canonical pages after Google updates the Page indexing report beyond 2026-08-06."
 ---
 # Search indexing
 
@@ -54,5 +54,7 @@ Exit code `0` is pass, `1` is a site defect, and `2` is configuration or infrast
 ## Current baseline
 
 - Repository baseline on 2026-08-09: nine intended canonical HTML pages after adding `/ringer.html`.
-- Production before this change: eight sitemap pages, canonical HTTPS redirects healthy, real 404 behavior healthy, and the served documentation pages lacked JSON-LD.
+- Production after commit `47f7ec3`: nine sitemap pages, 0 contract defects, canonical HTTPS redirects healthy, real 404 behavior healthy, and all sitemap pages carry valid JSON-LD.
 - Google Search Console baseline: `ops/search/GoogleSearchConsole/2026-08-09/summary.md`.
+- GSC sitemap status: `Success`, last read 2026-08-09, 9 discovered pages.
+- Indexing requested for `/guide.html`, `/ladder.html`, `/brains.html`, and `/ringer.html`; all four are pending recrawl.
