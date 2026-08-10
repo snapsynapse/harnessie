@@ -16,6 +16,7 @@ Subsystem map (each module is one explicit boundary):
     inward_manifest.py Hash-pinned prompt/config/ownership inputs checked before dispatch
     maiden.py     Staged first execution and operator promotion for new phase contracts
     ownership.py  Ownership lanes: agents own their files, never each other's
+    plugins.py    Explicit operator-trusted tool plugin admission and resume identity
     adversarial.py Contested phases: positions, objections, decision records, lint
     audit.py      Hash-chain verification + governance timeline for any run
     runner.py     WorkflowRunner: executes workflows/*.yaml phase by phase through gates
@@ -25,4 +26,4 @@ Security model: SECURITY.md. Architecture and source map: ARCHITECTURE.md.
 Governance layer (consent, ownership, contest, audit): GOVERNANCE.md.
 """
 
-__version__ = "0.8.0"
+__version__ = "1.0.0"

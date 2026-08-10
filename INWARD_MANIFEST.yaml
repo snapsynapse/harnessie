@@ -30,6 +30,6 @@ files:
 - path: harness/schemas/v1/models.schema.json
   sha256: ebb3c9bc4876cd5833c66cdf6c2d79e65cb81fcd6aac7387db2404e2acb0c67a
 - path: harness/schemas/v1/ownership.schema.json
-  sha256: ee1bf26278290a838a3e70ec52d4f6c840b93e433aa1f958ec2d7d8fd12582de
+  sha256: b0a7eedcec428585f4b7c9c62fcbd878dabd8aee6e12b8ea8de07b69616a7832
 - path: harness/schemas/v1/workflow.schema.json
   sha256: 0797501a99b1b4d1086ddca1987fb674775eb3f6975905f4d863bb3f08966a76

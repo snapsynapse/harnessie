@@ -66,7 +66,8 @@ class Verdict:
 def run_checks(checks: list[Check], workspace: Path, proofs: ProofStore,
                events: EventLog, attempt: int,
                allow_network: bool = False,
-               blast_radius: PhaseBlastRadius | None = None) -> list[CheckResult]:
+               blast_radius: PhaseBlastRadius | None = None,
+               readonly_paths: tuple[Path, ...] = ()) -> list[CheckResult]:
     from .sandbox import SandboxUnavailable, wrap as sandbox_wrap
     from .tools.builtin import scrubbed_env
     results = []
@@ -74,8 +75,12 @@ def run_checks(checks: list[Check], workspace: Path, proofs: ProofStore,
         try:
             # Checks run agent-produced code (pytest imports the workspace), so
             # they are sandboxed exactly like run_shell and fail closed with it.
-            sandboxed = sandbox_wrap(shlex.split(check.command), workspace,
-                                     allow_network=allow_network)
+            argv = shlex.split(check.command)
+            sandboxed = (sandbox_wrap(
+                argv, workspace, allow_network=allow_network,
+                readonly_paths=readonly_paths)
+                if readonly_paths else
+                sandbox_wrap(argv, workspace, allow_network=allow_network))
             def apply_check():
                 return subprocess.run(
                     sandboxed, cwd=workspace, capture_output=True, text=True,
@@ -184,6 +189,7 @@ class VerificationGate:
         # default — byte-identical to the pre-cascade ladder.
         escalate_fn: Callable[[Route, "Verdict"], Route | None] | None = None,
         blast_radius: PhaseBlastRadius | None = None,
+        readonly_paths: tuple[Path, ...] = (),
     ) -> GateResult:
         verdicts: list[Verdict] = []
         current_task, current_route = task, route
@@ -234,7 +240,8 @@ class VerificationGate:
                 check_results = run_checks(checks, self.workspace, self.proofs,
                                            self.events, attempt,
                                            allow_network=allow_network,
-                                           blast_radius=blast_radius)
+                                           blast_radius=blast_radius,
+                                           readonly_paths=readonly_paths)
                 terminal = next(
                     (result for result in check_results if result.terminal), None)
                 if terminal is not None:

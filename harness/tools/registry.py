@@ -25,6 +25,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from typing import Any, Callable
+from pathlib import Path
 
 from ..quarantine import guard_result
 
@@ -76,6 +77,7 @@ class ToolSpec:
     requires_approval: bool = False
     role_aware: bool = False               # fn also receives _role/_agent/_allow_network
     quarantine: bool = False               # result runs the injection filter
+    provenance: str = "builtin"            # immutable loader-supplied origin
 
 
 @dataclass
@@ -93,6 +95,10 @@ class ToolRegistry:
     # Set by the runner for the active phase. Built-ins consult it at call
     # time so the shared sequential registry can enforce phase-local limits.
     blast_radius: Any = None
+    # Populated by built-in registration. Verification checks use the same
+    # agent-specific kernel profile as run_shell instead of bypassing lanes.
+    readonly_paths_for: Callable[[str], tuple[Path, ...]] = field(
+        default=lambda agent: ())
     # approval_handler decides interactive approvals. Default denies, so a
     # misconfigured headless run fails closed instead of mutating silently.
     approval_handler: Callable[[str, dict], bool] = field(
@@ -104,7 +110,21 @@ class ToolRegistry:
             raise ValueError(f"Duplicate tool name: {spec.name}")
         if spec.effects not in ("read", "write", "execute"):
             raise ValueError(f"{spec.name}: bad effects class {spec.effects!r}")
+        known_roles = {"orchestrator", "worker", "verifier"}
+        if not spec.allowed_roles or not spec.allowed_roles <= known_roles:
+            raise ValueError(
+                f"{spec.name}: allowed_roles must be a nonempty subset of "
+                f"{sorted(known_roles)}")
+        if not isinstance(spec.parameters, dict) \
+                or spec.parameters.get("type") != "object":
+            raise ValueError(f"{spec.name}: parameters must be a JSON object schema")
+        if not isinstance(spec.provenance, str) or not spec.provenance:
+            raise ValueError(f"{spec.name}: provenance must be nonempty")
         self.tools[spec.name] = spec
+
+    def provenance_for(self, name: str) -> str:
+        spec = self.tools.get(name)
+        return spec.provenance if spec is not None else "unknown"
 
     def for_role(self, role: str) -> list[ToolSpec]:
         return [t for t in self.tools.values() if role in t.allowed_roles]

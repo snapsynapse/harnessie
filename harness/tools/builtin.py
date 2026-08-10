@@ -15,11 +15,10 @@ Design rules encoded here:
     change request without granting anything.
   - Consent verbs: accept_task / decline_task are registered here so consent-
     gated loops can offer them; the loop intercepts both (like task_complete).
-  - Honest limit: an allowlisted interpreter (python3 for workers) or a test
-    runner executing workspace code (pytest for verifiers) can still perform
-    writes the argument jail and the per-file ownership check cannot see. The
-    OS sandbox confines those to the workspace as a whole; per-lane sandbox
-    profiles are roadmap. The events log records every call either way.
+  - Allowlisted interpreters and test runners receive an ownership-derived
+    read-only overlay at the OS sandbox. Operator lanes, other-agent lanes,
+    and other agents' first-writer claims stay protected even when a write
+    target is hidden inside code executed by the child process.
   - task_complete is how a loop ends deliberately. Requiring an explicit final
     report beats inferring completion from silence.
 """
@@ -76,6 +75,8 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
                      blast_radius: PhaseBlastRadius | None = None) -> None:
     ws = workspace.resolve()
     allowlists = shell_allowlists or DEFAULT_SHELL_ALLOWLISTS
+    if ledger is not None:
+        reg.readonly_paths_for = lambda agent: ledger.confinement_roots(agent, ws)
 
     def _emit(kind: str, **data) -> None:
         if events is not None:
@@ -152,8 +153,15 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
                     f"Argument {tok!r} was rejected. Paths must stay inside the workspace.",
                     "The argument jail blocks simple path escapes before process launch.")
         try:
-            sandboxed = sandbox_wrap(argv, ws, allow_network=_allow_network)
-        except SandboxUnavailable as e:
+            readonly_paths = reg.readonly_paths_for(_agent or _role)
+            sandboxed = (sandbox_wrap(
+                argv, ws, allow_network=_allow_network,
+                readonly_paths=readonly_paths)
+                if readonly_paths else
+                sandbox_wrap(argv, ws, allow_network=_allow_network))
+        except (SandboxUnavailable, ValueError) as e:
+            _emit("lane_confinement_refused", agent=_agent or _role,
+                  detail=str(e)[:500])
             return Refusal(
                 "sandbox_unavailable", "sandbox",
                 f"Sandbox unavailable; shell blocked fail-closed: {e}",

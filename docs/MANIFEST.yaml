@@ -2,19 +2,19 @@ kind: harnessie-trust-bundle
 version: 1
 files:
   - path: assistant-guide.txt
-    sha256: 19e8bae7ea3e66a69f484abf3c3bece469ce7e1645aa55b935f6fbdd1548a0a5
+    sha256: 86bd1c898f55ba611cb93af829ad93765b3c6c8bc6294601405fea5004a398ad
   - path: docs/.well-known/assistant-guide.txt
-    sha256: 19e8bae7ea3e66a69f484abf3c3bece469ce7e1645aa55b935f6fbdd1548a0a5
+    sha256: 86bd1c898f55ba611cb93af829ad93765b3c6c8bc6294601405fea5004a398ad
   - path: docs/.well-known/assistant-guide-manifest.txt
-    sha256: 13941e9e197adc6fb23b39b0aae69bab23e5ba95dba6c9dd4296014ebae924a6
+    sha256: df1da09b8708a091876e611dc11c6b8712cbb48b2da55883b7842081e7f76722
   - path: docs/.well-known/security.txt
     sha256: 8987609c662c5b80d92843e8cb00489c281470a091e808bd7a1cee5aa0fe1387
   - path: docs/agents.json
-    sha256: e0ce109435e220119b8ee298837e861fa23c68007675304b5d4105f5269c0813
+    sha256: e83e97a44d20bd6abbfdd51402e79977e9d026034be2d44528d077032bb65d7c
   - path: docs/api/v1/index.json
-    sha256: 217b2d0b0e975662b1a37ded594089c071d4071e00691fafafeea27b52b8774f
+    sha256: 6258a67a9aecab5c8fb4a2335e763b5b520025bc0b0a679791ae99eeb17bc2e7
   - path: docs/changelog.json
-    sha256: 6cc1515804ab0d18102e0478509e284968a346d4ee3aedddf8b4c18f8dabea74
+    sha256: b3911381eff376b6b4fc3e6ea37e214dd5bc74ee4e606e1890f3ed1de813cc19
   - path: docs/llms.txt
     sha256: c27f8687ca754d832785e66f5fd160a8e97b6e532223ab82d4ef86e28319f3e9
   - path: docs/robots.txt
@@ -28,7 +28,7 @@ files:
   - path: docs/schemas/v1/models.schema.json
     sha256: ebb3c9bc4876cd5833c66cdf6c2d79e65cb81fcd6aac7387db2404e2acb0c67a
   - path: docs/schemas/v1/ownership.schema.json
-    sha256: ee1bf26278290a838a3e70ec52d4f6c840b93e433aa1f958ec2d7d8fd12582de
+    sha256: b0a7eedcec428585f4b7c9c62fcbd878dabd8aee6e12b8ea8de07b69616a7832
   - path: docs/schemas/v1/workflow.schema.json
     sha256: 0797501a99b1b4d1086ddca1987fb674775eb3f6975905f4d863bb3f08966a76
   - path: docs/sitemap.xml

@@ -10,7 +10,7 @@
   },
   "package": {
     "name": "harnessie",
-    "version": "0.8.0",
+    "version": "1.0.0",
     "registry": "https://pypi.org/project/harnessie/",
     "source": "https://github.com/snapsynapse/harnessie"
   },
@@ -24,14 +24,14 @@
       "side_effects": "Writes scaffold files below the selected project root; refuses overwrite unless --force is explicit."
     },
     "run": {
-      "synopsis": "harnessie run WORKFLOW [--goal GOAL] [--approval-policy FILE] [--approve-interactive]",
+      "synopsis": "harnessie run WORKFLOW [--goal GOAL] [--approval-policy FILE] [--approve-interactive] [--plugin NAME ...]",
       "purpose": "Run a governed workflow under declared budgets, ownership, sandbox, and verification policy.",
-      "side_effects": "Side-effecting tools remain consent and policy gated; network is denied unless a phase explicitly allows it."
+      "side_effects": "Side-effecting tools remain consent and policy gated; network is denied unless a phase explicitly allows it. Plugins never auto-load; each selected in-process plugin is operator-trusted code."
     },
     "resume": {
-      "synopsis": "harnessie resume RUN_ID WORKFLOW [--goal GOAL] [--approval-policy FILE] [--approve-interactive]",
+      "synopsis": "harnessie resume RUN_ID WORKFLOW [--goal GOAL] [--approval-policy FILE] [--approve-interactive] [--plugin NAME ...]",
       "purpose": "Resume from the audited journal while skipping already verified phases.",
-      "side_effects": "Uses the same consent, ownership, sandbox, budget, and verification gates as run."
+      "side_effects": "Uses the same consent, ownership, sandbox, budget, and verification gates as run; the exact recorded plugin receipt is required."
     },
     "report": {
       "synopsis": "harnessie report RUN_ID [--raw]",
@@ -80,8 +80,8 @@
     "unknown_or_unenforceable_control": "Fails closed."
   },
   "stability": {
-    "status": "pre-1.0",
-    "policy": "The CLI remains pre-1.0. The six v1 authoring schemas and their compatibility and deprecation policy are frozen as the first 1.0 development slice."
+    "status": "stable-1.0",
+    "policy": "The six v1 authoring schemas and harnessie.tools.v1 plugin contract are stable for the 1.x line under SCHEMA_COMPATIBILITY.md and PLUGIN_CONTRACT.md."
   },
   "canonical": "https://harnessie.com/api/v1/index.json",
   "last_updated": "2026-08-09"

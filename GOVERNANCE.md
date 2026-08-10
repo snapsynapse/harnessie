@@ -47,13 +47,17 @@ Three lane kinds, declared in `OWNERSHIP.yaml` at the project root (outside the 
 
 Unlisted paths follow first-writer-owns: the first agent to create a file becomes its owner, recorded in the ledger (`files:` section of `OWNERSHIP.yaml`, auto-maintained) and emitted as `ownership_claimed`. Operator lane declarations always override auto-claims — the human is the root owner of everything and can reassign any path by editing the file.
 
-Enforcement (in `write_file` dispatch, fail closed):
+Enforcement (in dispatch and the OS sandbox, fail closed):
 
 - write to another agent's file → refused with the owner's name and the remedy: call `request_change`.
 - write to an operator lane → refused, no remedy offered to the agent.
 - `request_change(path, description)` records a change request (journal + event + run report). It does not grant anything. Resolution is routing work to the owning agent or an operator lane edit — a decision above the requesting agent's authority (§1).
+- child commands receive a read-only overlay for operator lanes, other-agent lanes, and other agents' first-writer claims. The overlay covers worker shell calls, agent-produced code executed by deterministic checks, and verifier shell calls under the verifier's identity.
+- invalid patterns and backends that cannot prove nested read-only enforcement refuse child execution. Glob prefixes are broadened conservatively, which may deny extra writes but cannot grant an ownership violation.
 
-Honest limit (recorded per the AIDR practice of stating what the runner actually guarantees): ownership is enforced at the `write_file` tool. An allowlisted interpreter (worker `python3`) can still write inside the workspace without a per-file check; the OS sandbox confines writes to the workspace as a whole, not per-lane. Interpreter writes are therefore visible in events and caught by verifiers and audit, not blocked per-file. Full per-lane confinement would need per-phase sandbox profiles (roadmap).
+Unlisted paths remain writable under first-writer semantics. Scratch space outside the workspace remains the sandbox's deliberate non-artifact boundary.
+
+Installed tool plugins use the single `harnessie.tools.v1` entry-point group and load only when the operator names them with `--plugin`. The import and implementation execute in process as operator-trusted code and cannot truthfully inherit OS lane confinement. Each admitted tool is namespaced and enters the same registry as built-ins, so role grants, consent locks, approval policy, effects metadata, and loader-supplied audit provenance apply at dispatch. Those controls mediate calls; they do not sandbox or verify the trusted implementation. Untrusted extensions are unsupported and require a future out-of-process protocol. The complete admission and resume contract is in `PLUGIN_CONTRACT.md`.
 
 ## 4. Adversarial collaboration: positions, objections, arbitration
 

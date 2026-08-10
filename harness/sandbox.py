@@ -10,24 +10,27 @@ Policy (operator-chosen, 2026-07-06):
     and gate checks are BLOCKED, never run unsandboxed. Wire a backend to
     enable shell on a new platform.
   - Deny network by default; a workflow phase opts in with allow_network: true.
-  - Confine writes to the workspace: writes anywhere under the user's home are
-    denied except the workspace subtree. Temp dirs outside home stay writable
-    so interpreters function; that is a deliberate boundary (the protected
-    asset is the user's files and the exfil channel, not scratch space).
+  - Confine writes to the workspace, then overlay ownership paths denied to
+    the active agent as read-only. Temp dirs outside home stay writable so
+    interpreters function; that is a deliberate boundary (the protected asset
+    is the user's files and the exfil channel, not scratch space).
 
 Backends: macOS Seatbelt via `sandbox-exec -p <profile>` (native, no deps);
 on Linux, in order of preference, bubblewrap (rootless, no daemon), firejail,
 then docker as a heavyweight fallback. Every backend is admitted only after a
 startup smoke test proves it can actually confine; a present-but-unusable
-backend is treated exactly like a missing one, and the platform fails closed.
+backend is treated exactly like a missing one. Nonempty lane overlays require
+a second nested-read-only probe and fail closed independently.
 """
 
 from __future__ import annotations
 
 import os
 import platform
+import json
 import shutil
 import subprocess
+import sys
 import tempfile
 from functools import lru_cache
 from pathlib import Path
@@ -58,17 +61,53 @@ def available() -> bool:
     return backend_name() is not None
 
 
-def _seatbelt_profile(workspace: Path, allow_network: bool) -> str:
-    home = str(Path.home())
-    ws = str(workspace.resolve())
+def _portable_readonly_roots(
+    workspace: Path, readonly_paths: tuple[Path, ...],
+) -> tuple[Path, ...]:
+    """Resolve portable read-only overlays, broadening safely when absent.
+
+    Mount backends cannot overlay a path that does not exist. Walking to the
+    nearest existing ancestor may deny extra writes, but never permits a lane
+    escape. Symlink resolution outside the workspace is invalid.
+    """
+    ws = workspace.resolve()
+    roots: set[Path] = set()
+    for raw in readonly_paths:
+        path = Path(raw).resolve()
+        if not path.is_relative_to(ws):
+            raise ValueError(f"read-only lane path {raw} is outside workspace {ws}")
+        while not path.exists() and path != ws:
+            path = path.parent
+        roots.add(path)
+    ordered = sorted(roots, key=lambda path: (len(path.parts), str(path)))
+    collapsed: list[Path] = []
+    for root in ordered:
+        if not any(root == parent or root.is_relative_to(parent)
+                   for parent in collapsed):
+            collapsed.append(root)
+    return tuple(collapsed)
+
+
+def _seatbelt_profile(
+    workspace: Path, allow_network: bool,
+    readonly_paths: tuple[Path, ...] = (),
+) -> str:
+    home = json.dumps(str(Path.home()))
+    ws = json.dumps(str(workspace.resolve()))
     # SBPL: last matching rule wins, so deny-home then allow-workspace confines
     # writes to the workspace even though it sits under home.
     lines = [
         "(version 1)",
         "(allow default)",
-        f'(deny file-write* (subpath "{home}"))',
-        f'(allow file-write* (subpath "{ws}"))',
+        f"(deny file-write* (subpath {home}))",
+        f"(allow file-write* (subpath {ws}))",
     ]
+    for path in _portable_readonly_roots(workspace, readonly_paths):
+        # Last match wins in SBPL, so these restrictions override the broad
+        # workspace allow above.
+        literal = json.dumps(str(path))
+        lines.append(f"(deny file-write* (literal {literal}))")
+        lines.append(f"(deny file-write* (subpath {literal}))")
     if not allow_network:
         lines.append("(deny network*)")
     return "\n".join(lines)
@@ -99,7 +138,10 @@ def _seatbelt_usable() -> bool:
     return proc.returncode == 0
 
 
-def _bwrap_argv(argv: list[str], ws: Path, allow_network: bool) -> list[str]:
+def _bwrap_argv(
+    argv: list[str], ws: Path, allow_network: bool,
+    readonly_paths: tuple[Path, ...] = (),
+) -> list[str]:
     # Read-only root, minimal /dev, private /tmp, the workspace as the only
     # writable subtree. Stricter than Seatbelt's deny-home policy (all of the
     # filesystem is read-only, not just home), which satisfies the same
@@ -111,29 +153,41 @@ def _bwrap_argv(argv: list[str], ws: Path, allow_network: bool) -> list[str]:
                "--tmpfs", "/tmp",
                "--bind", str(ws), str(ws),
                "--die-with-parent", "--new-session"]
+    for path in _portable_readonly_roots(ws, readonly_paths):
+        wrapped.extend(("--ro-bind", str(path), str(path)))
     if not allow_network:
         wrapped.append("--unshare-net")
     return [*wrapped, "--", *argv]
 
 
-def _firejail_argv(argv: list[str], ws: Path, allow_network: bool) -> list[str]:
+def _firejail_argv(
+    argv: list[str], ws: Path, allow_network: bool,
+    readonly_paths: tuple[Path, ...] = (),
+) -> list[str]:
     # Mirrors the Seatbelt policy shape: home read-only except the workspace,
     # private /dev and /tmp.
     wrapped = ["firejail", "--quiet", "--noprofile",
                "--private-dev", "--private-tmp",
                f"--read-only={Path.home()}",
                f"--read-write={ws}"]
+    wrapped.extend(f"--read-only={path}"
+                   for path in _portable_readonly_roots(ws, readonly_paths))
     if not allow_network:
         wrapped.append("--net=none")
     return [*wrapped, "--", *argv]
 
 
-def _docker_argv(argv: list[str], ws: Path, allow_network: bool) -> list[str]:
+def _docker_argv(
+    argv: list[str], ws: Path, allow_network: bool,
+    readonly_paths: tuple[Path, ...] = (),
+) -> list[str]:
     image = os.environ.get("HARNESSIE_SANDBOX_IMAGE", DEFAULT_DOCKER_IMAGE)
     wrapped = ["docker", "run", "--rm",
                "--user", f"{os.getuid()}:{os.getgid()}",
                "-v", f"{ws}:{ws}",
                "-w", str(ws)]
+    for path in _portable_readonly_roots(ws, readonly_paths):
+        wrapped += ["--mount", f"type=bind,src={path},dst={path},readonly"]
     if not allow_network:
         wrapped += ["--network", "none"]
     return [*wrapped, image, *argv]
@@ -177,23 +231,99 @@ def _docker_usable() -> bool:
     return proc.returncode == 0 and bool(proc.stdout.strip())
 
 
-def wrap(argv: list[str], workspace: Path, allow_network: bool = False) -> list[str]:
+def _backend_argv(
+    name: str, argv: list[str], workspace: Path, allow_network: bool,
+    readonly_paths: tuple[Path, ...] = (),
+) -> list[str]:
+    if name == "seatbelt":
+        profile = _seatbelt_profile(workspace, allow_network, readonly_paths)
+        return ["sandbox-exec", "-p", profile, *argv]
+    if name == "bwrap":
+        return _bwrap_argv(argv, workspace, allow_network, readonly_paths)
+    if name == "firejail":
+        return _firejail_argv(argv, workspace, allow_network, readonly_paths)
+    if name == "docker":
+        return _docker_argv(argv, workspace, allow_network, readonly_paths)
+    raise SandboxUnavailable(f"sandbox backend {name!r} is unavailable")
+
+
+@lru_cache(maxsize=None)
+def _readonly_backend_usable(name: str) -> bool:
+    """Probe that a backend enforces a nested read-only overlay.
+
+    Docker remains unavailable for lane profiles until its configured image is
+    explicitly probe-admitted; `docker info` alone proves only the daemon.
+    """
+    if name == "docker":
+        return False
+    try:
+        with tempfile.TemporaryDirectory(prefix="harnessie-lanes-") as raw:
+            ws = Path(raw).resolve()
+            protected = ws / "protected"
+            protected.mkdir()
+            locked = protected / "locked.txt"
+            locked.write_text("original", encoding="utf-8")
+            script = (
+                "from pathlib import Path; "
+                "Path('allowed.txt').write_text('ok'); "
+                "\ntry: Path('protected/locked.txt').write_text('changed')"
+                "\nexcept OSError: raise SystemExit(0)"
+                "\nraise SystemExit(9)"
+            )
+            argv = _backend_argv(
+                name, [sys.executable, "-c", script], ws, False,
+                (protected,))
+            proc = subprocess.run(
+                argv, cwd=ws, capture_output=True, text=True, timeout=10)
+            return (proc.returncode == 0
+                    and (ws / "allowed.txt").read_text(encoding="utf-8") == "ok"
+                    and locked.read_text(encoding="utf-8") == "original")
+    except (OSError, subprocess.TimeoutExpired, ValueError):
+        return False
+
+
+def readonly_available() -> bool:
+    return readonly_backend_name() is not None
+
+
+def readonly_backend_name() -> str | None:
+    """Best available backend that proves nested read-only enforcement."""
+    system = platform.system()
+    candidates: list[tuple[str, bool]] = []
+    if system == "Darwin":
+        candidates.append((
+            "seatbelt", bool(shutil.which("sandbox-exec") and _seatbelt_usable())))
+    elif system == "Linux":
+        candidates.extend((
+            ("bwrap", bool(shutil.which("bwrap") and _bwrap_usable())),
+            ("firejail", bool(shutil.which("firejail") and _firejail_usable())),
+        ))
+    for name, base_usable in candidates:
+        if base_usable and _readonly_backend_usable(name):
+            return name
+    return None
+
+
+def wrap(
+    argv: list[str], workspace: Path, allow_network: bool = False,
+    readonly_paths: tuple[Path, ...] = (),
+) -> list[str]:
     """Return a sandboxed argv for `argv`, or raise SandboxUnavailable.
 
     The returned list is passed straight to subprocess.run (no shell), so the
     profile string travels as one argv element and needs no escaping."""
-    name = backend_name()
+    base_name = backend_name()
     ws = Path(workspace).resolve()
-    if name == "seatbelt":
-        profile = _seatbelt_profile(ws, allow_network)
-        return ["sandbox-exec", "-p", profile, *argv]
-    if name == "bwrap":
-        return _bwrap_argv(argv, ws, allow_network)
-    if name == "firejail":
-        return _firejail_argv(argv, ws, allow_network)
-    if name == "docker":
-        return _docker_argv(argv, ws, allow_network)
-    raise SandboxUnavailable(
-        f"no OS sandbox backend on {platform.system()}; child-process "
-        "execution is blocked (fail-closed policy). Wire a backend "
-        "(bubblewrap / firejail / docker) to enable shell on this platform.")
+    if base_name is None:
+        raise SandboxUnavailable(
+            f"no OS sandbox backend on {platform.system()}; child-process "
+            "execution is blocked (fail-closed policy). Wire a backend "
+            "(bubblewrap / firejail / docker) to enable shell on this platform.")
+    readonly = _portable_readonly_roots(ws, readonly_paths)
+    name = readonly_backend_name() if readonly else base_name
+    if name is None:
+        raise SandboxUnavailable(
+            f"available OS sandbox backend {base_name!r} did not prove nested "
+            "read-only lane enforcement; child-process execution is blocked "
+            "fail-closed")
+    return _backend_argv(name, argv, ws, allow_network, readonly)

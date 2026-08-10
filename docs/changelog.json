@@ -7,12 +7,18 @@
     "source": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md#unreleased"
   },
   "current": {
-    "version": "0.8.0",
-    "released": "2026-08-04",
-    "summary": "Write-safety ceilings, declared parallel write paths, maiden-voyage staging, inward integrity, hardened release gates, and truthful public machine handoffs.",
-    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v0.8.0"
+    "version": "1.0.0",
+    "released": "2026-08-09",
+    "summary": "Stable v1 authoring contracts, kernel-enforced per-agent child-process ownership, and explicit operator-trusted tool plugin admission.",
+    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.0.0"
   },
   "history": [
+    {
+      "version": "1.0.0",
+      "released": "2026-08-09",
+      "summary": "Extensibility earned through stable schemas, per-lane child-process confinement, and one explicit plugin trust boundary.",
+      "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.0.0"
+    },
     {
       "version": "0.8.0",
       "released": "2026-08-04",
@@ -38,5 +44,5 @@
       "release": "https://github.com/snapsynapse/harnessie/releases/tag/v0.6.0"
     }
   ],
-  "last_updated": "2026-08-04"
+  "last_updated": "2026-08-09"
 }

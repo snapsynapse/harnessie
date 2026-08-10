@@ -14,7 +14,7 @@ means the operator does not need to be a developer (declared token/dollar ceilin
 named halt conditions each with one plain operator action, disagreement surfaced as a
 human decision rather than a silent merge).
 
-Shipped as the `harnessie` Python package (Apache-2.0, current 0.8.0). The verifier also
+Shipped as the `harnessie` Python package (Apache-2.0, current 1.0.0). The verifier also
 ships standalone as a GitHub Action (Harnessie Verify) for gating PRs.
 
 ## Audience
@@ -51,14 +51,18 @@ trademark and PAICE.work PBC spec/code carveouts recorded in NOTICE.
 
 ## Current status (2026-08-09)
 
-Active and healthy. v0.8.0 is live on PyPI and GitHub; the separately owned Verify
-Action v0.1.1 and Homebrew formula both pin 0.8.0. The docs site is live, and a fresh
+Active and healthy. v1.0.0 is the current core release on PyPI and GitHub. The
+separately owned Verify Action v0.1.1 and Homebrew formula still pin 0.8.0 pending
+their own release trains. The docs site is live, and a fresh
 Siteline scan scored it A, 97/100. Public-facing doc pages under `docs/` are generated
 from markdown via `scripts/build_docs_html.py` (edit markdown, rebuild, commit both).
 AIDR-0008 is arbitrated and executed in the independent engine-wrappers release train.
 See NEXT.md for the live session handoff and CHANGELOG.md for release history.
 
-The first 1.0 development slice is implemented: six stable v1 authoring schemas,
-side-effect-free validation, runtime startup enforcement, cross-document checks, and a
-written compatibility and deprecation policy. Per-lane confinement and the plugin trust
-boundary remain the next 1.0 work.
+The three 1.0 slices are shipped: six stable v1 authoring schemas,
+side-effect-free validation, runtime startup enforcement, cross-document checks, a
+written compatibility and deprecation policy, and per-agent read-only sandbox overlays
+that enforce ownership for child processes. Installed tool extensions now use one
+explicit versioned entry-point mechanism with an operator-trusted in-process boundary,
+registry-mediated calls, immutable provenance, and exact resume receipts. Untrusted
+plugins remain unsupported.

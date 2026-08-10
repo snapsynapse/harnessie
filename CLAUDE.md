@@ -16,7 +16,7 @@ harness structure carries the quality floor, the model carries the ceiling.
 
 ## Stack
 
-- Python 3.11+ (packaged as `harnessie`, current version 0.8.0, Apache-2.0).
+- Python 3.11+ (packaged as `harnessie`, current version 1.0.0, Apache-2.0).
 - Runtime dependencies: PyYAML and jsonschema. Model adapters remain stdlib-only (no vendor SDK).
 - Dev dependency: pytest 8+. Console entry point: `harnessie = harness.cli:main`.
 - OS sandbox: macOS `sandbox-exec` (Seatbelt); Linux bubblewrap / firejail / docker.
@@ -92,15 +92,21 @@ PyPI promotion and live-provider calls are deliberate operator acts, never headl
 
 ## Current state (2026-08-09)
 
-- Version 0.8.0 is shipped on GitHub and PyPI. The separately owned Verify Action
-  v0.1.1 and Homebrew formula both pin 0.8.0; `NEXT.md` records the completed release
-  train and remaining forward work.
+- Version 1.0.0 is the current core release on GitHub and PyPI. The separately owned
+  Verify Action v0.1.1 and Homebrew formula still pin 0.8.0 pending their own release
+  trains; `NEXT.md` records that intentional lag and remaining forward work.
 - All four 0.8 write-safety and self-integrity mechanics plus the composed package
   release gate pass with 352 tests, one environment-dependent skip, 47/47 evals, both
   manifests, built-artifact inspection, and a fresh install.
 - The first 1.0 development slice freezes six v1 authoring schemas, validates them
   without starting a run, and preserves schema-less 0.8 documents as implicit v1.
-- The composed gate passes 387 tests with one environment-dependent skip, 47/47
+- The second 1.0 slice compiles ownership denials into per-agent read-only sandbox
+  overlays for shell calls, deterministic checks, and verifier execution. Unsupported
+  nested profiles fail closed.
+- The third 1.0 slice admits installed tool extensions only through explicit
+  `harnessie.tools.v1` entry points. Plugin code is operator-trusted in process; tool
+  calls remain registry-mediated, namespaced, provenance-stamped, and resume-pinned.
+- The composed gate passes 413 tests with one environment-dependent skip, 50/50
   evals, authoring validation, both manifests, artifact inspection, and fresh install.
 - The public Siteline follow-up is green. A fresh live rubric 2.3.0 scan on 2026-08-05
   UTC scored the deployed site A, 97/100, with Level 4 machine enablement at 16/18.

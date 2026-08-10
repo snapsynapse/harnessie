@@ -21,9 +21,11 @@ from .events import EventLog
 from .inward_manifest import render_inward_manifest
 from .loop import AgentLoop
 from .models.base import AssistantTurn, Message, MockModel, ModelSpec, ToolCall
+from .plugins import PluginDeclaration, PluginError, _admit
 from .runner import WorkflowRunner
 from .tools.builtin import register_builtin
 from .tools.registry import ToolRegistry
+from .tools.registry import ToolSpec
 from .verify import parse_verdict
 
 
@@ -79,6 +81,8 @@ def run_scenario(scenario: dict[str, Any], root: Path | None = None) -> EvalCase
         return _run_resume_scenario(scenario)
     if kind == "ownership":
         return _run_ownership_scenario(scenario)
+    if kind == "plugin":
+        return _run_plugin_scenario(scenario)
     if kind == "adversarial":
         return _run_adversarial_scenario(scenario)
     if kind == "audit":
@@ -103,6 +107,50 @@ def run_scenario(scenario: dict[str, Any], root: Path | None = None) -> EvalCase
         expected="known scenario kind",
         observed=kind,
         notes="unknown scenario kind",
+    )
+
+
+def _run_plugin_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
+    class ScenarioEntryPoint:
+        name = scenario.get("entry_point_name", "acme")
+        value = "eval_plugin:declaration"
+
+        @staticmethod
+        def load():
+            declaration_name = scenario.get("declaration_name", "acme")
+            return PluginDeclaration(
+                name=declaration_name,
+                version=scenario.get("version", "1.0.0"),
+                tools=(ToolSpec(
+                    name=scenario.get("tool_name", "lookup"),
+                    description="eval tool",
+                    parameters={"type": "object", "properties": {}},
+                    fn=lambda: "ok",
+                    allowed_roles=frozenset({"worker"}),
+                ),),
+            )
+
+    expected = bool(scenario["expect_admitted"])
+    try:
+        admitted = _admit(ScenarioEntryPoint())
+        registry = ToolRegistry()
+        registry.register(admitted.tools[0])
+        public_name = f"{admitted.name}__{scenario.get('tool_name', 'lookup')}"
+        observed = (
+            registry.dispatch("worker", public_name, {}).content == "ok"
+            and registry.provenance_for(public_name)
+            == f"plugin:{admitted.name}@{admitted.version}"
+        )
+        note = public_name
+    except (PluginError, ValueError) as exc:
+        observed = False
+        note = str(exc)
+    return EvalCaseResult(
+        id=scenario["id"],
+        passed=observed == expected,
+        expected=expected,
+        observed=observed,
+        notes=note,
     )
 
 
@@ -244,6 +292,17 @@ def _run_ownership_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
             actual = reloaded.owner_of(rel)
             if actual != owner:
                 problems.append(f"owner of {rel}: {actual!r}, expected {owner!r}")
+        expected_roots = scenario.get("expect_confinement_roots")
+        if expected_roots is not None:
+            agent = scenario.get("confinement_agent", "implementer")
+            resolved_workspace = workspace.resolve()
+            actual_roots = sorted(
+                path.relative_to(resolved_workspace).as_posix()
+                for path in reloaded.confinement_roots(agent, workspace))
+            if actual_roots != sorted(expected_roots):
+                problems.append(
+                    f"confinement roots={actual_roots!r}, expected "
+                    f"{sorted(expected_roots)!r}")
         _check_file_expectations(scenario, workspace, problems)
         _check_refusal_expectations(scenario, root / "run", problems)
     return EvalCaseResult(

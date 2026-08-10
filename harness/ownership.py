@@ -18,12 +18,10 @@ Lane kinds, checked in precedence order:
 Glob semantics are fnmatch (a `*` crosses path separators), matched against
 workspace-relative POSIX paths.
 
-Honest limit (recorded, per the AIDR practice of stating what the runner
-actually guarantees): enforcement happens in write_file dispatch. An
-allowlisted interpreter can still write inside the workspace without a
-per-file check; the OS sandbox confines writes to the workspace as a whole,
-not per lane. Interpreter writes are visible in events and caught by
-verifiers and audit, not blocked per file.
+Interpreter and check subprocesses receive a kernel-enforced read-only overlay
+for operator lanes, other-agent lanes, and other agents' first-writer claims.
+Patterns that cannot be translated conservatively make subprocess execution
+fail closed rather than falling back to workspace-wide write access.
 """
 
 from __future__ import annotations
@@ -31,10 +29,56 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from fnmatch import fnmatch
 from pathlib import Path
+from pathlib import PurePosixPath
 
 import yaml
 
 from .schema import read_document
+
+
+_GLOB_META = frozenset("*?[")
+
+
+def _pattern_protection_root(pattern: str) -> PurePosixPath:
+    """Return a conservative literal root covering every fnmatch match.
+
+    `src/*` becomes `src`; `*.lock` becomes the workspace root. Exact paths
+    remain exact. Protecting a broader root is safe: it may refuse a write,
+    but can never admit one the ledger denies.
+    """
+    if not isinstance(pattern, str) or not pattern or pattern != pattern.strip():
+        raise ValueError("ownership lane patterns must be non-empty strings without surrounding whitespace")
+    if any(ord(char) < 32 or ord(char) == 127 for char in pattern):
+        raise ValueError(f"ownership lane pattern {pattern!r} contains control characters")
+    if "\\" in pattern or pattern.startswith("/"):
+        raise ValueError(f"ownership lane pattern {pattern!r} must be a relative POSIX path")
+    parts = pattern.split("/")
+    if any(part in ("", ".", "..") for part in parts):
+        raise ValueError(f"ownership lane pattern {pattern!r} contains an unsafe path segment")
+    literal: list[str] = []
+    for part in parts:
+        if any(char in part for char in _GLOB_META):
+            break
+        literal.append(part)
+    return PurePosixPath(*literal) if literal else PurePosixPath(".")
+
+
+def _confinement_roots(workspace: Path, patterns: list[str]) -> tuple[Path, ...]:
+    ws = workspace.resolve()
+    roots: set[Path] = set()
+    for pattern in patterns:
+        relative = _pattern_protection_root(pattern)
+        root = (ws / relative).resolve()
+        if not root.is_relative_to(ws):
+            raise ValueError(f"ownership lane pattern {pattern!r} resolves outside the workspace")
+        roots.add(root)
+    ordered = sorted(roots, key=lambda path: (len(path.parts), str(path)))
+    collapsed: list[Path] = []
+    for root in ordered:
+        if not any(root == parent or root.is_relative_to(parent)
+                   for parent in collapsed):
+            collapsed.append(root)
+    return tuple(collapsed)
 
 
 @dataclass
@@ -138,6 +182,16 @@ class OwnershipLedger:
     def isolated_view(self) -> "IsolatedOwnershipView":
         return IsolatedOwnershipView(self)
 
+    def confinement_roots(self, agent: str, workspace: Path) -> tuple[Path, ...]:
+        """Paths a subprocess must see as read-only for this agent."""
+        patterns = list(self.operator)
+        for owner, globs in self.agent_lanes.items():
+            if owner != agent:
+                patterns.extend(globs)
+        patterns.extend(path for path, owner in self.files.items()
+                        if owner != agent)
+        return _confinement_roots(workspace, patterns)
+
 
 @dataclass(frozen=True)
 class IsolatedOwnershipView:
@@ -162,3 +216,12 @@ class IsolatedOwnershipView:
 
     def claim(self, agent: str, rel: str) -> bool:
         return False
+
+    def confinement_roots(self, agent: str, workspace: Path) -> tuple[Path, ...]:
+        # Auto-claims describe the shared target workspace, not physically
+        # distinct parallel phase workspaces. Declared lanes still apply.
+        patterns = list(self.ledger.operator)
+        for owner, globs in self.ledger.agent_lanes.items():
+            if owner != agent:
+                patterns.extend(globs)
+        return _confinement_roots(workspace, patterns)

@@ -67,6 +67,13 @@ def test_unknown_keys_and_coercible_types_are_rejected():
                for problem in wrong_type)
 
 
+def test_ownership_lane_paths_reject_traversal_before_runtime():
+    problems = validate_data(
+        {"lanes": {"operator": ["../outside/*"]}}, "ownership")
+    assert any(problem.path.endswith("operator[0]")
+               and problem.code == "schema.pattern" for problem in problems)
+
+
 def test_unsupported_schema_version_fails_before_other_validation():
     problems = validate_data({"schema_version": 2}, "boundary")
     assert [(p.path, p.code) for p in problems] == [

@@ -116,15 +116,15 @@ Theme: bound what a run may change, the way 0.7 bounds what a run may expose. 0.
 
 Acceptance: a phase that exceeds a declared volume ceiling fails with the count and applies nothing further; a parallel group with overlapping declared write paths refuses before any phase starts; a first-run workflow stages artifacts without applying them until operator approval is recorded; a run under an edited role prompt is either recorded as divergent or refused, and the shipped-state run proves byte-identical prompts.
 
-### 1.0.0: Extensibility, earned
+### 1.0.0: Extensibility, earned (shipped 2026-08-09)
 
 Theme: stable surfaces and pluggability, only after the core is proven.
 
-- Stable, versioned configuration and workflow schemas with a written compatibility and deprecation policy: GREEN on the development head. Six strict Draft 2020-12 schemas cover every user-authored models, cascade, boundary, approval-policy, ownership, and workflow surface. `harnessie validate` is side-effect-free, runtime startup uses the same validator, cross-document references fail closed, public schema bytes match the packaged contracts, and schema-less 0.8 documents remain implicit v1 throughout 1.x. `SCHEMA_COMPATIBILITY.md` defines compatibility and deprecation behavior.
-- Per-lane sandbox profiles close the ownership layer's honest limit before general plugin admission: interpreter and plugin writes outside the assigned lane are blocked, and a backend that cannot enforce the profile fails closed.
-- Tool plugins load through one named extension mechanism and declare effects, roles, approvals, and provenance before registry admission. The trust boundary must be explicit: either installed plugin code is operator-trusted and every tool invocation remains registry-mediated, or untrusted plugin code executes out of process under confinement. An in-process Python import cannot truthfully be described as unable to bypass the registry.
+- Stable, versioned configuration and workflow schemas with a written compatibility and deprecation policy: SHIPPED. Six strict Draft 2020-12 schemas cover every user-authored models, cascade, boundary, approval-policy, ownership, and workflow surface. `harnessie validate` is side-effect-free, runtime startup uses the same validator, cross-document references fail closed, public schema bytes match the packaged contracts, and schema-less 0.8 documents remain implicit v1 throughout 1.x. `SCHEMA_COMPATIBILITY.md` defines compatibility and deprecation behavior.
+- Per-lane sandbox profiles: SHIPPED. Operator lanes, other-agent lanes, and other agents' first-writer claims compile into conservative read-only roots for worker shell calls, deterministic checks, and verifier execution. Invalid patterns and backends that cannot prove nested enforcement fail closed; unowned paths retain first-writer semantics. Docker remains admitted for the base workspace sandbox only and refuses nonempty lane profiles until its configured image has a truthful nested-mount probe.
+- Tool plugins: SHIPPED. Installed packages expose declarations through the single versioned `harnessie.tools.v1` entry-point group and never auto-load. Repeatable `--plugin NAME` admission validates and namespaces tools before model dispatch, applies registry roles, consent, approvals, effects metadata, and quarantine, records immutable provenance, and pins the exact receipt across resume. Imported implementation code is explicitly operator-trusted and not lane-confined; untrusted plugins remain unsupported pending a separate out-of-process protocol.
 
-Gate: no 1.0 while any 0.3, 0.4, 0.5, 0.6, 0.7, or 0.8 acceptance criterion is red; no stable plugin surface before the schema and per-lane confinement slices are green.
+Gate result: GREEN. All earlier acceptance criteria, the three 1.0 slices, the composed release gate, exact package build, and fresh-install smoke passed before release.
 
 ### Post-1.0 candidates
 
@@ -138,7 +138,7 @@ Deliberately after 1.0, not before:
 
 ### Supported today
 
-macOS is fully supported: the OS sandbox uses native `sandbox-exec` (Seatbelt), confining child-command writes to the workspace and denying network by default. Linux backends (bubblewrap preferred, firejail alternate, docker fallback) are implemented as of the 0.4 line, each admitted only after a startup smoke test; CI proves the suite green under bubblewrap and proves fail-closed with every backend removed. On Windows, and on any host where no backend passes its smoke test, shell-using workflows fail closed. This is the fail-closed-everywhere policy working as designed, not a bug: a control that cannot be enforced is refused rather than skipped.
+macOS is fully supported: the OS sandbox uses native `sandbox-exec` (Seatbelt), confining child-command writes to the workspace, overlaying denied ownership lanes read-only, and denying network by default. Linux backends (bubblewrap preferred, firejail alternate, docker fallback for the base workspace sandbox) are implemented as of the 0.4 line. Bubblewrap and firejail must pass a second nested read-only probe for nonempty lane profiles; Docker refuses those profiles until its configured image has an equivalent probe. CI proves the suite green under bubblewrap and proves fail-closed with every backend removed. On Windows, and on any host where no backend passes its required smoke test, shell-using workflows fail closed. This is the fail-closed-everywhere policy working as designed, not a bug: a control that cannot be enforced is refused rather than skipped.
 
 ### Linux backend design (shipped in 0.4.0)
 

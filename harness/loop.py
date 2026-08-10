@@ -180,8 +180,10 @@ class AgentLoop:
                         detail={"reason": reason, "counter_proposal": counter})
                 res = self._dispatch(tc.name, tc.arguments, consented=consented)
                 ok, content, flags = res.ok, res.content, res.flags
-                self.events.emit("tool_result", role=self.role, tool=tc.name,
-                                 ok=ok, content=content[:300])
+                self.events.emit(
+                    "tool_result", role=self.role, tool=tc.name,
+                    provenance=self.registry.provenance_for(tc.name),
+                    ok=ok, content=content[:300])
                 if res.refusal is not None:
                     # detail/why ride here in full so audit consumers never
                     # parse the truncated tool_result content.

@@ -2,13 +2,19 @@
 
 ## Current state
 
-Harnessie 0.8.0 is shipped on PyPI and GitHub, and its downstream release train is complete. Harnessie Verify v0.1.1 and stable `snapsynapse/harnessie-verify-action@v0` pin Harnessie 0.8.0; the public Homebrew formula also installs 0.8.0. `python3 scripts/ecosystem_status.py` reports both downstream pins matching core.
+Harnessie 1.0.0 is the current core release. It freezes six v1 authoring contracts, enforces agent-specific ownership lanes for child processes, and admits installed tool plugins through one explicit operator-trusted entry-point mechanism. The core release is published independently before its downstream release train.
 
-The next public milestone is 1.0.0, extensibility earned. Its first acceptance-complete slice is implemented on the development head: six stable Draft 2020-12 authoring schemas, a side-effect-free `harnessie validate` command, runtime startup validation, cross-document checks, explicit v1 scaffolds, packaged and served schema artifacts, and the compatibility and deprecation contract in `SCHEMA_COMPATIBILITY.md`. Schema-less 0.8 documents remain implicit v1 throughout 1.x.
+Harnessie Verify v0.1.1 and stable `snapsynapse/harnessie-verify-action@v0` still pin Harnessie 0.8.0. The public Homebrew formula also remains on 0.8.0. Those are intentional, separately owned release follow-ups rather than hidden drift. `harnessie-engine-wrappers` remains independently released at v0.1.0 because core 1.0.0 does not consume a new wrapper seam.
 
-The remaining 1.0 admission bar stays strict: per-lane sandbox profiles must close the ownership layer's honest confinement limit before general plugin admission, and the plugin trust boundary must preserve every shipped fail-closed guarantee.
+The first 1.0 slice freezes six stable Draft 2020-12 authoring schemas, a side-effect-free `harnessie validate` command, runtime startup validation, cross-document checks, explicit v1 scaffolds, packaged and served schema artifacts, and the compatibility and deprecation contract in `SCHEMA_COMPATIBILITY.md`. Schema-less 0.8 documents remain implicit v1 throughout 1.x.
 
-The pre-1.0 correctness packet is complete on the current development head. Anthropic and OpenAI-compatible adapters now turn invalid JSON, malformed envelopes, invalid tool calls, and invalid usage counters into non-echoing provider error turns. Adversarial rebuttal agents now receive each peer position in full and exclude their own position by value, removing the truncation that previously produced a spurious objection.
+The second 1.0 slice compiles ownership decisions into agent-specific read-only sandbox overlays for shell calls, deterministic checks, and verifier execution. Operator lanes, other-agent lanes, and other agents' first-writer claims are kernel-protected from interpreter-hidden writes. Invalid patterns and unsupported nested profiles fail closed; unowned paths retain first-writer compatibility.
+
+The third 1.0 slice admits installed tool extensions only through the `harnessie.tools.v1` entry-point group and never auto-loads them. Operators select plugins explicitly with repeatable `--plugin NAME` arguments. Admission validates and namespaces declarations before model dispatch, records loader-supplied provenance, and pins exact plugin receipts across resume. Imported implementation code is explicitly operator-trusted and not lane-confined. Untrusted plugins are unsupported pending a separately versioned out-of-process protocol.
+
+All three planned 1.0 slices and the admission review are complete. The next work is the separately authorized downstream release train and external guide-anchor rotation, followed by post-1.0 maintenance. Do not expand that work into deferred multi-orchestrator or untrusted-plugin designs without new evidence and authority.
+
+The pre-1.0 correctness packet ships in 1.0.0. Anthropic and OpenAI-compatible adapters turn invalid JSON, malformed envelopes, invalid tool calls, and invalid usage counters into non-echoing provider error turns. Adversarial rebuttal agents receive each peer position in full and exclude their own position by value, removing the truncation that previously produced a spurious objection.
 
 `decisions/AIDR-0008` was arbitrated on 2026-07-16 and executed on 2026-07-21 as [snapsynapse/harnessie-engine-wrappers](https://github.com/snapsynapse/harnessie-engine-wrappers). The fresh-authored Apache-2.0 v0.1.0 seed contains a macOS Seatbelt reference wrapper, shared credential deny policy, and a deny/allow/symlink admission probe. Its macOS-14 CI probe passed, unsupported and unavailable backends fail closed, and the consent boundary remains intact: other developers' work enters only through their own consenting contribution.
 
@@ -22,7 +28,7 @@ Cross-repo authority, dependency direction, and release propagation are defined 
 
 ## Verified baseline
 
-Verified on the current development head on 2026-08-09: the composed release gate passed with 387 tests, one environment-dependent skip, 47/47 evals, all six shipped authoring contracts, both manifests, ecosystem and generated-doc validation, isolated wheel and sdist inspection, `twine check`, and a fresh-install smoke.
+Verified for the 1.0.0 release on 2026-08-09: the composed release gate passed with 413 tests, one environment-dependent skip, 50/50 evals, all six shipped authoring contracts, both manifests, ecosystem and generated-doc validation, isolated wheel and sdist inspection, `twine check`, and a fresh-install smoke.
 
 Verified locally on 2026-08-04:
 
@@ -49,7 +55,7 @@ Downstream propagation was verified during the 2026-08-04 MDT closeout:
 - `snapsynapse/homebrew-tap`: the clean local checkout and remote `main` are at `2d64648`. The public formula installs Harnessie 0.8.0 from the immutable PyPI sdist with SHA-256 `c9caffef61a8b1f9569cee36ede59f59c3dc8c66a47e500ecc090d445111f5e7`, declares the audited `libyaml` dependency, and has no open pull request.
 - `snapsynapse/harnessie-engine-wrappers`: v0.1.0 is released from `ad3d759`. CI passed its real macOS-14 containment probe and its Ubuntu unsupported-platform refusal; release archives, wheel, and `SHA256SUMS` are attached.
 - This repo dogfoods `snapsynapse/harnessie-verify-action@v0` in `.github/workflows/verify-pr-claims.yml`. A live verdict still depends on the repository verifier endpoint/model variables and API-key secret.
-- GitHub `main` carries the v0.8.0 release commit, and v0.8.0 is the latest release. Exact-commit CI, Pages, wheel, sdist, and fresh-install checks passed before publication. There were no open pull requests or issues at release preparation.
+- GitHub `main`, tag `v1.0.0`, the GitHub Release, and PyPI carry the core 1.0.0 release. Exact-commit wheel, sdist, structural inspection, `twine check`, and fresh-install checks passed before publication.
 
 ## Handoff disposition
 
@@ -62,16 +68,17 @@ The detailed inventory and relevance assessment is in `audits/handoff-relevance-
 
 ## Recommended work order
 
-1. Close per-lane confinement before general plugin admission. An interpreter or plugin must not write outside its assigned lane merely because the path remains inside the workspace; unsupported profiles fail closed.
-2. Define the plugin trust boundary before coding its loader. Trusted installed extensions may run in process while their tool invocations remain registry-mediated; untrusted extension code requires out-of-process confinement. Choose one extension mechanism rather than leaving Python package entry points and discovered `tools/*.py` ambiguous.
-3. Keep the six v1 authoring contracts frozen while the remaining 1.0 slices develop. Additive schema changes require explicit defaults and compatibility fixtures; breaking changes require a new major schema version and migration path.
-4. Keep multi-orchestrator handoffs deferred unless a documented real job proves a single orchestrator insufficient; it is not an unconditional 1.0 gate. Keep engine-wrapper contributions consent-based and probe-gated.
-5. The smaller remaining core backlog is structured memory frontmatter and macOS sandbox parity for non-workspace temporary writes.
+1. Propagate Harnessie 1.0.0 through the separately owned Verify Action and Homebrew release trains, with their own tests and publication authority.
+2. Rotate the `_assistant-guide.harnessie.com` DNS TXT anchor to the 1.0.0 guide hash and re-run hosted GuideCheck verification.
+3. Keep the six v1 authoring contracts frozen. Additive schema changes require explicit defaults and compatibility fixtures; breaking changes require a new major schema version and migration path.
+4. Treat `PLUGIN_CONTRACT.md` as the complete v1 plugin trust decision. Do not add local-file discovery, automatic loading, configuration namespaces, or an untrusted execution mode without a separately versioned design.
+5. Keep multi-orchestrator handoffs deferred unless a documented real job proves a single orchestrator insufficient. Structured memory frontmatter and macOS temporary-write parity remain post-1.0 candidates pending evidence.
 
 ## Operator-attended or external checks
 
 - Configure the dogfood verifier repository variables and secret if live PR verdicts are desired.
 - Live provider scorecards remain explicit opt-in operations via `HARNESSIE_LIVE=1`.
+- Rotate the independent GuideCheck DNS anchor and re-run hosted verification after the 1.0.0 guide is deployed.
 
 ## Session start commands
 

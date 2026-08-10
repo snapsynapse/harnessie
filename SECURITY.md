@@ -31,20 +31,27 @@ Clean content passes through byte-for-byte, so the filter is free on the common 
 `harness/sandbox.py`. Every child command, both `run_shell` and gate checks, is wrapped in an OS confinement before it executes. This closes the gap the allowlist and argument jail only narrow: an allowlisted interpreter (worker `python3`, verifier `pytest`) can put its write target and its socket calls inside the code string, where a string-level jail cannot see them. The sandbox confines them at the kernel level:
 
 - writes are confined to the workspace subtree; a write anywhere under the user's home is denied (proven: worker `python3 -c "open('~/x','w')"` raises PermissionError and the file is never created).
+- inside the workspace, child commands receive an agent-specific read-only overlay for operator lanes, other-agent lanes, and other agents' first-writer claims. Deterministic checks inherit the worker's overlay, while verifier shell calls receive the verifier's stricter view. A broad glob is translated to a conservative literal root, so uncertainty may deny extra writes but never admits a denied write.
 - network is denied by default; a workflow phase opts in with `allow_network: true`, and verifiers never get it.
 - reads still work, so interpreters run normally.
 
-Every backend is admitted only after a startup smoke test proves it can actually confine on this host; a present-but-unusable backend (managed macOS returning `sandbox_apply: Operation not permitted`, Linux with unprivileged user namespaces restricted) is treated exactly like a missing one. Policy is fail closed everywhere: on a platform with no usable backend, `run_shell` and gate checks are blocked rather than run unconfined. Deliberate boundary: scratch space stays writable so interpreters function, because the protected assets are the user's files and the exfil channel, not scratch space.
+Every backend is admitted only after a startup smoke test proves it can actually confine on this host; a present-but-unusable backend (managed macOS returning `sandbox_apply: Operation not permitted`, Linux with unprivileged user namespaces restricted) is treated exactly like a missing one. A second probe is required when a lane overlay is nonempty: it must prove an ordinary workspace write succeeds while a nested protected write fails. Docker is not lane-admitted from `docker info` alone, so a protected-lane child command on the Docker fallback refuses until its configured image has a truthful probe. Policy is fail closed everywhere: on a platform with no usable backend, or a backend that cannot prove the required profile, `run_shell` and gate checks are blocked rather than run unconfined. Deliberate boundary: scratch space stays writable so interpreters function, because the protected assets are the user's files and the exfil channel, not scratch space.
 
 | Platform | Backend | Confinement primitive | Known gaps |
 |---|---|---|---|
-| macOS | `seatbelt` (`sandbox-exec -p`, native) | SBPL profile: deny `file-write*` under home, allow under workspace; `deny network*` unless opted in | temp dirs outside home writable (deliberate); Apple marks `sandbox-exec` deprecated but it remains functional |
-| Linux (preferred) | `bwrap` (bubblewrap, rootless, no daemon) | read-only bind of `/`, rw bind of workspace only, private `/tmp`, minimal `/dev`, `--unshare-net` unless opted in, `--die-with-parent`, `--new-session` | needs unprivileged userns (smoke-tested; fails closed when restricted); no seccomp filtering beyond bwrap defaults |
-| Linux (alternate) | `firejail` | home read-only except workspace, `--private-dev`, `--private-tmp`, `--net=none` unless opted in | setuid-root binary (larger TCB than bwrap); paths outside home follow firejail defaults, not the read-only-root guarantee |
-| Linux (fallback) | `docker` | workspace bind-mounted as the only host path, `--network none` unless opted in, non-root `--user uid:gid` | requires a daemon (root or rootless); image (`python:3.12-slim`, override `HARNESSIE_SANDBOX_IMAGE`) must provide the tools the allowlist names; missing image surfaces at run time, not probe time |
+| macOS | `seatbelt` (`sandbox-exec -p`, native) | SBPL profile: deny `file-write*` under home, allow under workspace, then deny protected lane roots; `deny network*` unless opted in | temp dirs outside home writable (deliberate); Apple marks `sandbox-exec` deprecated but it remains functional |
+| Linux (preferred) | `bwrap` (bubblewrap, rootless, no daemon) | read-only bind of `/`, rw bind of workspace, nested read-only binds for protected lane roots, private `/tmp`, minimal `/dev`, `--unshare-net` unless opted in | needs unprivileged userns (smoke-tested; fails closed when restricted); no seccomp filtering beyond bwrap defaults |
+| Linux (alternate) | `firejail` | home read-only except workspace, protected lane roots made read-only, `--private-dev`, `--private-tmp`, `--net=none` unless opted in | setuid-root binary (larger TCB than bwrap); paths outside home follow firejail defaults, not the read-only-root guarantee |
+| Linux (fallback) | `docker` | workspace bind-mounted as the only host path, `--network none` unless opted in, non-root `--user uid:gid` | base sandbox only; lane profiles fail closed because daemon reachability does not prove the configured image can enforce nested mounts |
 | Windows | none | — | fails closed; use WSL2 (presents as Linux) |
 
 Backend order on Linux is bwrap, then firejail, then docker — smallest trusted computing base first.
+
+### Trusted plugin boundary
+
+`harness/plugins.py`. Tool extensions have one opt-in mechanism: installed entry points in `harnessie.tools.v1`, selected by name with `--plugin` on both run and resume. Harnessie never scans local tool files or auto-loads an installed plugin. Admission validates and namespaces every tool before model dispatch, and the registry enforces its role grant, consent lock, approval requirement, effects metadata, quarantine choice, and loader-supplied provenance.
+
+The plugin import and tool implementation run inside the Harnessie process with the operator's authority. They are not OS-sandboxed, do not inherit per-agent read-only lane profiles, and can lie about their own behavior despite declared effects. Install and admit only trusted code. Untrusted plugins are unsupported. A future untrusted mode requires a separately versioned out-of-process protocol that carries lane roots, scrubbed environment, network default, approval decision, and effects declaration into the confined child. See `PLUGIN_CONTRACT.md`.
 
 ### 5. Artifact-volume ceilings (mechanical, harness-enforced, opt-in)
 
@@ -75,7 +82,7 @@ The gate's verifier agent runs in a fresh context, sees only artifacts and crite
 | 1 ingress filter | known directive phrasings, hidden Unicode | novel phrasings; injection as plausible prose |
 | 2 loop tripwire | re-steers the model after a flagged read | only fires when layer 1 flagged something |
 | 3 deny_tools | limits blast radius of a hijack | a phase still needs some tools |
-| 4 OS sandbox | interpreter writes outside workspace; network exfil | scratch-space writes; a phase that opts into network |
+| 4 OS sandbox | interpreter writes outside workspace or into another ownership lane; network exfil | scratch-space writes; a phase that opts into network |
 | 5 artifact-volume ceilings | runaway file creation and rewrite volume inside the workspace | opt-in; harness-owned artifacts outside the workspace are not counted |
 | 6 secret guards | credential exfil via env, shell output, file writes | secrets in non-standard formats |
 | 7 verifier | behavior-level corruption of the deliverable | injection that satisfies the criteria maliciously |
@@ -88,7 +95,7 @@ The honest residual: a well-crafted injection written as ordinary-looking advice
 Three further code-enforced controls, specified in [GOVERNANCE.md](GOVERNANCE.md), that bound what agents can do to each other and what any of them can hide from the operator:
 
 - Consent lock: on consent-gated worker phases, registry dispatch refuses write/execute tools until the agent calls `accept_task`; `decline_task` is a first-class stop the gate routes to a single counter-proposal re-offer or the operator, never to route escalation. A hijacked or confused agent cannot mutate anything while the offer is still open.
-- Ownership lanes: `write_file` checks `OWNERSHIP.yaml` (project root, outside the workspace jail, unwritable by any agent) — agents own the files they create, cross-agent writes are refused with a `request_change` remedy, operator lanes are locked to all agents. Honest limit: an allowlisted interpreter can still write inside the workspace without a per-file check; the sandbox confines the workspace as a whole, events record every call, and verifiers plus audit catch what the per-file check cannot block. Per-lane sandbox profiles are roadmap.
+- Ownership lanes: `write_file` checks `OWNERSHIP.yaml` (project root, outside the workspace jail, unwritable by any agent). Agents own the files they create, cross-agent writes are refused with a `request_change` remedy, and operator lanes are locked to all agents. The same decision is compiled into the OS sandbox for interpreters and checks: denied lane roots become read-only, invalid patterns or unsupported profiles refuse child execution, and unowned paths retain first-writer semantics.
 - Hash-chained audit: every event carries `seq` and `prev` (SHA-256 of the previous line); `harnessie audit <run_id>` verifies the chain and renders the consent/ownership/injection/gate/arbitration timeline, exit 1 on any break. Tamper-evident, not tamper-proof: whole-file rewrites are out of scope; anchoring the chain head externally (git commit, transparency log) is the operator's escrow decision.
 
 Decision records for contested phases live under `runs/<id>/decisions/` — also outside the workspace jail — and only a human may author their Arbitration sections; the harness lints structure and earned claims but never judgment.
@@ -123,6 +130,7 @@ The security claims here are meant to be contestable, not asserted. [evals/redte
 - Give content-reading phases the narrowest `deny_tools` that still lets the task run.
 - Leave `allow_network` off unless a phase genuinely needs the network; verifiers never get it.
 - Declare phase and workflow `blast_radius` ceilings whenever the artifact volume can be bounded in advance.
+- Run `harnessie validate` after editing ownership lanes. Use relative POSIX patterns only; broad globs are enforced conservatively and may make a larger subtree read-only.
 - On a host without a usable sandbox backend, wire one before running shell-using workflows; until then they fail closed.
 - Keep secrets in environment variables; never write a prompt that reads a key into a command string.
 - Verify sources exist before trusting them (the verification-workflow pattern; see [source-verification.json](source-verification.json)).

@@ -1,6 +1,6 @@
 """Proves the OS sandbox closes the interpreter-escape gap: an allowlisted
-python3 can no longer write outside the workspace or open the network, and
-when no sandbox backend exists the harness fails closed.
+python3 can no longer write outside the workspace, into a denied ownership
+lane, or onto the network, and missing or insufficient backends fail closed.
 
 These tests execute real sandbox-exec on macOS. On a platform with no backend
 the escape/allow cases are skipped (there is nothing to confine), but the
@@ -21,6 +21,9 @@ from harness.verify import Check, run_checks
 
 HAS_SANDBOX = sandbox.available()
 needs_sandbox = pytest.mark.skipif(not HAS_SANDBOX, reason="no OS sandbox backend")
+HAS_LANE_SANDBOX = sandbox.readonly_available()
+needs_lane_sandbox = pytest.mark.skipif(
+    not HAS_LANE_SANDBOX, reason="no read-only lane sandbox backend")
 
 
 def make_reg(tmp_path):
@@ -39,6 +42,16 @@ def test_profile_denies_network_by_default(tmp_path):
     assert '(deny file-write* (subpath "' in prof   # home write denied
     open_prof = sandbox._seatbelt_profile(tmp_path, allow_network=True)
     assert "(deny network*)" not in open_prof         # opt-in lifts it
+
+
+def test_seatbelt_profile_restricts_lane_after_workspace_allow(tmp_path):
+    protected = tmp_path / "protected"
+    protected.mkdir()
+    prof = sandbox._seatbelt_profile(
+        tmp_path, allow_network=False, readonly_paths=(protected,))
+    workspace_allow = prof.index('(allow file-write* (subpath "')
+    lane_deny = prof.index(f'(deny file-write* (subpath "{protected}"))')
+    assert lane_deny > workspace_allow
 
 
 def test_wrap_returns_sandbox_prefixed_argv(tmp_path):
@@ -97,6 +110,28 @@ def test_worker_network_denied_by_default(tmp_path):
     assert "exit=0" not in res.content or "error" in res.content.lower()
 
 
+@needs_lane_sandbox
+def test_worker_interpreter_cannot_modify_operator_lane(tmp_path):
+    ws = tmp_path / "ws"
+    frozen = ws / "frozen"
+    frozen.mkdir(parents=True)
+    target = frozen / "config.txt"
+    target.write_text("original")
+    ledger_path = tmp_path / "OWNERSHIP.yaml"
+    ledger_path.write_text("lanes:\n  operator: ['frozen/*']\n")
+    from harness.ownership import OwnershipLedger
+    reg = ToolRegistry()
+    register_builtin(reg, workspace=ws, ledger=OwnershipLedger.load(ledger_path))
+    res = reg.dispatch("worker", "run_shell", {
+        "command": "python3 -c \"from pathlib import Path; "
+                   "Path('allowed.txt').write_text('ok'); "
+                   "Path('frozen/config.txt').write_text('changed')\"",
+    }, agent="implementer")
+    assert res.ok and "exit=0" not in res.content
+    assert (ws / "allowed.txt").read_text() == "ok"
+    assert target.read_text() == "original"
+
+
 # -- fail closed everywhere (runs on all platforms) -------------------------
 
 def test_run_shell_fails_closed_without_backend(tmp_path, monkeypatch):
@@ -116,6 +151,35 @@ def test_gate_check_fails_closed_without_backend(tmp_path, monkeypatch):
                          tmp_path, proofs, events, attempt=1)
     assert not results[0].passed
     assert "sandbox unavailable" in results[0].output
+
+
+def test_gate_check_receives_worker_lane_profile(tmp_path, monkeypatch):
+    protected = tmp_path / "protected"
+    protected.mkdir()
+    captured = {}
+
+    def fake_wrap(argv, workspace, allow_network=False, readonly_paths=()):
+        captured["readonly"] = readonly_paths
+        return ["true"]
+
+    monkeypatch.setattr(sandbox, "wrap", fake_wrap)
+    proofs = ProofStore(tmp_path / "run")
+    events = EventLog(tmp_path / "run", echo=False)
+    results = run_checks(
+        [Check(name="t", command="python3 -c pass")],
+        tmp_path, proofs, events, attempt=1,
+        readonly_paths=(protected,))
+    assert results[0].passed
+    assert captured["readonly"] == (protected,)
+
+
+def test_readonly_lane_backend_failure_blocks_child(monkeypatch, tmp_path):
+    protected = tmp_path / "protected"
+    protected.mkdir()
+    monkeypatch.setattr(sandbox, "backend_name", lambda: "docker")
+    monkeypatch.setattr(sandbox, "readonly_backend_name", lambda: None)
+    with pytest.raises(sandbox.SandboxUnavailable, match="lane enforcement"):
+        sandbox.wrap(["ls"], tmp_path, readonly_paths=(protected,))
 
 
 # -- Linux backend selection and policy construction (run on any host) ------
@@ -141,6 +205,15 @@ def test_linux_backend_preference_order(monkeypatch):
     assert sandbox.backend_name() is None
 
 
+def test_lane_backend_falls_through_to_proven_alternative(monkeypatch):
+    _force_linux(monkeypatch, {"bwrap", "firejail", "docker"})
+    monkeypatch.setattr(sandbox, "_bwrap_usable", lambda: True)
+    monkeypatch.setattr(sandbox, "_firejail_usable", lambda: True)
+    monkeypatch.setattr(
+        sandbox, "_readonly_backend_usable", lambda name: name == "firejail")
+    assert sandbox.readonly_backend_name() == "firejail"
+
+
 def test_linux_present_but_unusable_backend_fails_closed(monkeypatch):
     # binary on PATH, smoke test failing (e.g. userns restricted) = no backend
     _force_linux(monkeypatch, {"bwrap"})
@@ -163,6 +236,27 @@ def test_bwrap_policy_confines_writes_and_network(monkeypatch, tmp_path):
     assert argv[argv.index("--") + 1:] == ["python3", "-c", "pass"]
     open_net = sandbox.wrap(["ls"], tmp_path, allow_network=True)
     assert "--unshare-net" not in open_net
+
+
+def test_backend_argv_adds_nested_readonly_overlays(tmp_path):
+    ws = tmp_path.resolve()
+    protected = ws / "protected"
+    protected.mkdir()
+    bwrap = sandbox._bwrap_argv(["true"], ws, False, (protected,))
+    pairs = list(zip(bwrap, bwrap[1:], bwrap[2:]))
+    assert ("--ro-bind", str(protected), str(protected)) in pairs
+    firejail = sandbox._firejail_argv(["true"], ws, False, (protected,))
+    assert f"--read-only={protected}" in firejail
+    docker = sandbox._docker_argv(["true"], ws, False, (protected,))
+    assert f"type=bind,src={protected},dst={protected},readonly" in docker
+
+
+def test_absent_protected_path_broadens_to_existing_parent(tmp_path):
+    parent = tmp_path / "parent"
+    parent.mkdir()
+    roots = sandbox._portable_readonly_roots(
+        tmp_path, (parent / "future" / "locked.txt",))
+    assert roots == (parent.resolve(),)
 
 
 def test_firejail_policy_confines_writes_and_network(monkeypatch, tmp_path):

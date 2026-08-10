@@ -68,8 +68,8 @@ All commands are subcommands of `python3 -m harness.cli` (or `harnessie` once in
 
 | Command | What it does |
 |---|---|
-| `run <workflow> --goal "..."` | Run a workflow from a goal. Prints a pre-run cost preview first (LIVE vs MOCK, ceilings, worst case) and refuses a live run with no budget ceiling; ends with a plain-language summary and the run id. |
-| `resume <run_id> <workflow> --goal "..."` | Resume a run from its journal. Re-runs only phases that did not pass. |
+| `run <workflow> --goal "..."` | Run a workflow from a goal. Prints a pre-run cost preview first (LIVE vs MOCK, ceilings, worst case) and refuses a live run with no budget ceiling; ends with a plain-language summary and the run id. Repeat `--plugin NAME` to admit an installed `harnessie.tools.v1` plugin explicitly. |
+| `resume <run_id> <workflow> --goal "..."` | Resume a run from its journal. Re-runs only phases that did not pass. Repeat the original `--plugin NAME` set exactly; name, version, entry-point target, or tool drift refuses before model dispatch. |
 | `report <run_id>` | Plain-language run summary: outcome, per-phase status, and on a halt the one named next action. `--raw` appends the raw journal, events, and proof listing. |
 | `audit <run_id>` | Verify the hash chain and render the governance timeline. Exit 0 clean, 1 broken chain, 2 run not found. |
 | `eval [suite]` | Run the deterministic eval scorecards (optionally one suite YAML). |
@@ -286,6 +286,8 @@ The boundary was adapted with provenance from PAICE.work PBC production PII code
 
 Paths not covered by any lane use first-writer-owns: the first agent to write a file claims it, and later cross-agent writes are refused. Claims and denials are logged as events and show up in the audit timeline. An agent that needs a file it does not own calls `request_change` to record the need rather than overwriting.
 
+Ownership also applies to child processes. Before `run_shell` or a deterministic check starts, Harnessie derives a read-only overlay for operator lanes, other-agent lanes, and other agents' first-writer claims. Broad globs are reduced to a conservative literal root, so a pattern such as `frozen/*` protects the complete `frozen/` subtree. Invalid patterns and sandbox backends that cannot prove nested read-only enforcement block child execution fail-closed. Unlisted paths remain available under first-writer semantics. Run `harnessie validate` after editing the ledger.
+
 ## Governance: consent, contests, and arbitration
 
 Harnessie treats agent work as governed, not merely executed. Three mechanisms carry that.
@@ -324,7 +326,7 @@ Harnessie's guarantees live in code at the tool and registry layer, so no role p
 - Consent lock. Side-effecting tools stay locked until the worker accepts the task.
 - Maiden voyage. A newly fingerprinted worker contract writes only to a staged clone until the operator approves the verified snapshot.
 - Workspace jail. File tools resolve and confine paths to the workspace subtree; a path escape is refused.
-- OS sandbox. Every child command (shell and gate checks) runs in an OS confinement that denies writes outside the workspace and denies network by default. macOS uses Seatbelt; Linux uses bubblewrap, firejail, or docker. No usable backend means shell fails closed.
+- OS sandbox. Every child command (shell and gate checks) runs in an OS confinement that denies writes outside the workspace, overlays ownership paths denied to the active agent as read-only, and denies network by default. macOS uses Seatbelt; Linux uses bubblewrap or firejail for lane profiles. The Docker fallback handles the base workspace sandbox but refuses protected-lane execution until its configured image can be probe-admitted. No usable profile means shell fails closed.
 - Quarantine. Tool results and inter-phase reports are scanned for injection patterns and invisible or bidirectional characters; flagged content is stripped of invisibles and fenced as data-not-instructions before a model sees it.
 - Secret handling. Child processes run under a scrubbed environment, so provider keys are never inherited. Shell output is redacted for credential-shaped strings, and writing credential-shaped content into the workspace is refused. Secret detection reports kind labels, never the value.
 - Containment boundary (opt-in). When enabled in `config/boundary.yaml`, structured PII is stripped to placeholders before any egress and a secret in an egress payload halts the run; unstructured sensitive data is kept on your controlled tiers by contained routing. See [The containment boundary](#the-containment-boundary).
@@ -334,13 +336,17 @@ The full threat model, the honest limits of each layer, and the per-platform bac
 
 ## Extending the harness
 
-Adding a tool. Tools are registered with a name, a JSON-schema signature, an effects class (`read`, `write`, or `execute`), the roles allowed to call it, and whether it requires approval. Registration is in `harness/tools/builtin.py`. The effects class and role grant are enforced at dispatch, so a new tool cannot bypass policy. The built-in grants are a useful template:
+Adding a built-in tool. Built-ins are registered with a name, a JSON-schema signature, an effects class (`read`, `write`, or `execute`), the roles allowed to call it, and whether it requires approval. Registration is in `harness/tools/builtin.py`. The effects class and role grant are enforced at dispatch. The built-in grants are a useful template:
 
 | Tool | Roles | Effects |
 |---|---|---|
 | `read_file`, `list_files`, `task_complete` | orchestrator, worker, verifier | read |
 | `run_shell` | worker, verifier | execute |
 | `write_file`, `accept_task`, `decline_task`, `save_fact`, `expire_fact`, `request_change` | worker | write or read |
+
+Adding an installed plugin. Harnessie supports exactly one plugin mechanism: Python package entry points in `harnessie.tools.v1`. Installation alone grants nothing. The operator must name each plugin with `--plugin NAME`, and resume requires the same recorded plugin receipts. Admission validates the declaration, prefixes local tools as `PLUGIN__TOOL`, and supplies immutable `plugin:NAME@VERSION` provenance to every result event. Plugin tools enter the normal registry, so roles, consent, approval, effects metadata, and quarantine still mediate their calls.
+
+The plugin import and implementation are operator-trusted in-process code. Registry mediation is not a sandbox and does not prove the implementation honors its declared effects. Harnessie has no untrusted plugin mode. Do not install or admit untrusted code. See [PLUGIN_CONTRACT.md](../PLUGIN_CONTRACT.md) for the package metadata, declaration shape, resume identity, and future out-of-process requirements.
 
 Adding a role. A role is a markdown prompt file plus its kind. Orchestrators live at `agents/orchestrator.md`, workers under `agents/workers/<name>.md`, verifiers under `agents/verifiers/<name>.md`. The harness appends machine-owned boundary text per kind, so the prompt file defines the role's job while policy stays in the harness. Reference the role by file name as a phase's `agent`.
 
@@ -356,13 +362,13 @@ Do I need an API key to try it? No. The test suite and `harnessie eval` run agai
 
 Can I run it fully offline on open-source models? Yes. Point the task classes you use at the `local` tier in `config/models.yaml` and use any OpenAI-compatible server (Ollama, vLLM, llama.cpp). Leave the key env unset.
 
-Does it run on Linux? Yes, with a sandbox backend present (bubblewrap preferred, then firejail, then docker). Without a usable backend, shell-using workflows fail closed by design. Windows should use WSL2, which presents as Linux.
+Does it run on Linux? Yes, with a sandbox backend present (bubblewrap preferred, then firejail, then docker for the base workspace sandbox). A nonempty ownership overlay currently requires bubblewrap or firejail to pass its nested read-only probe; Docker refuses that profile. Without a usable backend or required profile, shell-using workflows fail closed by design. Windows should use WSL2, which presents as Linux.
 
 What happens if a worker goes off the rails? The gate is the backstop: deterministic checks plus an independent verifier that fails closed, then an automatic reformulate-effort-tier ladder, then a human halt. Ownership lanes and the sandbox bound what a single worker can touch in the meantime.
 
 Where is my run's data? Under `runs/<run_id>/`: `journal.jsonl` (the resume ledger), `events.jsonl` (the hash-chained audit log), `proofs/` (check outputs), and `decisions/` (contested-phase records). This directory is gitignored.
 
-How do I make an agent stop overwriting another agent's files? Declare lanes in `OWNERSHIP.yaml`, or rely on first-writer-owns. Cross-agent writes are refused with a `request_change` remedy.
+How do I make an agent stop overwriting another agent's files? Declare lanes in `OWNERSHIP.yaml`, or rely on first-writer-owns. Cross-agent writes are refused with a `request_change` remedy, and interpreter or test-runner attempts see the denied paths as read-only.
 
 ## See also
 

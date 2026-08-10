@@ -14,6 +14,7 @@ Harnessie 1.0 freezes six operator-authored contracts at schema version 1: model
 - Unknown keys fail at every core schema level. Provider-specific request fields belong only under a model's explicit `extra` mapping.
 - Types are exact. Strings are not coerced to booleans or numbers, and falsey invalid containers are not converted to defaults.
 - Structural validation runs before cross-document validation. Cross-document checks cover configured tiers, cascade names, role and verifier names, unique phase names, prior-phase placeholders, and consecutive parallel groups.
+- Ownership lane and claim paths must be relative POSIX paths or globs without traversal, backslashes, control characters, or surrounding whitespace. Broad globs are accepted but sandbox enforcement protects their conservative literal prefix.
 - Diagnostics are deterministic and contain source, instance path, code, message, and schema version. Invalid authoring input exits 2 and never reaches a model.
 - `harnessie validate` validates the project without model calls, network, sandbox admission, run-state creation, or workspace writes. `harnessie validate PATH --kind KIND` validates one explicitly typed document.
 
@@ -33,7 +34,7 @@ Changing a behavioral default is a major-version change. JSON Schema's `default`
 
 ## Extension boundary
 
-Version 1 defines no active plugin configuration namespace. A future plugin contract must introduce one named extension mechanism and namespaced configuration with its own schema identity. Nonempty unknown extension data fails closed until the owning plugin and schema are admitted. This prevents a misspelled core control or an unavailable plugin from becoming silently ignored configuration.
+Version 1 defines no plugin configuration namespace. The active plugin contract is command-line admission of installed `harnessie.tools.v1` entry points, documented separately in `PLUGIN_CONTRACT.md`; it does not widen any of the six authoring schemas. Nonempty unknown extension data in a v1 authoring document remains invalid. Any future plugin-owned configuration requires its own namespaced schema identity and compatibility policy rather than an unvalidated escape hatch.
 
 ## Outside this guarantee
 

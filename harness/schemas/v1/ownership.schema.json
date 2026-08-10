@@ -13,9 +13,19 @@
         "operator": {"$ref": "#/$defs/paths"}
       }
     },
-    "files": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1}}
+    "files": {
+      "type": "object",
+      "propertyNames": {"$ref": "#/$defs/path"},
+      "additionalProperties": {"type": "string", "minLength": 1}
+    }
   },
   "$defs": {
-    "paths": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!\\s)(?!/)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!.*\\s$)[^\\\\\\r\\n]+$",
+      "description": "Relative POSIX path or glob without traversal, backslashes, or surrounding whitespace."
+    },
+    "paths": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/path"}}
   }
 }

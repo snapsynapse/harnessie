@@ -51,6 +51,8 @@ def main(argv: list[str] | None = None) -> int:
     p_run.add_argument("--approval-policy", help="headless approval policy YAML")
     p_run.add_argument("--approve-interactive", action="store_true",
                        help="prompt on TTY for approval-gated tools")
+    p_run.add_argument("--plugin", action="append", default=[], metavar="NAME",
+                       help="admit an installed harnessie.tools.v1 plugin (repeatable)")
 
     p_resume = sub.add_parser("resume", help="resume a run from its journal")
     p_resume.add_argument("run_id")
@@ -59,6 +61,8 @@ def main(argv: list[str] | None = None) -> int:
     p_resume.add_argument("--approval-policy", help="headless approval policy YAML")
     p_resume.add_argument("--approve-interactive", action="store_true",
                           help="prompt on TTY for approval-gated tools")
+    p_resume.add_argument("--plugin", action="append", default=[], metavar="NAME",
+                          help="readmit the original harnessie.tools.v1 plugin (repeatable)")
 
     p_report = sub.add_parser(
         "report", help="plain-language summary of a run and its next action")
@@ -297,13 +301,27 @@ def main(argv: list[str] | None = None) -> int:
         print(preview.refuse_reason, file=sys.stderr)
         return 2
 
+    from .plugins import PluginError, resolve_plugins
+    try:
+        plugins = resolve_plugins(getattr(args, "plugin", []))
+    except PluginError as exc:
+        print(f"plugin admission refused: {exc}", file=sys.stderr)
+        return 2
+
     run_id = args.run_id if args.cmd == "resume" else None
     approval_policy = (root / args.approval_policy).resolve() \
         if getattr(args, "approval_policy", None) else None
-    runner = WorkflowRunner(project_root=root, run_id=run_id,
-                            approval_policy=approval_policy,
-                            interactive_approvals=bool(
-                                getattr(args, "approve_interactive", False)))
+    try:
+        runner = WorkflowRunner(
+            project_root=root, run_id=run_id,
+            approval_policy=approval_policy,
+            interactive_approvals=bool(
+                getattr(args, "approve_interactive", False)),
+            plugins=plugins,
+        )
+    except PluginError as exc:
+        print(f"plugin admission refused: {exc}", file=sys.stderr)
+        return 2
     from .explain import HALT_STATUSES, format_run_summary
 
     outcomes = runner.run_workflow(root / args.workflow, goal=args.goal)

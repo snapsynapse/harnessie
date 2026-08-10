@@ -200,8 +200,10 @@ def test_refuse_policy_halts_before_model_dispatch_on_drift(tmp_path):
     assert brain.calls == []
     events = _events(tmp_path, "refuse")
     assert [event["kind"] for event in events] == [
+        "plugin_set_admitted",
         "inward_manifest_refused",
     ]
+    assert events[0]["plugins"] == []
 
 
 def test_record_policy_runs_and_records_drift_before_workflow_start(tmp_path):

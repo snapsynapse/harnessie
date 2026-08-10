@@ -1,17 +1,21 @@
 """Ownership lanes: agents own their files, not each other's.
 
 OWNERSHIP.yaml lives at the project root (outside the workspace jail, so no
-agent can edit it). Enforcement happens at write_file dispatch, fail closed.
+agent can edit it). Direct writes are checked at dispatch; child processes get
+the same denials as a kernel-enforced read-only overlay.
 """
 
 import json
 import re
+
+import pytest
 
 from harness.events import EventLog
 from harness.ids import verify_check_digit
 from harness.loop import AgentLoop
 from harness.models.base import AssistantTurn, MockModel, ModelSpec, ToolCall
 from harness.ownership import OwnershipLedger
+from harness.tools import builtin
 from harness.tools.builtin import register_builtin
 from harness.tools.registry import ToolRegistry
 
@@ -102,6 +106,41 @@ def test_isolated_view_enforces_declared_lanes_without_auto_claims(tmp_path):
     assert view.claim("alice", "ordinary.txt") is False
 
 
+def test_confinement_roots_cover_operator_other_agent_and_claims(tmp_path):
+    ws = tmp_path / "ws"
+    ws.mkdir()
+    ledger = OwnershipLedger(
+        path=tmp_path / "OWNERSHIP.yaml",
+        agent_lanes={"alice": ["alice/*"], "bob": ["bob/*"]},
+        collaborative=["shared/*"],
+        operator=["frozen/*"],
+        files={"alice-owned.txt": "alice", "bob-owned.txt": "bob"},
+    )
+    assert set(ledger.confinement_roots("alice", ws)) == {
+        (ws / "bob").resolve(),
+        (ws / "frozen").resolve(),
+        (ws / "bob-owned.txt").resolve(),
+    }
+
+
+def test_root_level_glob_conservatively_protects_whole_workspace(tmp_path):
+    ws = tmp_path / "ws"
+    ws.mkdir()
+    ledger = OwnershipLedger(
+        path=tmp_path / "OWNERSHIP.yaml", operator=["*.lock"])
+    assert ledger.confinement_roots("alice", ws) == (ws.resolve(),)
+
+
+@pytest.mark.parametrize("pattern", ["/absolute/*", "../escape/*", "bad\\path/*"])
+def test_invalid_lane_pattern_refuses_confinement(tmp_path, pattern):
+    ws = tmp_path / "ws"
+    ws.mkdir()
+    ledger = OwnershipLedger(
+        path=tmp_path / "OWNERSHIP.yaml", operator=[pattern])
+    with pytest.raises(ValueError, match="ownership lane pattern"):
+        ledger.confinement_roots("alice", ws)
+
+
 # -- tool-layer enforcement ----------------------------------------------------
 
 def make_agent_loop(tmp_path, agent, script):
@@ -119,6 +158,40 @@ def make_agent_loop(tmp_path, agent, script):
 def events_of(tmp_path, kind):
     lines = (tmp_path / "run" / "events.jsonl").read_text().splitlines()
     return [json.loads(l) for l in lines if json.loads(l).get("kind") == kind]
+
+
+def test_run_shell_receives_agent_specific_readonly_roots(tmp_path, monkeypatch):
+    ws = tmp_path / "ws"
+    (ws / "frozen").mkdir(parents=True)
+    ledger = OwnershipLedger(
+        path=tmp_path / "OWNERSHIP.yaml", operator=["frozen/*"])
+    captured = {}
+
+    def fake_wrap(argv, workspace, allow_network=False, readonly_paths=()):
+        captured["readonly"] = readonly_paths
+        return ["true"]
+
+    monkeypatch.setattr(builtin, "sandbox_wrap", fake_wrap)
+    registry = ToolRegistry()
+    register_builtin(registry, workspace=ws, ledger=ledger)
+    result = registry.dispatch(
+        "worker", "run_shell", {"command": "ls"}, agent="alice")
+    assert result.ok and "exit=0" in result.content
+    assert captured["readonly"] == ((ws / "frozen").resolve(),)
+
+
+def test_invalid_lane_pattern_blocks_shell_fail_closed(tmp_path, monkeypatch):
+    ws = tmp_path / "ws"
+    ws.mkdir()
+    ledger = OwnershipLedger(
+        path=tmp_path / "OWNERSHIP.yaml", operator=["../escape/*"])
+    registry = ToolRegistry()
+    register_builtin(registry, workspace=ws, ledger=ledger)
+    result = registry.dispatch(
+        "worker", "run_shell", {"command": "ls"}, agent="alice")
+    assert result.refusal
+    assert result.refusal.error == "sandbox_unavailable"
+    assert "ownership lane pattern" in result.refusal.detail
 
 
 def test_cross_agent_write_denied_at_dispatch(tmp_path):

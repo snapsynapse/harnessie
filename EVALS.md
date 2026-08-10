@@ -8,7 +8,7 @@ Harnessie evals are YAML scorecards under `evals/`. They are deliberately small,
 ## Scenario contract
 Every scenario has:
 - `id`: stable snake-case identifier, unique within the suite.
-- `kind`: one of `verdict`, `loop`, `workflow`, `resume`, `ownership`, `adversarial`, `audit`, `triage`, `parallel`, `blast_radius`, `inward_manifest`, `maiden_voyage`, or `repo_hygiene`.
+- `kind`: one of `verdict`, `loop`, `workflow`, `resume`, `ownership`, `plugin`, `adversarial`, `audit`, `triage`, `parallel`, `blast_radius`, `inward_manifest`, `maiden_voyage`, or `repo_hygiene`.
 - Expected result fields, which depend on `kind`.
 ## Suites
 - `evals/baseline.yaml`: core harness guarantees (verdicts, stop conditions, gates, resume).
@@ -44,6 +44,11 @@ Sequential worker loops as different agents over one shared workspace and owners
 - Input: `steps` (list of `{agent, script}`), optional `lanes` (`agent` / `collaborative` / `operator`)
 - Expected: optional `expect_owner` (path -> agent), `expect_file`, `expect_file_absent`
 - Use for first-writer-owns, cross-agent denial, operator-lane locks, and collaborative sharing.
+### plugin
+Exercises the v1 installed entry-point declaration boundary without importing an external package.
+- Input: `entry_point_name`, `declaration_name`, `tool_name`, and `version`.
+- Expected: `expect_admitted`.
+- Use for namespaced golden admission, loader-supplied provenance, and fail-closed declaration mismatches.
 ### adversarial
 A contested phase (`mode: adversarial`, two scripted positions) in a temporary project.
 - Input: `script`; optional `arbitration_text` to simulate the operator arbitrating between runs (the eval fixture plays the human; at runtime no code path does this)

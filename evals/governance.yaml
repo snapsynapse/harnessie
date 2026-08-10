@@ -3,6 +3,23 @@
 # route through the declared ladder. Deterministic, mock-brain, no network.
 name: governance
 scenarios:
+  # -- plugin admission: golden + risky ---------------------------------------
+  - id: plugin_explicit_declaration_is_namespaced_and_attributed
+    kind: plugin
+    entry_point_name: acme
+    declaration_name: acme
+    tool_name: lookup
+    version: 1.0.0
+    expect_admitted: true
+
+  - id: plugin_name_mismatch_fails_closed
+    kind: plugin
+    entry_point_name: acme
+    declaration_name: renamed
+    tool_name: lookup
+    version: 1.0.0
+    expect_admitted: false
+
   # -- consent: golden ---------------------------------------------------------
   - id: consent_accept_unlocks_side_effects
     kind: loop
@@ -118,6 +135,20 @@ scenarios:
           - { tool: write_file, args: { path: shared/notes.md, content: from-bob } }
           - { tool: task_complete, args: { report: done } }
     expect_file: { path: shared/notes.md, contains: from-bob }
+
+  - id: ownership_child_profile_covers_denied_lanes_and_claims
+    kind: ownership
+    lanes:
+      agent:
+        bob: ["bob/*"]
+      operator: ["frozen/*"]
+    steps:
+      - agent: bob
+        script:
+          - { tool: write_file, args: { path: claimed.txt, content: bob-owned } }
+          - { tool: task_complete, args: { report: done } }
+    confinement_agent: alice
+    expect_confinement_roots: [bob, claimed.txt, frozen]
 
   # -- adversarial: golden convergence ------------------------------------------
   - id: adversarial_unanimous_converges

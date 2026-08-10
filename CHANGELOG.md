@@ -4,11 +4,17 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+## 1.0.0 (2026-08-09)
+
+Theme: extensibility earned. Harnessie freezes its authoring contracts, closes the interpreter ownership gap, and admits installed tool extensions through one explicit trust boundary.
+
 ### Added
 
 - Six stable Draft 2020-12 authoring schemas now cover models, cascade, boundary, approval-policy, ownership, and workflow documents. `harnessie validate` checks one document or a complete project without starting a run, reports deterministic path and code diagnostics, and performs cross-document checks for roles, tiers, cascade policies, phase references, and placeholders.
 - Runtime loaders use the same strict validation contract and fail closed before model dispatch. Project scaffolds and shipped documents declare `schema_version: 1`; schema-less 0.8 documents remain implicit v1 throughout 1.x under the compatibility and deprecation rules in `SCHEMA_COMPATIBILITY.md`.
 - Schema JSON ships inside the Python package, is pinned by the inward manifest, and is served byte-identically from `/schemas/v1/` under the public trust manifest. Release artifact checks require the validator and all six packaged schemas.
+- Per-lane sandbox profiles close the interpreter ownership gap. Operator lanes, other-agent lanes, and other agents' first-writer claims become conservative read-only overlays for worker shell calls, deterministic checks, and verifier execution. Each backend must separately prove nested read-only enforcement; an invalid pattern or unsupported profile blocks the child process fail-closed. Unowned paths retain existing first-writer behavior.
+- Installed tool plugins now use one explicit versioned mechanism: `harnessie.tools.v1` Python package entry points selected with repeatable `--plugin NAME` arguments. Admission validates declarations, namespaces tools, applies the normal registry policy, stamps immutable provenance, and pins exact receipts across resume. Imported implementations are explicitly operator-trusted in-process code; untrusted plugins remain unsupported pending an out-of-process protocol.
 
 ### Fixed
 
@@ -17,7 +23,7 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ### Verified
 
-- The composed release gate passes 387 tests with one environment-dependent skip, 47/47 deterministic evals, side-effect-free authoring validation, both manifests, ecosystem and generated-doc validation, isolated wheel and source builds, `twine check`, packaged-schema inspection, and a fresh-install smoke.
+- The composed release gate passes 413 tests with one environment-dependent skip, 50/50 deterministic evals, side-effect-free authoring validation, both manifests, ecosystem and generated-doc validation, isolated wheel and source builds, `twine check`, packaged-schema inspection, and a fresh-install smoke.
 
 ## 0.8.0 (2026-08-04)
 

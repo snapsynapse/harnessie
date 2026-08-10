@@ -49,6 +49,8 @@ from .memory import ProjectMemory, ProofStore
 from .models import build_model
 from .models.base import EFFORT_LEVELS, ModelSpec
 from .ownership import OwnershipLedger
+from .plugins import (AdmittedPlugin, plugin_receipts, register_plugins,
+                      verify_resume_plugins)
 from .write_safety import WriteDeclarationError, parallel_write_conflicts
 from .quarantine import guard_result
 from .roles import RoleLibrary
@@ -152,7 +154,8 @@ class WorkflowRunner:
     def __init__(self, project_root: Path, models_config: Path | None = None,
                  run_id: str | None = None, echo: bool = True,
                  approval_policy: Path | None = None,
-                 interactive_approvals: bool = False) -> None:
+                 interactive_approvals: bool = False,
+                 plugins: tuple[AdmittedPlugin, ...] = ()) -> None:
         self.root = project_root.resolve()
         tiers, routing_table, budget_cfg, fallbacks = load_models_config(
             models_config or self.root / "config" / "models.yaml")
@@ -165,7 +168,18 @@ class WorkflowRunner:
         self.budget = Budget(**budget_cfg)
         self.run_id = run_id or new_run_id()
         self.run_dir = self.root / "runs" / self.run_id
+        self.plugins = tuple(plugins)
+        resuming = (self.run_dir / "events.jsonl").exists()
+        if resuming:
+            verify_resume_plugins(self.run_dir / "events.jsonl", self.plugins)
         self.events = EventLog(self.run_dir, echo=echo)
+        if not resuming:
+            self.events.emit(
+                "plugin_set_admitted",
+                plugins=plugin_receipts(self.plugins),
+                mechanism="harnessie.tools.v1",
+                trust="operator-trusted-in-process",
+            )
         self.state = RunState.open(self.run_dir)
         # Containment boundary (0.7): opt-in via config/boundary.yaml. Off by
         # default, so a project that does not enable it runs byte-identically
@@ -187,6 +201,7 @@ class WorkflowRunner:
                          ledger=self.ledger, events=self.events,
                          memory=self.memory,
                          provenance=f"run {self.run_id}")
+        register_plugins(self.registry, self.plugins)
         (self.root / "workspace").mkdir(exist_ok=True)
         self._models: dict[str, object] = {}   # tier name -> ModelInterface cache
 
@@ -473,6 +488,7 @@ class WorkflowRunner:
             provenance=f"run {self.run_id}, maiden phase {name}",
             blast_radius=blast_radius,
         )
+        register_plugins(registry, self.plugins)
         staged_phase = dict(phase)
         staged_phase["deny_tools"] = sorted(
             set(phase.get("deny_tools", []))
@@ -718,6 +734,7 @@ class WorkflowRunner:
                          memory=self.memory,
                          provenance=f"run {self.run_id}, phase {name}",
                          blast_radius=blast_radius)
+        register_plugins(registry, self.plugins)
         task = self._render_task(phase, reports)
         outcome = self._execute_standard_phase(
             phase, task, workspace=workspace, registry=registry,
@@ -789,6 +806,14 @@ class WorkflowRunner:
         max_steps = int(phase.get("max_steps", 40))
         deny_tools = frozenset(phase.get("deny_tools", []))
         allow_network = bool(phase.get("allow_network", False))
+        try:
+            readonly_paths = registry.readonly_paths_for(agent_name)
+        except ValueError as exc:
+            self.events.emit("lane_confinement_refused", phase=name,
+                             agent=agent_name, detail=str(exc))
+            return PhaseOutcome(
+                name, "needs_human",
+                f"invalid ownership lane confinement: {exc}")
 
         if self.roles.get(agent_name).kind == "orchestrator":
             result = self._run_role(agent_name, task, route, max_steps=max_steps,
@@ -830,7 +855,8 @@ class WorkflowRunner:
                 allow_network=allow_network,
                 harness_checks=self._harness_checks(phase),
                 escalate_fn=escalate_fn,
-                blast_radius=registry.blast_radius)
+                blast_radius=registry.blast_radius,
+                readonly_paths=readonly_paths)
         finally:
             registry.approval_handler = prev_handler
         return PhaseOutcome(name, gres.status, gres.final_report)
