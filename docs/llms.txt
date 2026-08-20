@@ -19,7 +19,7 @@ An orchestrator decomposes a goal into task packets with acceptance criteria and
 
 ## Install
 
-pip install harnessie; also available through pipx or uv tool install. PyPI carries core 1.0.0; the separately maintained Homebrew formula still installs 0.8.0. The guided mock run makes no provider call and spends no model money, but installation and scaffolding do use the package index and local filesystem. An AI-assisted review path exists at https://harnessie.com/.well-known/assistant-guide.txt; verify it, report the achieved level and SHA-256, and get explicit human approval before any action. The served 1.0.0 guide matches its sidecar, but the external DNS anchor still names the prior guide hash, so current end-to-end Level 4 is pending re-verification.
+pip install harnessie; also available through pipx or uv tool install. PyPI and the separately maintained Homebrew formula both carry core 1.0.0. The guided mock run makes no provider call and spends no model money, but installation and scaffolding do use the package index and local filesystem. An AI-assisted review path exists at https://harnessie.com/.well-known/assistant-guide.txt; verify it, report the achieved level and SHA-256, and get explicit human approval before any action. The served 1.0.0 guide matches its sidecar and the independent DNS TXT anchor; end-to-end GuideCheck Level 4 was re-confirmed by the hosted verifier on 2026-08-20 UTC.
 
 ## Key files
 

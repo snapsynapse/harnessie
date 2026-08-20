@@ -24,8 +24,8 @@
       "side_effects": "The guide authorizes read-only inspection only. Installation, code execution, and mutation require a separate human-approved task.",
       "integrity_status": {
         "served_copy": "byte-identical to the repository guide and provenance sidecar",
-        "external_anchor": "pending rotation: DNS still names the prior guide hash",
-        "current_end_to_end_level": "not re-verified for guide 1.0.0"
+        "external_anchor": "DNS TXT anchor matches the 1.0.0 guide hash",
+        "current_end_to_end_level": "Level 4 re-confirmed by the hosted GuideCheck verifier on 2026-08-20 UTC (0 blocking findings)"
       }
     },
     {

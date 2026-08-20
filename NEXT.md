@@ -69,7 +69,7 @@ The detailed inventory and relevance assessment is in `audits/handoff-relevance-
 ## Recommended work order
 
 1. Done 2026-08-19: Harnessie 1.0.0 propagated through the Verify Action (v0.1.2, `v0` moved) and Homebrew (formula at 1.0.0) release trains.
-2. Rotate the `_assistant-guide.harnessie.com` DNS TXT anchor to the 1.0.0 guide hash (`v=1; sha256=86bd1c898f55ba611cb93af829ad93765b3c6c8bc6294601405fea5004a398ad; url=https://harnessie.com/.well-known/assistant-guide.txt`) and re-run hosted GuideCheck verification. Operator-manual DNS edit; the live TXT still holds the 0.8.0-era hash `19e8bae7...48a0a5`.
+2. Done 2026-08-20: the operator rotated the `_assistant-guide.harnessie.com` DNS TXT anchor to the 1.0.0 guide hash, and the hosted GuideCheck verifier re-confirmed end-to-end Level 4 with zero blocking findings (dns-txt and repository-file anchors both present-matches). The tracked receipt is `audits/guidecheck-live-result-2026-08-20.json`; public trust copy in README, INTENT, agents.json, llms.txt, and the landing page now states the re-earned level.
 3. Keep the six v1 authoring contracts frozen. Additive schema changes require explicit defaults and compatibility fixtures; breaking changes require a new major schema version and migration path.
 4. Treat `PLUGIN_CONTRACT.md` as the complete v1 plugin trust decision. Do not add local-file discovery, automatic loading, configuration namespaces, or an untrusted execution mode without a separately versioned design.
 5. Keep multi-orchestrator handoffs deferred unless a documented real job proves a single orchestrator insufficient. Structured memory frontmatter and macOS temporary-write parity remain post-1.0 candidates pending evidence.
@@ -78,7 +78,7 @@ The detailed inventory and relevance assessment is in `audits/handoff-relevance-
 
 - Configure the dogfood verifier repository variables and secret if live PR verdicts are desired.
 - Live provider scorecards remain explicit opt-in operations via `HARNESSIE_LIVE=1`.
-- Rotate the independent GuideCheck DNS anchor and re-run hosted verification after the 1.0.0 guide is deployed.
+- Done 2026-08-20: the GuideCheck DNS anchor is rotated and hosted verification re-confirmed Level 4 for the 1.0.0 guide.
 
 ## Session start commands
 

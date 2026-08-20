@@ -66,8 +66,8 @@ def test_agents_json_describes_only_shipped_local_surfaces():
     capabilities = {item["id"]: item for item in data["capabilities"]}
     assert capabilities["review-checkout"]["human_approval_required"] is True
     guide_status = capabilities["review-checkout"]["integrity_status"]
-    assert "pending rotation" in guide_status["external_anchor"]
-    assert guide_status["current_end_to_end_level"].startswith("not re-verified")
+    assert "matches the 1.0.0 guide hash" in guide_status["external_anchor"]
+    assert guide_status["current_end_to_end_level"].startswith("Level 4 re-confirmed")
     assert capabilities["run-workflow"]["human_arbitration_required"] is True
 
 
