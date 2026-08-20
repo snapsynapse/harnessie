@@ -4,7 +4,7 @@
 
 Harnessie 1.0.0 is the current core release. It freezes six v1 authoring contracts, enforces agent-specific ownership lanes for child processes, and admits installed tool plugins through one explicit operator-trusted entry-point mechanism. The core release is published independently before its downstream release train.
 
-Harnessie Verify v0.1.1 and stable `snapsynapse/harnessie-verify-action@v0` still pin Harnessie 0.8.0. The public Homebrew formula also remains on 0.8.0. Those are intentional, separately owned release follow-ups rather than hidden drift. `harnessie-engine-wrappers` remains independently released at v0.1.0 because core 1.0.0 does not consume a new wrapper seam.
+Downstream propagation completed 2026-08-19: Harnessie Verify v0.1.2 and stable `snapsynapse/harnessie-verify-action@v0` now pin Harnessie 1.0.0 (release commit `2aa3859`, CI green before tagging), and the public Homebrew formula installs 1.0.0 from the immutable PyPI sdist (SHA-256 `40c2daa307d71a4687321205fac8fc1a24b6778c4412fb1f20cb2b20f89bd787`, with the new jsonschema resource tree and a rust build dependency for rpds-py; strict online audit, from-source upgrade, and formula test passed). `python3 scripts/ecosystem_status.py` reports both downstream pins as `match`. `harnessie-engine-wrappers` remains independently released at v0.1.0 because core 1.0.0 does not consume a new wrapper seam.
 
 The first 1.0 slice freezes six stable Draft 2020-12 authoring schemas, a side-effect-free `harnessie validate` command, runtime startup validation, cross-document checks, explicit v1 scaffolds, packaged and served schema artifacts, and the compatibility and deprecation contract in `SCHEMA_COMPATIBILITY.md`. Schema-less 0.8 documents remain implicit v1 throughout 1.x.
 
@@ -51,8 +51,8 @@ Downstream propagation was verified during the 2026-08-04 MDT closeout:
 
 ## Current cross-repo state
 
-- `snapsynapse/harnessie-verify-action`: the clean local checkout and remote `main` are at `7d22949`. Release v0.1.1 is Latest, stable `v0` resolves to the same commit, and the default core pin is 0.8.0. The observed non-blocking residual is GitHub's Node 20 deprecation warning for `actions/checkout@v4`; that dependency update is owned by the action repository.
-- `snapsynapse/homebrew-tap`: the clean local checkout and remote `main` are at `2d64648`. The public formula installs Harnessie 0.8.0 from the immutable PyPI sdist with SHA-256 `c9caffef61a8b1f9569cee36ede59f59c3dc8c66a47e500ecc090d445111f5e7`, declares the audited `libyaml` dependency, and has no open pull request.
+- `snapsynapse/harnessie-verify-action`: the clean local checkout and remote `main` are at `2aa3859`. Release v0.1.2 is Latest, stable `v0` resolves to the same commit, and the default core pin is 1.0.0. The observed non-blocking residual is GitHub's Node 20 deprecation warning for `actions/checkout@v4`; that dependency update is owned by the action repository.
+- `snapsynapse/homebrew-tap`: the clean local checkout and remote `main` are at `53b8b61`, and public bytes match local. The public formula installs Harnessie 1.0.0 from the immutable PyPI sdist with SHA-256 `40c2daa307d71a4687321205fac8fc1a24b6778c4412fb1f20cb2b20f89bd787`, declares the audited `libyaml` dependency plus a rust build dependency for the rpds-py resource, and has no open pull request.
 - `snapsynapse/harnessie-engine-wrappers`: v0.1.0 is released from `ad3d759`. CI passed its real macOS-14 containment probe and its Ubuntu unsupported-platform refusal; release archives, wheel, and `SHA256SUMS` are attached.
 - This repo dogfoods `snapsynapse/harnessie-verify-action@v0` in `.github/workflows/verify-pr-claims.yml`. A live verdict still depends on the repository verifier endpoint/model variables and API-key secret.
 - GitHub `main`, tag `v1.0.0`, the GitHub Release, and PyPI carry the core 1.0.0 release. Exact-commit wheel, sdist, structural inspection, `twine check`, and fresh-install checks passed before publication.
@@ -68,8 +68,8 @@ The detailed inventory and relevance assessment is in `audits/handoff-relevance-
 
 ## Recommended work order
 
-1. Propagate Harnessie 1.0.0 through the separately owned Verify Action and Homebrew release trains, with their own tests and publication authority.
-2. Rotate the `_assistant-guide.harnessie.com` DNS TXT anchor to the 1.0.0 guide hash and re-run hosted GuideCheck verification.
+1. Done 2026-08-19: Harnessie 1.0.0 propagated through the Verify Action (v0.1.2, `v0` moved) and Homebrew (formula at 1.0.0) release trains.
+2. Rotate the `_assistant-guide.harnessie.com` DNS TXT anchor to the 1.0.0 guide hash (`v=1; sha256=86bd1c898f55ba611cb93af829ad93765b3c6c8bc6294601405fea5004a398ad; url=https://harnessie.com/.well-known/assistant-guide.txt`) and re-run hosted GuideCheck verification. Operator-manual DNS edit; the live TXT still holds the 0.8.0-era hash `19e8bae7...48a0a5`.
 3. Keep the six v1 authoring contracts frozen. Additive schema changes require explicit defaults and compatibility fixtures; breaking changes require a new major schema version and migration path.
 4. Treat `PLUGIN_CONTRACT.md` as the complete v1 plugin trust decision. Do not add local-file discovery, automatic loading, configuration namespaces, or an untrusted execution mode without a separately versioned design.
 5. Keep multi-orchestrator handoffs deferred unless a documented real job proves a single orchestrator insufficient. Structured memory frontmatter and macOS temporary-write parity remain post-1.0 candidates pending evidence.
