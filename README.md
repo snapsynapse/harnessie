@@ -6,6 +6,12 @@ Harnessie is built to be the safest and easiest first AI harness for people. "Sa
 
 The operating thesis: the harness structure carries the quality floor, the model carries the ceiling. Run it with Claude Fable 5 as the orchestrator and it exploits effort dials, long autonomous turns, and verifier subagents. Swap the workers (or everything) for Haiku, GLM, Qwen, or any OpenAI-compatible local endpoint by editing one YAML file, and the gates, jails, budgets, and retry ladders keep output honest.
 
+## Harnessie's Golden Rule for agent work
+
+Read together. Write only what you own.
+
+Shared context helps agents collaborate; shared write authority lets them silently erase one another's work. Harnessie's [ownership lanes](docs/agent-file-ownership.md) turn the rule into a checkable workflow contract: direct cross-lane writes are refused, child processes receive agent-specific read-only overlays, and overlapping declared writes in a parallel group refuse before dispatch. An agent that needs another agent's file changed records a `request_change` instead of overwriting it. Collaborative lanes remain an explicit operator-chosen exception, and operator-trusted in-process plugins remain outside child-process lane confinement.
+
 Beneath that thesis sit five engineering habits, each proven separately in the author's other tools and standards before it landed here as code: deterministic checks run before any model judgment (the gate order in [docs/GUIDE.md](docs/GUIDE.md)); evaluation comes before implementation — a governance mechanic without a red-then-green scenario pair does not merge ([EVALS.md](EVALS.md)); remembered facts carry verified and verify-by dates and expire visibly, never silently ([GOVERNANCE.md](GOVERNANCE.md)); every agent and operator action lands in one hash-chained, tamper-evident timeline ([docs/threat-model.md](docs/threat-model.md)); and any control that cannot be enforced fails closed rather than running unenforced ([SECURITY.md](SECURITY.md)). The same habits produced the standards Harnessie adopts — [Turnfile](https://turnfile.work/), [AIDR](https://aidr.work/), [Graceful Boundaries](https://gracefulboundaries.dev/) — which is why they fit together.
 
 ## Quick start
@@ -15,7 +21,7 @@ pip install harnessie                # or: pipx install / uv tool install
 harnessie init my-project            # scaffold + guided readiness check + zero-dollar mock run
 ```
 
-PyPI carries the current 1.0.0 core release. The separately maintained Homebrew formula still installs 0.8.0 until its own release train is completed; see [NEXT.md](NEXT.md) for current downstream status.
+PyPI and the separately maintained Homebrew formula both carry the current 1.0.0 core release; see [NEXT.md](NEXT.md) for current downstream status.
 
 To gate pull requests on claim-by-claim verification without installing anything locally, the standalone verifier also ships as a GitHub Action: [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify) (one workflow file; the PR body is treated as claims to test, and the exit code gates the merge).
 
@@ -42,6 +48,7 @@ Worked end-to-end example with sample data: [examples/policy-compliance/README.m
 - [docs/quickstart.md](docs/quickstart.md): the gentlest path for someone who has never cloned a repo or written YAML, assuming no git or shell fluency, with a glossary and an honest Windows/WSL2 page.
 - [docs/getting-started.md](docs/getting-started.md): the five-minute path from install to a green run and reading the evidence.
 - [docs/GUIDE.md](docs/GUIDE.md): the complete user guide, concepts through extension, including workflow authoring, brain configuration, ownership, governance, and the halt-recovery table.
+- [docs/agent-file-ownership.md](docs/agent-file-ownership.md): Harnessie's Golden Rule for agent work, the ownership-lane mechanics beneath it, explicit boundaries, and the tests that make the claim falsifiable.
 - [PLUGIN_CONTRACT.md](PLUGIN_CONTRACT.md): the versioned, opt-in tool extension contract and its explicit in-process trust boundary.
 - [docs/brains.md](docs/brains.md): the brain-agnostic receipt, the models actually run under the harness with a link to the record that proves each.
 - [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run. The served 1.0.0 guide, provenance sidecar, and independent DNS TXT anchor agree; the hosted GuideCheck verifier re-confirmed end-to-end Level 4 on 2026-08-20 UTC with zero blocking findings.

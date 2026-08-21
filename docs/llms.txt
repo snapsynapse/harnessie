@@ -11,7 +11,8 @@ An orchestrator decomposes a goal into task packets with acceptance criteria and
 - Roles: orchestrator (decompose and integrate), worker (execute, own files), verifier (judge in fresh context, fail closed).
 - Consent: task packets are offers; side-effecting tools unlock only after a worker accepts.
 - Gates: deterministic checks plus an independent verifier between every phase.
-- Ownership lanes: agents own the files they create; operator lanes are locked.
+- Harnessie's Golden Rule for agent work: Read together. Write only what you own.
+- Ownership lanes: direct cross-lane writes are refused; child processes receive agent-specific read-only overlays; operator lanes are locked; declared overlapping parallel writes refuse before dispatch.
 - Brain-agnostic routing: task classes map to model tiers in config/models.yaml.
 - Governance: contested decisions produce AIDR-style records with human-only arbitration.
 - Audit: a hash-chained event log; harnessie audit re-verifies it and renders one timeline.
@@ -29,6 +30,7 @@ pip install harnessie; also available through pipx or uv tool install. PyPI and 
 - Getting started: https://harnessie.com/getting-started.html
 - Modes (the ease-and-safety ladder: five run modes, what is real at each, human-only arbitration across all): https://harnessie.com/ladder.html
 - User guide: https://harnessie.com/guide.html
+- Agent file ownership (Harnessie's Golden Rule, enforcement, boundaries, and proof): https://harnessie.com/agent-file-ownership.html
 - Compare (where Harnessie fits among agent frameworks and guardrail tools): https://harnessie.com/compare.html
 - Architecture: https://github.com/snapsynapse/harnessie/blob/main/ARCHITECTURE.md
 - Governance: https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md
@@ -38,7 +40,7 @@ pip install harnessie; also available through pipx or uv tool install. PyPI and 
 - Stable v1 workflow schema: https://harnessie.com/schemas/v1/workflow.schema.json
 - Schema compatibility contract: https://github.com/snapsynapse/harnessie/blob/main/SCHEMA_COMPATIBILITY.md
 - Plugin contract: https://github.com/snapsynapse/harnessie/blob/main/PLUGIN_CONTRACT.md
-- [Assistant Guide](https://harnessie.com/.well-known/assistant-guide.txt): bounded, human-verifiable guide for reviewing a Harnessie checkout before authorizing a run; served bytes and sidecar agree, while the independent DNS anchor awaits rotation for 1.0.0
+- [Assistant Guide](https://harnessie.com/.well-known/assistant-guide.txt): bounded, human-verifiable guide for reviewing a Harnessie checkout before authorizing a run; served bytes, sidecar, and independent DNS anchor agree, and the hosted GuideCheck verifier re-confirmed Level 4 on 2026-08-20 UTC
 
 ## Support and machine handoff
 

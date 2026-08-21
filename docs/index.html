@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  <title>Harnessie: verifiable multi-agent AI on models you control</title>
-  <meta name="description" content="An open-source harness for governed multi-agent AI work: side-effecting worker phases are independently gated, child commands are confined, and opt-in containment keeps declared sensitive work on models you control.">
-  <meta name="keywords" content="harnessie, multi-agent harness, agent orchestration, verification gate, brain-agnostic, model-agnostic agents, agent sandbox, prompt injection defense, agent ownership, audit log, consent-based orchestration, local LLM agents">
+  <title>Harnessie: verifiable multi-agent AI with enforced file ownership</title>
+  <meta name="description" content="Harnessie's Golden Rule for agent work: read together, write only what you own. An open-source multi-agent harness with enforced ownership lanes, independent verification, and confined child commands.">
+  <meta name="keywords" content="harnessie, multi-agent harness, agent orchestration, agent file ownership, ownership lanes, cross-agent overwrite prevention, verification gate, brain-agnostic, model-agnostic agents, agent sandbox, prompt injection defense, audit log, consent-based orchestration, local LLM agents">
   <meta name="author" content="Sam Rogers">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
   <meta name="theme-color" content="#2f6b28">
@@ -28,7 +28,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Harnessie">
   <meta property="og:title" content="Harnessie">
-  <meta property="og:description" content="Governed multi-agent AI work with independent worker gates, confined child commands, human arbitration, and opt-in sensitive-data containment. Open source, Apache-2.0.">
+  <meta property="og:description" content="Read together. Write only what you own. Governed multi-agent AI with enforced ownership lanes, independent worker gates, confined child commands, and human arbitration.">
   <meta property="og:image" content="https://harnessie.com/imgs/og.png">
   <meta property="og:image:alt" content="The Harnessie wordmark beside a green Loch Ness monster wearing a harness, rising from a line-art loch.">
   <meta property="og:image:width" content="1200">
@@ -36,7 +36,7 @@
   <meta property="og:url" content="https://harnessie.com/">
   <meta property="og:locale" content="en_US">
   <meta property="article:published_time" content="2026-07-06T00:00:00Z">
-  <meta property="article:modified_time" content="2026-08-09T00:00:00Z">
+  <meta property="article:modified_time" content="2026-08-20T00:00:00Z">
   <meta property="article:author" content="Sam Rogers">
   <meta property="article:publisher" content="https://snapsynapse.com/">
   <meta property="article:section" content="Developer Tools">
@@ -45,11 +45,12 @@
   <meta property="article:tag" content="agent-orchestration">
   <meta property="article:tag" content="verification-gate">
   <meta property="article:tag" content="brain-agnostic">
+  <meta property="article:tag" content="agent-file-ownership">
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Harnessie">
-  <meta name="twitter:description" content="Governed multi-agent AI work with independent worker gates, confined child commands, human arbitration, and opt-in sensitive-data containment. Open source, Apache-2.0.">
+  <meta name="twitter:description" content="Read together. Write only what you own. Governed multi-agent AI with enforced ownership lanes, independent worker gates, and confined child commands.">
   <meta name="twitter:image" content="https://harnessie.com/imgs/og.png">
   <meta name="twitter:site" content="@snapsynapse">
   <meta name="twitter:creator" content="@snapsynapse">
@@ -64,14 +65,14 @@
     "@context": "https://schema.org",
     "@type": "TechArticle",
     "headline": "Harnessie",
-    "alternativeHeadline": "A brain-agnostic multi-agent harness",
-    "description": "Harnessie is an open-source, brain-agnostic multi-agent harness. An orchestrator decomposes a goal into task packets, workers execute inside a jailed workspace, and deterministic checks plus an independent verifier gate side-effecting worker phases. Human-only in-run arbitration, declared budgets, ownership rules, and a hash-chained audit log stay consistent across configured models. The optional containment boundary strips structured PII and blocks secret egress; contained routing keeps declared free-text-sensitive work on controlled tiers.",
+    "alternativeHeadline": "Read together. Write only what you own.",
+    "description": "Harnessie is an open-source, brain-agnostic multi-agent harness. Its Golden Rule for agent work is read together, write only what you own. Ownership lanes refuse direct cross-agent writes, compile denied paths into read-only child-process overlays, and reject overlapping declared parallel writes before dispatch. Deterministic checks plus an independent verifier gate side-effecting worker phases, while human-only arbitration, declared budgets, and a hash-chained audit log stay consistent across configured models.",
     "inLanguage": "en",
     "url": "https://harnessie.com/",
     "mainEntityOfPage": { "@type": "WebPage", "@id": "https://harnessie.com/" },
     "image": "https://harnessie.com/imgs/og.png",
     "datePublished": "2026-07-06",
-    "dateModified": "2026-08-09",
+    "dateModified": "2026-08-20",
     "author": {
       "@type": "Person",
       "name": "Sam Rogers",
@@ -87,7 +88,7 @@
         "url": "https://github.com/snapsynapse/harnessie/issues"
       }
     },
-    "keywords": ["harnessie", "multi-agent harness", "agent orchestration", "verification gate", "brain-agnostic", "agent sandbox", "prompt-injection defense", "audit log"],
+    "keywords": ["harnessie", "multi-agent harness", "agent orchestration", "agent file ownership", "ownership lanes", "cross-agent overwrite prevention", "verification gate", "brain-agnostic", "agent sandbox", "audit log"],
     "license": "https://github.com/snapsynapse/harnessie/blob/main/LICENSE",
     "copyrightHolder": { "@type": "Organization", "name": "Snap Synapse" },
     "copyrightYear": 2026,
@@ -197,6 +198,13 @@
     .btn-secondary:hover { background: var(--accent); color: var(--bg); }
     .hero-note { font-size: 0.9rem; color: var(--text-muted); max-width: 500px; }
 
+    /* Golden Rule */
+    .golden-rule { margin-top: 2.5rem; padding: 1.65rem 1.8rem; border: 1px solid var(--border); border-left: 5px solid var(--accent); border-radius: 12px; background: #fff; display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 2rem; align-items: center; }
+    .golden-rule .rule-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 0.45rem; }
+    .golden-rule h2 { font-size: 1.65rem; line-height: 1.22; }
+    .golden-rule p { color: var(--text-mid); }
+    .golden-rule a { font-weight: 600; }
+
     /* Hero media */
     .hero-media { position: relative; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #fff; box-shadow: 0 18px 48px rgba(23,40,26,0.18); }
     .hero-media img.still, .hero-media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -302,7 +310,7 @@
 
     /* Responsive */
     @media (max-width: 860px) {
-      .hero-grid, .two-col, .what-grid, .three-col, .count-grid, .code-grid { grid-template-columns: 1fr !important; }
+      .hero-grid, .two-col, .what-grid, .three-col, .count-grid, .code-grid, .golden-rule { grid-template-columns: 1fr !important; }
       .enforce-grid { grid-template-columns: 1fr; }
       .pipeline { flex-direction: column; }
       .pl-arrow { transform: rotate(90deg); }
@@ -357,6 +365,7 @@
           <a class="docs-item" href="/getting-started.html"><strong>Getting started</strong><span>Install to a green run in five minutes.</span></a>
           <a class="docs-item" href="/ladder.html"><strong>Operating modes</strong><span>What is shipped, partial, experimental, or not yet implemented.</span></a>
           <a class="docs-item" href="/guide.html"><strong>User guide</strong><span>Concepts through extension.</span></a>
+          <a class="docs-item" href="/agent-file-ownership.html"><strong>File ownership</strong><span>Harnessie's Golden Rule, enforced.</span></a>
           <a class="docs-item" href="/compare.html"><strong>Compare</strong><span>Where Harnessie fits, and where it doesn't.</span></a>
           <a class="docs-item" href="/brains.html"><strong>Brains: the receipts</strong><span>Models proven under the harness.</span></a>
           <a class="docs-item" href="/threat-model.html"><strong>Threat model</strong><span>The safety claims, made falsifiable.</span></a>
@@ -399,7 +408,7 @@
     </div>
 
     <div class="proof-strip">
-      <div class="chip"><b>!</b> Guide bytes verified &middot; <span class="m">DNS re-anchor pending</span></div>
+      <div class="chip"><b>&#10003;</b> GuideCheck Level 4 &middot; <span class="m">DNS + repository anchors match</span></div>
       <div class="chip"><b>8</b> providers &middot; <span class="m">11 models, verified work</span></div>
       <div class="chip"><b>&#10003;</b> Fails closed <span class="m">by default</span></div>
       <div class="chip"><b>&#10003;</b> Opt-in containment <span class="m">keeps declared sensitive work controlled</span></div>
@@ -427,6 +436,16 @@
           <div class="card"><h4>You have the final say</h4><p>On a real judgment call the run stops and waits for a person. The machine never decides for you.</p></div>
           <div class="card"><h4>It keeps the receipts</h4><p>Agent and operator events enter a hash-chained record. Edits to existing history break verification; preventing a complete history rewrite requires an external anchor.</p></div>
         </div>
+      </div>
+    </div>
+    <div class="golden-rule">
+      <div>
+        <p class="rule-label">Harnessie's Golden Rule for agent work</p>
+        <h2>Read together.<br>Write only what you own.</h2>
+      </div>
+      <div>
+        <p>Shared context helps agents collaborate. Shared write authority lets them silently erase one another's work. Harnessie turns the rule into an enforceable workflow contract: ownership lanes deny cross-agent writes at dispatch, compile denied paths into read-only child-process overlays, and refuse overlapping declared parallel writes before model dispatch.</p>
+        <p style="margin-top:0.75rem;"><a href="/agent-file-ownership.html">See the mechanism, boundaries, and proving tests &rarr;</a></p>
       </div>
     </div>
   </div>
@@ -502,7 +521,7 @@
     <div class="install-line">
       <code class="oneliner"><span class="p">$</span> pip install harnessie</code>
       <button type="button" class="copy-btn ghost" data-copy="pip install harnessie">Copy</button>
-      <span class="muted">&hellip; or pipx / uv. Homebrew currently remains on 0.8.0.</span>
+      <span class="muted">&hellip; or pipx / uv. Homebrew also carries 1.0.0.</span>
     </div>
 
     <div class="two-col code-grid">
@@ -592,6 +611,7 @@ routing:
       <div class="foot-col">
         <span class="head">Reference</span>
         <a href="/guide.html">User guide</a>
+        <a href="/agent-file-ownership.html">File ownership</a>
         <a href="/brains.html">Brains: the receipts</a>
         <a href="/threat-model.html">Threat model</a>
         <a href="https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>

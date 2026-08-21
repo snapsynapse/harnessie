@@ -46,6 +46,10 @@ PAGES = {
         "guide.html", "User guide",
         "The complete Harnessie user guide: concepts, CLI, workflow authoring, "
         "brain configuration, ownership, governance, and the halt-recovery table."),
+    "agent-file-ownership.md": (
+        "agent-file-ownership.html", "File ownership",
+        "Harnessie's Golden Rule for agent work: how ownership lanes let agents "
+        "read shared context while mechanically preventing cross-agent writes."),
     "brains.md": (
         "brains.html", "Brains",
         "The brain-agnostic receipt: the models actually run under the "
@@ -468,7 +472,7 @@ def render_pages() -> dict[Path, str]:
             gridclass="" if toc else " no-toc",
             toc=toc,
             label=html.escape(label),
-            h1=inline(html.escape(h1)) if h1 else html.escape(label),
+            h1=inline(h1) if h1 else html.escape(label),
             body=body,
             script=SCRIPT,
             srcurl=f"{GITHUB}/docs/{src}",

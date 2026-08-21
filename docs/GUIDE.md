@@ -279,6 +279,8 @@ The boundary was adapted with provenance from PAICE.work PBC production PII code
 
 ## Ownership lanes
 
+Harnessie's Golden Rule for agent work is: **Read together. Write only what you own.** The rule is the memorable explanation; ownership lanes are the enforcement. See [Agent file ownership](agent-file-ownership.md) for the complete public claim, its boundaries, and a focused proof command.
+
 `OWNERSHIP.yaml` at the project root declares who may write what. It sits outside the workspace jail and no agent can reach it. Three lane kinds:
 
 - Operator lanes are locked to every agent. No agent may write a path in an operator lane, full stop.

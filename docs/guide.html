@@ -113,6 +113,7 @@
       <a href="/getting-started.html">Getting started</a>
       <a href="/ladder.html">Modes</a>
       <a href="/guide.html" aria-current="page">User guide</a>
+      <a href="/agent-file-ownership.html">File ownership</a>
       <a href="/brains.html">Brains</a>
       <a href="/threat-model.html">Threat model</a>
       <a href="/compare.html">Compare</a>
@@ -259,6 +260,7 @@ rehydration_grants: config/rehydration-grants.yaml</code></pre>
 <p>The placeholder map (placeholder to original value) is the one place real values live, and it is written outside the run tree, at <code>.boundary/&lt;run_id&gt;.json</code> with owner-only permissions. Rehydration — turning placeholders back into values — happens only at the operator boundary, and only for tools you explicitly grant in <code>rehydration_grants</code> (the same allow/deny grammar as approval policy, deny-all by default). On resume the map reloads; if it is missing or corrupt, rehydration is disabled fail-closed and the run tells you, rather than guessing.</p>
 <p>The boundary was adapted with provenance from PAICE.work PBC production PII code, released under Apache-2.0 (see <a href="https://github.com/snapsynapse/harnessie/blob/main/NOTICE">NOTICE</a>), and adopted through Harnessie&#x27;s own contested-decision process (<code>decisions/AIDR-0003</code> and <code>AIDR-0004</code>).</p>
 <h2 id="ownership-lanes">Ownership lanes</h2>
+<p>Harnessie&#x27;s Golden Rule for agent work is: <strong>Read together. Write only what you own.</strong> The rule is the memorable explanation; ownership lanes are the enforcement. See <a href="/agent-file-ownership.html">Agent file ownership</a> for the complete public claim, its boundaries, and a focused proof command.</p>
 <p><code>OWNERSHIP.yaml</code> at the project root declares who may write what. It sits outside the workspace jail and no agent can reach it. Three lane kinds:</p>
 <ul><li>Operator lanes are locked to every agent. No agent may write a path in an operator lane, full stop.</li><li>Agent lanes assign glob patterns to a named agent. Only that agent may write matching paths; another agent&#x27;s write is refused with a <code>request_change</code> remedy.</li><li>Collaborative lanes are shared: any agent may write matching paths, and no one exclusively claims them.</li></ul>
 <p>Paths not covered by any lane use first-writer-owns: the first agent to write a file claims it, and later cross-agent writes are refused. Claims and denials are logged as events and show up in the audit timeline. An agent that needs a file it does not own calls <code>request_change</code> to record the need rather than overwriting.</p>
@@ -303,6 +305,7 @@ rehydration_grants: config/rehydration-grants.yaml</code></pre>
       <a href="/getting-started.html">Getting started</a>
       <a href="/ladder.html">Modes</a>
       <a href="/guide.html">User guide</a>
+      <a href="/agent-file-ownership.html">File ownership</a>
       <a href="/brains.html">Brains</a>
       <a href="/threat-model.html">Threat model</a>
       <a href="/compare.html">Compare</a>

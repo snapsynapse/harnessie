@@ -4,7 +4,7 @@
     "name": "Harnessie",
     "version": "1.0.0",
     "type": "local Python library and CLI",
-    "description": "A brain-agnostic multi-agent harness with consent, workspace confinement, independent verification, human-only arbitration, and tamper-evident audit records.",
+    "description": "A brain-agnostic multi-agent harness with consent, mechanically enforced per-agent file ownership, workspace confinement, independent verification, human-only arbitration, and tamper-evident audit records.",
     "url": "https://harnessie.com/",
     "repository": "https://github.com/snapsynapse/harnessie",
     "publisher": {
@@ -58,7 +58,7 @@
       "type": "local CLI",
       "status": "live",
       "command": "harnessie run",
-      "description": "Runs consented task packets with declared budgets, ownership lanes, OS-sandboxed shell work, verification gates, audited stop conditions, and explicitly selected operator-trusted tool plugins.",
+      "description": "Runs consented task packets under Harnessie's Golden Rule for agent work: read together, write only what you own. Ownership lanes, OS-sandboxed shell work, verification gates, audited stop conditions, and explicitly selected operator-trusted tool plugins enforce the shipped boundary.",
       "operator_consent_required": true,
       "human_arbitration_required": true,
       "network_default": "denied",
@@ -72,6 +72,7 @@
     "changelog": "https://harnessie.com/changelog.json",
     "security": "https://harnessie.com/.well-known/security.txt",
     "documentation": "https://harnessie.com/guide.html",
+    "agent_file_ownership": "https://harnessie.com/agent-file-ownership.html",
     "workflow_schema": "https://harnessie.com/schemas/v1/workflow.schema.json",
     "schema_compatibility": "https://github.com/snapsynapse/harnessie/blob/main/SCHEMA_COMPATIBILITY.md",
     "plugin_contract": "https://github.com/snapsynapse/harnessie/blob/main/PLUGIN_CONTRACT.md",
@@ -89,5 +90,5 @@
     "autonomous_remote_agent": false,
     "note": "Harnessie is installed and run locally. These declarations describe its shipped CLI and review surfaces; they do not advertise a hosted agent, API, or MCP server."
   },
-  "last_updated": "2026-08-09"
+  "last_updated": "2026-08-20"
 }

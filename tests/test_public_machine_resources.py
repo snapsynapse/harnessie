@@ -138,11 +138,14 @@ def test_public_discovery_links_expose_support_and_machine_resources():
         assert f"https://harnessie.com{path}" in llms
     assert "Contact support" in html
     assert "Report a vulnerability" in html
-    assert "GuideCheck Level&nbsp;4" not in html
-    assert "DNS re-anchor pending" in html
+    assert "GuideCheck Level 4" in html
+    assert "DNS re-anchor pending" not in html
     assert "opt-in containment" in html.lower()
     assert "operator-trusted in-process code" in html
-    assert "Homebrew currently remains on 0.8.0" in html
+    assert "Homebrew also carries 1.0.0" in html
+    assert "Harnessie's Golden Rule for agent work" in html
+    assert "Read together." in html
+    assert "Write only what you own." in html
 
     sitemap = ET.parse(DOCS / "sitemap.xml")
     namespace = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
@@ -151,9 +154,35 @@ def test_public_discovery_links_expose_support_and_machine_resources():
     }
     for page in (
         "quickstart.html", "getting-started.html", "ladder.html", "guide.html",
-        "brains.html", "threat-model.html", "compare.html", "ringer.html",
+        "agent-file-ownership.html", "brains.html", "threat-model.html",
+        "compare.html", "ringer.html",
     ):
         assert f"https://harnessie.com/{page}" in locations
+
+    assert "https://harnessie.com/agent-file-ownership.html" in llms
+    agents = _json(AGENTS)
+    assert agents["discovery"]["agent_file_ownership"] == (
+        "https://harnessie.com/agent-file-ownership.html")
+
+
+def test_agent_file_ownership_claim_is_bounded_and_falsifiable():
+    html = (DOCS / "agent-file-ownership.html").read_text(encoding="utf-8")
+    assert "<h1>Harnessie&#x27;s Golden Rule for agent work</h1>" in html
+    assert "Read together. Write only what you own." in html
+    assert "does not claim that cross-agent overwrite prevention is a unique" in html
+    assert "Collaborative lanes deliberately permit co-editing" in html
+    assert "operator-trusted code" in html
+    for proof in (
+        "harness/ownership.py", "harness/sandbox.py", "tests/test_ownership.py",
+        "tests/test_runner.py", "tests/test_sandbox.py",
+    ):
+        assert proof in html
+    for target in (
+        "https://github.com/snapsynapse/harnessie/blob/main/harness/ownership.py",
+        "https://github.com/snapsynapse/harnessie/blob/main/harness/sandbox.py",
+        "https://github.com/snapsynapse/harnessie/blob/main/OWNERSHIP.yaml",
+    ):
+        assert f'href="{target}"' in html
 
 
 def test_trust_bundle_pins_all_machine_resources():

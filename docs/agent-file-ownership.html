@@ -4,27 +4,27 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  <title>Compare &mdash; Harnessie</title>
-  <meta name="description" content="Where Harnessie fits among AI agent frameworks and guardrail tools: a category map, an honest native-versus-build-it-yourself table, and when to reach for something else instead.">
+  <title>File ownership &mdash; Harnessie</title>
+  <meta name="description" content="Harnessie&#x27;s Golden Rule for agent work: how ownership lanes let agents read shared context while mechanically preventing cross-agent writes.">
   <meta name="author" content="Sam Rogers">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
   <meta name="theme-color" content="#2f6b28">
-  <link rel="canonical" href="https://harnessie.com/compare.html">
+  <link rel="canonical" href="https://harnessie.com/agent-file-ownership.html">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="alternate" type="text/plain" href="https://harnessie.com/llms.txt" title="LLM-readable summary">
   <link rel="assistant-guide" href="https://harnessie.com/.well-known/assistant-guide.txt">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Harnessie">
-  <meta property="og:title" content="Compare &mdash; Harnessie">
-  <meta property="og:description" content="Where Harnessie fits among AI agent frameworks and guardrail tools: a category map, an honest native-versus-build-it-yourself table, and when to reach for something else instead.">
+  <meta property="og:title" content="File ownership &mdash; Harnessie">
+  <meta property="og:description" content="Harnessie&#x27;s Golden Rule for agent work: how ownership lanes let agents read shared context while mechanically preventing cross-agent writes.">
   <meta property="og:image" content="https://harnessie.com/imgs/og.png">
-  <meta property="og:url" content="https://harnessie.com/compare.html">
+  <meta property="og:url" content="https://harnessie.com/agent-file-ownership.html">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Compare &mdash; Harnessie">
-  <meta name="twitter:description" content="Where Harnessie fits among AI agent frameworks and guardrail tools: a category map, an honest native-versus-build-it-yourself table, and when to reach for something else instead.">
+  <meta name="twitter:title" content="File ownership &mdash; Harnessie">
+  <meta name="twitter:description" content="Harnessie&#x27;s Golden Rule for agent work: how ownership lanes let agents read shared context while mechanically preventing cross-agent writes.">
   <meta name="twitter:image" content="https://harnessie.com/imgs/og.png">
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://harnessie.com/compare.html","url":"https://harnessie.com/compare.html","name":"Compare - Harnessie","description":"Where Harnessie fits among AI agent frameworks and guardrail tools: a category map, an honest native-versus-build-it-yourself table, and when to reach for something else instead.","isPartOf":{"@type":"WebSite","@id":"https://harnessie.com/#website","url":"https://harnessie.com/","name":"Harnessie"},"inLanguage":"en"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Harnessie","item":"https://harnessie.com/"},{"@type":"ListItem","position":2,"name":"Compare","item":"https://harnessie.com/compare.html"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://harnessie.com/agent-file-ownership.html","url":"https://harnessie.com/agent-file-ownership.html","name":"File ownership - Harnessie","description":"Harnessie's Golden Rule for agent work: how ownership lanes let agents read shared context while mechanically preventing cross-agent writes.","isPartOf":{"@type":"WebSite","@id":"https://harnessie.com/#website","url":"https://harnessie.com/","name":"Harnessie"},"inLanguage":"en"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Harnessie","item":"https://harnessie.com/"},{"@type":"ListItem","position":2,"name":"File ownership","item":"https://harnessie.com/agent-file-ownership.html"}]}]}</script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -113,38 +113,44 @@
       <a href="/getting-started.html">Getting started</a>
       <a href="/ladder.html">Modes</a>
       <a href="/guide.html">User guide</a>
-      <a href="/agent-file-ownership.html">File ownership</a>
+      <a href="/agent-file-ownership.html" aria-current="page">File ownership</a>
       <a href="/brains.html">Brains</a>
       <a href="/threat-model.html">Threat model</a>
-      <a href="/compare.html" aria-current="page">Compare</a>
+      <a href="/compare.html">Compare</a>
       <a href="https://github.com/snapsynapse/harnessie" class="gh-star" target="_blank" rel="noopener" aria-label="Star snapsynapse/harnessie on GitHub"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg><span>GitHub</span></a>
     </div>
   </div>
 </nav>
 <div class="doc-grid">
-  <aside class="doc-toc" aria-label="On this page"><p class="toc-title">On this page</p><nav class="toc-nav"><a class="toc-link" href="#three-categories-not-one-race">Three categories, not one race</a><a class="toc-link" href="#what-is-native-and-what-you-build-yourself">What is native, and what you build yourself</a><a class="toc-link" href="#when-to-reach-for-something-else">When to reach for something else</a><a class="toc-link" href="#the-honest-alternative-assemble-it-yourself">The honest alternative: assemble it yourself</a></nav></aside>
+  <aside class="doc-toc" aria-label="On this page"><p class="toc-title">On this page</p><nav class="toc-nav"><a class="toc-link" href="#what-the-rule-means">What the rule means</a><a class="toc-link" href="#the-harness-enforces-it-twice">The harness enforces it twice</a><a class="toc-link" href="#how-this-differs-from-adjacent-patterns">How this differs from adjacent patterns</a><a class="toc-link" href="#boundaries-and-exceptions">Boundaries and exceptions</a><a class="toc-link" href="#verify-the-claim">Verify the claim</a><a class="toc-link" href="#the-short-version">The short version</a></nav></aside>
   <main id="main-content" class="doc-content">
-    <p class="crumb"><a href="/">harnessie.com</a> &nbsp;/&nbsp; docs &nbsp;/&nbsp; Compare</p>
-    <h1>How Harnessie compares</h1>
-<p>Harnessie is often mistaken for yet another agent framework. It isn&#x27;t one, and the difference is the whole point.</p>
-<p>Agent frameworks answer one question well: how do several agents work together? Guardrail tools answer a different one: how do I filter a single model&#x27;s output? Harnessie answers a third that neither of the others owns: how do I trust what a group of agents produced, and contain what they were allowed to touch, on models I choose to run?</p>
-<p>You can use Harnessie&#x27;s ideas next to an orchestrator, or use Harnessie as the harness. This page is about where it fits, and where it honestly does not.</p>
-<p>For one concrete pairing, see how <a href="/ringer.html">Harnessie and Ringer</a> combine Ringer&#x27;s parallel execution with Harnessie&#x27;s governance and independent verification.</p>
-<h2 id="three-categories-not-one-race">Three categories, not one race</h2>
-<ul><li>Orchestration frameworks (LangGraph, CrewAI, AutoGen / AG2, the OpenAI and Claude Agent SDKs). Best at composing multi-agent workflows: handoffs, group chat, hierarchical managers, optional critic and reflection agents. Their collaboration is cooperative by design. Agents help each other converge.</li><li>Guardrail and safety tools (Guardrails AI, NeMo Guardrails, Lakera). Best at wrapping a model with input and output controls: validators, policy rails, prompt-injection defense. They sit around one model, not across a multi-agent result.</li><li>Harnessie. A harness that treats agent work as governed, not merely executed: an independent verifier that fails closed, decisions that preserve dissent for a human to arbitrate, an opt-in containment boundary plus contained routing, and a hash-chained audit of all of it. Brain-agnostic evidence is separate from configuration: runtime records and scorecard bundles earn a public “proven” label.</li></ul>
-<p>The categories are complementary. The comparison below is not a scoreboard; it is a map of what each category ships natively versus what it leaves you to build.</p>
-<h2 id="what-is-native-and-what-you-build-yourself">What is native, and what you build yourself</h2>
-<p>As of mid-2026. Frameworks move quickly; verify current capabilities before relying on this.</p>
-<div class="table-wrap"><table><thead><tr><th>Capability</th><th>Orchestration frameworks</th><th>Guardrail tools</th><th>Harnessie</th></tr></thead><tbody><tr><td>Multi-agent orchestration (handoffs, roles, group chat)</td><td>Native, and their core strength</td><td>Not their job</td><td>Native, deliberately minimal (orchestrator / workers / verifier)</td></tr><tr><td>Independent verifier that can only fail-closed, with no access to the worker&#x27;s reasoning, blocking progress until it passes</td><td>You build it (critics are cooperative and share state)</td><td>Output validators, but not a phase gate across a multi-agent run</td><td>Native</td></tr><tr><td>Contested decisions that preserve dissent verbatim and let only a human arbitrate</td><td>You build it (frameworks assume machine consensus)</td><td>Not their job</td><td>Native (AIDR-shaped decision records)</td></tr><tr><td>Structured PII stripped before egress; secrets halt the run; free-text-sensitive work stays on controlled tiers</td><td>You build it</td><td>Partial: PII and injection validators exist (for example Guardrails AI, Lakera), but as filters on one model, not never-egress routing across the run</td><td>Native but opt-in (boundary plus contained routing)</td></tr><tr><td>Brain-agnostic evidence tied to model, provider, endpoint, prompt, parser, and sampling identity</td><td>Model-agnostic by config; evidence varies</td><td>Not their job</td><td>Native scorecard bundles and runtime records; configuration does not enforce prior passage</td></tr><tr><td>Hash-chained, tamper-evident audit of every agent and operator action</td><td>You build it</td><td>Logging, not a verifiable chain</td><td>Native</td></tr><tr><td>Fails closed when a control cannot be enforced (no sandbox backend, no budget ceiling)</td><td>Varies; usually best-effort</td><td>Varies</td><td>Native, by policy</td></tr></tbody></table></div>
-<p>The pattern: orchestration frameworks are excellent at the middle row and leave the rest to you; guardrail tools own a slice of one row; Harnessie ships the whole column and keeps it identical underneath any brain.</p>
-<h2 id="when-to-reach-for-something-else">When to reach for something else</h2>
-<p>A comparison page that only argues for itself is not worth reading. Harnessie is the wrong tool in real cases:</p>
-<ul><li>You need fast multi-agent prototyping and do not need verification, containment, or an audit trail. Reach for CrewAI or LangGraph; they are lighter and have far more examples.</li><li>You only need to validate one model&#x27;s output (schema, toxicity, PII on a single call). Guardrails AI or a provider guardrail is simpler than a whole harness.</li><li>You are all-in on one provider and want that vendor&#x27;s managed tracing and handoffs. The OpenAI or Claude Agent SDK will have less friction.</li><li>You want a large ecosystem, plugins, and a big community today. Harnessie is new and small on purpose; it competes on the mechanisms, not the mindshare.</li></ul>
-<p>Harnessie earns its place only when you need the integrated, verifiable, contained whole, on models you control, and want the guarantees to live in code rather than in a prompt.</p>
-<h2 id="the-honest-alternative-assemble-it-yourself">The honest alternative: assemble it yourself</h2>
-<p>Nothing here is magic. You could build most of it: take LangGraph for orchestration, hand-roll a fresh-context verifier that fails closed, bolt on Guardrails AI for PII, write your own placeholder-based egress boundary, add a hash-chained event log, and maintain a scorecard for every model you swap in.</p>
-<p>Harnessie is that assembly, already built and tested, with runtime decision records spanning eight providers and eleven models. Core registry, sandbox, gate, and audit controls live below prompts; optional containment must be enabled, and admitted plugin code remains operator-trusted in process. If the assembly is worth your weeks, build it. If it is worth a <code>pip install</code>, that is what this is.</p>
-<p>Open source, Apache-2.0. Read every line, self-host it, owe no one.</p>
+    <p class="crumb"><a href="/">harnessie.com</a> &nbsp;/&nbsp; docs &nbsp;/&nbsp; File ownership</p>
+    <h1>Harnessie&#x27;s Golden Rule for agent work</h1>
+<p>Read together. Write only what you own.</p>
+<p>Shared context makes a group of agents useful. Shared write authority makes their work fragile. Two agents can read the same artifact, form different plans, and contribute complementary results. If both can silently replace the same file, however, the last writer wins and neither agent can prove which work survived.</p>
+<p>Harnessie calls its answer the Golden Rule for agent work. The memorable phrase is communications shorthand. The technical mechanism is ownership lanes, enforced below the prompt.</p>
+<h2 id="what-the-rule-means">What the rule means</h2>
+<p>An agent may use shared workspace context, but it may change only paths where the ownership ledger gives it write authority.</p>
+<ul><li>Agent lanes assign paths to one named agent.</li><li>Operator lanes are read-only to every agent.</li><li>Collaborative lanes are an explicit shared-write exception chosen by the operator.</li><li>Unlisted files follow first-writer-owns. The first agent to create a file becomes its owner.</li><li>An agent that needs another agent&#x27;s file changed calls <code>request_change</code> instead of overwriting it.</li></ul>
+<p>The operator remains the root owner. The operator can reassign a path or deliberately declare a collaborative lane. The rule constrains agents, not the human accountable for the run.</p>
+<h2 id="the-harness-enforces-it-twice">The harness enforces it twice</h2>
+<p>A prompt can ask an agent to respect ownership. Harnessie makes refusal independent of whether the model cooperates.</p>
+<ol><li>Direct tool writes are checked against <code>OWNERSHIP.yaml</code>. A cross-lane write is refused with the owner&#x27;s identity and the <code>request_change</code> remedy.</li><li>Child commands receive agent-specific read-only overlays for operator lanes, other-agent lanes, and other agents&#x27; first-writer claims. This covers shell calls, deterministic checks, and verifier execution. If the host cannot prove the required nested read-only confinement, the child process does not run.</li></ol>
+<p>Parallel workflow members execute in isolated phase workspaces. When a parallel group opts into declared <code>writes:</code>, every member must declare its intended paths and overlapping declarations refuse before workspace creation or model dispatch. Ownership lanes still apply inside each isolated phase workspace.</p>
+<h2 id="how-this-differs-from-adjacent-patterns">How this differs from adjacent patterns</h2>
+<div class="table-wrap"><table><thead><tr><th>Pattern</th><th>Write model</th><th>Where a collision appears</th></tr></thead><tbody><tr><td>Prompt-only cooperation</td><td>Agents are asked not to interfere</td><td>A model can ignore or misunderstand the rule</td></tr><tr><td>Worktree isolation</td><td>Each parallel agent writes a separate checkout</td><td>Conflicts appear when results are integrated</td></tr><tr><td>Shared-state conflict detection</td><td>Multiple writers are allowed; stale or competing writes are rejected</td><td>At the attempted shared-state update</td></tr><tr><td>Harnessie ownership lanes</td><td>Write authority is declared or acquired by first write; cross-lane writes are denied</td><td>Before a direct write, inside child-process confinement, or before a declared parallel group dispatches</td></tr></tbody></table></div>
+<p>Harnessie does not claim that cross-agent overwrite prevention is a unique problem or that ownership is the only valid coordination design. Its specific claim is falsifiable: within the shipped boundary, an agent cannot write across an ownership lane through a built-in direct write or a confined child process, and declared overlapping parallel writes refuse before dispatch.</p>
+<h2 id="boundaries-and-exceptions">Boundaries and exceptions</h2>
+<ul><li>Collaborative lanes deliberately permit co-editing. Their writes are events, not exclusive claims.</li><li>Parallel agents do not live-edit one shared active workspace. They work in isolated phase workspaces and their results are integrated after the group completes.</li><li>Installed <code>harnessie.tools.v1</code> plugin implementations run in process as operator-trusted code. Registry policy mediates their calls, but ownership-lane OS confinement does not sandbox the implementation itself.</li><li>Ownership governs writes, not truth. Deterministic checks and an independent verifier still decide whether owned work earns passage through the phase gate.</li></ul>
+<h2 id="verify-the-claim">Verify the claim</h2>
+<p>The enforcing paths are <a href="https://github.com/snapsynapse/harnessie/blob/main/harness/ownership.py">harness/ownership.py</a>, <a href="https://github.com/snapsynapse/harnessie/blob/main/harness/sandbox.py">harness/sandbox.py</a>, and the operator-owned <a href="https://github.com/snapsynapse/harnessie/blob/main/OWNERSHIP.yaml">OWNERSHIP.yaml</a>. The threat-model claim and proof references are collected in <a href="/threat-model.html">Threat model</a>.</p>
+<p>Literal</p>
+<pre><code>python3 -m pytest -q tests/test_ownership.py::test_cross_agent_write_denied_at_dispatch tests/test_ownership.py::test_run_shell_receives_agent_specific_readonly_roots tests/test_runner.py::test_parallel_declared_write_conflict_refuses_before_dispatch tests/test_sandbox.py::test_readonly_lane_backend_failure_blocks_child</code></pre>
+<p>These deterministic tests prove direct denial, compilation of agent-specific read-only roots, pre-dispatch parallel conflict refusal, and fail-closed behavior when lane confinement is unavailable. Platform-backed sandbox tests add a live interpreter probe when the required backend is present.</p>
+<h2 id="the-short-version">The short version</h2>
+<p>Harnessie&#x27;s Golden Rule for agent work is simple enough to remember and strict enough to test:</p>
+<p><strong>Read together. Write only what you own.</strong></p>
+<p>The rule is the explanation. Ownership lanes are the enforcement.</p>
   </main>
 </div>
 <footer>
@@ -159,7 +165,7 @@
       <a href="/threat-model.html">Threat model</a>
       <a href="/compare.html">Compare</a>
     </div>
-    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com/" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/compare.md" target="_blank" rel="noopener">docs/compare.md</a>.</p>
+    <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com/" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/agent-file-ownership.md" target="_blank" rel="noopener">docs/agent-file-ownership.md</a>.</p>
   </div>
 </footer>
 
