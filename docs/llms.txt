@@ -13,6 +13,7 @@ An orchestrator decomposes a goal into task packets with acceptance criteria and
 - Gates: deterministic checks plus an independent verifier between every phase.
 - Harnessie's Golden Rule for agent work: Read together. Write only what you own.
 - Ownership lanes: direct cross-lane writes are refused; child processes receive agent-specific read-only overlays; operator lanes are locked; declared overlapping parallel writes refuse before dispatch.
+- Shipped in 1.1.0: harnessie ownership PATH --agent AGENT [--json] explains a ledger decision without mutating it. The zero-model collision proof lives at https://github.com/snapsynapse/harnessie/tree/main/examples/ownership-collision
 - Brain-agnostic routing: task classes map to model tiers in config/models.yaml.
 - Governance: contested decisions produce AIDR-style records with human-only arbitration.
 - Audit: a hash-chained event log; harnessie audit re-verifies it and renders one timeline.
@@ -20,7 +21,7 @@ An orchestrator decomposes a goal into task packets with acceptance criteria and
 
 ## Install
 
-pip install harnessie; also available through pipx or uv tool install. PyPI and the separately maintained Homebrew formula both carry core 1.0.0. The guided mock run makes no provider call and spends no model money, but installation and scaffolding do use the package index and local filesystem. An AI-assisted review path exists at https://harnessie.com/.well-known/assistant-guide.txt; verify it, report the achieved level and SHA-256, and get explicit human approval before any action. The served 1.0.0 guide matches its sidecar and the independent DNS TXT anchor; end-to-end GuideCheck Level 4 was re-confirmed by the hosted verifier on 2026-08-20 UTC.
+pip install harnessie; also available through pipx or uv tool install. PyPI carries core 1.1.0; the separately maintained Homebrew formula remains on 1.0.0 until its downstream release completes. The guided mock run makes no provider call and spends no model money, but installation and scaffolding do use the package index and local filesystem. An AI-assisted review path exists at https://harnessie.com/.well-known/assistant-guide.txt; verify it, report the achieved level and SHA-256, and get explicit human approval before any action. The served 1.1.0 guide matches its sidecar. Its DNS re-anchor and hosted re-verification are pending; Level 4 was last confirmed for the 1.0.0 guide on 2026-08-20 UTC.
 
 ## Key files
 
@@ -40,7 +41,7 @@ pip install harnessie; also available through pipx or uv tool install. PyPI and 
 - Stable v1 workflow schema: https://harnessie.com/schemas/v1/workflow.schema.json
 - Schema compatibility contract: https://github.com/snapsynapse/harnessie/blob/main/SCHEMA_COMPATIBILITY.md
 - Plugin contract: https://github.com/snapsynapse/harnessie/blob/main/PLUGIN_CONTRACT.md
-- [Assistant Guide](https://harnessie.com/.well-known/assistant-guide.txt): bounded, human-verifiable guide for reviewing a Harnessie checkout before authorizing a run; served bytes, sidecar, and independent DNS anchor agree, and the hosted GuideCheck verifier re-confirmed Level 4 on 2026-08-20 UTC
+- [Assistant Guide](https://harnessie.com/.well-known/assistant-guide.txt): bounded, human-verifiable guide for reviewing a Harnessie checkout before authorizing a run; 1.1.0 served bytes and sidecar agree, while DNS re-anchoring and hosted re-verification remain pending
 
 ## Support and machine handoff
 
@@ -53,6 +54,7 @@ pip install harnessie; also available through pipx or uv tool install. PyPI and 
 
 ## Related
 
+- Anthropic, Patterns and problems in emerging multiagent systems: https://anthropic.com/research/multiagent-systems
 - HardGuard25 (human-safe identifiers): https://hardguard25.com/
 - Graceful Boundaries (refusal grammar): https://gracefulboundaries.dev/
 - AI Decision Records (AIDR): https://aidr.work/

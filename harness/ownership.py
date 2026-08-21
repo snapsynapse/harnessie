@@ -39,6 +39,20 @@ from .schema import read_document
 _GLOB_META = frozenset("*?[")
 
 
+@dataclass(frozen=True)
+class OwnershipDecision:
+    """Read-only explanation of one agent/path write decision."""
+
+    allowed: bool
+    agent: str
+    path: str
+    source: str
+    reason: str
+    owner: str | None = None
+    pattern: str | None = None
+    remedy: str | None = None
+
+
 def _pattern_protection_root(pattern: str) -> PurePosixPath:
     """Return a conservative literal root covering every fnmatch match.
 
@@ -132,6 +146,63 @@ class OwnershipLedger:
                 return agent
         return self.files.get(rel)
 
+    def _declared_decision(
+            self, agent: str, rel: str) -> OwnershipDecision | None:
+        for pattern in self.operator:
+            if fnmatch(rel, pattern):
+                reason = (f"{rel!r} is in an operator-owned lane; no agent may "
+                          "write it. This is not negotiable at agent level.")
+                return OwnershipDecision(
+                    allowed=False, agent=agent, path=rel,
+                    source="operator_lane", owner="operator", pattern=pattern,
+                    reason=reason, remedy="operator_reassignment")
+        for owner, globs in self.agent_lanes.items():
+            for pattern in globs:
+                if not fnmatch(rel, pattern):
+                    continue
+                if owner == agent:
+                    return OwnershipDecision(
+                        allowed=True, agent=agent, path=rel,
+                        source="agent_lane", owner=owner, pattern=pattern,
+                        reason="agent lane")
+                reason = (f"{rel!r} is in the lane of agent {owner!r}. "
+                          "You may not modify another agent's files; call "
+                          "request_change to record what you need changed.")
+                return OwnershipDecision(
+                    allowed=False, agent=agent, path=rel,
+                    source="agent_lane", owner=owner, pattern=pattern,
+                    reason=reason, remedy="request_change")
+        for pattern in self.collaborative:
+            if fnmatch(rel, pattern):
+                return OwnershipDecision(
+                    allowed=True, agent=agent, path=rel,
+                    source="collaborative_lane", pattern=pattern,
+                    reason="collaborative lane")
+        return None
+
+    def explain_write(self, agent: str, rel: str) -> OwnershipDecision:
+        """Explain the same decision used by ``check_write`` without writing."""
+        declared = self._declared_decision(agent, rel)
+        if declared is not None:
+            return declared
+        claimed = self.files.get(rel)
+        if claimed is not None:
+            if claimed == agent:
+                return OwnershipDecision(
+                    allowed=True, agent=agent, path=rel,
+                    source="first_writer", owner=claimed,
+                    reason="unowned (first writer claims)")
+            reason = (f"{rel!r} is owned by agent {claimed!r} (first writer). "
+                      "You may not modify another agent's files; call "
+                      "request_change to record what you need changed.")
+            return OwnershipDecision(
+                allowed=False, agent=agent, path=rel,
+                source="first_writer", owner=claimed,
+                reason=reason, remedy="request_change")
+        return OwnershipDecision(
+            allowed=True, agent=agent, path=rel, source="unowned",
+            reason="unowned (first writer claims)")
+
     def declared_write(self, agent: str, rel: str) -> tuple[bool, str] | None:
         """Evaluate operator/agent/collaborative lanes only.
 
@@ -140,31 +211,14 @@ class OwnershipLedger:
         declared authority remains enforced without conflating two physically
         separate `out.txt` files into one first-writer claim.
         """
-        if any(fnmatch(rel, g) for g in self.operator):
-            return False, (f"{rel!r} is in an operator-owned lane; no agent may "
-                           "write it. This is not negotiable at agent level.")
-        for owner, globs in self.agent_lanes.items():
-            if any(fnmatch(rel, g) for g in globs):
-                if owner == agent:
-                    return True, "agent lane"
-                return False, (f"{rel!r} is in the lane of agent {owner!r}. "
-                               "You may not modify another agent's files; call "
-                               "request_change to record what you need changed.")
-        if any(fnmatch(rel, g) for g in self.collaborative):
-            return True, "collaborative lane"
-        return None
+        decision = self._declared_decision(agent, rel)
+        return ((decision.allowed, decision.reason)
+                if decision is not None else None)
 
     def check_write(self, agent: str, rel: str) -> tuple[bool, str]:
         """May `agent` write workspace-relative `rel`? (allowed, reason)."""
-        declared = self.declared_write(agent, rel)
-        if declared is not None:
-            return declared
-        claimed = self.files.get(rel)
-        if claimed and claimed != agent:
-            return False, (f"{rel!r} is owned by agent {claimed!r} (first "
-                           "writer). You may not modify another agent's files; "
-                           "call request_change to record what you need changed.")
-        return True, "unowned (first writer claims)"
+        decision = self.explain_write(agent, rel)
+        return decision.allowed, decision.reason
 
     def claim(self, agent: str, rel: str) -> bool:
         """Record first-writer ownership. Returns True on a NEW claim.

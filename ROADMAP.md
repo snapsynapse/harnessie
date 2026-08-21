@@ -6,7 +6,7 @@ Roadmap items are intent, not commitments. Dates are omitted deliberately; miles
 
 ## Released so far
 
-Versions 0.1.0 through 1.0.0 are shipped; the current core release is 1.0.0, which freezes six authoring contracts, kernel-enforces per-agent child-process ownership lanes, and admits installed tool plugins through one explicit operator-trusted boundary. This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
+Versions 0.1.0 through 1.1.0 are shipped; the current core release is 1.1.0. It retains the stable 1.x authoring and plugin contracts while making Harnessie's ownership invariant inspectable through a read-only CLI decision surface and executable collision proof. This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
 
 ## Guiding priorities
 
@@ -125,6 +125,17 @@ Theme: stable surfaces and pluggability, only after the core is proven.
 - Tool plugins: SHIPPED. Installed packages expose declarations through the single versioned `harnessie.tools.v1` entry-point group and never auto-load. Repeatable `--plugin NAME` admission validates and namespaces tools before model dispatch, applies registry roles, consent, approvals, effects metadata, and quarantine, records immutable provenance, and pins the exact receipt across resume. Imported implementation code is explicitly operator-trusted and not lane-confined; untrusted plugins remain unsupported pending a separate out-of-process protocol.
 
 Gate result: GREEN. All earlier acceptance criteria, the three 1.0 slices, the composed release gate, exact package build, and fresh-install smoke passed before release.
+
+### 1.1.0: The Golden Rule becomes inspectable (shipped 2026-08-20)
+
+Theme: turn the ownership invariant into a memorable, falsifiable product surface without weakening the 1.x compatibility contract.
+
+- Positioning: SHIPPED. "Harnessie's Golden Rule for agent work: Read together. Write only what you own" names the existing invariant while the technical term remains ownership lanes. The public explanation cites dispatch denial, child-process read-only overlays, pre-dispatch parallel conflict refusal, explicit collaborative and plugin boundaries, and the `request_change` remedy.
+- Policy inspection: SHIPPED. `harnessie ownership PATH --agent AGENT [--json]` evaluates the exact decision used by enforcement without claiming or changing a path. Human output names the governing source, owner, matching pattern, reason, and remedy. Schema-versioned JSON provides a stable machine vocabulary. Valid allow and deny explanations exit 0; invalid input exits 2.
+- Collision proof: SHIPPED. A zero-model, zero-network example writes an artifact as Alice, attempts to replace it as Bob through the built-in tool registry, and passes only when Bob receives `ownership_denied`, Alice's bytes survive, and the ledger still names Alice.
+- Public and release surfaces: SHIPPED. README, website, Guide, agent declarations, CLI manifest, machine changelog, assistant guide, package metadata, release notes, generated pages, and fresh-install smoke describe and test the same 1.1.0 behavior.
+
+Gate result: GREEN. The composed release gate, ownership adversarial corpus, exact package build, and fresh-install ownership inspection passed before release. The assistant guide's external DNS re-anchor and hosted re-verification follow publication because those checks require the final public bytes.
 
 ### Post-1.0 candidates
 

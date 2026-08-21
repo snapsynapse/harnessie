@@ -2,9 +2,11 @@
 
 ## Current state
 
-Harnessie 1.0.0 is the current core release. It freezes six v1 authoring contracts, enforces agent-specific ownership lanes for child processes, and admits installed tool plugins through one explicit operator-trusted entry-point mechanism. The core release is published independently before its downstream release train.
+Harnessie 1.1.0 is the current core release. It retains the six stable v1 authoring contracts and explicit operator-trusted plugin boundary from 1.0.0, then makes Harnessie's Golden Rule inspectable through the read-only `harnessie ownership` decision command and a zero-model executable collision proof. The core release is published independently before its downstream release train.
 
-Downstream propagation completed 2026-08-19: Harnessie Verify v0.1.2 and stable `snapsynapse/harnessie-verify-action@v0` now pin Harnessie 1.0.0 (release commit `2aa3859`, CI green before tagging), and the public Homebrew formula installs 1.0.0 from the immutable PyPI sdist (SHA-256 `40c2daa307d71a4687321205fac8fc1a24b6778c4412fb1f20cb2b20f89bd787`, with the new jsonschema resource tree and a rust build dependency for rpds-py; strict online audit, from-source upgrade, and formula test passed). `python3 scripts/ecosystem_status.py` reports both downstream pins as `match`. `harnessie-engine-wrappers` remains independently released at v0.1.0 because core 1.0.0 does not consume a new wrapper seam.
+The 1.1.0 downstream release train is pending. Harnessie Verify v0.1.2 and stable `snapsynapse/harnessie-verify-action@v0` currently pin 1.0.0, and the public Homebrew formula currently installs 1.0.0 from the immutable PyPI sdist. Both must move only after the 1.1.0 core package is public and independently tested. `harnessie-engine-wrappers` remains independently released at v0.1.0 because core 1.1.0 consumes no new wrapper seam.
+
+The 1.1.0 ownership inspector calls the same ledger decision function as enforcement and performs no claim or write. Human output names the governing lane or first-writer claim, owner, pattern, reason, and remedy. JSON output uses schema version 1. The executable collision proof attempts a real built-in `write_file` overwrite and passes only if the second agent is denied and the first artifact survives byte-for-byte.
 
 The first 1.0 slice freezes six stable Draft 2020-12 authoring schemas, a side-effect-free `harnessie validate` command, runtime startup validation, cross-document checks, explicit v1 scaffolds, packaged and served schema artifacts, and the compatibility and deprecation contract in `SCHEMA_COMPATIBILITY.md`. Schema-less 0.8 documents remain implicit v1 throughout 1.x.
 
@@ -12,7 +14,7 @@ The second 1.0 slice compiles ownership decisions into agent-specific read-only 
 
 The third 1.0 slice admits installed tool extensions only through the `harnessie.tools.v1` entry-point group and never auto-loads them. Operators select plugins explicitly with repeatable `--plugin NAME` arguments. Admission validates and namespaces declarations before model dispatch, records loader-supplied provenance, and pins exact plugin receipts across resume. Imported implementation code is explicitly operator-trusted and not lane-confined. Untrusted plugins are unsupported pending a separately versioned out-of-process protocol.
 
-All three planned 1.0 slices and the admission review are complete. The next work is the separately authorized downstream release train and external guide-anchor rotation, followed by post-1.0 maintenance. Do not expand that work into deferred multi-orchestrator or untrusted-plugin designs without new evidence and authority.
+All three planned 1.0 slices and the 1.1.0 ownership inspection release are complete. The active work is the separately gated 1.1.0 downstream release train and external guide-anchor rotation. Do not expand it into deferred multi-orchestrator or untrusted-plugin designs without new evidence and authority.
 
 The pre-1.0 correctness packet ships in 1.0.0. Anthropic and OpenAI-compatible adapters turn invalid JSON, malformed envelopes, invalid tool calls, and invalid usage counters into non-echoing provider error turns. Adversarial rebuttal agents receive each peer position in full and exclude their own position by value, removing the truncation that previously produced a spurious objection.
 
@@ -27,6 +29,8 @@ The public first-harness gate is green. A fresh live Siteline 2.3.0 scan on 2026
 Cross-repo authority, dependency direction, and release propagation are defined in `ECOSYSTEM.md` and `ecosystem.yaml`. `python3 scripts/ecosystem_status.py` provides the offline local status view; use its optional `--github` mode only for non-authoritative release and pull-request observations.
 
 ## Verified baseline
+
+Verified for the 1.1.0 release on 2026-08-20: the composed release gate passed with 433 tests, one environment-dependent skip, 50/50 evals, all six shipped authoring contracts, both manifests, ecosystem and generated-doc validation, the ten-page search contract, isolated wheel and sdist inspection, `twine check`, and a fresh-install smoke that exercised the ownership inspector from the built wheel.
 
 Verified for the 1.0.0 release on 2026-08-09: the composed release gate passed with 413 tests, one environment-dependent skip, 50/50 evals, all six shipped authoring contracts, both manifests, ecosystem and generated-doc validation, isolated wheel and sdist inspection, `twine check`, and a fresh-install smoke.
 
@@ -51,11 +55,11 @@ Downstream propagation was verified during the 2026-08-04 MDT closeout:
 
 ## Current cross-repo state
 
-- `snapsynapse/harnessie-verify-action`: the clean local checkout and remote `main` are at `2aa3859`. Release v0.1.2 is Latest, stable `v0` resolves to the same commit, and the default core pin is 1.0.0. The observed non-blocking residual is GitHub's Node 20 deprecation warning for `actions/checkout@v4`; that dependency update is owned by the action repository.
+- `snapsynapse/harnessie-verify-action`: the clean local checkout and remote `main` are at `2aa3859`. Release v0.1.2 is Latest, stable `v0` resolves to the same commit, and the default core pin remains 1.0.0 pending the gated 1.1.0 update. The observed non-blocking residual is GitHub's Node 20 deprecation warning for `actions/checkout@v4`; that dependency update is owned by the action repository.
 - `snapsynapse/homebrew-tap`: the clean local checkout and remote `main` are at `53b8b61`, and public bytes match local. The public formula installs Harnessie 1.0.0 from the immutable PyPI sdist with SHA-256 `40c2daa307d71a4687321205fac8fc1a24b6778c4412fb1f20cb2b20f89bd787`, declares the audited `libyaml` dependency plus a rust build dependency for the rpds-py resource, and has no open pull request.
 - `snapsynapse/harnessie-engine-wrappers`: v0.1.0 is released from `ad3d759`. CI passed its real macOS-14 containment probe and its Ubuntu unsupported-platform refusal; release archives, wheel, and `SHA256SUMS` are attached.
 - This repo dogfoods `snapsynapse/harnessie-verify-action@v0` in `.github/workflows/verify-pr-claims.yml`. A live verdict still depends on the repository verifier endpoint/model variables and API-key secret.
-- GitHub `main`, tag `v1.0.0`, the GitHub Release, and PyPI carry the core 1.0.0 release. Exact-commit wheel, sdist, structural inspection, `twine check`, and fresh-install checks passed before publication.
+- GitHub `main`, tag `v1.1.0`, the GitHub Release, and PyPI carry the core 1.1.0 release. Exact-commit wheel, sdist, structural inspection, `twine check`, and fresh-install checks passed before publication. The assistant-guide DNS anchor and hosted re-verification remain the explicit post-publication trust step.
 
 ## Handoff disposition
 
@@ -68,17 +72,19 @@ The detailed inventory and relevance assessment is in `audits/handoff-relevance-
 
 ## Recommended work order
 
-1. Done 2026-08-19: Harnessie 1.0.0 propagated through the Verify Action (v0.1.2, `v0` moved) and Homebrew (formula at 1.0.0) release trains.
-2. Done 2026-08-20: the operator rotated the `_assistant-guide.harnessie.com` DNS TXT anchor to the 1.0.0 guide hash, and the hosted GuideCheck verifier re-confirmed end-to-end Level 4 with zero blocking findings (dns-txt and repository-file anchors both present-matches). The tracked receipt is `audits/guidecheck-live-result-2026-08-20.json`; public trust copy in README, INTENT, agents.json, llms.txt, and the landing page now states the re-earned level.
-3. Keep the six v1 authoring contracts frozen. Additive schema changes require explicit defaults and compatibility fixtures; breaking changes require a new major schema version and migration path.
-4. Treat `PLUGIN_CONTRACT.md` as the complete v1 plugin trust decision. Do not add local-file discovery, automatic loading, configuration namespaces, or an untrusted execution mode without a separately versioned design.
-5. Keep multi-orchestrator handoffs deferred unless a documented real job proves a single orchestrator insufficient. Structured memory frontmatter and macOS temporary-write parity remain post-1.0 candidates pending evidence.
+1. Publish and verify Harnessie 1.1.0 on GitHub and PyPI from the exact tagged commit.
+2. Test that public package in Harnessie Verify, release the updated action, and move stable `v0` only after CI passes.
+3. Update Homebrew from the immutable PyPI 1.1.0 sdist, then pass strict online audit, from-source upgrade, formula test, and linkage checks before pushing.
+4. Rotate `_assistant-guide.harnessie.com` to the 1.1.0 guide hash, confirm public DNS, run the hosted GuideCheck verifier, and update public trust copy only if the new bytes re-earn the level.
+5. Keep the six v1 authoring contracts frozen. Additive schema changes require explicit defaults and compatibility fixtures; breaking changes require a new major schema version and migration path.
+6. Treat `PLUGIN_CONTRACT.md` as the complete v1 plugin trust decision. Do not add local-file discovery, automatic loading, configuration namespaces, or an untrusted execution mode without a separately versioned design.
+7. Keep multi-orchestrator handoffs deferred unless a documented real job proves a single orchestrator insufficient. Structured memory frontmatter and macOS temporary-write parity remain post-1.0 candidates pending evidence.
 
 ## Operator-attended or external checks
 
 - Configure the dogfood verifier repository variables and secret if live PR verdicts are desired.
 - Live provider scorecards remain explicit opt-in operations via `HARNESSIE_LIVE=1`.
-- Done 2026-08-20: the GuideCheck DNS anchor is rotated and hosted verification re-confirmed Level 4 for the 1.0.0 guide.
+- Rotate the GuideCheck DNS anchor and run hosted verification only after the 1.1.0 guide is live. Until then, 1.0.0 is the last independently anchored guide receipt.
 
 ## Session start commands
 

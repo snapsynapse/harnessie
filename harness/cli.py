@@ -4,6 +4,7 @@
     harnessie resume <run_id> workflows/build-and-verify.yaml       resume a crashed run
     harnessie report <run_id>                                       human-readable run report
     harnessie audit <run_id>                                        verify hash chain + governance timeline
+    harnessie ownership <path> --agent <name>                       explain write authority
 """
 
 from __future__ import annotations
@@ -11,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from dataclasses import asdict
 from pathlib import Path
 
 
@@ -38,6 +40,18 @@ def _print_raw_report(run_dir: Path) -> None:
         print("\nproofs:")
         for p in sorted(proofs.iterdir()):
             print(f"  {p.name}")
+
+
+def _ownership_relative_path(root: Path, raw: str) -> str:
+    """Resolve a CLI path exactly as a workspace-relative write target."""
+    if not raw or raw != raw.strip() or "\\" in raw \
+            or any(ord(char) < 32 or ord(char) == 127 for char in raw):
+        raise ValueError("PATH must be a non-empty relative POSIX workspace path")
+    workspace = (root / "workspace").resolve()
+    target = (workspace / raw).resolve()
+    if target == workspace or not target.is_relative_to(workspace):
+        raise ValueError("PATH must name a file or directory inside workspace/")
+    return target.relative_to(workspace).as_posix()
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -87,6 +101,15 @@ def main(argv: list[str] | None = None) -> int:
         "--kind", choices=("models", "cascade", "boundary", "approval-policy",
                             "ownership", "workflow"),
         help="schema kind for one explicitly named document")
+
+    p_ownership = sub.add_parser(
+        "ownership", help="explain whether an agent may write a workspace path")
+    p_ownership.add_argument("path", metavar="PATH",
+                             help="path relative to workspace/")
+    p_ownership.add_argument("--agent", required=True,
+                             help="agent identity to evaluate")
+    p_ownership.add_argument("--json", action="store_true", dest="json_output",
+                             help="emit the decision as JSON")
 
     p_manifest = sub.add_parser(
         "verify-manifest", help="verify the trust-bundle MANIFEST integrity")
@@ -142,6 +165,38 @@ def main(argv: list[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
     root = Path(args.root).resolve()
+
+    if args.cmd == "ownership":
+        from .ownership import OwnershipLedger
+        from .schema import ConfigurationError
+
+        try:
+            if not args.agent or args.agent != args.agent.strip() \
+                    or any(ord(char) < 32 or ord(char) == 127
+                           for char in args.agent):
+                raise ValueError("AGENT must be a non-empty identity without surrounding whitespace")
+            rel = _ownership_relative_path(root, args.path)
+            decision = OwnershipLedger.load(
+                root / "OWNERSHIP.yaml").explain_write(args.agent, rel)
+        except (ConfigurationError, ValueError) as exc:
+            print(f"ownership inspection failed: {exc}", file=sys.stderr)
+            return 2
+        if args.json_output:
+            print(json.dumps(
+                {"schema_version": 1, **asdict(decision)}, sort_keys=True))
+            return 0
+        print(f"ownership: {'ALLOWED' if decision.allowed else 'DENIED'}")
+        print(f"agent: {decision.agent}")
+        print(f"path: {decision.path}")
+        print(f"source: {decision.source}")
+        if decision.owner is not None:
+            print(f"owner: {decision.owner}")
+        if decision.pattern is not None:
+            print(f"pattern: {decision.pattern}")
+        print(f"reason: {decision.reason}")
+        if decision.remedy is not None:
+            print(f"remedy: {decision.remedy}")
+        return 0
 
     if args.cmd == "validate":
         from .schema import (ConfigurationError, ValidationReport, format_report,

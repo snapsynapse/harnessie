@@ -38,6 +38,8 @@ Parallel workflow members execute in isolated phase workspaces. When a parallel 
 
 Harnessie does not claim that cross-agent overwrite prevention is a unique problem or that ownership is the only valid coordination design. Its specific claim is falsifiable: within the shipped boundary, an agent cannot write across an ownership lane through a built-in direct write or a confined child process, and declared overlapping parallel writes refuse before dispatch.
 
+This is why Harnessie treats cooperation prompts as guidance, not as a control. [Anthropic's August 2026 multiagent experiments](https://anthropic.com/research/multiagent-systems) report coordination failures, collusion, and sabotage in agent swarms. Ownership lanes are a structural response to that class of failure: write authority is checked at dispatch and carried into child-process confinement even when a model does not cooperate.
+
 ## Boundaries and exceptions
 
 - Collaborative lanes deliberately permit co-editing. Their writes are events, not exclusive claims.
@@ -49,11 +51,39 @@ Harnessie does not claim that cross-agent overwrite prevention is a unique probl
 
 The enforcing paths are [harness/ownership.py](../harness/ownership.py), [harness/sandbox.py](../harness/sandbox.py), and the operator-owned [OWNERSHIP.yaml](../OWNERSHIP.yaml). The threat-model claim and proof references are collected in [Threat model](threat-model.md).
 
+From a source checkout after installing the development dependencies:
+
 Literal
 ```bash
 python3 -m pytest -q tests/test_ownership.py::test_cross_agent_write_denied_at_dispatch tests/test_ownership.py::test_run_shell_receives_agent_specific_readonly_roots tests/test_runner.py::test_parallel_declared_write_conflict_refuses_before_dispatch tests/test_sandbox.py::test_readonly_lane_backend_failure_blocks_child
 ```
 These deterministic tests prove direct denial, compilation of agent-specific read-only roots, pre-dispatch parallel conflict refusal, and fail-closed behavior when lane confinement is unavailable. Platform-backed sandbox tests add a live interpreter probe when the required backend is present.
+
+## Run the collision proof
+
+The [executable repository example](../examples/ownership-collision/README.md) performs an actual built-in `write_file` collision in a temporary workspace. Alice writes first. Bob attempts to replace the same artifact. The script exits 0 only when Bob receives `ownership_denied`, Alice's bytes survive unchanged, and the ledger still names Alice as owner. It makes no model or network call and does not modify the checkout.
+
+Literal
+```bash
+python3 examples/ownership-collision/demo.py
+```
+The final line must be `Golden Rule proof: PASS`.
+
+## Inspect a policy before a run
+
+Shipped in Harnessie 1.1.0, `harnessie ownership` evaluates the same ledger decision used by `write_file` without claiming or changing the path.
+
+Replace: PROJECT_ROOT -> the Harnessie project directory containing `OWNERSHIP.yaml`
+
+Replace: WORKSPACE_PATH -> the path to inspect, relative to that project's `workspace/`
+
+Replace: AGENT_NAME -> the agent identity to evaluate
+
+Customize
+```bash
+python3 -m harness.cli --root PROJECT_ROOT ownership WORKSPACE_PATH --agent AGENT_NAME
+```
+The human-readable result names `ALLOWED` or `DENIED`, the governing source, owner and pattern when present, the reason, and any remedy. Add `--json` for a schema-versioned machine result. Schema version 1 fixes the fields and the source vocabulary (`operator_lane`, `agent_lane`, `collaborative_lane`, `first_writer`, or `unowned`); remedies are `request_change`, `operator_reassignment`, or null. A valid explanation exits 0 regardless of allow or deny; malformed input exits 2.
 
 ## The short version
 

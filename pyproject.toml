@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "harnessie"
-version = "1.0.0"
-description = "Harnessie: a brain-agnostic multi-agent harness with stable authoring contracts, verification gates, consent-based orchestration, kernel-enforced ownership lanes for child processes, explicit operator-trusted tool plugins, containment-aware routing, and tamper-evident audit."
+version = "1.1.0"
+description = "Harnessie: a brain-agnostic multi-agent harness whose Golden Rule, read together and write only what you own, is enforced by ownership lanes, verification gates, consent-based orchestration, containment-aware routing, and tamper-evident audit."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"

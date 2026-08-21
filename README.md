@@ -12,6 +12,8 @@ Read together. Write only what you own.
 
 Shared context helps agents collaborate; shared write authority lets them silently erase one another's work. Harnessie's [ownership lanes](docs/agent-file-ownership.md) turn the rule into a checkable workflow contract: direct cross-lane writes are refused, child processes receive agent-specific read-only overlays, and overlapping declared writes in a parallel group refuse before dispatch. An agent that needs another agent's file changed records a `request_change` instead of overwriting it. Collaborative lanes remain an explicit operator-chosen exception, and operator-trusted in-process plugins remain outside child-process lane confinement.
 
+Shipped in 1.1.0, `harnessie ownership PATH --agent AGENT [--json]` explains a write decision without mutating the ledger. The [executable ownership-collision proof](examples/ownership-collision/README.md) attempts a real cross-agent overwrite through the built-in tool registry and passes only when the denial preserves the original artifact.
+
 Beneath that thesis sit five engineering habits, each proven separately in the author's other tools and standards before it landed here as code: deterministic checks run before any model judgment (the gate order in [docs/GUIDE.md](docs/GUIDE.md)); evaluation comes before implementation — a governance mechanic without a red-then-green scenario pair does not merge ([EVALS.md](EVALS.md)); remembered facts carry verified and verify-by dates and expire visibly, never silently ([GOVERNANCE.md](GOVERNANCE.md)); every agent and operator action lands in one hash-chained, tamper-evident timeline ([docs/threat-model.md](docs/threat-model.md)); and any control that cannot be enforced fails closed rather than running unenforced ([SECURITY.md](SECURITY.md)). The same habits produced the standards Harnessie adopts — [Turnfile](https://turnfile.work/), [AIDR](https://aidr.work/), [Graceful Boundaries](https://gracefulboundaries.dev/) — which is why they fit together.
 
 ## Quick start
@@ -21,7 +23,7 @@ pip install harnessie                # or: pipx install / uv tool install
 harnessie init my-project            # scaffold + guided readiness check + zero-dollar mock run
 ```
 
-PyPI and the separately maintained Homebrew formula both carry the current 1.0.0 core release; see [NEXT.md](NEXT.md) for current downstream status.
+PyPI carries the current 1.1.0 core release. The separately maintained Homebrew formula remains on 1.0.0 until its downstream release completes; see [NEXT.md](NEXT.md) for current status.
 
 To gate pull requests on claim-by-claim verification without installing anything locally, the standalone verifier also ships as a GitHub Action: [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify) (one workflow file; the PR body is treated as claims to test, and the exit code gates the merge).
 
@@ -41,7 +43,7 @@ python3 -m harness.cli audit <run_id>   # verify the hash chain + governance tim
 
 The shipped worker declares `phase_type: artifact-builder`. Its first exact contract runs and verifies in an ignored `.maiden/` staged clone, then stops before changing the target. Inspect the path named in the report, approve with `harnessie approve-maiden <run_id> implement`, and resume the original workflow. Any later contract change triggers another maiden voyage.
 
-Worked end-to-end example with sample data: [examples/policy-compliance/README.md](examples/policy-compliance/README.md).
+Worked examples: [policy compliance](examples/policy-compliance/README.md) exercises a complete model-backed workflow; [ownership collision](examples/ownership-collision/README.md) proves cross-agent overwrite denial without a model or network.
 
 ## Documentation
 
@@ -51,7 +53,7 @@ Worked end-to-end example with sample data: [examples/policy-compliance/README.m
 - [docs/agent-file-ownership.md](docs/agent-file-ownership.md): Harnessie's Golden Rule for agent work, the ownership-lane mechanics beneath it, explicit boundaries, and the tests that make the claim falsifiable.
 - [PLUGIN_CONTRACT.md](PLUGIN_CONTRACT.md): the versioned, opt-in tool extension contract and its explicit in-process trust boundary.
 - [docs/brains.md](docs/brains.md): the brain-agnostic receipt, the models actually run under the harness with a link to the record that proves each.
-- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run. The served 1.0.0 guide, provenance sidecar, and independent DNS TXT anchor agree; the hosted GuideCheck verifier re-confirmed end-to-end Level 4 on 2026-08-20 UTC with zero blocking findings.
+- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run. The 1.1.0 guide and provenance sidecar are synchronized; its new hash requires DNS re-anchoring and hosted GuideCheck re-verification before the release can claim the independently anchored level again.
 - [docs/agents.json](docs/agents.json), [docs/api/v1/index.json](docs/api/v1/index.json), [docs/changelog.json](docs/changelog.json), and [docs/.well-known/security.txt](docs/.well-known/security.txt): machine-readable capability, local CLI, release-history, and private security-report handoffs. The declarations explicitly do not advertise a hosted API, service, or MCP server.
 
 The engineering references below (ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP) sit at the repo root; the user-facing guides live under `docs/`.
@@ -74,7 +76,7 @@ decisions/          the repo's own AIDR decision records (AIDR-0001 = v0.2 direc
 memory/             project memory: MEMORY.md index + facts/ (stamped provenance, verify_by
                     expiry) + archive/ (expired facts; nothing deletes) — maintained by
                     workflows/memory-triage.yaml under approval gates
-examples/           worked end-to-end example (policy-compliance) with sample data
+examples/           model-backed policy-compliance example + zero-model ownership proof
 runs/               per-run journal.jsonl (resume ledger) + events.jsonl (hash-chained audit)
                     + proofs/ + decisions/ (contested-phase records) (gitignored)
 evals/              deterministic scorecards over mock-brain golden/risky/recovery scenarios

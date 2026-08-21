@@ -14,7 +14,7 @@ means the operator does not need to be a developer (declared token/dollar ceilin
 named halt conditions each with one plain operator action, disagreement surfaced as a
 human decision rather than a silent merge).
 
-Shipped as the `harnessie` Python package (Apache-2.0, current 1.0.0). The verifier also
+Shipped as the `harnessie` Python package (Apache-2.0, current 1.1.0). The verifier also
 ships standalone as a GitHub Action (Harnessie Verify) for gating PRs.
 
 ## Audience
@@ -49,10 +49,10 @@ ships standalone as a GitHub Action (Harnessie Verify) for gating PRs.
 Copyright Snap Synapse LLC (author Sam Rogers, subscriptions@snapsynapse.com), with
 trademark and PAICE.work PBC spec/code carveouts recorded in NOTICE.
 
-## Current status (2026-08-09)
+## Current status (2026-08-20)
 
-Active and healthy. v1.0.0 is the current core release on PyPI and GitHub. The
-separately owned Verify Action v0.1.1 and Homebrew formula still pin 0.8.0 pending
+Active and healthy. v1.1.0 is the current core release on PyPI and GitHub. The
+separately owned Verify Action v0.1.2 and Homebrew formula still pin 1.0.0 pending
 their own release trains. The docs site is live, and a fresh
 Siteline scan scored it A, 97/100. Public-facing doc pages under `docs/` are generated
 from markdown via `scripts/build_docs_html.py` (edit markdown, rebuild, commit both).
@@ -66,3 +66,8 @@ that enforce ownership for child processes. Installed tool extensions now use on
 explicit versioned entry-point mechanism with an operator-trusted in-process boundary,
 registry-mediated calls, immutable provenance, and exact resume receipts. Untrusted
 plugins remain unsupported.
+
+Harnessie's Golden Rule is now a public and executable product surface: read together,
+write only what you own. The read-only `harnessie ownership` command explains the exact
+ledger decision, and the zero-model collision example proves a second agent cannot
+overwrite the first agent's artifact through the built-in write path.

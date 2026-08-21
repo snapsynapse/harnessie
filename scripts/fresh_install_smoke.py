@@ -56,6 +56,7 @@ def smoke(wheel: Path) -> None:
         help_result = run([str(cli), "--help"], temp)
         for command in (
             "approve-maiden",
+            "ownership",
             "verify-inward-manifest",
             "verify-manifest",
         ):
@@ -78,6 +79,12 @@ def smoke(wheel: Path) -> None:
             [str(cli), "--root", str(project), "verify-inward-manifest"],
             temp,
             contains="inward manifest OK",
+        )
+        run(
+            [str(cli), "--root", str(project), "ownership", "draft.txt",
+             "--agent", "implementer", "--json"],
+            temp,
+            contains='"allowed": true',
         )
         run(
             [str(cli), "--root", str(project), "eval"],

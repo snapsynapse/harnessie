@@ -7,9 +7,13 @@ the same denials as a kernel-enforced read-only overlay.
 
 import json
 import re
+import subprocess
+import sys
+from pathlib import Path
 
 import pytest
 
+from harness.cli import main
 from harness.events import EventLog
 from harness.ids import verify_check_digit
 from harness.loop import AgentLoop
@@ -42,6 +46,154 @@ def test_owner_may_rewrite_own_file(tmp_path):
     led.claim("alice", "a.txt")
     ok, _ = led.check_write("alice", "a.txt")
     assert ok
+
+
+def test_explain_write_names_source_owner_pattern_and_remedy(tmp_path):
+    (tmp_path / "OWNERSHIP.yaml").write_text(
+        "lanes:\n"
+        "  agent:\n"
+        "    alice: ['src/*']\n"
+        "  collaborative: ['shared/*']\n"
+        "  operator: ['config/*']\n"
+        "files:\n"
+        "  notes/bob.md: bob\n")
+    ledger = OwnershipLedger.load(tmp_path / "OWNERSHIP.yaml")
+
+    own = ledger.explain_write("alice", "src/app.py")
+    assert own.allowed and own.source == "agent_lane"
+    assert own.owner == "alice" and own.pattern == "src/*"
+
+    crossed = ledger.explain_write("bob", "src/app.py")
+    assert not crossed.allowed and crossed.source == "agent_lane"
+    assert crossed.owner == "alice" and crossed.remedy == "request_change"
+
+    shared = ledger.explain_write("bob", "shared/notes.md")
+    assert shared.allowed and shared.source == "collaborative_lane"
+
+    operator = ledger.explain_write("alice", "config/models.yaml")
+    assert not operator.allowed and operator.owner == "operator"
+    assert operator.remedy == "operator_reassignment"
+
+    claimed = ledger.explain_write("alice", "notes/bob.md")
+    assert not claimed.allowed and claimed.source == "first_writer"
+    assert claimed.owner == "bob" and claimed.remedy == "request_change"
+
+    claimed_owner = ledger.explain_write("bob", "notes/bob.md")
+    assert claimed_owner.allowed and claimed_owner.source == "first_writer"
+    assert claimed_owner.owner == "bob"
+
+    unowned = ledger.explain_write("alice", "new.txt")
+    assert unowned.allowed and unowned.source == "unowned"
+
+    for decision in (own, crossed, shared, operator, claimed,
+                     claimed_owner, unowned):
+        assert ledger.check_write(decision.agent, decision.path) == (
+            decision.allowed, decision.reason)
+
+
+def test_cli_ownership_explains_without_mutating_ledger(tmp_path, capsys):
+    ledger_path = tmp_path / "OWNERSHIP.yaml"
+    ledger_path.write_text(
+        "schema_version: 1\n"
+        "lanes:\n"
+        "  agent:\n"
+        "    alice: ['src/*']\n"
+        "  collaborative: []\n"
+        "  operator: []\n"
+        "files: {}\n")
+    before = ledger_path.read_bytes()
+
+    code = main(["--root", str(tmp_path), "ownership", "src/app.py",
+                 "--agent", "bob"])
+    assert code == 0
+    out = capsys.readouterr().out
+    assert "ownership: DENIED" in out
+    assert "owner: alice" in out
+    assert "pattern: src/*" in out
+    assert "remedy: request_change" in out
+    assert ledger_path.read_bytes() == before
+
+    code = main(["--root", str(tmp_path), "ownership", "src/app.py",
+                 "--agent", "alice", "--json"])
+    assert code == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["schema_version"] == 1
+    assert payload["allowed"] is True
+    assert payload["source"] == "agent_lane"
+    assert payload["owner"] == "alice"
+    assert set(payload) == {
+        "schema_version", "allowed", "agent", "path", "source", "reason",
+        "owner", "pattern", "remedy",
+    }
+    assert ledger_path.read_bytes() == before
+
+
+@pytest.mark.parametrize("path", [
+    "../outside.txt",
+    "/tmp/outside.txt",
+    "\\outside.txt",
+    " leading.txt",
+    "trailing.txt ",
+    "control\x1f.txt",
+    "delete\x7f.txt",
+    ".",
+])
+def test_cli_ownership_rejects_ambiguous_or_escaping_paths(
+        tmp_path, capsys, path):
+    assert main(["--root", str(tmp_path), "ownership", path,
+                 "--agent", "alice"]) == 2
+    assert "PATH must" in capsys.readouterr().err
+
+
+def test_cli_ownership_rejects_symlink_escape(tmp_path, capsys):
+    (tmp_path / "workspace").mkdir()
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (tmp_path / "workspace" / "link").symlink_to(outside,
+                                                   target_is_directory=True)
+
+    assert main(["--root", str(tmp_path), "ownership", "link/file.txt",
+                 "--agent", "alice"]) == 2
+    assert "inside workspace" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("agent", ["", " ", " alice", "alice ",
+                                    "ali\x1fce", "ali\x7fce"])
+def test_cli_ownership_rejects_invalid_agent_identity(tmp_path, capsys, agent):
+    assert main(["--root", str(tmp_path), "ownership", "inside.txt",
+                 "--agent", agent]) == 2
+    assert "AGENT must be" in capsys.readouterr().err
+
+
+def test_cli_ownership_accepts_safe_normalization_without_claiming(
+        tmp_path, capsys):
+    ledger_path = tmp_path / "OWNERSHIP.yaml"
+    ledger_path.write_text("lanes: {}\nfiles: {}\n")
+    before = ledger_path.read_bytes()
+
+    assert main(["--root", str(tmp_path), "ownership",
+                 "nested/../safe report.txt", "--agent", "alice",
+                 "--json"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["allowed"] is True
+    assert payload["path"] == "safe report.txt"
+    assert payload["source"] == "unowned"
+    assert ledger_path.read_bytes() == before
+
+
+def test_ownership_collision_example_proves_denial():
+    root = Path(__file__).resolve().parents[1]
+    result = subprocess.run(
+        [sys.executable, "examples/ownership-collision/demo.py"],
+        cwd=root, check=False, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.splitlines() == [
+        "alice first write: ALLOWED",
+        "bob overwrite: DENIED (ownership_denied)",
+        "surviving artifact: alice-v1",
+        "recorded owner: alice",
+        "Golden Rule proof: PASS",
+    ]
 
 
 def test_operator_lane_denies_all_agents(tmp_path):

@@ -95,7 +95,8 @@
     "citation": [
       { "@type": "WebPage", "name": "GuideCheck", "url": "https://guidecheck.org/" },
       { "@type": "WebPage", "name": "Graceful Boundaries", "url": "https://gracefulboundaries.dev/" },
-      { "@type": "WebPage", "name": "AI Decision Records", "url": "https://aidr.work/" }
+      { "@type": "WebPage", "name": "AI Decision Records", "url": "https://aidr.work/" },
+      { "@type": "Article", "name": "Patterns and problems in emerging multiagent systems", "url": "https://anthropic.com/research/multiagent-systems" }
     ]
   }
   </script>
@@ -386,7 +387,7 @@
   <div class="container">
     <div class="hero-grid">
       <div>
-        <div class="pill"><span class="dot"></span> v1.0.0 &middot; stable &middot; Apache-2.0</div>
+        <div class="pill"><span class="dot"></span> v1.1.0 &middot; stable &middot; Apache-2.0</div>
         <h1>Put AI to work without giving up control.</h1>
         <p class="subtitle">An open-source harness for governed multi-agent work: side-effecting worker phases pass deterministic checks and an independent verifier, child commands run confined, and opt-in containment keeps declared sensitive work on models you control. Run local, private, or frontier brains, swapped by one line.</p>
         <div class="cta-row">
@@ -408,7 +409,7 @@
     </div>
 
     <div class="proof-strip">
-      <div class="chip"><b>&#10003;</b> GuideCheck Level 4 &middot; <span class="m">DNS + repository anchors match</span></div>
+      <div class="chip"><b>!</b> Guide bytes synchronized &middot; <span class="m">DNS re-anchor pending</span></div>
       <div class="chip"><b>8</b> providers &middot; <span class="m">11 models, verified work</span></div>
       <div class="chip"><b>&#10003;</b> Fails closed <span class="m">by default</span></div>
       <div class="chip"><b>&#10003;</b> Opt-in containment <span class="m">keeps declared sensitive work controlled</span></div>
@@ -445,7 +446,8 @@
       </div>
       <div>
         <p>Shared context helps agents collaborate. Shared write authority lets them silently erase one another's work. Harnessie turns the rule into an enforceable workflow contract: ownership lanes deny cross-agent writes at dispatch, compile denied paths into read-only child-process overlays, and refuse overlapping declared parallel writes before model dispatch.</p>
-        <p style="margin-top:0.75rem;"><a href="/agent-file-ownership.html">See the mechanism, boundaries, and proving tests &rarr;</a></p>
+        <p style="margin-top:0.75rem;">That structure does not depend on a model choosing to cooperate. <a href="https://anthropic.com/research/multiagent-systems">Anthropic's August 2026 multiagent experiments</a> report coordination failures, collusion, and sabotage in agent swarms. Harnessie makes write authority a dispatch and confinement decision instead of a prompt-only request.</p>
+        <p style="margin-top:0.75rem;"><code>harnessie ownership PATH --agent AGENT --json</code> explains the exact decision without claiming the path. <a href="/agent-file-ownership.html">See the mechanism, executable collision proof, boundaries, and tests &rarr;</a></p>
       </div>
     </div>
   </div>
@@ -507,7 +509,7 @@
         <code class="cmd"><span class="p">&rsaquo;</span> Fetch and follow https://harnessie.com/.well-known/assistant-guide.txt</code>
         <button type="button" class="copy-btn" data-copy="Fetch and follow https://harnessie.com/.well-known/assistant-guide.txt">Copy prompt</button>
       </div>
-      <p class="lede" style="font-size:0.86rem; max-width:720px; margin-bottom:1rem;">The 1.0.0 plain-text guide is byte-identical across the repository and served copy, its sidecar reports the same SHA-256, and the independent DNS TXT anchor matches. The hosted <a href="https://guidecheck.org/" target="_blank" rel="noopener">GuideCheck</a> verifier re-confirmed end-to-end Level&nbsp;4 on 2026-08-20 UTC with zero blocking findings. The guide requires the assistant to report the achieved level and hash, then get approval before its read-only review. It authorizes no install or run.</p>
+      <p class="lede" style="font-size:0.86rem; max-width:720px; margin-bottom:1rem;">The 1.1.0 plain-text guide is byte-identical across the repository and served copy, and its sidecar reports the same SHA-256. DNS re-anchor pending: the independently controlled TXT record still names the 1.0.0 hash, so 1.1.0 does not yet claim the independently anchored level. Level 4 was last confirmed for 1.0.0 by the hosted <a href="https://guidecheck.org/" target="_blank" rel="noopener">GuideCheck</a> verifier on 2026-08-20 UTC with zero blocking findings. The guide requires the assistant to report the achieved level and hash, then get approval before its read-only review. It authorizes no install or run.</p>
       <div class="trust-chips">
         <span class="trust-chip"><b>&#10003;</b> Verifies before it acts</span>
         <span class="trust-chip"><b>&#10003;</b> Read-only until you approve</span>
@@ -521,7 +523,7 @@
     <div class="install-line">
       <code class="oneliner"><span class="p">$</span> pip install harnessie</code>
       <button type="button" class="copy-btn ghost" data-copy="pip install harnessie">Copy</button>
-      <span class="muted">&hellip; or pipx / uv. Homebrew also carries 1.0.0.</span>
+      <span class="muted">&hellip; or pipx / uv. Homebrew currently carries 1.0.0 pending its 1.1.0 update.</span>
     </div>
 
     <div class="two-col code-grid">
@@ -596,7 +598,7 @@ routing:
     <div class="footer-grid">
       <div class="footer-brand">
         <a href="/" class="brand"><img src="/imgs/harnessie-mark.png" width="26" height="26" alt=""><span>Harnessie</span></a>
-        <p>v1.0.0 &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a></p>
+        <p>v1.1.0 &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a></p>
         <p>A <a href="https://snapsynapse.com/" target="_blank" rel="noopener">Snap Synapse</a> project by <a href="https://linkedin.com/in/samrogers" target="_blank" rel="noopener author">Sam Rogers</a>.</p>
         <p style="margin-top:0.65rem; font-size:0.8rem;">Builds on: <a href="https://guidecheck.org/" target="_blank" rel="noopener">GuideCheck</a> &middot; <a href="https://gracefulboundaries.dev/" target="_blank" rel="noopener">Graceful Boundaries</a> &middot; <a href="https://aidr.work/" target="_blank" rel="noopener">AIDR</a></p>
       </div>

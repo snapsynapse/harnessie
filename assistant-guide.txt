@@ -3,23 +3,23 @@ Assistant Guide: review a Harnessie checkout before authorizing a run
 [assistant-guide-metadata]
 identifier: assistant-guide
 profile: human-verifiable-assistant-guide
-profile-version: 0.7.0
-guide-version: 1.0.0
-applies-to: harnessie 1.0.x
+profile-version: 0.7.1
+guide-version: 1.1.0
+applies-to: harnessie 1.1.x
 canonical-url: https://harnessie.com/.well-known/assistant-guide.txt
 repository-url: https://github.com/snapsynapse/harnessie
 source-path: /docs/.well-known/assistant-guide.txt
 manifest-url: https://harnessie.com/.well-known/assistant-guide-manifest.txt
-registry-url: https://pypi.org/pypi/harnessie/1.0.0/json
-last-reviewed: 2026-08-09
+registry-url: https://pypi.org/pypi/harnessie/1.1.0/json
+last-reviewed: 2026-08-20
 status: active
 recommended-verifier: https://guidecheck.org/verify
-verifier-conformance: human-verifiable-assistant-guide-verifier >=0.7.0, <0.8.0
+verifier-conformance: human-verifiable-assistant-guide-verifier >=0.7.1, <0.8.0
 [/assistant-guide-metadata]
 
 Task scope
-This guide orients an assistant to read a local Harnessie checkout and its
-offline verification surface so the human can decide whether to authorize a
+This guide orients an assistant to read a local Harnessie checkout, its Golden
+Rule, and offline verification surface so the human can decide whether to authorize a
 run. It is bounded to read-only inspection. It does not install anything, does
 not run the harness, does not call any AI provider, and does not authorize
 changes. Running the test suite, the eval scorecard, or any workflow is a human
@@ -111,7 +111,7 @@ approval: not-required
 command: cat OWNERSHIP.yaml
 runner: argv
 cwd: .
-notes: Reads the ownership ledger: operator lanes and first-writer claims.
+notes: Reads the ownership ledger behind the Golden Rule and its lane claims.
 [/action]
 
 [action]
@@ -154,12 +154,12 @@ Approve, modify, or cancel?
 
 Acceptance checklist
 This review task is complete when the assistant has:
-- read the files in the action blocks above and summarized the safety posture
+- read the files in the action blocks above and summarized the safety posture and Golden Rule
 - reported the tiers, routing, and budget ceilings from config/models.yaml
 - confirmed that config/models.yaml ships mock or ceiling-bearing tiers, so a
   first run is offline and zero-dollar
 - named, for the human to run themselves under their own approval, the offline
-  verification commands: python3 -m pytest -q, expecting 413 passed and 1
+  verification commands: python3 -m pytest -q, expecting 433 passed and 1
   skipped; python3 -m harness.cli eval, expecting 50 of 50; and python3 -m
   harness.cli verify-manifest, expecting 19 trust-bundle files to verify
 The task is incomplete, and the assistant must stop, if:

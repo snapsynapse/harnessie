@@ -55,7 +55,8 @@ def test_agents_json_describes_only_shipped_local_surfaces():
     assert data["product"]["version"] == _project_version()
     assert data["product"]["type"] == "local Python library and CLI"
     assert {item["id"] for item in data["capabilities"]} == {
-        "review-checkout", "verify-claims", "validate-project", "run-workflow"}
+        "review-checkout", "verify-claims", "validate-project",
+        "inspect-ownership", "run-workflow"}
     assert data["boundaries"] == {
         "hosted_api": False,
         "hosted_service": False,
@@ -66,8 +67,10 @@ def test_agents_json_describes_only_shipped_local_surfaces():
     capabilities = {item["id"]: item for item in data["capabilities"]}
     assert capabilities["review-checkout"]["human_approval_required"] is True
     guide_status = capabilities["review-checkout"]["integrity_status"]
-    assert "matches the 1.0.0 guide hash" in guide_status["external_anchor"]
-    assert guide_status["current_end_to_end_level"].startswith("Level 4 re-confirmed")
+    assert "re-anchor pending" in guide_status["external_anchor"]
+    assert guide_status["current_end_to_end_level"].startswith(
+        "Pending re-verification")
+    assert capabilities["inspect-ownership"]["side_effects"] == "read-only"
     assert capabilities["run-workflow"]["human_arbitration_required"] is True
 
 
@@ -97,6 +100,7 @@ def test_cli_manifest_is_complete_and_explicitly_not_hosted():
     assert set(data["paths"]) == {
         "run", "resume", "report", "audit", "eval", "verify-manifest",
         "verify-inward-manifest", "approve-maiden", "verify", "init", "validate",
+        "ownership",
     }
     for command, contract in data["paths"].items():
         assert contract["synopsis"].startswith(f"harnessie {command}")
@@ -114,6 +118,7 @@ def test_cli_manifest_is_complete_and_explicitly_not_hosted():
         documented_options = set(
             re.findall(r"--[a-z][a-z-]*", contract["synopsis"]))
         assert documented_options == live_options, command
+    assert "status" not in data["paths"]["ownership"]
 
 
 def test_security_txt_has_a_current_rfc9116_contact_contract():
@@ -138,14 +143,16 @@ def test_public_discovery_links_expose_support_and_machine_resources():
         assert f"https://harnessie.com{path}" in llms
     assert "Contact support" in html
     assert "Report a vulnerability" in html
-    assert "GuideCheck Level 4" in html
-    assert "DNS re-anchor pending" not in html
+    assert "DNS re-anchor pending" in html
+    assert "Level 4 was last confirmed for 1.0.0" in html
     assert "opt-in containment" in html.lower()
     assert "operator-trusted in-process code" in html
-    assert "Homebrew also carries 1.0.0" in html
+    assert "Homebrew currently carries 1.0.0" in html
     assert "Harnessie's Golden Rule for agent work" in html
     assert "Read together." in html
     assert "Write only what you own." in html
+    assert "https://anthropic.com/research/multiagent-systems" in html
+    assert "coordination failures, collusion, and sabotage" in html
 
     sitemap = ET.parse(DOCS / "sitemap.xml")
     namespace = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
@@ -172,6 +179,9 @@ def test_agent_file_ownership_claim_is_bounded_and_falsifiable():
     assert "does not claim that cross-agent overwrite prevention is a unique" in html
     assert "Collaborative lanes deliberately permit co-editing" in html
     assert "operator-trusted code" in html
+    assert "Shipped in Harnessie 1.1.0" in html
+    assert "https://anthropic.com/research/multiagent-systems" in html
+    assert "cooperation prompts as guidance, not as a control" in html
     for proof in (
         "harness/ownership.py", "harness/sandbox.py", "tests/test_ownership.py",
         "tests/test_runner.py", "tests/test_sandbox.py",

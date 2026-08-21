@@ -4,13 +4,27 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+## 1.1.0 (2026-08-20)
+
+Theme: the Golden Rule becomes inspectable. Harnessie turns its ownership invariant into a memorable public contract, a read-only policy explanation command, and an executable collision proof.
+
+### Added
+
+- Harnessie's Golden Rule for agent work, "Read together. Write only what you own," now has a canonical, falsifiable public explanation connected to the ownership ledger, dispatch denial, child-process read-only overlays, parallel-write preflight, explicit exceptions, and proving tests.
+- A read-only `harnessie ownership PATH --agent AGENT [--json]` command explains the exact ledger decision for one agent and workspace path, including the governing lane or first-writer claim, owner, matching pattern, reason, and available remedy. JSON output uses schema version 1. Valid allowed and denied decisions exit 0; invalid paths or ownership documents exit 2.
+- `examples/ownership-collision/demo.py` performs a zero-model, zero-network overwrite attempt through the built-in `write_file` registry path and passes only when the second agent receives `ownership_denied` and the first agent's exact artifact survives.
+
 ### Fixed
 
 - Search indexing now has repository-owned offline and production contracts, CI checks generated search output, all nine canonical pages carry valid structured data and crawl-visible discovery, and the dated Google Search Console baseline distinguishes intentional redirects and decorative-video noise from defects.
 - Documentation and public agent surfaces now distinguish shipped core 1.0.0 from the still-lagging Homebrew and Verify Action release trains, use the actual `harnessie resume` syntax, name both runtime dependencies, and mark the plugin contract stable for 1.x.
-- Current-guide trust copy no longer claims end-to-end GuideCheck Level 4 while the external DNS TXT anchor still names the prior guide hash. Public and machine-readable surfaces distinguish byte-identical served provenance from pending independent re-anchoring.
+- Guide trust copy now distinguishes byte-identical repository and served provenance from the independently controlled DNS TXT anchor. The 1.0.0 guide re-earned hosted GuideCheck Level 4 on 2026-08-20; the new 1.1.0 hash is disclosed as pending re-anchoring until that external release step completes.
 - Website safety copy now scopes the containment boundary as opt-in, distinguishes configured models from models with earned evidence, and removes unsupported claims that every side effect is interactively approved or that an external delegated operator can be authenticated as human or agent.
 - Roadmap, eval-count, sitemap, generated-doc inventory, canonical URL, and website metadata drift were reconciled with the shipped 1.0.0 surfaces.
+
+### Verified
+
+- The composed release gate passes 433 tests with one environment-dependent skip, 50/50 deterministic evals, all six v1 authoring contracts, both manifests, ecosystem and generated-doc validation, isolated wheel and source builds, `twine check`, release-artifact inspection, and a fresh-install smoke that exercises `harnessie ownership` from the built wheel.
 
 ## 1.0.0 (2026-08-09)
 

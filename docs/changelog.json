@@ -3,17 +3,23 @@
   "project": "Harnessie",
   "canonical": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md",
   "unreleased": {
-    "status": "development",
+    "status": "none",
     "source": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md#unreleased",
-    "summary": "Documentation and public agent-surface corrections after the 1.0.0 release, including current trust-anchor, installation, containment, operating-mode, and roadmap status."
+    "summary": "No unreleased changes."
   },
   "current": {
-    "version": "1.0.0",
-    "released": "2026-08-09",
-    "summary": "Stable v1 authoring contracts, kernel-enforced per-agent child-process ownership, and explicit operator-trusted tool plugin admission.",
-    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.0.0"
+    "version": "1.1.0",
+    "released": "2026-08-20",
+    "summary": "Harnessie's Golden Rule, a read-only ownership-decision inspector, and an executable cross-agent overwrite proof.",
+    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.1.0"
   },
   "history": [
+    {
+      "version": "1.1.0",
+      "released": "2026-08-20",
+      "summary": "The Golden Rule becomes inspectable through one read-only CLI decision surface and an executable collision proof.",
+      "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.1.0"
+    },
     {
       "version": "1.0.0",
       "released": "2026-08-09",
@@ -45,5 +51,5 @@
       "release": "https://github.com/snapsynapse/harnessie/releases/tag/v0.6.0"
     }
   ],
-  "last_updated": "2026-08-09"
+  "last_updated": "2026-08-20"
 }

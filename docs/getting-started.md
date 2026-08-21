@@ -16,7 +16,7 @@ harnessie init my-project      # scaffold + guided readiness check + zero-dollar
 cd my-project
 ```
 
-The separately maintained Homebrew formula still installs Harnessie 0.8.0. Use PyPI for the current 1.0.0 core release until the Homebrew release train catches up.
+PyPI installs the current Harnessie 1.1.0 core release. The separately maintained Homebrew formula remains on 1.0.0 until its downstream release completes.
 
 Working on Harnessie itself (or wanting the test suite)? Install from source instead:
 

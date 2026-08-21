@@ -51,7 +51,7 @@ Python 3.11 or newer. PyYAML and jsonschema install with Harnessie. Install from
 pip install harnessie   # or: pipx install harnessie / uv tool install harnessie
 ```
 
-PyPI carries the current 1.0.0 core release. The separately maintained Homebrew formula remains on 0.8.0 until its own release train is completed.
+PyPI carries the current 1.1.0 core release. The separately maintained Homebrew formula remains on 1.0.0 until its own release train is completed.
 
 Developing on the harness itself (or wanting the test suite), install from source:
 
@@ -76,6 +76,7 @@ All commands are subcommands of `python3 -m harness.cli` (or `harnessie` once in
 | `eval [suite]` | Run the deterministic eval scorecards (optionally one suite YAML). |
 | `eval --live` | Run opt-in live provider scorecards; skipped visibly unless `HARNESSIE_LIVE=1` and provider configuration are present. |
 | `validate [paths...]` | Validate the six v1 authoring contracts without model calls, network, sandbox admission, run-state creation, or workspace writes. Use `--kind` when validating one document whose filename does not identify its contract. Exit 0 valid, 2 invalid. |
+| `ownership <path> --agent <name> [--json]` | Explain the exact ownership-ledger decision for one agent and path relative to `workspace/` without claiming or modifying it. JSON output uses schema version 1. Valid allowed and denied decisions exit 0; invalid paths or ownership documents exit 2. |
 | `verify <flags>` | Standalone verification of any workspace against a claims file, no project scaffold required: `--workspace <dir> --criteria <claims.md> [--check "<cmd>" ...] [--models <models.yaml>] [--report-dir <dir>] [--tier <tier>] [--allow-network] [--no-verifier]`. Deterministic checks run sandboxed (network-denied unless `--allow-network`; the verifier agent stays denied regardless), then a read-only fresh-context verifier tests each claim against the artifacts. Exit 0 verified, 1 failed, 2 cannot-verify, fail closed. Single pass, no retry ladder. The report records the workspace git revision, criteria hash, verifier model, and network mode. Adopted via `decisions/AIDR-0006`. |
 | `verify-manifest [manifest]` | Verify the trust-bundle manifest. Defaults to `docs/MANIFEST.yaml`. |
 | `verify-inward-manifest [manifest]` | Verify the harness input manifest. Defaults to `INWARD_MANIFEST.yaml`; exit 2 on malformed content, hash drift, or incomplete coverage. |
