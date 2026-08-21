@@ -135,7 +135,7 @@ Theme: turn the ownership invariant into a memorable, falsifiable product surfac
 - Collision proof: SHIPPED. A zero-model, zero-network example writes an artifact as Alice, attempts to replace it as Bob through the built-in tool registry, and passes only when Bob receives `ownership_denied`, Alice's bytes survive, and the ledger still names Alice.
 - Public and release surfaces: SHIPPED. README, website, Guide, agent declarations, CLI manifest, machine changelog, assistant guide, package metadata, release notes, generated pages, and fresh-install smoke describe and test the same 1.1.0 behavior.
 
-Gate result: GREEN. The composed release gate, ownership adversarial corpus, exact package build, and fresh-install ownership inspection passed before release. The assistant guide's external DNS re-anchor and hosted re-verification follow publication because those checks require the final public bytes.
+Gate result: GREEN. The composed release gate, ownership adversarial corpus, exact package build, and fresh-install ownership inspection passed before release. After publication, the assistant guide's external DNS and repository-file anchors matched the final bytes and hosted GuideCheck re-earned Level 4 with zero blocking findings.
 
 ### Post-1.0 candidates
 

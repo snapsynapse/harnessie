@@ -409,7 +409,7 @@
     </div>
 
     <div class="proof-strip">
-      <div class="chip"><b>!</b> Guide bytes synchronized &middot; <span class="m">DNS re-anchor pending</span></div>
+      <div class="chip"><b>&#10003;</b> GuideCheck Level 4 &middot; <span class="m">hash independently pinned</span></div>
       <div class="chip"><b>8</b> providers &middot; <span class="m">11 models, verified work</span></div>
       <div class="chip"><b>&#10003;</b> Fails closed <span class="m">by default</span></div>
       <div class="chip"><b>&#10003;</b> Opt-in containment <span class="m">keeps declared sensitive work controlled</span></div>
@@ -509,7 +509,7 @@
         <code class="cmd"><span class="p">&rsaquo;</span> Fetch and follow https://harnessie.com/.well-known/assistant-guide.txt</code>
         <button type="button" class="copy-btn" data-copy="Fetch and follow https://harnessie.com/.well-known/assistant-guide.txt">Copy prompt</button>
       </div>
-      <p class="lede" style="font-size:0.86rem; max-width:720px; margin-bottom:1rem;">The 1.1.0 plain-text guide is byte-identical across the repository and served copy, and its sidecar reports the same SHA-256. DNS re-anchor pending: the independently controlled TXT record still names the 1.0.0 hash, so 1.1.0 does not yet claim the independently anchored level. Level 4 was last confirmed for 1.0.0 by the hosted <a href="https://guidecheck.org/" target="_blank" rel="noopener">GuideCheck</a> verifier on 2026-08-20 UTC with zero blocking findings. The guide requires the assistant to report the achieved level and hash, then get approval before its read-only review. It authorizes no install or run.</p>
+      <p class="lede" style="font-size:0.86rem; max-width:720px; margin-bottom:1rem;">The 1.1.0 plain-text guide is byte-identical across the repository and served copy. The hosted <a href="https://guidecheck.org/" target="_blank" rel="noopener">GuideCheck</a> verifier observed its sidecar, independently controlled DNS TXT, and repository-file anchor at SHA-256 <code>f7d45f62&hellip;e5080d</code>, then re-earned Level 4 on 2026-08-21 UTC with zero blocking findings; the <a href="https://github.com/snapsynapse/harnessie/blob/main/audits/guidecheck-live-result-2026-08-21-v1.1.0.json">exact receipt is tracked</a>. The guide requires the assistant to report the achieved level and hash, then get approval before its read-only review. It authorizes no install or run.</p>
       <div class="trust-chips">
         <span class="trust-chip"><b>&#10003;</b> Verifies before it acts</span>
         <span class="trust-chip"><b>&#10003;</b> Read-only until you approve</span>
@@ -523,7 +523,7 @@
     <div class="install-line">
       <code class="oneliner"><span class="p">$</span> pip install harnessie</code>
       <button type="button" class="copy-btn ghost" data-copy="pip install harnessie">Copy</button>
-      <span class="muted">&hellip; or pipx / uv. Homebrew currently carries 1.0.0 pending its 1.1.0 update.</span>
+      <span class="muted">&hellip; or pipx / uv. Homebrew also carries the current 1.1.0 release.</span>
     </div>
 
     <div class="two-col code-grid">

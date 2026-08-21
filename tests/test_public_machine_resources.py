@@ -18,6 +18,8 @@ CHANGELOG = DOCS / "changelog.json"
 CLI_MANIFEST = DOCS / "api" / "v1" / "index.json"
 SECURITY = DOCS / ".well-known" / "security.txt"
 TRUST = DOCS / "MANIFEST.yaml"
+GUIDECHECK_RECEIPT = (
+    ROOT / "audits" / "guidecheck-live-result-2026-08-21-v1.1.0.json")
 
 
 def _project_version() -> str:
@@ -67,11 +69,33 @@ def test_agents_json_describes_only_shipped_local_surfaces():
     capabilities = {item["id"]: item for item in data["capabilities"]}
     assert capabilities["review-checkout"]["human_approval_required"] is True
     guide_status = capabilities["review-checkout"]["integrity_status"]
-    assert "re-anchor pending" in guide_status["external_anchor"]
+    assert "Hosted GuideCheck observed matching DNS TXT" in (
+        guide_status["external_anchor"])
     assert guide_status["current_end_to_end_level"].startswith(
-        "Pending re-verification")
+        "Hosted GuideCheck Level 4 confirmed for 1.1.0")
+    assert guide_status["receipt"].endswith(
+        "/audits/guidecheck-live-result-2026-08-21-v1.1.0.json")
     assert capabilities["inspect-ownership"]["side_effects"] == "read-only"
     assert capabilities["run-workflow"]["human_arbitration_required"] is True
+
+
+def test_current_guidecheck_receipt_earns_the_claimed_level():
+    receipt = _json(GUIDECHECK_RECEIPT)
+    assert receipt["outcome"] == "evaluated"
+    assert receipt["guide"] == {
+        "bytes": 7947,
+        "sha256": (
+            "f7d45f62f2941f5541d1342be0fc037c1ef7fc3e06f44ad39cf94a5b50e5080d"),
+        "achieved_level": 4,
+        "level5_ready": True,
+    }
+    assert receipt["summary"]["blocking_findings"] == 0
+    anchors = {
+        item["channel"]: item for item in receipt["cross_channel_anchors"]}
+    for channel in ("dns-txt", "repository-file"):
+        assert anchors[channel]["status"] == "present-matches"
+        assert anchors[channel]["observed_sha256"] == (
+            receipt["guide"]["sha256"])
 
 
 def test_machine_resource_urls_follow_public_url_policy():
@@ -143,11 +167,12 @@ def test_public_discovery_links_expose_support_and_machine_resources():
         assert f"https://harnessie.com{path}" in llms
     assert "Contact support" in html
     assert "Report a vulnerability" in html
-    assert "DNS re-anchor pending" in html
-    assert "Level 4 was last confirmed for 1.0.0" in html
+    assert "GuideCheck Level 4" in html
+    assert "hash independently pinned" in html
+    assert "exact receipt is tracked" in html
     assert "opt-in containment" in html.lower()
     assert "operator-trusted in-process code" in html
-    assert "Homebrew currently carries 1.0.0" in html
+    assert "Homebrew also carries the current 1.1.0 release" in html
     assert "Harnessie's Golden Rule for agent work" in html
     assert "Read together." in html
     assert "Write only what you own." in html

@@ -17,14 +17,16 @@ Theme: the Golden Rule becomes inspectable. Harnessie turns its ownership invari
 ### Fixed
 
 - Search indexing now has repository-owned offline and production contracts, CI checks generated search output, all nine canonical pages carry valid structured data and crawl-visible discovery, and the dated Google Search Console baseline distinguishes intentional redirects and decorative-video noise from defects.
-- Documentation and public agent surfaces now distinguish shipped core 1.0.0 from the still-lagging Homebrew and Verify Action release trains, use the actual `harnessie resume` syntax, name both runtime dependencies, and mark the plugin contract stable for 1.x.
-- Guide trust copy now distinguishes byte-identical repository and served provenance from the independently controlled DNS TXT anchor. The 1.0.0 guide re-earned hosted GuideCheck Level 4 on 2026-08-20; the new 1.1.0 hash is disclosed as pending re-anchoring until that external release step completes.
+- Documentation and public agent surfaces use the actual `harnessie resume` syntax, name both runtime dependencies, mark the plugin contract stable for 1.x, and report the completed 1.1.0 PyPI, Verify Action v0.1.3, stable `v0`, and Homebrew release train.
+- Guide trust copy distinguishes byte-identical repository and served provenance from the independently controlled DNS TXT anchor. After the final 1.1.0 bytes were public, the DNS TXT and repository-file anchors matched and hosted GuideCheck re-earned Level 4 on 2026-08-21 UTC with zero blocking findings.
 - Website safety copy now scopes the containment boundary as opt-in, distinguishes configured models from models with earned evidence, and removes unsupported claims that every side effect is interactively approved or that an external delegated operator can be authenticated as human or agent.
 - Roadmap, eval-count, sitemap, generated-doc inventory, canonical URL, and website metadata drift were reconciled with the shipped 1.0.0 surfaces.
 
 ### Verified
 
 - The composed release gate passes 433 tests with one environment-dependent skip, 50/50 deterministic evals, all six v1 authoring contracts, both manifests, ecosystem and generated-doc validation, isolated wheel and source builds, `twine check`, release-artifact inspection, and a fresh-install smoke that exercises `harnessie ownership` from the built wheel.
+- The immutable GitHub and PyPI artifacts share wheel SHA-256 `c400b913fdb9401c8669163532dd23aeccf9800cdb68be48d97831465784a465` and sdist SHA-256 `8a8c6e62348b647b2b9e02ecb1de846160d83ea224e7a467bdde6445d0486ba1`. A public-index consumer exercised the ownership command; Harnessie Verify v0.1.3 passed its four-job matrix before stable `v0` advanced; and Homebrew passed strict online audit, a 1.0.0 to 1.1.0 source upgrade, formula test, linkage, and installed-command smoke.
+- Hosted GuideCheck 0.7.1 fetched the 7,947-byte public assistant guide, matched SHA-256 `f7d45f62f2941f5541d1342be0fc037c1ef7fc3e06f44ad39cf94a5b50e5080d` across the sidecar, DNS TXT, and repository-file anchor, and reported Level 4 with zero blocking findings. The two warnings are the known GitHub Pages header limitations for `X-Content-Type-Options` and HSTS.
 
 ## 1.0.0 (2026-08-09)
 

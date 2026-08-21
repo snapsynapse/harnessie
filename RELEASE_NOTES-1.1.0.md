@@ -25,7 +25,7 @@ Read together. Write only what you own.
 
 - `harnessie ownership` is an explanation surface, not an authorization grant. Enforcement remains in the registry, runner preflight, ownership ledger, and OS sandbox.
 - Collaborative lanes deliberately allow co-editing, and operator-trusted in-process plugins remain outside child-process lane confinement.
-- The 1.1.0 assistant guide and served copy are byte-identical and pinned by the provenance sidecar. The independently controlled DNS TXT anchor still names the 1.0.0 hash until the post-publication rotation, after which hosted GuideCheck must re-verify the new public bytes.
-- Harnessie Verify v0.1.2 and the Homebrew formula initially remain on core 1.0.0. Their separately gated release train follows the core publication. Engine wrappers remain independently released at v0.1.0 because 1.1.0 consumes no new wrapper seam.
+- The 1.1.0 assistant guide and served copy are byte-identical and pinned by the provenance sidecar. After publication, the independently controlled DNS TXT and repository-file anchors matched the final hash and hosted GuideCheck re-earned Level 4 with zero blocking findings.
+- Harnessie Verify v0.1.3, stable Action tag `v0`, and the Homebrew formula carry core 1.1.0 after their separate gates passed. Engine wrappers remain independently released at v0.1.0 because 1.1.0 consumes no new wrapper seam.
 
 The complete change record is in [CHANGELOG.md](https://github.com/snapsynapse/harnessie/blob/v1.1.0/CHANGELOG.md#110-2026-08-20).

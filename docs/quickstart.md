@@ -26,7 +26,7 @@ One line installs the `harnessie` command from the Python package index:
 pip install harnessie
 ```
 
-If `pip` is not found, try `python3 -m pip install harnessie`. `pipx install harnessie` and `uv tool install harnessie` install the same current 1.1.0 package without cloning the repository. The separately maintained Homebrew formula remains on 1.0.0 until its downstream release completes.
+If `pip` is not found, try `python3 -m pip install harnessie`. `pipx install harnessie`, `uv tool install harnessie`, and `brew install snapsynapse/tap/harnessie` install the same current 1.1.0 package without cloning the repository.
 
 ## Step 2: Let the tool check your machine
 

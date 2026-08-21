@@ -24,8 +24,9 @@
       "side_effects": "The guide authorizes read-only inspection only. Installation, code execution, and mutation require a separate human-approved task.",
       "integrity_status": {
         "served_copy": "byte-identical to the repository guide and provenance sidecar",
-        "external_anchor": "DNS TXT re-anchor pending for the 1.1.0 guide hash; the record still names the 1.0.0 hash",
-        "current_end_to_end_level": "Pending re-verification for 1.1.0; Level 4 was last confirmed for 1.0.0 on 2026-08-20 UTC"
+        "external_anchor": "Hosted GuideCheck observed matching DNS TXT and repository-file anchors for the 1.1.0 guide SHA-256 f7d45f62f2941f5541d1342be0fc037c1ef7fc3e06f44ad39cf94a5b50e5080d",
+        "current_end_to_end_level": "Hosted GuideCheck Level 4 confirmed for 1.1.0 on 2026-08-21 UTC with zero blocking findings",
+        "receipt": "https://github.com/snapsynapse/harnessie/blob/main/audits/guidecheck-live-result-2026-08-21-v1.1.0.json"
       }
     },
     {

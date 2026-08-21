@@ -23,7 +23,7 @@ pip install harnessie                # or: pipx install / uv tool install
 harnessie init my-project            # scaffold + guided readiness check + zero-dollar mock run
 ```
 
-PyPI carries the current 1.1.0 core release. The separately maintained Homebrew formula remains on 1.0.0 until its downstream release completes; see [NEXT.md](NEXT.md) for current status.
+PyPI and Homebrew carry the current 1.1.0 core release. Harnessie Verify v0.1.3 and stable `snapsynapse/harnessie-verify-action@v0` pin the same tested core version; see [NEXT.md](NEXT.md) for current status.
 
 To gate pull requests on claim-by-claim verification without installing anything locally, the standalone verifier also ships as a GitHub Action: [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify) (one workflow file; the PR body is treated as claims to test, and the exit code gates the merge).
 
@@ -53,7 +53,7 @@ Worked examples: [policy compliance](examples/policy-compliance/README.md) exerc
 - [docs/agent-file-ownership.md](docs/agent-file-ownership.md): Harnessie's Golden Rule for agent work, the ownership-lane mechanics beneath it, explicit boundaries, and the tests that make the claim falsifiable.
 - [PLUGIN_CONTRACT.md](PLUGIN_CONTRACT.md): the versioned, opt-in tool extension contract and its explicit in-process trust boundary.
 - [docs/brains.md](docs/brains.md): the brain-agnostic receipt, the models actually run under the harness with a link to the record that proves each.
-- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run. The 1.1.0 guide and provenance sidecar are synchronized; its new hash requires DNS re-anchoring and hosted GuideCheck re-verification before the release can claim the independently anchored level again.
+- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run. Hosted GuideCheck observed the 1.1.0 guide, provenance sidecar, DNS TXT anchor, and repository-file anchor at one matching hash and re-earned Level 4 on 2026-08-21 UTC with zero blocking findings; the [exact hosted receipt](audits/guidecheck-live-result-2026-08-21-v1.1.0.json) is tracked.
 - [docs/agents.json](docs/agents.json), [docs/api/v1/index.json](docs/api/v1/index.json), [docs/changelog.json](docs/changelog.json), and [docs/.well-known/security.txt](docs/.well-known/security.txt): machine-readable capability, local CLI, release-history, and private security-report handoffs. The declarations explicitly do not advertise a hosted API, service, or MCP server.
 
 The engineering references below (ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP) sit at the repo root; the user-facing guides live under `docs/`.

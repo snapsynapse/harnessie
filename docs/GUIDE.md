@@ -51,7 +51,7 @@ Python 3.11 or newer. PyYAML and jsonschema install with Harnessie. Install from
 pip install harnessie   # or: pipx install harnessie / uv tool install harnessie
 ```
 
-PyPI carries the current 1.1.0 core release. The separately maintained Homebrew formula remains on 1.0.0 until its own release train is completed.
+PyPI and the separately maintained Homebrew formula carry the current 1.1.0 core release. Harnessie Verify v0.1.3 and stable `snapsynapse/harnessie-verify-action@v0` pin the same tested version.
 
 Developing on the harness itself (or wanting the test suite), install from source:
 
