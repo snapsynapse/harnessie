@@ -25,7 +25,7 @@ harnessie init my-project            # scaffold + guided readiness check + zero-
 
 PyPI and Homebrew carry the current 1.1.0 core release. Harnessie Verify v0.1.3 and stable `snapsynapse/harnessie-verify-action@v0` pin the same tested core version; see [NEXT.md](NEXT.md) for current status.
 
-To gate pull requests on claim-by-claim verification without installing anything locally, the standalone verifier also ships as a GitHub Action: [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify) (one workflow file; the PR body is treated as claims to test, and the exit code gates the merge).
+To gate pull requests on claim-by-claim verification without installing anything locally, the standalone verifier also ships as a GitHub Action: [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify). Raw criteria remain supported; the stronger local contract is a v1 evidence bundle binding stable claim IDs to an exact Git state, content-addressed proofs, and recorded deterministic checks. Structured verdicts distinguish reproduced, refuted, and not-verifiable claims before the exit code gates the merge.
 
 Developing on the harness itself, install from source:
 ```bash

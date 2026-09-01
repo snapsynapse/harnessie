@@ -74,7 +74,7 @@
       "side_effects": "Explicit operator action that writes only the verified staged proposal to an unchanged target."
     },
     "verify": {
-      "synopsis": "harnessie verify --workspace DIR --criteria FILE [--check CMD] [--report-dir DIR] [--models FILE] [--tier TIER] [--verifier-prompt FILE] [--no-verifier] [--allow-network] [--max-steps N]",
+      "synopsis": "harnessie verify --workspace DIR [--criteria FILE] [--evidence-bundle FILE] [--evidence-root DIR] [--check CMD] [--report-dir DIR] [--models FILE] [--tier TIER] [--verifier-prompt FILE] [--no-verifier] [--allow-network] [--max-steps N]",
       "purpose": "Verify a local artifact with deterministic checks followed by an optional independent verifier.",
       "side_effects": "Checks are sandboxed and network-denied by default; the verifier is read-only."
     }

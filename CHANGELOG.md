@@ -7,11 +7,16 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 ### Added
 
 - A direct OpenAI Responses API adapter supports current OpenAI reasoning models with function tools, including high reasoning effort, stateless encrypted-reasoning replay, strict response validation, and usage accounting. The existing `openai-compat` adapter remains the Chat Completions path for Ollama, vLLM, and compatible endpoints.
+- Standalone verification accepts a v1 evidence bundle as an alternative to raw criteria. Bundles bind stable claim IDs to an exact Git revision and dirty state, content-addressed diffs and proof files, and recorded deterministic checks; unsafe paths, stale revisions, missing files, and hash drift refuse before model dispatch.
+- Verifier verdicts support structured claim results (`reproduced`, `refuted`, or `not_verifiable`) with deterministic overall status and exact claim-coverage checks. Legacy boolean verdicts remain parseable for 1.x compatibility.
+- Deterministic Ringer-derived fixtures, event-trace metrics, and a governance recovery case cover the failure modes exposed by the first current-head adoption cohort.
+- Live scorecards can exercise OpenAI Responses models, including a high-effort reasoning-plus-tools continuation smoke.
 
 ### Fixed
 
 - Parallel copies of the same denied tool call now count as one failed turn for stuck-loop detection, allowing a verifier to recover on its next turn without weakening the tool allowlist.
 - The standalone verifier prompt now names its exact shell allowlist and directs agents to use `read_file` for staged diffs, reducing avoidable denied calls.
+- Child-process checks ignore operator-wide Git configuration, preventing global signing, hooks, aliases, or credential helpers from contaminating verification fixtures.
 
 ## 1.1.0 (2026-08-20)
 

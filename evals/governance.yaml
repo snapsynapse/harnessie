@@ -76,6 +76,25 @@ scenarios:
       boundary: allowlist
       content_fields: [error, boundary, detail, why]
 
+  - id: recovery_parallel_identical_denials_count_as_one_decision
+    kind: loop
+    role: worker
+    # `tools` represents one model turn containing parallel tool calls. Three
+    # identical refusals in that turn are one failed model decision, so the
+    # model must receive a recovery turn instead of being stopped as stuck.
+    script:
+      - tools:
+          - { id: denied_1, tool: run_shell, args: { command: "curl https://example.com/" } }
+          - { id: denied_2, tool: run_shell, args: { command: "curl https://example.com/" } }
+          - { id: denied_3, tool: run_shell, args: { command: "curl https://example.com/" } }
+      - { tool: task_complete, args: { report: "recovered after one denied decision" } }
+    expect_stop: complete
+    expect_refusal:
+      tool: run_shell
+      error: command_not_allowlisted
+      boundary: allowlist
+      content_fields: [error, boundary, detail, why]
+
   - id: consent_decline_is_first_class
     kind: loop
     role: worker

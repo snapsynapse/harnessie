@@ -5,6 +5,8 @@ checks run through the real sandbox wrapper.
 """
 
 import json
+import hashlib
+import subprocess
 
 import pytest
 
@@ -31,6 +33,7 @@ def test_default_verifier_prompt_names_exact_shell_allowlist():
     for command in ("`ls`", "`cat`", "`grep`", "`pytest`"):
         assert command in DEFAULT_VERIFIER_PROMPT
     assert "Do not call `git`" in DEFAULT_VERIFIER_PROMPT
+    assert '"claims"' in DEFAULT_VERIFIER_PROMPT
 
 
 def make_request(tmp_path, criteria="- out.txt exists", **kw):
@@ -144,14 +147,134 @@ def test_verifier_fail_verdict_exits_one(tmp_path, monkeypatch):
     assert "claim refuted" in out.report_path.read_text(encoding="utf-8")
 
 
-def test_verifier_without_verdict_object_fails_closed(tmp_path, monkeypatch):
+def test_verifier_without_verdict_object_is_cannot_verify(tmp_path, monkeypatch):
     turn = AssistantTurn(content="", stop_reason="tool_use",
                          tool_calls=[ToolCall(id="c1", name="task_complete",
                                               arguments={"report": "looks fine!"})])
     patch_model(monkeypatch, [turn])
     req = make_request(tmp_path, models_path=write_models_yaml(tmp_path))
     out = run_standalone_verify(req)
-    assert out.exit_code == EXIT_FAILED   # parse_verdict fails closed
+    assert out.exit_code == EXIT_CANNOT_VERIFY
+
+
+def test_structured_verdict_maps_claim_status_to_exit_code(tmp_path, monkeypatch):
+    report = json.dumps({
+        "claims": [
+            {"id": "C1", "status": "reproduced", "required": True,
+             "evidence": ["out.txt"]},
+            {"id": "C2", "status": "not_verifiable", "required": True,
+             "reason": "historical log absent"},
+        ],
+        "reasons": "implementation reproduced; history unavailable",
+    })
+    turn = AssistantTurn(
+        content="", stop_reason="tool_use",
+        tool_calls=[ToolCall(id="c1", name="task_complete",
+                             arguments={"report": report})])
+    patch_model(monkeypatch, [turn])
+    req = make_request(tmp_path, models_path=write_models_yaml(tmp_path))
+
+    out = run_standalone_verify(req)
+
+    assert out.exit_code == EXIT_CANNOT_VERIFY
+    rendered = out.report_path.read_text(encoding="utf-8")
+    assert "Verdict: CANNOT VERIFY" in rendered
+    assert "historical log absent" in rendered
+
+
+def _evidence_request(tmp_path, monkeypatch, verdict_claims):
+    ws = tmp_path / "ws"
+    ws.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=ws, check=True)
+    (ws / "artifact.txt").write_text("artifact\n", encoding="utf-8")
+    subprocess.run(["git", "add", "artifact.txt"], cwd=ws, check=True)
+    subprocess.run(
+        ["git", "-c", "user.name=Harnessie", "-c",
+         "user.email=harnessie@example.invalid", "-c", "commit.gpgsign=false",
+         "commit", "-qm", "fixture"], cwd=ws, check=True)
+    revision = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=ws, check=True,
+        capture_output=True, text=True).stdout.strip()
+    evidence_root = tmp_path / "evidence"
+    evidence_root.mkdir()
+    proof = b"focused check: PASS\n"
+    (evidence_root / "focused.log").write_bytes(proof)
+    bundle = {
+        "schema_version": 1,
+        "workspace": {"revision": revision, "dirty": False},
+        "evidence": [{
+            "id": "focused-log", "path": "focused.log",
+            "sha256": hashlib.sha256(proof).hexdigest(),
+        }],
+        "claims": [{
+            "id": "C1", "statement": "artifact.txt exists",
+            "evidence": ["focused-log"],
+        }],
+    }
+    bundle_path = tmp_path / "evidence.json"
+    bundle_path.write_text(json.dumps(bundle), encoding="utf-8")
+    read = AssistantTurn(
+        content="", stop_reason="tool_use",
+        tool_calls=[ToolCall(id="read", name="read_evidence",
+                             arguments={"evidence_id": "focused-log"})])
+    verdict_report = (
+        json.dumps({"passed": True, "reasons": "legacy pass"})
+        if verdict_claims is None else json.dumps({"claims": verdict_claims}))
+    complete = AssistantTurn(
+        content="", stop_reason="tool_use",
+        tool_calls=[ToolCall(id="done", name="task_complete", arguments={
+            "report": verdict_report})])
+    model = patch_model(monkeypatch, [read, complete])
+    req = VerifyRequest(
+        workspace=ws, criteria_path=None,
+        evidence_bundle_path=bundle_path, evidence_root=evidence_root,
+        models_path=write_models_yaml(tmp_path),
+        report_dir=tmp_path / "report")
+    return run_standalone_verify(req), model
+
+
+def test_evidence_bundle_supplies_claims_and_read_only_proofs(tmp_path, monkeypatch):
+    out, model = _evidence_request(tmp_path, monkeypatch, [{
+        "id": "C1", "status": "reproduced", "required": True,
+        "evidence": ["focused-log"],
+    }])
+
+    assert out.exit_code == EXIT_VERIFIED
+    assert len(model.calls) == 2
+    tool_results = [message for message in model.calls[1]["messages"]
+                    if message.role == "tool"]
+    assert any("focused check: PASS" in message.content for message in tool_results)
+    report = out.report_path.read_text(encoding="utf-8")
+    assert "evidence_bundle_sha256" in report
+    metrics = json.loads((out.report_path.parent /
+                          "proofs/trace-metrics.json").read_text(encoding="utf-8"))
+    assert metrics["claim_coverage_rate"] == 1.0
+
+
+def test_evidence_bundle_requires_exact_claim_coverage(tmp_path, monkeypatch):
+    out, _ = _evidence_request(tmp_path, monkeypatch, [{
+        "id": "OTHER", "status": "reproduced", "required": True,
+    }])
+
+    assert out.exit_code == EXIT_CANNOT_VERIFY
+    assert "missing=['C1']" in out.report_path.read_text(encoding="utf-8")
+
+
+def test_evidence_bundle_rejects_legacy_boolean_verdict(tmp_path, monkeypatch):
+    out, _ = _evidence_request(tmp_path, monkeypatch, None)
+
+    assert out.exit_code == EXIT_CANNOT_VERIFY
+
+
+def test_evidence_bundle_required_flags_are_not_model_controlled(
+        tmp_path, monkeypatch):
+    out, _ = _evidence_request(tmp_path, monkeypatch, [{
+        "id": "C1", "status": "refuted", "required": False,
+    }])
+
+    assert out.exit_code == EXIT_CANNOT_VERIFY
+    assert "requires a structured claim verdict" in out.report_path.read_text(
+        encoding="utf-8")
 
 
 def test_verifier_loop_stop_is_cannot_verify(tmp_path, monkeypatch):

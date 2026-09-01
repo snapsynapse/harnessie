@@ -10,9 +10,9 @@ files:
   - path: docs/.well-known/security.txt
     sha256: 8987609c662c5b80d92843e8cb00489c281470a091e808bd7a1cee5aa0fe1387
   - path: docs/agents.json
-    sha256: 42bfef09e9d32b16a38abf88359693262e5c14c33534ff0ff132557ac623c41d
+    sha256: aaaeee6e548f31714f6726f863146ece869387ed1bd27e6d2783e96298422066
   - path: docs/api/v1/index.json
-    sha256: a0ba2ddba6a9ceab27a2ea3a56353ac304c72faaa927175a0e93689017c304ff
+    sha256: 95755ea1a89b5e708d0104f7ba8501b1e35f652c7a4ff86a8d63dda74f9ef708
   - path: docs/changelog.json
     sha256: 9555d317b86dd43f530b07cea185ca96c51efeb92a18aa5a21af1865b359ed75
   - path: docs/llms.txt
@@ -29,6 +29,8 @@ files:
     sha256: 61fa32c1b90414a4c0ab033f032009063c9685f85f6841886366e7e23b5cfcac
   - path: docs/schemas/v1/ownership.schema.json
     sha256: b0a7eedcec428585f4b7c9c62fcbd878dabd8aee6e12b8ea8de07b69616a7832
+  - path: docs/schemas/v1/verify-evidence.schema.json
+    sha256: 76bfdc6488419ca4c6caeceb4a7cec02922800229f35478c6794823fbdbdc240
   - path: docs/schemas/v1/workflow.schema.json
     sha256: 0797501a99b1b4d1086ddca1987fb674775eb3f6975905f4d863bb3f08966a76
   - path: docs/sitemap.xml

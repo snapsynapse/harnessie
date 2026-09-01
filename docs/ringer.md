@@ -35,6 +35,8 @@ This division is not only our framing. Declining to ship an official sandbox and
 
 The worker's own claims stop being the evidence; a model that never saw the worker's reasoning has to reproduce them. Fail-closed: 0 verified, 1 failed, 2 cannot-verify (nothing was observed, so nothing is asserted). For GitHub-hosted repos the same contract ships packaged as a one-file-install Action: [harnessie-verify-action](https://github.com/snapsynapse/harnessie-verify-action).
 
+For a durable Ringer intake gate, prefer a v1 evidence bundle over the raw PR body. The bundle assigns stable IDs to the claims being graded and binds them to the exact Git revision and dirty state, content-addressed diffs and logs, and the deterministic commands that produced those logs. Harnessie rejects a stale or incomplete bundle before spending model tokens. Proof files stay outside the checkout and are exposed to the verifier through a quarantined read-only evidence tool.
+
 ## Verifying an agent-produced pull request
 
 The same command reviews PR-shaped work anywhere. The recipe: check out the PR head, stage its diff alongside it (`git diff <base>..HEAD > PR.diff`, so the verifier can judge change-surface claims without git), distill the PR body's claims into a criteria file, then:
@@ -44,7 +46,7 @@ harnessie verify --workspace <checkout> --criteria claims.md \
   --check "python3 -m pytest tests/ -q" --models models.yaml
 ```
 
-The report answers claim by claim: reproduced, refuted, or not verifiable in this environment, with the evidence named. The first public run of this recipe [refuted a claim in its own author's pull request](https://github.com/NateBJones-Projects/ringer/pull/4), which was the point: a verifier that has never failed its own author is a rubber stamp. The decision record behind the feature (four providers' independent positions, preserved dissent, human arbitration) is public: [AIDR-0006](https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0006-standalone-verifier-surface-for-agent-produced-prs.md).
+The report answers claim by claim: reproduced, refuted, or not verifiable in this environment, with the evidence named. The overall exit is derived rather than improvised: every required claim reproduced is 0; any required claim refuted is 1; no refutation but at least one required claim not verifiable is 2. The first public run of this recipe [refuted a claim in its own author's pull request](https://github.com/NateBJones-Projects/ringer/pull/4), which was the point: a verifier that has never failed its own author is a rubber stamp. The decision record behind the feature (four providers' independent positions, preserved dissent, human arbitration) is public: [AIDR-0006](https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0006-standalone-verifier-surface-for-agent-produced-prs.md).
 
 ## If you came from Ringer
 

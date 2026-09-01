@@ -70,13 +70,16 @@ def prompt_sha(root: Path) -> str:
 
 
 def bundle_identity(root: Path, spec: ModelSpec) -> BundleIdentity:
+    sampling = SCORECARD_SAMPLING
+    if spec.provider == "openai-responses":
+        sampling += "; protocol-smoke=high"
     return BundleIdentity(
         model=spec.model_id,
         provider=spec.provider,
         endpoint=spec.base_url or f"{spec.provider}:default",
         prompt_sha=prompt_sha(root),
         parser_version=PARSER_VERSION,
-        sampling=SCORECARD_SAMPLING,
+        sampling=sampling,
     )
 
 
@@ -113,7 +116,7 @@ class LiveCaseResult:
     observed: str
     notes: str = ""
     tokens: int = 0
-    cost_usd: float = 0.0
+    cost_usd: float | None = None
 
 
 def discover_live_targets(
@@ -134,12 +137,16 @@ def discover_live_targets(
         return [
             LiveTarget("anthropic", "anthropic", None, "skipped",
                        "set HARNESSIE_LIVE=1 and ANTHROPIC_API_KEY"),
+            LiveTarget("openai_responses", "openai-responses", None, "skipped",
+                       "set HARNESSIE_LIVE=1, OPENAI_API_KEY, and "
+                       "HARNESSIE_OPENAI_RESPONSES_MODEL"),
             LiveTarget("openai_compat", "openai-compat", None, "skipped",
                        "set HARNESSIE_LIVE=1 and HARNESSIE_OPENAI_COMPAT_BASE_URL"),
         ]
 
     return [
         _anthropic_target(tiers, env),
+        _openai_responses_target(tiers, env),
         _openai_compat_target(tiers, env),
     ]
 
@@ -179,8 +186,10 @@ def format_live_scorecard(scorecard: dict) -> str:
             f"{mark} {result.provider}:{result.id}: expected={result.expected} "
             f"observed={result.observed}"
         )
-        if result.tokens or result.cost_usd:
-            lines[-1] += f" tokens={result.tokens} cost=${result.cost_usd:.6f}"
+        if result.tokens:
+            lines[-1] += f" tokens={result.tokens}"
+        if result.cost_usd is not None:
+            lines[-1] += f" cost=${result.cost_usd:.6f}"
         if result.notes and not result.passed:
             lines.append(f"  {result.notes[:500]}")
     return "\n".join(lines)
@@ -229,6 +238,39 @@ def _openai_compat_target(
     return LiveTarget("openai_compat", "openai-compat", spec, "ready")
 
 
+def _openai_responses_target(
+    tiers: dict[str, ModelSpec],
+    env: Mapping[str, str],
+) -> LiveTarget:
+    spec = _first_provider(tiers, "openai-responses")
+    model_id = env.get("HARNESSIE_OPENAI_RESPONSES_MODEL")
+    if spec is None and not model_id:
+        return LiveTarget(
+            "openai_responses", "openai-responses", None, "skipped",
+            "config has no openai-responses tier and "
+            "HARNESSIE_OPENAI_RESPONSES_MODEL is unset")
+    if spec is None:
+        spec = ModelSpec(
+            name="openai-responses-live",
+            provider="openai-responses",
+            model_id=model_id or "",
+            base_url="https://api.openai.com/v1",
+            api_key_env="OPENAI_API_KEY",
+            supports_effort=True,
+        )
+    spec = replace(
+        spec,
+        model_id=model_id or spec.model_id,
+        base_url=(env.get("HARNESSIE_OPENAI_RESPONSES_BASE_URL")
+                  or spec.base_url or "https://api.openai.com/v1"),
+    )
+    key_env = spec.api_key_env or "OPENAI_API_KEY"
+    if not env.get(key_env):
+        return LiveTarget("openai_responses", "openai-responses", None,
+                          "skipped", f"missing {key_env}")
+    return LiveTarget("openai_responses", "openai-responses", spec, "ready")
+
+
 def _first_provider(tiers: dict[str, ModelSpec], provider: str) -> ModelSpec | None:
     for spec in tiers.values():
         if spec.provider == provider:
@@ -238,14 +280,55 @@ def _first_provider(tiers: dict[str, ModelSpec], provider: str) -> ModelSpec | N
 
 def _run_target_scorecard(target: LiveTarget) -> list[LiveCaseResult]:
     assert target.spec is not None
-    return [
+    cases = [
         _direct_smoke(target),
         _verdict_smoke(target),
+        _structured_verdict_smoke(target),
         _loop_smoke(target, consent=False),
         _loop_smoke(target, consent=True),
         _consent_lock_smoke(target),
         _placeholder_impact_smoke(target),
     ]
+    if target.provider == "openai-responses":
+        cases.append(_openai_responses_protocol_smoke(target))
+    return cases
+
+
+def _openai_responses_protocol_smoke(target: LiveTarget) -> LiveCaseResult:
+    """Exercise reasoning plus function tools on the Responses endpoint."""
+    with tempfile.TemporaryDirectory(prefix="harnessie-live-responses-") as d:
+        root = Path(d)
+        workspace = root / "workspace"
+        workspace.mkdir()
+        (workspace / "marker.txt").write_text("responses protocol ok\n",
+                                               encoding="utf-8")
+        run_dir = root / "run"
+        registry = ToolRegistry()
+        register_builtin(registry, workspace=workspace)
+        loop = AgentLoop(
+            role="verifier",
+            model=build_model(target.spec),
+            registry=registry,
+            events=EventLog(run_dir, echo=False),
+            max_steps=5,
+            agent_name="verifier",
+        )
+        result = loop.run(
+            "You are a protocol verifier. Use the available tools exactly as asked.",
+            "Read marker.txt, then call task_complete with a report containing "
+            "the exact marker text.",
+            effort="high",
+        )
+    passed = result.stop == "complete" and "responses protocol ok" in result.report
+    return LiveCaseResult(
+        id="responses_reasoning_tools_high",
+        provider=target.provider,
+        status="passed" if passed else "failed",
+        passed=passed,
+        expected="high-effort read_file continuation completes",
+        observed=f"{result.stop}: {result.report[:120]}",
+        notes=f"steps={result.steps}; store=false stateless replay",
+    )
 
 
 def _placeholder_impact_smoke(target: LiveTarget) -> LiveCaseResult:
@@ -324,6 +407,34 @@ def _verdict_smoke(target: LiveTarget) -> LiveCaseResult:
         passed=passed,
         expected='parseable {"passed": true}',
         observed=f"{turn.stop_reason}: {turn.content[:120]}",
+        notes=verdict.reasons,
+        tokens=turn.input_tokens + turn.output_tokens,
+        cost_usd=_cost(target.spec, turn.input_tokens, turn.output_tokens),
+    )
+
+
+def _structured_verdict_smoke(target: LiveTarget) -> LiveCaseResult:
+    model = build_model(target.spec)  # type: ignore[arg-type]
+    turn = model.complete([
+        Message(role="user", content=(
+            "Return only this structured verifier JSON: "
+            '{"claims":[{"id":"C1","status":"reproduced",'
+            '"required":true,"evidence":["live-smoke"]}],'
+            '"reasons":"live structured smoke"}'
+        ))
+    ], tools=None, effort="low")
+    verdict = parse_verdict(turn.content)
+    passed = (turn.stop_reason not in {"error", "refusal"}
+              and verdict.overall_status == "verified"
+              and len(verdict.claims) == 1
+              and verdict.claims[0].claim_id == "C1")
+    return LiveCaseResult(
+        id="structured_verdict_json",
+        provider=target.provider,
+        status="passed" if passed else "failed",
+        passed=passed,
+        expected="parseable structured claim verdict",
+        observed=f"{turn.stop_reason}: {turn.content[:160]}",
         notes=verdict.reasons,
         tokens=turn.input_tokens + turn.output_tokens,
         cost_usd=_cost(target.spec, turn.input_tokens, turn.output_tokens),
@@ -419,9 +530,11 @@ def _event_kinds(run_dir: Path) -> list[str]:
     return kinds
 
 
-def _cost(spec: ModelSpec | None, tokens_in: int, tokens_out: int) -> float:
-    if spec is None:
-        return 0.0
+def _cost(spec: ModelSpec | None, tokens_in: int,
+          tokens_out: int) -> float | None:
+    if spec is None or (spec.cost_per_mtok_in == 0
+                        and spec.cost_per_mtok_out == 0):
+        return None
     return (
         tokens_in * spec.cost_per_mtok_in
         + tokens_out * spec.cost_per_mtok_out

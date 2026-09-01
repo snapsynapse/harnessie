@@ -85,6 +85,7 @@
     "documentation": "https://harnessie.com/guide.html",
     "agent_file_ownership": "https://harnessie.com/agent-file-ownership.html",
     "workflow_schema": "https://harnessie.com/schemas/v1/workflow.schema.json",
+    "verify_evidence_schema": "https://harnessie.com/schemas/v1/verify-evidence.schema.json",
     "schema_compatibility": "https://github.com/snapsynapse/harnessie/blob/main/SCHEMA_COMPATIBILITY.md",
     "plugin_contract": "https://github.com/snapsynapse/harnessie/blob/main/PLUGIN_CONTRACT.md",
     "quickstart": "https://harnessie.com/quickstart.html"

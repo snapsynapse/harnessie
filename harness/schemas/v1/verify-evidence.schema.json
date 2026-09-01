@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harnessie.com/schemas/v1/verify-evidence.schema.json",
+  "title": "Harnessie verification evidence bundle v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "workspace", "claims"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "workspace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "dirty"],
+      "properties": {
+        "revision": {"type": "string", "minLength": 1},
+        "dirty": {"type": "boolean"}
+      }
+    },
+    "diff": {"$ref": "#/$defs/file"},
+    "evidence": {
+      "type": "array",
+      "default": [],
+      "items": {"$ref": "#/$defs/evidenceFile"}
+    },
+    "checks": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "command", "exit_code"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "command": {"type": "string", "minLength": 1},
+          "exit_code": {"type": "integer"},
+          "platform": {"type": "string", "minLength": 1},
+          "environment": {
+            "type": "object",
+            "propertyNames": {"minLength": 1},
+            "additionalProperties": {"type": "string"}
+          },
+          "evidence": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/id"}
+          }
+        }
+      }
+    },
+    "claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "statement"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "statement": {"type": "string", "minLength": 1},
+          "required": {"type": "boolean", "default": true},
+          "diff": {"type": "boolean", "default": false},
+          "evidence": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/id"}
+          },
+          "checks": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/id"}
+          }
+        },
+        "anyOf": [
+          {"required": ["diff"], "properties": {"diff": {"const": true}}},
+          {"required": ["evidence"], "properties": {"evidence": {"minItems": 1}}},
+          {"required": ["checks"], "properties": {"checks": {"minItems": 1}}}
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "evidenceFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "sha256"],
+      "properties": {
+        "id": {"allOf": [{"$ref": "#/$defs/id"}, {"not": {"const": "diff"}}]},
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "media_type": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

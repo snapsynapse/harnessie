@@ -1,0 +1,46 @@
+# Synthetic regression corpus distilled from the 2026-09-01 Ringer cohort.
+#
+# This is deliberately a fixture corpus, not a model-authored verdict suite.
+# `tests/test_ringer_verifier_fixtures.py` executes every case without network
+# access or a checkout of Ringer. Keeping the inputs explicit makes them usable
+# later as golden cases for model-verifier scoring without preserving PR code.
+name: ringer-verifier
+format: synthetic-fixtures-v1
+fixtures:
+  - id: quoted_command_substitution_fails_closed
+    kind: shell-substitution
+    quoted: 'set -euo pipefail; OUTER="$(cd "$(false)" && pwd -P)"; printf "%s" "$OUTER"'
+    unquoted: 'set -euo pipefail; OUTER=$(cd $(false) && pwd -P); printf "%s" "$OUTER"'
+    expect:
+      quoted_exit: nonzero
+      quoted_stdout: ""
+      unquoted_exit: 0
+      unquoted_stdout: nonempty
+
+  - id: staged_parent_of_owned_child_is_accepted
+    kind: staged-harvest
+    owned: [newdir/only.py]
+    stage:
+      - { path: newdir, type: file, content: "UNOWNED PARENT FILE\n" }
+    expect:
+      ok: true
+      installed: [newdir]
+
+  - id: directory_symlink_is_ignored_while_sibling_installs
+    kind: staged-harvest
+    owned: [gate/ok.py]
+    stage:
+      - { path: gate/ok.py, type: file, content: "OK\n" }
+      - { path: linked-dir, type: directory-symlink }
+    expect:
+      ok: true
+      installed: [gate/ok.py]
+
+  - id: dangling_stage_root_is_treated_as_absent
+    kind: staged-harvest
+    owned: [gate/ok.py]
+    stage_root: dangling-symlink
+    stage: []
+    expect:
+      ok: true
+      installed: []

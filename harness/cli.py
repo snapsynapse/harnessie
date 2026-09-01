@@ -132,8 +132,15 @@ def main(argv: list[str] | None = None) -> int:
                        "claims file (exit 0 verified / 1 failed / 2 cannot verify)")
     p_verify.add_argument("--workspace", required=True,
                           help="directory holding the artifacts to verify")
-    p_verify.add_argument("--criteria", required=True,
-                          help="markdown file of acceptance criteria / claims")
+    verify_source = p_verify.add_mutually_exclusive_group(required=True)
+    verify_source.add_argument(
+        "--criteria", help="markdown file of acceptance criteria / claims")
+    verify_source.add_argument(
+        "--evidence-bundle",
+        help="v1 evidence bundle containing claims and content-addressed proofs")
+    p_verify.add_argument(
+        "--evidence-root",
+        help="directory containing files referenced by the evidence bundle")
     p_verify.add_argument("--check", action="append", default=[],
                           metavar="CMD",
                           help="deterministic check command (repeatable); "
@@ -280,7 +287,7 @@ def main(argv: list[str] | None = None) -> int:
                   for i, cmd in enumerate(args.check, start=1)]
         outcome = run_standalone_verify(VerifyRequest(
             workspace=Path(args.workspace),
-            criteria_path=Path(args.criteria),
+            criteria_path=Path(args.criteria) if args.criteria else None,
             checks=checks,
             report_dir=Path(args.report_dir) if args.report_dir else None,
             models_path=Path(args.models) if args.models else None,
@@ -289,7 +296,11 @@ def main(argv: list[str] | None = None) -> int:
                                   if args.verifier_prompt else None),
             no_verifier=args.no_verifier,
             allow_network=args.allow_network,
-            max_steps=args.max_steps))
+            max_steps=args.max_steps,
+            evidence_bundle_path=(Path(args.evidence_bundle)
+                                  if args.evidence_bundle else None),
+            evidence_root=(Path(args.evidence_root)
+                           if args.evidence_root else None)))
         print(outcome.summary, file=sys.stderr if outcome.exit_code else sys.stdout)
         return outcome.exit_code
 

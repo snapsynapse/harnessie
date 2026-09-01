@@ -31,5 +31,7 @@ files:
   sha256: 61fa32c1b90414a4c0ab033f032009063c9685f85f6841886366e7e23b5cfcac
 - path: harness/schemas/v1/ownership.schema.json
   sha256: b0a7eedcec428585f4b7c9c62fcbd878dabd8aee6e12b8ea8de07b69616a7832
+- path: harness/schemas/v1/verify-evidence.schema.json
+  sha256: 76bfdc6488419ca4c6caeceb4a7cec02922800229f35478c6794823fbdbdc240
 - path: harness/schemas/v1/workflow.schema.json
   sha256: 0797501a99b1b4d1086ddca1987fb674775eb3f6975905f4d863bb3f08966a76

@@ -50,10 +50,28 @@ class CheckResult:
 
 
 # Version of the verifier-verdict parsing contract (parse_verdict: last JSON
-# object with a "passed" key wins; fail closed otherwise). Part of a proven
+# verdict object wins; fail closed otherwise). Part of a proven
 # brain's bundle identity: bump on ANY behavior change to the parser, because
 # a scorecard earned under one parsing contract says nothing about another.
-PARSER_VERSION = "1"
+PARSER_VERSION = "2"
+
+
+CLAIM_STATUSES = frozenset({"reproduced", "refuted", "not_verifiable"})
+
+
+@dataclass(frozen=True)
+class ClaimVerdict:
+    """One independently adjudicated acceptance claim.
+
+    Required claims determine the overall verdict. Optional claims remain in
+    the result as useful findings but cannot block the gate.
+    """
+
+    claim_id: str
+    status: str
+    required: bool = True
+    reason: str = ""
+    evidence: tuple[str, ...] = ()
 
 
 @dataclass
@@ -61,6 +79,14 @@ class Verdict:
     passed: bool
     reasons: str
     source: str             # "checks" | "verifier" | "gate" | "consent"
+    overall_status: str = ""  # "verified" | "failed" | "cannot_verify"
+    claims: tuple[ClaimVerdict, ...] = ()
+
+    def __post_init__(self) -> None:
+        # Preserve the long-standing three-positional-argument constructor for
+        # checks, gates, consent, and legacy verifier JSON.
+        if not self.overall_status:
+            self.overall_status = "verified" if self.passed else "failed"
 
 
 def run_checks(checks: list[Check], workspace: Path, proofs: ProofStore,
@@ -131,29 +157,144 @@ def _json_objects(report: str):
         idx = start + max(consumed, 1)
 
 
+def _failed_parse(reason: str) -> Verdict:
+    return Verdict(
+        passed=False,
+        reasons=reason,
+        source="verifier",
+        overall_status="cannot_verify",
+    )
+
+
+def _parse_claims(obj: dict) -> Verdict:
+    raw_claims = obj.get("claims")
+    if not isinstance(raw_claims, list) or not raw_claims:
+        return _failed_parse(
+            "invalid structured verdict (failing closed): claims must be a "
+            "non-empty array")
+
+    claims: list[ClaimVerdict] = []
+    seen_ids: set[str] = set()
+    for index, raw in enumerate(raw_claims):
+        if not isinstance(raw, dict):
+            return _failed_parse(
+                f"invalid structured verdict (failing closed): claim {index} "
+                "must be an object")
+
+        claim_id = raw.get("id", raw.get("claim_id"))
+        if not isinstance(claim_id, str) or not claim_id.strip():
+            return _failed_parse(
+                f"invalid structured verdict (failing closed): claim {index} "
+                "requires a non-empty id")
+        claim_id = claim_id.strip()
+        if claim_id in seen_ids:
+            return _failed_parse(
+                "invalid structured verdict (failing closed): duplicate claim "
+                f"id {claim_id!r}")
+        seen_ids.add(claim_id)
+
+        status = raw.get("status")
+        if status not in CLAIM_STATUSES:
+            return _failed_parse(
+                f"invalid structured verdict (failing closed): claim "
+                f"{claim_id!r} has unknown status {status!r}")
+
+        required = raw.get("required", True)
+        if not isinstance(required, bool):
+            return _failed_parse(
+                f"invalid structured verdict (failing closed): claim "
+                f"{claim_id!r} required must be boolean")
+
+        reason = raw.get("reason", "")
+        if not isinstance(reason, str):
+            return _failed_parse(
+                f"invalid structured verdict (failing closed): claim "
+                f"{claim_id!r} reason must be a string")
+
+        raw_evidence = raw.get("evidence", [])
+        if isinstance(raw_evidence, str):
+            evidence = (raw_evidence,)
+        elif (isinstance(raw_evidence, list)
+              and all(isinstance(item, str) for item in raw_evidence)):
+            evidence = tuple(raw_evidence)
+        else:
+            return _failed_parse(
+                f"invalid structured verdict (failing closed): claim "
+                f"{claim_id!r} evidence must be a string or array of strings")
+
+        claims.append(ClaimVerdict(
+            claim_id=claim_id,
+            status=status,
+            required=required,
+            reason=reason[:2000],
+            evidence=evidence,
+        ))
+
+    required_claims = [claim for claim in claims if claim.required]
+    if not required_claims:
+        return _failed_parse(
+            "invalid structured verdict (failing closed): at least one claim "
+            "must be required")
+
+    if any(claim.status == "refuted" for claim in required_claims):
+        overall_status = "failed"
+    elif any(claim.status == "not_verifiable" for claim in required_claims):
+        overall_status = "cannot_verify"
+    else:
+        overall_status = "verified"
+
+    supplied_reasons = obj.get("reasons", "")
+    if not isinstance(supplied_reasons, str):
+        return _failed_parse(
+            "invalid structured verdict (failing closed): reasons must be a "
+            "string")
+    if supplied_reasons:
+        reasons = supplied_reasons[:2000]
+    else:
+        findings = [
+            f"{claim.claim_id}: {claim.status}"
+            + (f" ({claim.reason})" if claim.reason else "")
+            for claim in required_claims
+            if claim.status != "reproduced"
+        ]
+        reasons = "; ".join(findings)[:2000]
+        if not reasons:
+            reasons = "all required claims reproduced"
+
+    return Verdict(
+        passed=overall_status == "verified",
+        reasons=reasons,
+        source="verifier",
+        overall_status=overall_status,
+        claims=tuple(claims),
+    )
+
+
 def parse_verdict(report: str) -> Verdict:
     """The verifier contract says the report ENDS with exactly one JSON verdict
     object. Weaker models wrap it in prose or quote example objects earlier, so
-    take the LAST parseable object carrying a "passed" key: the contract's
-    final-position object always wins over anything quoted before it.
+    take the LAST parseable object carrying either the legacy ``passed`` key or
+    structured ``claims``: the contract's final-position object always wins
+    over anything quoted before it.
 
     passed must be boolean true (string "true" tolerated for weak models).
     Any other shape, and reports with no verdict object at all, fail closed:
     at a gate, a false FAIL costs one retry; a false PASS ships a defect."""
     verdict_obj = None
     for obj in _json_objects(report):
-        if "passed" in obj:
+        if "passed" in obj or "claims" in obj:
             verdict_obj = obj
     if verdict_obj is None:
-        return Verdict(passed=False,
-                       reasons="no JSON verdict object found (failing closed): "
-                               + report[:500],
-                       source="verifier")
+        return _failed_parse(
+            "no JSON verdict object found (failing closed): " + report[:500])
+    if "claims" in verdict_obj:
+        return _parse_claims(verdict_obj)
     passed = verdict_obj["passed"]
     ok = passed is True or (isinstance(passed, str) and passed.strip().lower() == "true")
     return Verdict(passed=ok,
                    reasons=str(verdict_obj.get("reasons", ""))[:2000],
-                   source="verifier")
+                   source="verifier",
+                   overall_status="verified" if ok else "failed")
 
 
 @dataclass

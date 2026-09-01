@@ -844,6 +844,22 @@ def _run_scripted_workflow(root: Path, run_id: str, script: list[dict[str, Any]]
 
 
 def _turn(spec: dict[str, Any], idx: int) -> AssistantTurn:
+    if "tools" in spec:
+        calls = spec["tools"]
+        if not isinstance(calls, list):
+            raise ValueError("scripted eval tools must be a list")
+        return AssistantTurn(
+            content=spec.get("content", ""),
+            stop_reason="tool_use",
+            tool_calls=[
+                ToolCall(
+                    id=item.get("id", f"call_{idx}_{call_index}"),
+                    name=item["tool"],
+                    arguments=item.get("args", {}),
+                )
+                for call_index, item in enumerate(calls, 1)
+            ],
+        )
     if "tool" in spec:
         return AssistantTurn(
             content=spec.get("content", ""),

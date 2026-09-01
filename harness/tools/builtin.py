@@ -45,7 +45,14 @@ def scrubbed_env() -> dict[str, str]:
     an injected 'print os.environ' in worker code must find nothing worth
     stealing. Applied to run_shell here and to gate checks in verify.py."""
     keep = ("PATH", "HOME", "LANG", "LC_ALL", "TMPDIR", "TERM")
-    return {k: os.environ[k] for k in keep if k in os.environ}
+    env = {k: os.environ[k] for k in keep if k in os.environ}
+    # Verification must not inherit operator-wide Git behavior such as commit
+    # signing, hooks paths, aliases, or credential helpers. Repository-local
+    # configuration remains visible, while global and system configuration are
+    # removed deterministically on every supported platform.
+    env["GIT_CONFIG_NOSYSTEM"] = "1"
+    env["GIT_CONFIG_GLOBAL"] = os.devnull
+    return env
 
 READ_ROLES = frozenset({"orchestrator", "worker", "verifier"})
 WRITE_ROLES = frozenset({"worker"})

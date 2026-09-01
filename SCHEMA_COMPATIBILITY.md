@@ -18,6 +18,10 @@ Harnessie 1.0 freezes six operator-authored contracts at schema version 1: model
 - Diagnostics are deterministic and contain source, instance path, code, message, and schema version. Invalid authoring input exits 2 and never reaches a model.
 - `harnessie validate` validates the project without model calls, network, sandbox admission, run-state creation, or workspace writes. `harnessie validate PATH --kind KIND` validates one explicitly typed document.
 
+## Standalone verification evidence
+
+The separately versioned `verify-evidence.schema.json` contract governs optional evidence bundles accepted by `harnessie verify`. It is not a seventh project-authoring document and is not loaded by `harnessie validate`. A bundle is an immutable intake envelope: stable claims, an exact workspace revision and dirty state, and content-addressed diffs, proof files, and recorded checks. Bundle schema version 1 remains additive to raw Markdown criteria; callers choose exactly one input form. Changing an existing v1 field incompatibly requires a new evidence-bundle schema version.
+
 ## Defaults
 
 Defaults are part of the behavioral contract even when omitted from YAML. Current v1 defaults are the runtime defaults already shipped in 0.8: model token and cost fields use `ModelSpec` defaults; the run budget uses `Budget` defaults when absent; cascade policies default to gate-failure escalation, full ladder-bounded climb, and defer on exhaustion; the boundary defaults off; approval and rehydration policies default deny-all; ownership lane groups and claims default empty; workflow phases default to 40 steps, network denied, no tool pre-approval, and the existing role-specific consent behavior.
@@ -38,4 +42,4 @@ Version 1 defines no plugin configuration namespace. The active plugin contract 
 
 ## Outside this guarantee
 
-Eval suites, ecosystem metadata, run journals, event records, maiden proposal records, and generated decision records are versioned or maintained separately. They do not silently become stable 1.0 authoring APIs through this document.
+Eval suites, ecosystem metadata, run journals, event records, maiden proposal records, trace metrics, and generated decision records are versioned or maintained separately. They do not silently become stable 1.0 authoring APIs through this document.
