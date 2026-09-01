@@ -39,6 +39,7 @@ workspace/
 .agents/
 .codex/
 .playwright-mcp/
+.search-evidence-private/
 
 # Private roadmap: operator-only planning notes (unreleased scope, portfolio
 # integration candidates not yet ready to name publicly). Sibling to the

@@ -6,6 +6,10 @@ Audit date: 2026-08-09 America/Denver
 
 Evidence type: authenticated Google Search Console UI observations through the existing Comet profile. No CSV export was downloaded.
 
+This file is the actual dated observation for the 2026-08-09 task. The legacy filename `summary.md` is retained to preserve repository history; future dated observations conventionally use `audit.md`.
+
+Privacy review: the record is sanitized and contains no account identity, private queries, authenticated console URLs, raw exports, screenshots, traces, cookies, browser profiles, or authentication state.
+
 ## Page indexing
 
 Report last update: 2026-08-06
@@ -61,6 +65,19 @@ Report last update: 2026-08-05
 3. Submitted `https://harnessie.com/sitemap.xml`; GSC read it successfully and discovered all 9 pages.
 4. Inspected `/guide.html`, `/ladder.html`, `/brains.html`, and `/ringer.html`. Each was `Discovered - currently not indexed`, had no prior crawl, and was eligible for indexing.
 5. Requested indexing for all four pages; GSC confirmed that each entered the priority crawl queue.
+
+The exact acceptance times were not recorded. The acceptance date and visible confirmations above are the strongest retained evidence; later confirmation must be recorded in a new dated observation rather than replacing this one.
+
+Active validation batches: none. Validation was deliberately not started for the intentional `Page with redirect` group.
+
+## Classification summary
+
+- Defect: none after production passed commit `47f7ec3`.
+- Pending recrawl: `/guide.html`, `/ladder.html`, `/brains.html`, and `/ringer.html` after accepted indexing requests.
+- Expected noise: three intentional host or protocol redirects and the decorative homepage video exclusion.
+- Policy decision: none open.
+- External limitation: Google controls crawl timing and indexing adjudication after accepting a request.
+- Unknown: Core Web Vitals status because field data was insufficient; no Bing property evidence was gathered.
 
 ## Remaining state
 
