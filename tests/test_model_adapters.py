@@ -141,6 +141,29 @@ def test_openai_compat_content_filter_maps_to_refusal(monkeypatch):
     assert _openai_compat().complete([]).stop_reason == "refusal"
 
 
+def test_openai_compat_max_completion_tokens_extra_replaces_max_tokens(monkeypatch):
+    """OpenAI's newest models reject max_tokens; declaring max_completion_tokens
+    in a tier's extra must suppress the default max_tokens in the request."""
+    captured = {}
+
+    def _capture(req, **_kwargs):
+        captured["body"] = json.loads(req.data.decode())
+        return _Response(json.dumps({
+            "choices": [{"message": {"content": "ok"}, "finish_reason": "stop"}],
+            "usage": {"prompt_tokens": 1, "completion_tokens": 1},
+        }).encode())
+
+    monkeypatch.setattr("urllib.request.urlopen", _capture)
+    model = OpenAICompatModel(ModelSpec(
+        name="mid", provider="openai-compat", model_id="test",
+        base_url="https://example.invalid/v1", supports_effort=False,
+        extra={"max_completion_tokens": 512}))
+    turn = model.complete([])
+    assert turn.stop_reason == "end_turn"
+    assert captured["body"]["max_completion_tokens"] == 512
+    assert "max_tokens" not in captured["body"]
+
+
 def test_openai_responses_preserves_reasoning_and_function_outputs(monkeypatch):
     captured = []
     replies = iter([

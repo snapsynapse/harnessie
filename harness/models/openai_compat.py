@@ -38,6 +38,10 @@ class OpenAICompatModel(ModelInterface):
             # collapse the 5-level dial onto the common 3-level scale
             body["reasoning_effort"] = {"xhigh": "high", "max": "high"}.get(effort, effort)
         body.update(self.spec.extra)
+        if "max_completion_tokens" in self.spec.extra and "max_tokens" not in self.spec.extra:
+            # OpenAI's newest models reject max_tokens outright; a declared
+            # max_completion_tokens takes its place unless both are explicit.
+            del body["max_tokens"]
 
         base = self.spec.base_url.rstrip("/")
         if not base:
