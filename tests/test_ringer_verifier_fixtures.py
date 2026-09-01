@@ -97,13 +97,13 @@ def test_corpus_has_stable_unique_case_ids() -> None:
     assert len(ids) == len(set(ids)) == 4
 
 
-def test_quoted_command_substitution_does_not_fall_back_to_home() -> None:
-    case = fixture_by_id("quoted_command_substitution_fails_closed")
-    quoted = subprocess.run(["bash", "-c", case["quoted"]], capture_output=True, text=True)
+def test_guarded_command_substitution_does_not_fall_back_to_home() -> None:
+    case = fixture_by_id("guarded_command_substitution_fails_closed")
+    guarded = subprocess.run(["bash", "-c", case["guarded"]], capture_output=True, text=True)
     unquoted = subprocess.run(["bash", "-c", case["unquoted"]], capture_output=True, text=True)
 
-    assert quoted.returncode != 0
-    assert quoted.stdout == case["expect"]["quoted_stdout"]
+    assert guarded.returncode != 0
+    assert guarded.stdout == case["expect"]["guarded_stdout"]
     assert unquoted.returncode == case["expect"]["unquoted_exit"]
     assert unquoted.stdout
 

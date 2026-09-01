@@ -7,13 +7,13 @@
 name: ringer-verifier
 format: synthetic-fixtures-v1
 fixtures:
-  - id: quoted_command_substitution_fails_closed
+  - id: guarded_command_substitution_fails_closed
     kind: shell-substitution
-    quoted: 'set -euo pipefail; OUTER="$(cd "$(false)" && pwd -P)"; printf "%s" "$OUTER"'
+    guarded: 'set -euo pipefail; INNER="$(false)" || exit $?; OUTER="$(cd "$INNER" && pwd -P)" || exit $?; printf "%s" "$OUTER"'
     unquoted: 'set -euo pipefail; OUTER=$(cd $(false) && pwd -P); printf "%s" "$OUTER"'
     expect:
-      quoted_exit: nonzero
-      quoted_stdout: ""
+      guarded_exit: nonzero
+      guarded_stdout: ""
       unquoted_exit: 0
       unquoted_stdout: nonempty
 
