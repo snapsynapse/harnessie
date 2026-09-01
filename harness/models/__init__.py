@@ -8,10 +8,12 @@ from .base import (
 )
 from .anthropic import AnthropicModel
 from .openai_compat import OpenAICompatModel
+from .openai_responses import OpenAIResponsesModel
 
 PROVIDERS = {
     "anthropic": AnthropicModel,
     "openai-compat": OpenAICompatModel,
+    "openai-responses": OpenAIResponsesModel,
     "mock": MockModel,
 }
 
@@ -37,6 +39,7 @@ __all__ = [
     "ToolCall",
     "AnthropicModel",
     "OpenAICompatModel",
+    "OpenAIResponsesModel",
     "build_model",
     "PROVIDERS",
 ]

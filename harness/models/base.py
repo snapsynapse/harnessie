@@ -26,7 +26,7 @@ class ModelSpec:
     """One named model endpoint from config/models.yaml."""
 
     name: str                    # config key, e.g. "frontier"
-    provider: str                # "anthropic" | "openai-compat" | "mock"
+    provider: str                # "anthropic" | "openai-compat" | "openai-responses" | "mock"
     model_id: str                # e.g. "claude-fable-5", "glm-5.2", "qwen3-coder"
     base_url: str = ""           # required for openai-compat
     api_key_env: str = ""        # env var holding the key; never store keys in config

@@ -18,12 +18,19 @@ needs_sandbox = pytest.mark.skipif(
            "(exit 2) by design; test_no_backend_checks_fail_closed covers that")
 
 from harness.verify_standalone import (
+    DEFAULT_VERIFIER_PROMPT,
     EXIT_CANNOT_VERIFY,
     EXIT_FAILED,
     EXIT_VERIFIED,
     VerifyRequest,
     run_standalone_verify,
 )
+
+
+def test_default_verifier_prompt_names_exact_shell_allowlist():
+    for command in ("`ls`", "`cat`", "`grep`", "`pytest`"):
+        assert command in DEFAULT_VERIFIER_PROMPT
+    assert "Do not call `git`" in DEFAULT_VERIFIER_PROMPT
 
 
 def make_request(tmp_path, criteria="- out.txt exists", **kw):

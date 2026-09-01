@@ -4,6 +4,15 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+### Added
+
+- A direct OpenAI Responses API adapter supports current OpenAI reasoning models with function tools, including high reasoning effort, stateless encrypted-reasoning replay, strict response validation, and usage accounting. The existing `openai-compat` adapter remains the Chat Completions path for Ollama, vLLM, and compatible endpoints.
+
+### Fixed
+
+- Parallel copies of the same denied tool call now count as one failed turn for stuck-loop detection, allowing a verifier to recover on its next turn without weakening the tool allowlist.
+- The standalone verifier prompt now names its exact shell allowlist and directs agents to use `read_file` for staged diffs, reducing avoidable denied calls.
+
 ## 1.1.0 (2026-08-20)
 
 Theme: the Golden Rule becomes inspectable. Harnessie turns its ownership invariant into a memorable public contract, a read-only policy explanation command, and an executable collision proof.

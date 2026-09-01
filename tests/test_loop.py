@@ -101,6 +101,22 @@ def test_stuck_detector_counts_ok_true_refusals(tmp_path):
     assert res.stop == "stuck"
 
 
+def test_parallel_identical_refusals_count_as_one_turn(tmp_path):
+    denied_calls = [
+        ToolCall(id=f"c{i}", name="run_shell",
+                 arguments={"command": "curl https://example.com/"})
+        for i in range(3)
+    ]
+    parallel = AssistantTurn(content="", stop_reason="tool_use",
+                             tool_calls=denied_calls)
+    loop, _ = make_loop(tmp_path, "worker", [
+        parallel,
+        turn_tool("task_complete", {"report": "recovered"}),
+    ])
+    res = loop.run("system", "fetch the page")
+    assert res.stop == "complete"
+
+
 def test_refusal_streak_broken_by_successful_call(tmp_path):
     deny = turn_tool("run_shell", {"command": "curl https://example.com/"})
     loop, _ = make_loop(tmp_path, "worker", [

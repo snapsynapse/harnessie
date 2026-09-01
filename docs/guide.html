@@ -210,6 +210,12 @@ phases:
     model_id: claude-fable-5
     api_key_env: ANTHROPIC_API_KEY
     supports_effort: true
+  mid:
+    provider: openai-responses
+    model_id: gpt-5.6-sol
+    base_url: https://api.openai.com/v1
+    api_key_env: OPENAI_API_KEY
+    supports_effort: true
   local:
     provider: openai-compat
     model_id: qwen3.6:35b-mlx
@@ -225,7 +231,7 @@ phases:
 <pre><code>budget:
   max_usd: 10.0
   max_tokens: 2000000</code></pre>
-<p>To run everything on a local open-source model, point the task classes you use at the <code>local</code> tier and leave <code>ANTHROPIC_API_KEY</code> unset. To swap one provider for another, change the tier&#x27;s <code>provider</code>, <code>model_id</code>, and <code>base_url</code>. Nothing else in the harness changes.</p>
+<p>Use <code>openai-responses</code> for OpenAI reasoning models that combine reasoning effort with function tools. Use <code>openai-compat</code> for Chat Completions endpoints such as Ollama and vLLM. To run everything on a local open-source model, point the task classes you use at the <code>local</code> tier and leave the external-provider keys unset. To swap one provider for another, change the tier&#x27;s <code>provider</code>, <code>model_id</code>, and <code>base_url</code>. Nothing else in the harness changes.</p>
 <p>The escalation ladder walks the tier order. When a phase fails its gate, the harness first reformulates the task with the verifier&#x27;s evidence, then raises effort, then raises tier, before halting for a human. That ladder is why a cheap worker can carry bulk execution safely: a capable verifier and an automatic escalation stand behind it.</p>
 <h2 id="cascade-routing-and-the-sovereign-tier">Cascade routing and the sovereign tier</h2>
 <p>The default ladder above is the whole story unless a phase opts in to a cascade policy. Cascade policies (introduced in 0.7) are declared, containment-aware routing: instead of a fixed <code>task_class</code>, a phase names a policy in <code>config/cascade.yaml</code> that decides how it climbs. Phases that do not opt in route exactly as before, byte for byte, so this is additive.</p>

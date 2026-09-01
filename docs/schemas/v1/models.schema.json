@@ -20,7 +20,7 @@
   },
   "$defs": {
     "baseModelFields": {
-      "provider": {"enum": ["anthropic", "openai-compat", "mock"]},
+      "provider": {"enum": ["anthropic", "openai-compat", "openai-responses", "mock"]},
       "model_id": {"type": "string", "minLength": 1},
       "base_url": {"type": "string", "default": ""},
       "api_key_env": {"type": "string", "default": ""},

@@ -70,6 +70,10 @@ The criteria arrive as CLAIMS made by whoever produced the work; your job is
 to test each claim against the artifacts actually present in the workspace,
 using your read tools and allowlisted shell commands.
 
+For verifier `run_shell`, the complete command allowlist is `ls`, `cat`,
+`grep`, and `pytest`. Do not call `git`, Python interpreters, or any other
+command. Inspect a staged diff with `read_file` instead of `git diff`.
+
 Work claim by claim. For each claim, state what evidence you inspected and
 whether the evidence supports it: reproduced, refuted, or not verifiable in
 this environment (say exactly why). A claim you could not check is NOT a
