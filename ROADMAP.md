@@ -6,7 +6,7 @@ Roadmap items are intent, not commitments. Dates are omitted deliberately; miles
 
 ## Released so far
 
-Versions 0.1.0 through 1.1.0 are shipped; the current core release is 1.1.0. It retains the stable 1.x authoring and plugin contracts while making Harnessie's ownership invariant inspectable through a read-only CLI decision surface and executable collision proof. This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
+Versions 0.1.0 through 1.2.0 are shipped; the current core release is 1.2.0. It retains the stable 1.x authoring and plugin contracts while making evidence-bound verification of agent-produced changes the smallest useful adoption surface. This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
 
 ## Guiding priorities
 
@@ -137,17 +137,17 @@ Theme: turn the ownership invariant into a memorable, falsifiable product surfac
 
 Gate result: GREEN. The composed release gate, ownership adversarial corpus, exact package build, and fresh-install ownership inspection passed before release. After publication, the assistant guide's external DNS and repository-file anchors matched the final bytes and hosted GuideCheck re-earned Level 4 with zero blocking findings.
 
-### 1.2.0: Verify agent-produced changes (candidate)
+### 1.2.0: Verify agent-produced changes (shipped 2026-09-01)
 
 Theme: make the standalone verifier the smallest useful adoption surface while preserving the full harness as the governed growth path. Ringer is the first named composition target because its task-check contract already consumes process exit codes.
 
-- Evidence-bound intake: IMPLEMENTED ON `main`, NOT YET RELEASED. A v1 evidence bundle binds stable claim IDs to an exact Git revision and dirty state, content-addressed diffs and proof files, and recorded deterministic checks. Unsafe paths, stale state, missing bindings, and hash drift fail before model dispatch.
-- Structured claim verdicts: IMPLEMENTED ON `main`, NOT YET RELEASED. Required claims resolve to `reproduced`, `refuted`, or `not_verifiable`; overall exit 0/1/2 is derived from complete required-claim coverage. Legacy raw criteria remain compatible.
-- Provider and regression coverage: IMPLEMENTED ON `main`, NOT YET RELEASED. OpenAI Responses is a first-class adapter, compatibility handling covers completion-token parameter differences, synthetic Ringer fixtures exercise the intake seam, and deterministic trace metrics report work, denial, duplication, token, and claim-coverage signals.
-- Public truth: IN PROGRESS. README, website, machine declarations, Ringer guide, architecture, eval docs, and operating context must distinguish stable 1.1.0 artifacts from current source. The 1.1.0 assistant-guide bytes and external anchor stay unchanged until an atomic guide rotation during release.
-- Release train: NOT STARTED. Version bump, changelog cut, exact artifact build, signed provenance decision, PyPI publication, Verify Action propagation, Homebrew propagation, assistant-guide rotation, and external verification each retain their own release gates and authority.
+- Evidence-bound intake: SHIPPED. A v1 evidence bundle binds stable claim IDs to an exact Git revision and dirty state, content-addressed diffs and proof files, and recorded deterministic checks. Unsafe paths, stale state, missing bindings, and hash drift fail before model dispatch.
+- Structured claim verdicts: SHIPPED. Required claims resolve to `reproduced`, `refuted`, or `not_verifiable`; overall exit 0/1/2 is derived from complete required-claim coverage. Legacy raw criteria remain compatible.
+- Provider and regression coverage: SHIPPED. OpenAI Responses is a first-class adapter, compatibility handling covers completion-token parameter differences, synthetic Ringer fixtures exercise the intake seam, and deterministic trace metrics report work, denial, duplication, token, and claim-coverage signals.
+- Public truth: SHIPPED. README, website, machine declarations, Ringer guide, architecture, eval docs, assistant guide, and operating context describe the same 1.2.0 core behavior while retaining the historical 1.1.0 GuideCheck receipt as dated evidence.
+- Release train: SHIPPED FOR CORE. The exact core artifacts and supply-chain evidence are recorded in `RELEASE_NOTES-1.2.0.md`; separately versioned downstream pins and the external guide anchor are reported at closeout rather than implied.
 
-Gate result: OPEN. Do not mark shipped until the exact released artifacts, downstream pins, generated and machine surfaces, and external trust evidence agree.
+Gate result: GREEN FOR CORE. Exact release and downstream evidence is recorded in `RELEASE_NOTES-1.2.0.md`.
 
 ### Post-1.0 candidates
 

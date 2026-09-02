@@ -15,6 +15,7 @@ from scripts.check_release_artifacts import (
     Archive,
     _check_archive_limits,
     _check_scrub_terms,
+    _scrub_terms,
     check_artifacts,
     read_sdist,
     read_wheel,
@@ -78,6 +79,20 @@ def test_scrub_patterns_keep_regular_expression_semantics(tmp_path):
 
     assert problems == [
         "artifact.whl: private scrub term found in module.py"]
+
+
+def test_scrub_patterns_load_from_private_controls(tmp_path):
+    controls = tmp_path / ".private-controls"
+    controls.mkdir()
+    (controls / "scrub-list.txt").write_text(
+        "# Private release patterns\nalpha[- ]beta\n",
+        encoding="utf-8",
+    )
+
+    patterns = _scrub_terms(tmp_path)
+
+    assert len(patterns) == 1
+    assert patterns[0].search(b"ALPHA BETA")
 
 
 def test_package_metadata_uses_current_spdx_fields():

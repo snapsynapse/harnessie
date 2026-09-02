@@ -23,9 +23,9 @@ pip install harnessie                # or: pipx install / uv tool install
 harnessie init my-project            # scaffold + guided readiness check + zero-dollar mock run
 ```
 
-PyPI and Homebrew carry the current 1.1.0 core release. Harnessie Verify v0.1.3 and stable `snapsynapse/harnessie-verify-action@v0` pin the same tested core version; see [NEXT.md](NEXT.md) for current status.
+PyPI carries the current 1.2.0 core release. Homebrew and Harnessie Verify are separately versioned downstreams; see [NEXT.md](NEXT.md) for their verified pins and propagation status.
 
-To gate pull requests on claim-by-claim verification without installing anything locally, the standalone verifier also ships as a GitHub Action: [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify). The stable 1.1.0 package and Action accept raw criteria. Current source on `main`, intended for the next minor release, also accepts a v1 evidence bundle that binds stable claim IDs to an exact Git state, content-addressed proofs, and recorded deterministic checks. Its structured verdicts distinguish reproduced, refuted, and not-verifiable claims before the exit code gates the merge.
+To gate pull requests on claim-by-claim verification without installing anything locally, the standalone verifier also ships as a GitHub Action: [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify). Harnessie 1.2.0 accepts raw criteria or a v1 evidence bundle that binds stable claim IDs to an exact Git state, content-addressed proofs, and recorded deterministic checks. Its structured verdicts distinguish reproduced, refuted, and not-verifiable claims before the exit code gates the merge. The Action's separately released pin is reported in [NEXT.md](NEXT.md).
 
 Developing on the harness itself, install from source:
 ```bash

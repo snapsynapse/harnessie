@@ -15,7 +15,7 @@ scenarios:
       - "/Users/"
       - "handoffs/"
 
-  - id: next_state_names_release_boundaries_gates_and_verification
+  - id: next_state_names_release_closeout_boundaries_and_verification
     kind: repo_hygiene
     paths:
       - NEXT.md
@@ -23,10 +23,11 @@ scenarios:
       - "Release boundary"
       - "Adoption direction"
       - "Verified evidence"
-      - "Release candidate order"
+      - "Remaining release order"
       - "External and optional checks"
       - "python3 -m pytest -q"
       - "python3 -m harness.cli eval"
       - "python3 -m harness.cli verify-manifest"
       - "stable core release"
-      - "Current `main` is ahead"
+      - "separately versioned downstreams"
+      - "external closeout gates"

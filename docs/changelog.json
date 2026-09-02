@@ -3,17 +3,23 @@
   "project": "Harnessie",
   "canonical": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md",
   "unreleased": {
-    "status": "active",
+    "status": "empty",
     "source": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md#unreleased",
-    "summary": "Current source adds OpenAI Responses support, evidence-bound standalone verification, structured claim verdicts, Ringer regression fixtures, trace metrics, and related fail-closed compatibility fixes. These changes are not in the stable 1.1.0 artifacts."
+    "summary": "No unreleased changes."
   },
   "current": {
-    "version": "1.1.0",
-    "released": "2026-08-20",
-    "summary": "Harnessie's Golden Rule, a read-only ownership-decision inspector, and an executable cross-agent overwrite proof.",
-    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.1.0"
+    "version": "1.2.0",
+    "released": "2026-09-01",
+    "summary": "Evidence-bound verification of agent-produced changes, structured claim verdicts, OpenAI Responses, Ringer regression fixtures, and deterministic trace metrics.",
+    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.2.0"
   },
   "history": [
+    {
+      "version": "1.2.0",
+      "released": "2026-09-01",
+      "summary": "Verify agent-produced changes through evidence-bound intake and deterministic claim coverage.",
+      "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.2.0"
+    },
     {
       "version": "1.1.0",
       "released": "2026-08-20",

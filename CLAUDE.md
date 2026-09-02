@@ -16,7 +16,7 @@ harness structure carries the quality floor, the model carries the ceiling.
 
 ## Stack
 
-- Python 3.11+ (packaged as `harnessie`, stable version 1.1.0, Apache-2.0).
+- Python 3.11+ (packaged as `harnessie`, stable version 1.2.0, Apache-2.0).
 - Runtime dependencies: PyYAML and jsonschema. Model adapters remain stdlib-only (no vendor SDK).
 - Dev dependency: pytest 8+. Console entry point: `harnessie = harness.cli:main`.
 - OS sandbox: macOS `sandbox-exec` (Seatbelt); Linux bubblewrap / firejail / docker.
@@ -93,16 +93,15 @@ PyPI promotion and live-provider calls are deliberate operator acts, never headl
 
 ## Current state (2026-09-01)
 
-- Version 1.1.0 is the stable core release on GitHub, PyPI, and Homebrew. Harnessie
-  Verify v0.1.3 and stable `snapsynapse/harnessie-verify-action@v0` pin 1.1.0.
-- Current `main` contains unreleased work intended for the next minor release:
-  OpenAI Responses support, v1 evidence bundles, structured claim verdicts,
-  deterministic Ringer fixtures, trace metrics, and compatibility fixes.
-- Stable and source channels must remain explicit. Do not claim the 1.1.0 wheel or
-  Action contains those additions. The assistant guide stays the externally anchored
-  1.1.0 artifact until an atomic release rotation.
-- The latest verified source baseline before this documentation pass was 481 passed,
-  9 skipped, 51/51 deterministic evals, 20 outward trust files, and 16 inward files.
+- Version 1.2.0 is the stable core release on GitHub and PyPI. It includes OpenAI
+  Responses support, v1 evidence bundles, structured claim verdicts, deterministic
+  Ringer fixtures, trace metrics, and compatibility fixes.
+- Homebrew and `snapsynapse/harnessie-verify-action@v0` are separately propagated
+  downstreams. `NEXT.md` records their exact verified pins and any temporary lag.
+- The 1.2.0 assistant guide is repository-pinned but does not inherit the historical
+  1.1.0 GuideCheck level until its new DNS TXT and hosted-verifier anchors agree.
+- The latest pre-release documentation baseline was 483 passed, 9 skipped, 51/51
+  deterministic evals, 21 outward trust files, and 16 inward files.
   Counts are observations, not a permanent contract; rerun the gates before claiming
   current status.
 - The lead adoption surface is `harnessie verify` for agent-produced changes. Ringer

@@ -68,16 +68,18 @@ are marked OPERATOR. Everything else is a working-tree change committed on
       commits are required, verify the signature from a clean clone before
       publication; otherwise record the explicit rationale and compensating
       immutable digest evidence.
-- [ ] Generate an SBOM for the final wheel and sdist and record its SHA-256
-      alongside the exact release commit and artifact digests.
+- [ ] Generate the release-level CycloneDX SBOM from the final wheel in a
+      clean runtime environment and record its SHA-256 alongside the exact
+      release commit and artifact digests.
 - [ ] Review the current OpenSSF Scorecard result and resolve or explicitly
       accept release-relevant findings. Do not add a score badge unless the
       result is current and its limits are explained.
 - [ ] Annotated tag `git tag -a vX.Y.Z -m "..."`, push the tag. If the release
       requires a signed tag, use the approved signing path instead.
-- [ ] OPERATOR: `gh release create vX.Y.Z dist/* --title ... --notes-file ...`
-      (attaching the built artifacts makes the sidecar
-      `immutable-release-url` resolve).
+- [ ] OPERATOR: publish the GitHub Release from the exact annotated tag with
+      `gh release create vX.Y.Z --title ... --notes-file ...`. The release
+      workflow builds once from that tag and attaches its exact wheel, sdist,
+      CycloneDX SBOM, and checksum record before PyPI publication.
 - [ ] OPERATOR: publish to PyPI through the repository's GitHub Actions
       Trusted Publisher and protected release environment. The workflow must
       build from the exact tag, require the configured environment approval,

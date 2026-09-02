@@ -52,12 +52,12 @@ def _security_fields() -> dict[str, str]:
     return fields
 
 
-def test_agents_json_distinguishes_stable_and_current_source_surfaces():
+def test_agents_json_describes_released_core_and_downstream_boundaries():
     data = _json(AGENTS)
     assert data["product"]["version"] == _project_version()
     assert data["product"]["type"] == "local Python library and CLI"
     assert data["release_context"]["stable_release"] == _project_version()
-    assert data["release_context"]["unreleased_changes_since_stable"] is True
+    assert data["release_context"]["unreleased_changes_since_stable"] is False
     assert {item["id"] for item in data["capabilities"]} == {
         "review-checkout", "verify-claims", "validate-project",
         "inspect-ownership", "run-workflow"}
@@ -71,11 +71,10 @@ def test_agents_json_distinguishes_stable_and_current_source_surfaces():
     capabilities = {item["id"]: item for item in data["capabilities"]}
     assert capabilities["review-checkout"]["human_approval_required"] is True
     guide_status = capabilities["review-checkout"]["integrity_status"]
-    assert "Hosted GuideCheck observed matching DNS TXT" in (
-        guide_status["external_anchor"])
+    assert "1.2.0 DNS TXT" in guide_status["external_anchor"]
     assert guide_status["current_end_to_end_level"].startswith(
-        "Hosted GuideCheck Level 4 confirmed for 1.1.0")
-    assert guide_status["receipt"].endswith(
+        "Pending external re-verification")
+    assert guide_status["historical_receipt"].endswith(
         "/audits/guidecheck-live-result-2026-08-21-v1.1.0.json")
     assert capabilities["inspect-ownership"]["side_effects"] == "read-only"
     assert capabilities["run-workflow"]["human_arbitration_required"] is True
@@ -115,11 +114,11 @@ def test_machine_changelog_tracks_the_packaged_release():
     assert versions[0] == version
     assert len(versions) == len(set(versions))
     assert data["current"]["release"].endswith(f"/v{version}")
-    assert data["unreleased"]["status"] == "active"
-    assert "not in the stable 1.1.0 artifacts" in data["unreleased"]["summary"]
+    assert data["unreleased"]["status"] == "empty"
+    assert data["unreleased"]["summary"] == "No unreleased changes."
 
 
-def test_public_verifier_copy_separates_stable_release_from_current_source():
+def test_public_verifier_copy_describes_the_released_evidence_contract():
     surfaces = {
         "README.md": (ROOT / "README.md").read_text(encoding="utf-8"),
         "docs/GUIDE.md": (DOCS / "GUIDE.md").read_text(encoding="utf-8"),
@@ -128,14 +127,15 @@ def test_public_verifier_copy_separates_stable_release_from_current_source():
         "docs/llms.txt": (DOCS / "llms.txt").read_text(encoding="utf-8"),
     }
     for name, text in surfaces.items():
-        assert "1.1.0" in text, name
-        assert "current source" in text.lower(), name
-        assert "next minor release" in text.lower(), name
+        assert "1.2.0" in text, name
+        assert "evidence bundle" in text.lower() or "evidence-bound" in text.lower(), name
 
-    stable_wheel = "stable 1.1.0 package"
-    assert stable_wheel in surfaces["README.md"]
-    assert "not present in the stable 1.1.0 package" in surfaces["docs/GUIDE.md"]
-    assert "Stable 1.1.0 accepts raw criteria" in surfaces["docs/index.html"]
+    assert "Harnessie 1.2.0 accepts raw criteria or a v1 evidence bundle" in (
+        surfaces["README.md"])
+    assert "Evidence bundles are the stronger 1.2.0 adoption contract" in (
+        surfaces["docs/GUIDE.md"])
+    assert "Harnessie 1.2.0 accepts raw criteria or evidence bundles" in (
+        surfaces["docs/index.html"])
 
 
 def test_cli_manifest_is_complete_and_explicitly_not_hosted():
@@ -146,8 +146,8 @@ def test_cli_manifest_is_complete_and_explicitly_not_hosted():
     assert data["interface"]["network_service"] is False
     assert data["release_context"] == {
         "stable_release": _project_version(),
-        "describes": "current main source",
-        "unreleased_changes_since_stable": True,
+        "describes": "released 1.2.0 core",
+        "unreleased_changes_since_stable": False,
         "note": data["release_context"]["note"],
     }
     assert set(data["paths"]) == {
@@ -197,12 +197,12 @@ def test_public_discovery_links_expose_support_and_machine_resources():
         assert f"https://harnessie.com{path}" in llms
     assert "Contact support" in html
     assert "Report a vulnerability" in html
-    assert "GuideCheck Level 4" in html
-    assert "hash independently pinned" in html
-    assert "exact receipt is tracked" in html
+    assert "1.1 guide: GuideCheck Level 4" in html
+    assert "historical hash independently pinned" in html
+    assert "historical evidence" in html
     assert "opt-in containment" in html.lower()
     assert "operator-trusted in-process code" in html
-    assert "Homebrew also carries the current 1.1.0 release" in html
+    assert "Homebrew is a separately propagated downstream" in html
     assert "Harnessie's Golden Rule for agent work" in html
     assert "Read together." in html
     assert "Write only what you own." in html

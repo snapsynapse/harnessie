@@ -135,7 +135,7 @@ def _metadata(
 
 
 def _scrub_terms(root: Path) -> list[re.Pattern[bytes]]:
-    path = root / "handoffs" / "scrub-list.txt"
+    path = root / ".private-controls" / "scrub-list.txt"
     if not path.is_file():
         return []
     patterns = []

@@ -4,6 +4,12 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+No unreleased changes.
+
+## 1.2.0 (2026-09-01)
+
+Theme: verify agent-produced changes. Harnessie makes its standalone verifier the smallest useful adoption surface, with evidence-bound intake and deterministic claim coverage, while preserving the full governed harness as the growth path.
+
 ### Added
 
 - A direct OpenAI Responses API adapter supports current OpenAI reasoning models with function tools, including high reasoning effort, stateless encrypted-reasoning replay, strict response validation, and usage accounting. The existing `openai-compat` adapter remains the Chat Completions path for Ollama, vLLM, and compatible endpoints.
@@ -17,6 +23,12 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 - Parallel copies of the same denied tool call now count as one failed turn for stuck-loop detection, allowing a verifier to recover on its next turn without weakening the tool allowlist.
 - The standalone verifier prompt now names its exact shell allowlist and directs agents to use `read_file` for staged diffs, reducing avoidable denied calls.
 - Child-process checks ignore operator-wide Git configuration, preventing global signing, hooks, aliases, or credential helpers from contaminating verification fixtures.
+- Release artifact inspection again loads private scrub patterns from `.private-controls/scrub-list.txt`, with a regression test that prevents the path from drifting back to the temporary handoff queue.
+
+### Verified
+
+- The composed release gate passes 492 tests with one environment-dependent skip, 51/51 deterministic evals, all nine shipped authoring documents, both manifests, ecosystem and generated-doc validation, isolated wheel and source builds, `twine check`, release-artifact inspection, and a fresh-install smoke from the built wheel.
+- The exact release commit, artifact and SBOM digests, publication attestations, and downstream versions are recorded during release closeout in `RELEASE_NOTES-1.2.0.md` and `NEXT.md`.
 
 ## 1.1.0 (2026-08-20)
 

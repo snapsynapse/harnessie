@@ -14,10 +14,9 @@ means the operator does not need to be a developer (declared token/dollar ceilin
 named halt conditions each with one plain operator action, disagreement surfaced as a
 human decision rather than a silent merge).
 
-Shipped as the `harnessie` Python package (Apache-2.0, stable 1.1.0). The verifier also
-ships standalone as a GitHub Action (Harnessie Verify) for gating PRs. Current source
-contains unreleased evidence-bound and structured-verdict work intended for the next
-minor release; public copy must not attribute those additions to the 1.1.0 artifacts.
+Shipped as the `harnessie` Python package (Apache-2.0, stable 1.2.0). The verifier also
+ships standalone as a separately versioned GitHub Action (Harnessie Verify) for gating
+PRs. Core 1.2.0 includes evidence-bound intake and structured required-claim verdicts.
 
 ## Audience
 
@@ -53,11 +52,11 @@ trademark and PAICE.work PBC spec/code carveouts recorded in NOTICE.
 
 ## Current status (2026-09-01)
 
-Active and healthy. v1.1.0 is the stable core release on PyPI, GitHub, and
-Homebrew. The separately owned Verify Action v0.1.3 and stable `v0` tag pin the
-same tested core release. Current `main` adds OpenAI Responses support,
-evidence bundles, structured claim verdicts, Ringer regression fixtures, and
-event-trace metrics; those changes are not yet a published release. The docs site is
+Active and healthy. v1.2.0 is the stable core release on PyPI and GitHub. It adds
+OpenAI Responses support, evidence bundles, structured claim verdicts, Ringer
+regression fixtures, and event-trace metrics. Homebrew and the separately owned Verify
+Action are independent propagation surfaces whose verified pins are recorded in
+NEXT.md. The docs site is
 live, and the dated 2026-08-05 Siteline scan scored it A, 97/100. Public-facing doc pages under `docs/` are generated
 from markdown via `scripts/build_docs_html.py` (edit markdown, rebuild, commit both).
 AIDR-0008 is arbitrated and executed in the independent engine-wrappers release train.
@@ -81,4 +80,4 @@ write only what you own. The read-only `harnessie ownership` command explains th
 ledger decision, and the zero-model collision example proves a second agent cannot
 overwrite the first agent's artifact through the built-in write path.
 
-The 1.1.0 assistant guide re-earned hosted GuideCheck Level 4 on 2026-08-21 UTC with zero blocking findings. Its served bytes, sidecar, independently controlled DNS TXT, and repository-file anchor match SHA-256 `f7d45f62f2941f5541d1342be0fc037c1ef7fc3e06f44ad39cf94a5b50e5080d`.
+The 1.1.0 assistant guide re-earned hosted GuideCheck Level 4 on 2026-08-21 UTC with zero blocking findings. That receipt remains historical evidence. The 1.2.0 guide must earn its own matching served bytes, sidecar, independently controlled DNS TXT, and hosted-verifier result before any current end-to-end level is claimed.

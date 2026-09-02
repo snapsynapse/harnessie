@@ -1,0 +1,128 @@
+name: release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+      - name: Verify release identity
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          version="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          test "$RELEASE_TAG" = "v$version"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - name: Install release dependencies and sandbox backend
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bubblewrap
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          python -m pip install -e '.[dev]'
+          python -m pip install 'uv==0.11.8' 'cyclonedx-bom==7.3.1'
+      - name: Assert confinement and run exact-tag release gate
+        run: |
+          python -c "from harness import sandbox; backend = sandbox.backend_name(); assert backend == 'bwrap', backend"
+          python scripts/release_gate.py
+          node scripts/check-search.mjs
+      - name: Build final distributions once
+        run: |
+          python -m build --outdir dist
+          python -m twine check dist/*
+          python scripts/check_release_artifacts.py dist
+          python scripts/fresh_install_smoke.py dist/harnessie-*.whl
+      - name: Generate reproducible CycloneDX SBOM and checksums
+        run: |
+          version="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          mkdir -p release
+          uv venv /tmp/harnessie-release-runtime
+          uv pip install --python /tmp/harnessie-release-runtime/bin/python dist/harnessie-*.whl
+          cyclonedx-py environment /tmp/harnessie-release-runtime/bin/python \
+            --pyproject pyproject.toml \
+            --mc-type library \
+            --spec-version 1.6 \
+            --output-format JSON \
+            --output-reproducible \
+            --validate \
+            --output-file "release/harnessie-$version.cdx.json"
+          cyclonedx-py environment /tmp/harnessie-release-runtime/bin/python \
+            --pyproject pyproject.toml \
+            --mc-type library \
+            --spec-version 1.6 \
+            --output-format JSON \
+            --output-reproducible \
+            --validate \
+            --output-file /tmp/harnessie-release-sbom-second.json
+          cmp "release/harnessie-$version.cdx.json" /tmp/harnessie-release-sbom-second.json
+          sha256sum dist/* "release/harnessie-$version.cdx.json" > "release/harnessie-$version.SHA256SUMS"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: python-package-distributions
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: release-integrity
+          path: release/
+          if-no-files-found: error
+          retention-days: 7
+
+  attach-release-assets:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: python-package-distributions
+          path: dist/
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: release-integrity
+          path: release/
+      - name: Attach exact distributions and integrity evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" dist/* release/*
+
+  publish-pypi:
+    needs: [build, attach-release-assets]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/harnessie/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish distributions with attestations
+        uses: pypa/gh-action-pypi-publish@a892a5a61159132606e93a2fa6f4358831b04d26 # v1.14.2
+        with:
+          packages-dir: dist/
+          attestations: true
