@@ -158,6 +158,16 @@ Deliberately after 1.0, not before:
 - Multi-orchestrator handoffs, only if a documented real job demonstrates that a single orchestrator cannot hold it. In the absence of that evidence this is not a 1.0 requirement.
 - Truthful operating-mode controls. The current `--approve-interactive` handler covers only tools declared `requires_approval`; it is not an every-side-effect approval mode. A future such mode must mediate every write and execute tool structurally. Delegated external operators also remain outside Harnessie's human-vs-agent identity proof until the audit contract can authenticate those seats.
 
+### Post-1.2 supply-chain and evaluation candidates
+
+These are general roadmap items, not incomplete 1.2.0 release gates. The exact 1.2.0 artifacts, downstreams, and first OpenSSF measurement are already recorded in `RELEASE_NOTES-1.2.0.md` and `audits/openssf-scorecard-2026-09-02.json`.
+
+- Reproducible Python CI dependency locks. Evaluate a hash-pinned development and release-gate lock without weakening the current clean-install test against declared package constraints. Acceptance: the lock has a documented update path, CI installs it with hash verification, release artifact tests still exercise the declared public dependency range, and stale-lock drift fails deterministically.
+- GitHub-native release-asset provenance. Extend the trusted release workflow so the wheel, source distribution, SBOM, and checksum record receive verifiable GitHub OIDC provenance in addition to the shipped PyPI attestations. Acceptance: exact downloaded GitHub Release assets verify against the repository and workflow identity, and the verification commands and resulting subject digests are recorded during closeout.
+- Parser and state fuzzing. Start with evidence bundles, structured verifier verdicts, workflow/schema documents, event journals, and resume-state inputs rather than adding a badge-only integration. Acceptance: a coverage-guided or property-based harness runs in CI on a bounded corpus, malformed input always refuses or returns a documented error, and any discovered crash becomes a permanent deterministic regression fixture.
+- Repository governance proportional to the maintainer model. Branch protection, required review, emergency recovery, and release permissions must be designed together rather than enabled to improve an aggregate score. Acceptance: the provider ruleset names required checks, prevents unreviewed unsafe paths, preserves a documented recovery route, and is exercised without deadlocking the current maintainer workflow.
+- OpenSSF Best Practices enrollment remains optional until its questionnaire would produce useful public operating evidence. Acceptance is truthful completion with citations and maintained answers, not the badge alone.
+
 ## Platform support
 
 ### Supported today

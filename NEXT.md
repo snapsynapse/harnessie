@@ -43,6 +43,11 @@ The repository, website, and agent-surface audit found one high-priority release
 
 1. Update the DNS TXT anchor to released guide SHA-256 `ff77d219add6f1cf6a22c4570830f9fbd70cedd59f3caa933fbd0c7ae3733421` and rerun hosted GuideCheck, then replace pending language only if all anchors agree.
 
+## Specific follow-up sessions
+
+1. Review Dependabot pull requests [#4](https://github.com/snapsynapse/harnessie/pull/4), [#5](https://github.com/snapsynapse/harnessie/pull/5), [#6](https://github.com/snapsynapse/harnessie/pull/6), and [#7](https://github.com/snapsynapse/harnessie/pull/7). Merge only updates whose immutable commits, release tags, diffs, and required checks verify; otherwise close with a recorded rationale. Consolidate future GitHub Actions updates if separate PR churn outweighs review clarity.
+2. Decide the `main` branch and review policy as a provider-governance session. Model the current maintainer path before enabling rules, require the exact CI and security checks that should gate merges, preserve an explicit emergency path, and verify the ruleset does not deadlock release recovery.
+
 ## External and optional checks
 
 - Live provider scorecards require explicit opt-in through `HARNESSIE_LIVE=1` and the relevant configured endpoint or credential.
