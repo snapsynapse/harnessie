@@ -447,7 +447,7 @@ def _run_parallel_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
                 return _turn({"tool": "task_complete",
                               "args": {"report": '{"passed": true, "reasons": "artifact ok"}'}}, 1)
             if "Write left" in task or "Write right" in task:
-                time.sleep(0.2)
+                time.sleep(float(scenario.get("mock_delay_seconds", 0.2)))
                 return _turn({"tool": "accept_task", "args": {}}, 1)
             if "Summarize" in task:
                 return _turn({"tool": "task_complete", "args": {"report": "FINAL"}}, 1)

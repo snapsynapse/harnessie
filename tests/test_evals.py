@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import yaml
+
 from harness.cli import main
 from harness.evals import _check_events_absent, run_eval_suite
 
@@ -17,6 +19,19 @@ def test_redteam_eval_suite_passes():
     scorecard = run_eval_suite(ROOT, ROOT / "evals" / "redteam.yaml")
     assert scorecard["total"] == 3
     assert scorecard["passed"] == scorecard["total"]
+
+
+def test_parallel_timing_eval_separates_parallel_from_sequential_execution():
+    suite = yaml.safe_load(
+        (ROOT / "evals" / "operability.yaml").read_text(encoding="utf-8"))
+    scenario = next(
+        item for item in suite["scenarios"]
+        if item["id"] == "parallel_phases_use_independent_workspaces")
+
+    delay = float(scenario["mock_delay_seconds"])
+    threshold = float(scenario["expect_elapsed_lt"])
+    assert delay < threshold
+    assert threshold <= (2 * delay) - 0.10
 
 
 def test_events_absent_check_can_fail(tmp_path):

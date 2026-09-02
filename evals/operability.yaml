@@ -49,7 +49,8 @@ scenarios:
   - id: parallel_phases_use_independent_workspaces
     kind: parallel
     expect_statuses: [passed, passed, passed, passed]
-    expect_elapsed_lt: 0.35
+    mock_delay_seconds: 0.30
+    expect_elapsed_lt: 0.50
     expect_files:
       left/out.txt: left
       right/out.txt: right

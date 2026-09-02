@@ -27,7 +27,7 @@ Theme: verify agent-produced changes. Harnessie makes its standalone verifier th
 
 ### Verified
 
-- The composed release gate passes 492 tests with one environment-dependent skip, 51/51 deterministic evals, all nine shipped authoring documents, both manifests, ecosystem and generated-doc validation, isolated wheel and source builds, `twine check`, release-artifact inspection, and a fresh-install smoke from the built wheel.
+- The composed release gate passes 493 tests with one environment-dependent skip, 51/51 deterministic evals, all nine shipped authoring documents, both manifests, ecosystem and generated-doc validation, isolated wheel and source builds, `twine check`, release-artifact inspection, and a fresh-install smoke from the built wheel.
 - The exact release commit, artifact and SBOM digests, publication attestations, and downstream versions are recorded during release closeout in `RELEASE_NOTES-1.2.0.md` and `NEXT.md`.
 
 ## 1.1.0 (2026-08-20)
