@@ -2,6 +2,7 @@
 
 Date: 2026-09-01
 Audited base: `965670a8d0fe8dc34cb7a5a20bb4afd75551b5c2`
+Remediation commit: `388c490ba9bf7bdb8d33cdb4ca2a1d9f3fc25705`
 Scope: Harnessie repository, generated and deployed documentation, public machine resources, Ringer adoption surface, temporary handoffs, release truth, search contracts, and homepage accessibility.
 
 ## Verdict
@@ -40,9 +41,13 @@ This remediation separates stable release artifacts from current source, makes R
 - Root and served assistant guides remain byte-identical at SHA-256 `f7d45f62f2941f5541d1342be0fc037c1ef7fc3e06f44ad39cf94a5b50e5080d`.
 - Local Lighthouse 13.4.1 accessibility score: 1.00 with no failing accessibility audits on the homepage and all nine generated documentation routes.
 - `git diff --check`: passed.
+- Exact-head GitHub CI run `33578047382`: passed.
+- Exact-head GitHub Pages run `33578046788`: passed, including deployment.
+- Sixteen deployed page and machine-resource surfaces were byte-identical to the remediation commit.
+- `node scripts/check-production-search.mjs`: 10 deployed sitemap pages, 0 defects, 0 infrastructure failures.
+- GitHub description and topics were reread after mutation and match the verifier-first positioning.
 
 ## Remaining gates
 
-- These changes are working-tree edits until separately committed and pushed. The remediated website is not deployed until GitHub Pages publishes that commit and exact live bytes are rechecked.
 - Browser automation does not substitute for manual screen-reader, keyboard, zoom, and other assistive-technology testing.
 - The 1.2.0 candidate remains open. Version bump, release commit, artifact build, publication, downstream propagation, assistant-guide rotation, DNS, and hosted verification remain separate authority gates.

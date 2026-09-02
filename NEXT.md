@@ -14,13 +14,14 @@ The lead adoption surface is `harnessie verify` as a fail-closed intake gate for
 
 ## Verified evidence
 
-The latest completed exact-head source verification before the documentation audit was:
+The deployed documentation-remediation head `388c490` has the following evidence:
 
-- `python3 -m pytest -q`: 481 passed, 9 skipped.
+- `python3 -m pytest -q`: 483 passed, 9 skipped.
 - `python3 -m harness.cli eval`: 51/51 passed.
-- `python3 -m harness.cli verify-manifest`: 20 outward files passed.
+- `python3 -m harness.cli verify-manifest`: 21 outward files passed.
 - `python3 -m harness.cli verify-inward-manifest`: 16 inward files passed.
-- GitHub CI and Pages passed at `965670a` after the portability repair.
+- Exact-head GitHub CI run `33578047382` and Pages deployment run `33578046788` passed.
+- Sixteen deployed page and machine-resource surfaces were byte-identical to the commit, and the production search contract reported ten sitemap pages with zero defects or infrastructure failures.
 - PyPI, GitHub Release, Homebrew, and stable Verify Action remain on 1.1.0.
 
 Skip counts depend on local sandbox and live-provider availability. Treat command outcomes and exact revisions as the contract, not fixed counts copied into future guides.
@@ -37,7 +38,7 @@ The repository, website, and agent-surface audit found one high-priority release
 
 ## Release candidate order
 
-After this remediation is reviewed and committed:
+With the documentation remediation deployed:
 
 1. Re-run the full repository, docs, search, manifest, and accessibility checks and record the exact candidate evidence.
 2. Review the 1.2.0 milestone and release provenance requirements, including Trusted Publishing, protected environment approval, artifact attestations, SBOM digests, signing policy, and the current OpenSSF Scorecard result.
