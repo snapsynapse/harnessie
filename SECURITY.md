@@ -116,7 +116,7 @@ A worker phase may declare `phase_type`. Harnessie hashes the exact normalized p
 
 ## Reporting a vulnerability
 
-Use GitHub private vulnerability reporting on this repository (Security tab, "Report a vulnerability") so the report stays private until a fix ships. If that path is unavailable, open an issue that says only "security contact requested" with no details, and a private channel will be arranged. Please do not disclose publicly before a fix is released; there is no bounty program, but reports are credited in the changelog unless you ask otherwise.
+Use [GitHub private vulnerability reporting](https://github.com/snapsynapse/harnessie/security/advisories/new) so the report stays private until a fix ships. If that path is unavailable, [open an issue](https://github.com/snapsynapse/harnessie/issues/new) that says only "security contact requested" with no details, and a private channel will be arranged. Please do not disclose publicly before a fix is released; there is no bounty program, but reports are credited in the changelog unless you ask otherwise.
 
 In scope: anything that falsifies a claim in this document or in [docs/threat-model.md](docs/threat-model.md) — a sandbox escape, a secret reaching the events log or a workspace artifact, an approval or consent gate bypassed, a hash chain that verifies after tampering. Out of scope: attacks requiring control of the operator's machine or environment variables, and the residual risks the threat model already states plainly.
 

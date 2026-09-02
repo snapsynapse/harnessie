@@ -9,6 +9,7 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 - Release recovery can verify and republish the exact distributions already attached to a GitHub Release, while no-checkout asset jobs pass explicit repository identity to GitHub CLI.
 - The PyPI publishing action is pinned to the annotated upstream release tag's peeled commit, matching the immutable container digest available from the publisher.
 - A repository-owned, fully commit-pinned OpenSSF Scorecard workflow publishes weekly and default-branch results, retains the SARIF artifact, and uploads findings to code scanning.
+- CI and PR-verifier workflows declare read-only token defaults and pin every action to an immutable commit; Dependabot now covers Python and GitHub Actions dependencies, CodeQL supplies repository-owned Python SAST, and the security policy links directly to private reporting.
 
 ### Documentation
 
