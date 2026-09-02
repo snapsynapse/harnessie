@@ -21,6 +21,7 @@ Harnessie 1.2.0 makes `harnessie verify` the smallest independently useful adopt
 
 ## Trust and downstream boundaries
 
+- Manual keyboard-only, 200% zoom/reflow, and screen-reader testing was not completed before publication. On 2026-09-01 the release owner explicitly authorized a one-time 1.2.0 waiver after reviewing that gap. Automated Lighthouse 13.4.1 checks scored 1.00 with no failing accessibility audits on the homepage and all nine generated routes, but that evidence is not represented as a substitute for assistive-technology testing. The manual gate remains required for later releases.
 - The 1.2.0 assistant guide, served copy, provenance sidecar, and repository trust pins move together. Its new DNS TXT anchor and hosted GuideCheck run are separate external gates. The 1.1.0 Level 4 receipt remains dated historical evidence and is not inherited by the new guide bytes.
 - Harnessie Verify Action and Homebrew are separately released downstreams. Do not assume they expose the 1.2.0 evidence-bundle contract until their own pins and gates are verified.
 - Engine wrappers retain their independent probe-gated release train because 1.2.0 consumes no new versioned wrapper seam.
