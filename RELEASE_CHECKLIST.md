@@ -21,6 +21,10 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 - [ ] `python3 -m harness.cli verify-inward-manifest` passes.
 - [ ] `python3 -m harness.cli validate` passes all shipped authoring documents.
 - [ ] `git diff --check` clean.
+- [ ] Manual accessibility evidence is current for changed public routes:
+      keyboard-only navigation and controls, 200% zoom/reflow, and at least
+      one screen-reader pass. Record the date, route set, OS, browser, and
+      assistive technology; do not substitute Lighthouse for this check.
 - [ ] `python3 scripts/ecosystem_status.py --validate` passes and
       `ECOSYSTEM.md` still describes the intended dependency direction.
 

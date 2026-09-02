@@ -49,5 +49,5 @@ This remediation separates stable release artifacts from current source, makes R
 
 ## Remaining gates
 
-- Browser automation does not substitute for manual screen-reader, keyboard, zoom, and other assistive-technology testing.
+- Browser automation does not substitute for manual screen-reader, keyboard, zoom, and other assistive-technology testing. `RELEASE_CHECKLIST.md` now requires dated keyboard, 200% zoom/reflow, and screen-reader evidence for changed public routes before release.
 - The 1.2.0 candidate remains open. Version bump, release commit, artifact build, publication, downstream propagation, assistant-guide rotation, DNS, and hosted verification remain separate authority gates.
