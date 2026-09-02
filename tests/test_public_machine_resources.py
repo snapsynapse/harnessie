@@ -52,10 +52,12 @@ def _security_fields() -> dict[str, str]:
     return fields
 
 
-def test_agents_json_describes_only_shipped_local_surfaces():
+def test_agents_json_distinguishes_stable_and_current_source_surfaces():
     data = _json(AGENTS)
     assert data["product"]["version"] == _project_version()
     assert data["product"]["type"] == "local Python library and CLI"
+    assert data["release_context"]["stable_release"] == _project_version()
+    assert data["release_context"]["unreleased_changes_since_stable"] is True
     assert {item["id"] for item in data["capabilities"]} == {
         "review-checkout", "verify-claims", "validate-project",
         "inspect-ownership", "run-workflow"}
@@ -113,6 +115,27 @@ def test_machine_changelog_tracks_the_packaged_release():
     assert versions[0] == version
     assert len(versions) == len(set(versions))
     assert data["current"]["release"].endswith(f"/v{version}")
+    assert data["unreleased"]["status"] == "active"
+    assert "not in the stable 1.1.0 artifacts" in data["unreleased"]["summary"]
+
+
+def test_public_verifier_copy_separates_stable_release_from_current_source():
+    surfaces = {
+        "README.md": (ROOT / "README.md").read_text(encoding="utf-8"),
+        "docs/GUIDE.md": (DOCS / "GUIDE.md").read_text(encoding="utf-8"),
+        "docs/ringer.md": (DOCS / "ringer.md").read_text(encoding="utf-8"),
+        "docs/index.html": (DOCS / "index.html").read_text(encoding="utf-8"),
+        "docs/llms.txt": (DOCS / "llms.txt").read_text(encoding="utf-8"),
+    }
+    for name, text in surfaces.items():
+        assert "1.1.0" in text, name
+        assert "current source" in text.lower(), name
+        assert "next minor release" in text.lower(), name
+
+    stable_wheel = "stable 1.1.0 package"
+    assert stable_wheel in surfaces["README.md"]
+    assert "not present in the stable 1.1.0 package" in surfaces["docs/GUIDE.md"]
+    assert "Stable 1.1.0 accepts raw criteria" in surfaces["docs/index.html"]
 
 
 def test_cli_manifest_is_complete_and_explicitly_not_hosted():
@@ -121,6 +144,12 @@ def test_cli_manifest_is_complete_and_explicitly_not_hosted():
     assert data["interface"]["kind"] == "local process interface"
     assert data["interface"]["hosted"] is False
     assert data["interface"]["network_service"] is False
+    assert data["release_context"] == {
+        "stable_release": _project_version(),
+        "describes": "current main source",
+        "unreleased_changes_since_stable": True,
+        "note": data["release_context"]["note"],
+    }
     assert set(data["paths"]) == {
         "run", "resume", "report", "audit", "eval", "verify-manifest",
         "verify-inward-manifest", "approve-maiden", "verify", "init", "validate",
@@ -160,6 +189,7 @@ def test_security_txt_has_a_current_rfc9116_contact_contract():
 def test_public_discovery_links_expose_support_and_machine_resources():
     html = (DOCS / "index.html").read_text(encoding="utf-8")
     llms = (DOCS / "llms.txt").read_text(encoding="utf-8")
+    assert (DOCS / "llm.txt").read_bytes() == (DOCS / "llms.txt").read_bytes()
     for path in (
         "/agents.json", "/api/v1/index.json", "/changelog.json",
         "/.well-known/security.txt"):
@@ -195,6 +225,33 @@ def test_public_discovery_links_expose_support_and_machine_resources():
     agents = _json(AGENTS)
     assert agents["discovery"]["agent_file_ownership"] == (
         "https://harnessie.com/agent-file-ownership.html")
+    assert agents["discovery"]["ringer"] == "https://harnessie.com/ringer.html"
+    assert "https://harnessie.com/ringer.html" in llms
+    assert 'href="/ringer.html"' in html
+
+    for page in ("quickstart.html", "guide.html", "ringer.html"):
+        generated = (DOCS / page).read_text(encoding="utf-8")
+        assert 'href="/ringer.html"' in generated
+
+
+def test_homepage_preserves_lighthouse_accessibility_repairs():
+    html = (DOCS / "index.html").read_text(encoding="utf-8")
+    assert 'aria-label="Star on GitHub"' in html
+    assert '<h4>It scopes first</h4>' not in html
+    for heading in (
+        "It scopes first", "It checks its work", "You have the final say",
+        "It keeps the receipts",
+    ):
+        assert f"<h3>{heading}</h3>" in html
+    assert "p a { text-decoration: underline;" in html
+    assert ".foot-col .head" in html and "color: var(--text-muted);" in html
+    assert ".foot-note" in html and "font-size: 0.78rem; color: var(--text-muted);" in html
+
+    generated = (DOCS / "ringer.html").read_text(encoding="utf-8")
+    assert ".doc-toc .toc-title" in generated
+    assert "color: var(--text-muted);" in generated
+    assert ".doc-content p a, .doc-content li a, footer p a" in generated
+    assert "text-decoration: underline; text-underline-offset: 0.14em;" in generated
 
 
 def test_agent_file_ownership_claim_is_bounded_and_falsifiable():

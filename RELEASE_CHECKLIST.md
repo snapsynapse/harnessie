@@ -60,13 +60,28 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 ## 5. Tag and publish
 
 - [ ] Commit steps 2-3 on `main` and push.
-- [ ] Annotated tag `git tag -a vX.Y.Z -m "..."`, push the tag.
+- [ ] Record the release-signing decision for this version. If signed tags or
+      commits are required, verify the signature from a clean clone before
+      publication; otherwise record the explicit rationale and compensating
+      immutable digest evidence.
+- [ ] Generate an SBOM for the final wheel and sdist and record its SHA-256
+      alongside the exact release commit and artifact digests.
+- [ ] Review the current OpenSSF Scorecard result and resolve or explicitly
+      accept release-relevant findings. Do not add a score badge unless the
+      result is current and its limits are explained.
+- [ ] Annotated tag `git tag -a vX.Y.Z -m "..."`, push the tag. If the release
+      requires a signed tag, use the approved signing path instead.
 - [ ] OPERATOR: `gh release create vX.Y.Z dist/* --title ... --notes-file ...`
       (attaching the built artifacts makes the sidecar
       `immutable-release-url` resolve).
-- [ ] OPERATOR: `twine upload dist/*` (irreversible; a PyPI version can be
-      yanked but never replaced). Verify a fresh `pip install harnessie`
-      from the live index.
+- [ ] OPERATOR: publish to PyPI through the repository's GitHub Actions
+      Trusted Publisher and protected release environment. The workflow must
+      build from the exact tag, require the configured environment approval,
+      and expose PyPI attestations. A local `twine upload` is an emergency
+      fallback only under separate explicit authority and a recorded reason.
+- [ ] Verify the immutable PyPI files, integrity metadata, attestations, and a
+      fresh `pip install harnessie` from the live index against the recorded
+      artifact digests.
 - [ ] OPERATOR: test the released core version in
       `snapsynapse/harnessie-verify-action`, update the default
       `harnessie-version` pin in `action.yml`, run its full CI, and release a

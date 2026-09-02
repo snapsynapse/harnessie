@@ -6,13 +6,19 @@
     "transport": "command line",
     "hosted": false,
     "network_service": false,
-    "description": "Machine-readable synopsis of the local CLI shipped by the named Harnessie package version. This is not a hosted HTTP API."
+    "description": "Machine-readable synopsis of the current main-source CLI. This is not a hosted HTTP API and may include unreleased additions beyond the stable package."
   },
   "package": {
     "name": "harnessie",
     "version": "1.1.0",
     "registry": "https://pypi.org/project/harnessie/",
     "source": "https://github.com/snapsynapse/harnessie"
+  },
+  "release_context": {
+    "stable_release": "1.1.0",
+    "describes": "current main source",
+    "unreleased_changes_since_stable": true,
+    "note": "The stable 1.1.0 package accepts raw criteria. Evidence-bundle intake and structured claim verdicts are current-source additions intended for the next minor release."
   },
   "global_options": {
     "--root": "Project root; defaults to the current working directory."
@@ -89,5 +95,5 @@
     "policy": "The six v1 authoring schemas and harnessie.tools.v1 plugin contract are stable for the 1.x line under SCHEMA_COMPATIBILITY.md and PLUGIN_CONTRACT.md."
   },
   "canonical": "https://harnessie.com/api/v1/index.json",
-  "last_updated": "2026-08-20"
+  "last_updated": "2026-09-01"
 }

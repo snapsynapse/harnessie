@@ -60,7 +60,7 @@
     .doc-grid.no-toc { grid-template-columns: 1fr; max-width: 820px; }
     .doc-grid.no-toc .doc-toc { display: none; }
     .doc-toc { position: sticky; top: 74px; align-self: start; max-height: calc(100vh - 96px); overflow-y: auto; border-right: 1px solid var(--border-soft); padding-right: 1.25rem; }
-    .doc-toc .toc-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-faint); margin-bottom: 0.85rem; }
+    .doc-toc .toc-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.85rem; }
     .doc-toc .toc-nav { display: flex; flex-direction: column; gap: 0.1rem; }
     .doc-toc .toc-link { font-size: 0.86rem; color: var(--text-muted); padding: 0.32rem 0 0.32rem 0.8rem; border-left: 2px solid var(--border-soft); transition: color .15s, border-color .15s; }
     .doc-toc .toc-link:hover { color: var(--text); text-decoration: none; }
@@ -68,13 +68,14 @@
 
     /* Content typography */
     .doc-content { min-width: 0; max-width: 760px; }
-    .doc-content .crumb { font-size: 0.88rem; color: var(--text-faint); margin-bottom: 1.1rem; }
-    .doc-content .crumb a { color: var(--text-faint); text-decoration: underline; text-decoration-color: var(--border); }
+    .doc-content .crumb { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.1rem; }
+    .doc-content .crumb a { color: var(--text-muted); text-decoration: underline; text-underline-offset: 0.14em; }
     .doc-content h1 { font-size: 2.2rem; line-height: 1.18; letter-spacing: -0.02em; font-weight: 800; margin-bottom: 0.9rem; }
     .doc-content h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; margin: 2.5rem 0 0.9rem; scroll-margin-top: 84px; }
     .doc-content h3 { font-size: 1.15rem; font-weight: 600; margin: 1.7rem 0 0.5rem; scroll-margin-top: 84px; }
     .doc-content h4 { font-size: 1rem; font-weight: 600; margin: 1.3rem 0 0.4rem; scroll-margin-top: 84px; }
     .doc-content p { margin: 0 0 1rem; color: var(--text-mid); }
+    .doc-content p a, .doc-content li a, footer p a { text-decoration: underline; text-underline-offset: 0.14em; }
     .doc-content ul, .doc-content ol { margin: 0 0 1.1rem 1.3rem; color: var(--text-mid); }
     .doc-content li { margin-bottom: 0.4rem; }
     .doc-content strong { color: var(--text); }
@@ -117,6 +118,7 @@
       <a href="/brains.html">Brains</a>
       <a href="/threat-model.html">Threat model</a>
       <a href="/compare.html">Compare</a>
+      <a href="/ringer.html" aria-current="page">Ringer</a>
       <a href="https://github.com/snapsynapse/harnessie" class="gh-star" target="_blank" rel="noopener" aria-label="Star snapsynapse/harnessie on GitHub"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg><span>GitHub</span></a>
     </div>
   </div>
@@ -143,18 +145,18 @@
   &quot;check&quot;: &quot;harnessie verify --workspace {taskdir} --criteria acceptance.md --models models.yaml&quot;
 }</code></pre>
 <p>The worker&#x27;s own claims stop being the evidence; a model that never saw the worker&#x27;s reasoning has to reproduce them. Fail-closed: 0 verified, 1 failed, 2 cannot-verify (nothing was observed, so nothing is asserted). For GitHub-hosted repos the same contract ships packaged as a one-file-install Action: <a href="https://github.com/snapsynapse/harnessie-verify-action">harnessie-verify-action</a>.</p>
-<p>For a durable Ringer intake gate, prefer a v1 evidence bundle over the raw PR body. The bundle assigns stable IDs to the claims being graded and binds them to the exact Git revision and dirty state, content-addressed diffs and logs, and the deterministic commands that produced those logs. Harnessie rejects a stale or incomplete bundle before spending model tokens. Proof files stay outside the checkout and are exposed to the verifier through a quarantined read-only evidence tool.</p>
+<p>The stable 1.1.0 package and Verify Action accept the raw criteria form above. Current source on <code>main</code>, intended for the next minor release, adds a stronger Ringer intake contract: a v1 evidence bundle. The bundle assigns stable IDs to the claims being graded and binds them to the exact Git revision and dirty state, content-addressed diffs and logs, and the deterministic commands that produced those logs. Harnessie rejects a stale or incomplete bundle before spending model tokens. Proof files stay outside the checkout and are exposed to the verifier through a quarantined read-only evidence tool.</p>
 <h2 id="verifying-an-agent-produced-pull-request">Verifying an agent-produced pull request</h2>
 <p>The same command reviews PR-shaped work anywhere. The recipe: check out the PR head, stage its diff alongside it (<code>git diff &lt;base&gt;..HEAD &gt; PR.diff</code>, so the verifier can judge change-surface claims without git), distill the PR body&#x27;s claims into a criteria file, then:</p>
 <pre><code>harnessie verify --workspace &lt;checkout&gt; --criteria claims.md \
   --check &quot;python3 -m pytest tests/ -q&quot; --models models.yaml</code></pre>
-<p>The report answers claim by claim: reproduced, refuted, or not verifiable in this environment, with the evidence named. The overall exit is derived rather than improvised: every required claim reproduced is 0; any required claim refuted is 1; no refutation but at least one required claim not verifiable is 2. The first public run of this recipe <a href="https://github.com/NateBJones-Projects/ringer/pull/4">refuted a claim in its own author&#x27;s pull request</a>, which was the point: a verifier that has never failed its own author is a rubber stamp. The decision record behind the feature (four providers&#x27; independent positions, preserved dissent, human arbitration) is public: <a href="https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0006-standalone-verifier-surface-for-agent-produced-prs.md">AIDR-0006</a>.</p>
+<p>Current source reports claim by claim: reproduced, refuted, or not verifiable in this environment, with the evidence named. The overall exit is derived rather than improvised: every required claim reproduced is 0; any required claim refuted is 1; no refutation but at least one required claim not verifiable is 2. Stable 1.1.0 retains its legacy boolean verifier result while preserving the same fail-closed 0/1/2 process contract. The first public run of this recipe <a href="https://github.com/NateBJones-Projects/ringer/pull/4">refuted a claim in its own author&#x27;s pull request</a>, which was the point: a verifier that has never failed its own author is a rubber stamp. The decision record behind the feature (four providers&#x27; independent positions, preserved dissent, human arbitration) is public: <a href="https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0006-standalone-verifier-surface-for-agent-produced-prs.md">AIDR-0006</a>.</p>
 <h2 id="if-you-came-from-ringer">If you came from Ringer</h2>
 <p>You already have parallel execution and verification-by-check. Harnessie adds four things, for when you need them:</p>
 <ul><li>An independent verifier agent, not only a shell check: a fresh-context model that judges the artifact against your acceptance criteria and can only pass or fail it, never wave it through. Available inside a governed run, or standalone as <code>harnessie verify</code>.</li><li>An opt-in containment boundary: when enabled, structured PII is stripped to placeholders, a secret in an outbound payload halts the run, and declared free-text-sensitive work stays on controlled tiers. The default is off, and the coverage is deliberately per data class rather than total.</li><li>Decisions, not only tasks: when a step is a judgment call rather than an implementation, run it as a contested decision with preserved dissent and human arbitration.</li><li>A tamper-evident audit: a hash-chained log of every action, agent and human, that you can verify and hand to a reviewer.</li></ul>
 <p>If you never need those, Ringer alone is the lighter tool, and that is the honest recommendation.</p>
 <h2 id="see-also">See also</h2>
-<ul><li><a href="/compare.html">How Harnessie compares</a> to agent frameworks and guardrail tools, for the wider landscape.</li><li><a href="https://unlock-ai.natebjones.com/guides/ringer">Ringer</a>, by Nate Jones.</li></ul>
+<ul><li><a href="/compare.html">How Harnessie compares</a> to agent frameworks and guardrail tools, for the wider landscape.</li><li><a href="https://github.com/NateBJones-Projects/ringer">Ringer</a>, by Nate Jones.</li></ul>
   </main>
 </div>
 <footer>
@@ -168,6 +170,7 @@
       <a href="/brains.html">Brains</a>
       <a href="/threat-model.html">Threat model</a>
       <a href="/compare.html">Compare</a>
+      <a href="/ringer.html">Ringer</a>
     </div>
     <p>Harnessie &middot; <a href="https://github.com/snapsynapse/harnessie/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a> &middot; A <a href="https://snapsynapse.com/" target="_blank" rel="noopener">Snap Synapse</a> project. This page is generated from <a href="https://github.com/snapsynapse/harnessie/blob/main/docs/ringer.md" target="_blank" rel="noopener">docs/ringer.md</a>.</p>
   </div>

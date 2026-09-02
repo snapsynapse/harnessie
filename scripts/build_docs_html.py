@@ -71,10 +71,9 @@ PAGES = {
         "the recipe for verifying agent-produced pull requests."),
 }
 
-# Pages built and served but deliberately left out of the nav and footer
-# (reachable only by direct link; e.g. the Ringer page is a targeted-promo
-# URL, not a general-discovery surface).
-HIDDEN = {"ringer.md"}
+# Pages built and served but deliberately left out of the nav and footer.
+# Ringer is a primary verifier-adoption surface and must remain discoverable.
+HIDDEN: set[str] = set()
 
 # md link target -> served path, for links between the docs pages
 LINK_MAP = {src: "/" + out for src, (out, _, _) in PAGES.items()}
@@ -260,7 +259,7 @@ STYLES = """
     .doc-grid.no-toc { grid-template-columns: 1fr; max-width: 820px; }
     .doc-grid.no-toc .doc-toc { display: none; }
     .doc-toc { position: sticky; top: 74px; align-self: start; max-height: calc(100vh - 96px); overflow-y: auto; border-right: 1px solid var(--border-soft); padding-right: 1.25rem; }
-    .doc-toc .toc-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-faint); margin-bottom: 0.85rem; }
+    .doc-toc .toc-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.85rem; }
     .doc-toc .toc-nav { display: flex; flex-direction: column; gap: 0.1rem; }
     .doc-toc .toc-link { font-size: 0.86rem; color: var(--text-muted); padding: 0.32rem 0 0.32rem 0.8rem; border-left: 2px solid var(--border-soft); transition: color .15s, border-color .15s; }
     .doc-toc .toc-link:hover { color: var(--text); text-decoration: none; }
@@ -268,13 +267,14 @@ STYLES = """
 
     /* Content typography */
     .doc-content { min-width: 0; max-width: 760px; }
-    .doc-content .crumb { font-size: 0.88rem; color: var(--text-faint); margin-bottom: 1.1rem; }
-    .doc-content .crumb a { color: var(--text-faint); text-decoration: underline; text-decoration-color: var(--border); }
+    .doc-content .crumb { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.1rem; }
+    .doc-content .crumb a { color: var(--text-muted); text-decoration: underline; text-underline-offset: 0.14em; }
     .doc-content h1 { font-size: 2.2rem; line-height: 1.18; letter-spacing: -0.02em; font-weight: 800; margin-bottom: 0.9rem; }
     .doc-content h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; margin: 2.5rem 0 0.9rem; scroll-margin-top: 84px; }
     .doc-content h3 { font-size: 1.15rem; font-weight: 600; margin: 1.7rem 0 0.5rem; scroll-margin-top: 84px; }
     .doc-content h4 { font-size: 1rem; font-weight: 600; margin: 1.3rem 0 0.4rem; scroll-margin-top: 84px; }
     .doc-content p { margin: 0 0 1rem; color: var(--text-mid); }
+    .doc-content p a, .doc-content li a, footer p a { text-decoration: underline; text-underline-offset: 0.14em; }
     .doc-content ul, .doc-content ol { margin: 0 0 1.1rem 1.3rem; color: var(--text-mid); }
     .doc-content li { margin-bottom: 0.4rem; }
     .doc-content strong { color: var(--text); }

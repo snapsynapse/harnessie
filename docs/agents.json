@@ -12,6 +12,12 @@
       "url": "https://snapsynapse.com/"
     }
   },
+  "release_context": {
+    "stable_release": "1.1.0",
+    "describes": "current main source plus stable release boundaries",
+    "unreleased_changes_since_stable": true,
+    "note": "PyPI, Homebrew, Harnessie Verify v0.1.3, and stable Verify Action v0 remain on 1.1.0. Evidence bundles, structured claim verdicts, OpenAI Responses, Ringer regression fixtures, and trace metrics are current-source capabilities intended for the next minor release."
+  },
   "capabilities": [
     {
       "id": "review-checkout",
@@ -36,6 +42,8 @@
       "status": "live",
       "command": "harnessie verify",
       "description": "Runs deterministic checks before an independent fresh-context verifier and exits fail-closed when a verdict cannot be earned.",
+      "stable_1_1_contract": "Raw criteria, deterministic checks, an optional independent verifier, and fail-closed exit codes 0, 1, and 2.",
+      "current_source_extension": "A v1 evidence bundle can bind stable claim IDs to exact Git state and content-addressed proofs; structured verdicts derive the exit from required-claim coverage. This extension is not in the stable 1.1.0 artifacts.",
       "network_default": "denied",
       "exit_codes": {
         "0": "verified",
@@ -88,7 +96,8 @@
     "verify_evidence_schema": "https://harnessie.com/schemas/v1/verify-evidence.schema.json",
     "schema_compatibility": "https://github.com/snapsynapse/harnessie/blob/main/SCHEMA_COMPATIBILITY.md",
     "plugin_contract": "https://github.com/snapsynapse/harnessie/blob/main/PLUGIN_CONTRACT.md",
-    "quickstart": "https://harnessie.com/quickstart.html"
+    "quickstart": "https://harnessie.com/quickstart.html",
+    "ringer": "https://harnessie.com/ringer.html"
   },
   "support": {
     "issues": "https://github.com/snapsynapse/harnessie/issues",
@@ -100,7 +109,7 @@
     "hosted_service": false,
     "mcp_server": false,
     "autonomous_remote_agent": false,
-    "note": "Harnessie is installed and run locally. These declarations describe its shipped CLI and review surfaces; they do not advertise a hosted agent, API, or MCP server."
+    "note": "Harnessie is installed and run locally. These declarations distinguish stable 1.1.0 artifacts from unreleased current-source additions; they do not advertise a hosted agent, API, or MCP server."
   },
-  "last_updated": "2026-08-20"
+  "last_updated": "2026-09-01"
 }

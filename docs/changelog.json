@@ -3,9 +3,9 @@
   "project": "Harnessie",
   "canonical": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md",
   "unreleased": {
-    "status": "none",
+    "status": "active",
     "source": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md#unreleased",
-    "summary": "No unreleased changes."
+    "summary": "Current source adds OpenAI Responses support, evidence-bound standalone verification, structured claim verdicts, Ringer regression fixtures, trace metrics, and related fail-closed compatibility fixes. These changes are not in the stable 1.1.0 artifacts."
   },
   "current": {
     "version": "1.1.0",
@@ -51,5 +51,5 @@
       "release": "https://github.com/snapsynapse/harnessie/releases/tag/v0.6.0"
     }
   ],
-  "last_updated": "2026-08-20"
+  "last_updated": "2026-09-01"
 }

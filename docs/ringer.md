@@ -35,7 +35,7 @@ This division is not only our framing. Declining to ship an official sandbox and
 
 The worker's own claims stop being the evidence; a model that never saw the worker's reasoning has to reproduce them. Fail-closed: 0 verified, 1 failed, 2 cannot-verify (nothing was observed, so nothing is asserted). For GitHub-hosted repos the same contract ships packaged as a one-file-install Action: [harnessie-verify-action](https://github.com/snapsynapse/harnessie-verify-action).
 
-For a durable Ringer intake gate, prefer a v1 evidence bundle over the raw PR body. The bundle assigns stable IDs to the claims being graded and binds them to the exact Git revision and dirty state, content-addressed diffs and logs, and the deterministic commands that produced those logs. Harnessie rejects a stale or incomplete bundle before spending model tokens. Proof files stay outside the checkout and are exposed to the verifier through a quarantined read-only evidence tool.
+The stable 1.1.0 package and Verify Action accept the raw criteria form above. Current source on `main`, intended for the next minor release, adds a stronger Ringer intake contract: a v1 evidence bundle. The bundle assigns stable IDs to the claims being graded and binds them to the exact Git revision and dirty state, content-addressed diffs and logs, and the deterministic commands that produced those logs. Harnessie rejects a stale or incomplete bundle before spending model tokens. Proof files stay outside the checkout and are exposed to the verifier through a quarantined read-only evidence tool.
 
 ## Verifying an agent-produced pull request
 
@@ -46,7 +46,7 @@ harnessie verify --workspace <checkout> --criteria claims.md \
   --check "python3 -m pytest tests/ -q" --models models.yaml
 ```
 
-The report answers claim by claim: reproduced, refuted, or not verifiable in this environment, with the evidence named. The overall exit is derived rather than improvised: every required claim reproduced is 0; any required claim refuted is 1; no refutation but at least one required claim not verifiable is 2. The first public run of this recipe [refuted a claim in its own author's pull request](https://github.com/NateBJones-Projects/ringer/pull/4), which was the point: a verifier that has never failed its own author is a rubber stamp. The decision record behind the feature (four providers' independent positions, preserved dissent, human arbitration) is public: [AIDR-0006](https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0006-standalone-verifier-surface-for-agent-produced-prs.md).
+Current source reports claim by claim: reproduced, refuted, or not verifiable in this environment, with the evidence named. The overall exit is derived rather than improvised: every required claim reproduced is 0; any required claim refuted is 1; no refutation but at least one required claim not verifiable is 2. Stable 1.1.0 retains its legacy boolean verifier result while preserving the same fail-closed 0/1/2 process contract. The first public run of this recipe [refuted a claim in its own author's pull request](https://github.com/NateBJones-Projects/ringer/pull/4), which was the point: a verifier that has never failed its own author is a rubber stamp. The decision record behind the feature (four providers' independent positions, preserved dissent, human arbitration) is public: [AIDR-0006](https://github.com/snapsynapse/harnessie/blob/main/decisions/AIDR-0006-standalone-verifier-surface-for-agent-produced-prs.md).
 
 ## If you came from Ringer
 
@@ -62,4 +62,4 @@ If you never need those, Ringer alone is the lighter tool, and that is the hones
 ## See also
 
 - [How Harnessie compares](compare.md) to agent frameworks and guardrail tools, for the wider landscape.
-- [Ringer](https://unlock-ai.natebjones.com/guides/ringer), by Nate Jones.
+- [Ringer](https://github.com/NateBJones-Projects/ringer), by Nate Jones.

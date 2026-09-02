@@ -13,6 +13,7 @@ def test_shipped_trust_manifest_verifies():
     assert result.ok, result.problems
     assert result.files
     assert "docs/llms.txt" in result.files
+    assert "docs/llm.txt" in result.files
 
 
 def test_cli_verify_manifest(capsys):

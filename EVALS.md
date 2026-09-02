@@ -18,6 +18,12 @@ Every scenario has:
 - `evals/stewardship.yaml`: meta checks for future-agent handoff quality and public-doc hygiene.
 - `evals/triage.yaml`: the v0.3 memory-triage layer (approval-gated expiry, headless propose-only, memory lint halting). Same red-first discipline.
 - `evals/redteam.yaml`: published break-it targets for the exfiltration claims (SECURITY.md "Break it"). Canary credentials enter as attacker input; passing proves they reach no workspace artifact and never appear anywhere in the events log.
+- `evals/gate-integrity.yaml`: meta-gates that prove a claimed harness check actually ran and earned the result, including synthetic Ringer-style change intake and duplicate-denial recovery behavior.
+- `evals/canary-leak.yaml`: evaluation-integrity canaries that distinguish the intended gate signal from a coincidental green result.
+
+The current default baseline is 51 deterministic scenarios. Treat the command result as the contract rather than hard-coding that count into stable release guides.
+
+Standalone verification also emits `proofs/trace-metrics.json`. `harness/trace_eval.py` derives step, token, denial, duplicate-tool-call, and claim-coverage metrics without treating a missing or malformed counter as success. Focused Ringer fixtures live in the test suite and do not depend on a private or ignored contribution queue.
 ## Scenario kinds
 ### verdict
 Exercises verifier verdict parsing only.

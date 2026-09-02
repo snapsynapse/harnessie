@@ -31,6 +31,24 @@
       "contains": []
     },
     {
+      "path": "llms.txt",
+      "contentTypes": [
+        "text/plain"
+      ],
+      "contains": [
+        "https://harnessie.com/ringer.html"
+      ]
+    },
+    {
+      "path": "llm.txt",
+      "contentTypes": [
+        "text/plain"
+      ],
+      "contains": [
+        "https://harnessie.com/ringer.html"
+      ]
+    },
+    {
       "path": "favicon.svg",
       "contentTypes": [
         "image",

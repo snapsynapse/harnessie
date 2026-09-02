@@ -1,7 +1,7 @@
 # CLAUDE.md — agent guidance for Harnessie
 
 Concise orientation for an AI agent working in this repo. Read alongside README.md,
-ARCHITECTURE.md, GOVERNANCE.md, SECURITY.md, and NEXT.md (the live session handoff).
+ARCHITECTURE.md, GOVERNANCE.md, SECURITY.md, and NEXT.md (current source and release state).
 
 ## Purpose
 
@@ -16,7 +16,7 @@ harness structure carries the quality floor, the model carries the ceiling.
 
 ## Stack
 
-- Python 3.11+ (packaged as `harnessie`, current version 1.0.0, Apache-2.0).
+- Python 3.11+ (packaged as `harnessie`, stable version 1.1.0, Apache-2.0).
 - Runtime dependencies: PyYAML and jsonschema. Model adapters remain stdlib-only (no vendor SDK).
 - Dev dependency: pytest 8+. Console entry point: `harnessie = harness.cli:main`.
 - OS sandbox: macOS `sandbox-exec` (Seatbelt); Linux bubblewrap / firejail / docker.
@@ -28,7 +28,7 @@ harness structure carries the quality floor, the model carries the ceiling.
 ## Directory layout
 
 - `harness/` — the runtime package: `cli.py`, `runner.py`, `loop.py`, `verify.py`,
-  `verify_standalone.py`, `routing.py`, `cascade.py`, `boundary.py` (PII/secret
+  `verify_standalone.py`, `verify_evidence.py`, `trace_eval.py`, `routing.py`, `cascade.py`, `boundary.py` (PII/secret
   containment), `memory.py`, `state.py`, `roles.py`, `quarantine.py`, `sandbox.py`,
   `ownership.py`, `adversarial.py`, `audit.py`, `events.py`, `approval.py`,
   `preflight.py`, `firstrun.py`, `explain.py`, plus `models/` and `tools/`.
@@ -44,12 +44,12 @@ harness structure carries the quality floor, the model carries the ceiling.
 - `memory/` — project memory: `MEMORY.md` index + stamped facts with `verify_by` expiry.
 - `evals/` — deterministic scorecards over mock-brain golden/risky/recovery scenarios.
 - `examples/policy-compliance/` — worked end-to-end example with sample data.
-- `tests/` — the done-tests for every subsystem (~35 test files).
+- `tests/` — the done-tests for every subsystem, including evidence-bundle, structured-verdict, trace-metric, and synthetic Ringer intake coverage.
 - `docs/` — the live served tree (harnessie.com via GitHub Pages): markdown sources plus
   generated HTML (built by `scripts/build_docs_html.py`) and the `.well-known/`
   GuideCheck trust pair. `docs/MANIFEST.yaml` pins the machine-readable public artifacts.
 - Root `*.md` — ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP, IMPLEMENTATION_PLAN,
-  PROMPTS, EVALS, INTENT (9-section standard), CHANGELOG, NEXT (session handoff).
+  PROMPTS, EVALS, INTENT (9-section standard), CHANGELOG, NEXT (current state).
 
 ## Conventions
 
@@ -79,7 +79,8 @@ harness structure carries the quality floor, the model carries the ceiling.
 pip install -e ".[dev]"                 # dev install from source
 python3 -m pytest -q                    # unit + integration, mock brain, no network
 python3 -m harness.cli eval             # deterministic eval scorecards
-python3 -m harness.cli verify-manifest  # trust-bundle integrity (pins ~9 files)
+python3 -m harness.cli verify-manifest  # outward public trust-bundle integrity
+python3 -m harness.cli verify-inward-manifest  # shipped harness-input integrity
 python3 -m harness.cli validate         # authoring schemas + cross-document references
 python3 -m harness.cli run workflows/build-and-verify.yaml --goal "..."
 python3 -m harness.cli report <run_id>  # plain-language run summary
@@ -90,28 +91,24 @@ Live provider scorecards are opt-in and never part of the default suite; without
 `HARNESSIE_LIVE=1` plus provider config they report `SKIP` and exit clean. Pages/DNS/
 PyPI promotion and live-provider calls are deliberate operator acts, never headless.
 
-## Current state (2026-08-09)
+## Current state (2026-09-01)
 
-- Version 1.0.0 is the current core release on GitHub and PyPI. The separately owned
-  Verify Action v0.1.1 and Homebrew formula still pin 0.8.0 pending their own release
-  trains; `NEXT.md` records that intentional lag and remaining forward work.
-- All four 0.8 write-safety and self-integrity mechanics plus the composed package
-  release gate pass with 352 tests, one environment-dependent skip, 47/47 evals, both
-  manifests, built-artifact inspection, and a fresh install.
-- The first 1.0 development slice freezes six v1 authoring schemas, validates them
-  without starting a run, and preserves schema-less 0.8 documents as implicit v1.
-- The second 1.0 slice compiles ownership denials into per-agent read-only sandbox
-  overlays for shell calls, deterministic checks, and verifier execution. Unsupported
-  nested profiles fail closed.
-- The third 1.0 slice admits installed tool extensions only through explicit
-  `harnessie.tools.v1` entry points. Plugin code is operator-trusted in process; tool
-  calls remain registry-mediated, namespaced, provenance-stamped, and resume-pinned.
-- The composed gate passes 413 tests with one environment-dependent skip, 50/50
-  evals, authoring validation, both manifests, artifact inspection, and fresh install.
-- The public Siteline follow-up is green. A fresh live rubric 2.3.0 scan on 2026-08-05
-  UTC scored the deployed site A, 97/100, with Level 4 machine enablement at 16/18.
-- AIDR-0008 was arbitrated and executed as the separately released, probe-gated
-  `harnessie-engine-wrappers` repository. Its release train remains independent.
+- Version 1.1.0 is the stable core release on GitHub, PyPI, and Homebrew. Harnessie
+  Verify v0.1.3 and stable `snapsynapse/harnessie-verify-action@v0` pin 1.1.0.
+- Current `main` contains unreleased work intended for the next minor release:
+  OpenAI Responses support, v1 evidence bundles, structured claim verdicts,
+  deterministic Ringer fixtures, trace metrics, and compatibility fixes.
+- Stable and source channels must remain explicit. Do not claim the 1.1.0 wheel or
+  Action contains those additions. The assistant guide stays the externally anchored
+  1.1.0 artifact until an atomic release rotation.
+- The latest verified source baseline before this documentation pass was 481 passed,
+  9 skipped, 51/51 deterministic evals, 20 outward trust files, and 16 inward files.
+  Counts are observations, not a permanent contract; rerun the gates before claiming
+  current status.
+- The lead adoption surface is `harnessie verify` for agent-produced changes. Ringer
+  is the first named composition target through its existing exit-code check contract;
+  the full harness is the growth path for consent, ownership, containment, arbitration,
+  and tamper-evident run audits.
 - CI (`.github/workflows/ci.yml`) proves Linux bubblewrap, macOS, Linux no-backend
-  fail-closed behavior, package artifacts, and fresh installation. See NEXT.md for
-  the full handoff, current worktree status, and operator-attended steps.
+  fail-closed behavior, package artifacts, and fresh installation. `NEXT.md` records
+  the exact current work order and release authority boundaries.

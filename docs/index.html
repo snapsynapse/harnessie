@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <title>Harnessie: verifiable multi-agent AI with enforced file ownership</title>
-  <meta name="description" content="Harnessie's Golden Rule for agent work: read together, write only what you own. An open-source multi-agent harness with enforced ownership lanes, independent verification, and confined child commands.">
+  <meta name="description" content="Verify agent-produced changes before merge, then govern multi-agent work with enforced ownership lanes, independent verification, confined child commands, and human arbitration.">
   <meta name="keywords" content="harnessie, multi-agent harness, agent orchestration, agent file ownership, ownership lanes, cross-agent overwrite prevention, verification gate, brain-agnostic, model-agnostic agents, agent sandbox, prompt injection defense, audit log, consent-based orchestration, local LLM agents">
   <meta name="author" content="Sam Rogers">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -36,7 +36,7 @@
   <meta property="og:url" content="https://harnessie.com/">
   <meta property="og:locale" content="en_US">
   <meta property="article:published_time" content="2026-07-06T00:00:00Z">
-  <meta property="article:modified_time" content="2026-08-20T00:00:00Z">
+  <meta property="article:modified_time" content="2026-09-01T00:00:00Z">
   <meta property="article:author" content="Sam Rogers">
   <meta property="article:publisher" content="https://snapsynapse.com/">
   <meta property="article:section" content="Developer Tools">
@@ -72,7 +72,7 @@
     "mainEntityOfPage": { "@type": "WebPage", "@id": "https://harnessie.com/" },
     "image": "https://harnessie.com/imgs/og.png",
     "datePublished": "2026-07-06",
-    "dateModified": "2026-08-20",
+    "dateModified": "2026-09-01",
     "author": {
       "@type": "Person",
       "name": "Sam Rogers",
@@ -82,6 +82,7 @@
       "@type": "Organization",
       "name": "Snap Synapse",
       "url": "https://snapsynapse.com/",
+      "sameAs": ["https://github.com/snapsynapse"],
       "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "technical support",
@@ -146,6 +147,7 @@
     body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.6; -webkit-font-smoothing: antialiased; }
     a { color: var(--accent); text-decoration: none; }
     a:hover { color: var(--accent-hover); text-decoration: underline; }
+    p a { text-decoration: underline; text-underline-offset: 0.14em; }
     .skip-link { position: absolute; left: -9999px; top: 0; background: var(--accent); color: var(--bg); padding: 0.5rem 1rem; z-index: 100; }
     .skip-link:focus { left: 0; }
     .container { max-width: var(--max); margin: 0 auto; padding: 0 1.5rem; }
@@ -305,9 +307,9 @@
     .footer-brand a.brand img { width: 26px; height: 26px; }
     .footer-brand p { margin-bottom: 0.25rem; }
     .foot-col { display: flex; flex-direction: column; gap: 0.6rem; }
-    .foot-col .head { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); }
+    .foot-col .head { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
     .foot-col a { color: var(--text-mid); }
-    .foot-note { margin-top: 2.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--text-faint); }
+    .foot-note { margin-top: 2.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--text-muted); }
 
     /* Responsive */
     @media (max-width: 860px) {
@@ -368,11 +370,12 @@
           <a class="docs-item" href="/guide.html"><strong>User guide</strong><span>Concepts through extension.</span></a>
           <a class="docs-item" href="/agent-file-ownership.html"><strong>File ownership</strong><span>Harnessie's Golden Rule, enforced.</span></a>
           <a class="docs-item" href="/compare.html"><strong>Compare</strong><span>Where Harnessie fits, and where it doesn't.</span></a>
+          <a class="docs-item" href="/ringer.html"><strong>Ringer</strong><span>Verify agent-produced changes through an exit-code gate.</span></a>
           <a class="docs-item" href="/brains.html"><strong>Brains: the receipts</strong><span>Models proven under the harness.</span></a>
           <a class="docs-item" href="/threat-model.html"><strong>Threat model</strong><span>The safety claims, made falsifiable.</span></a>
         </div>
       </details>
-      <a href="https://github.com/snapsynapse/harnessie" class="gh-star" target="_blank" rel="noopener" aria-label="Star snapsynapse/harnessie on GitHub">
+      <a href="https://github.com/snapsynapse/harnessie" class="gh-star" target="_blank" rel="noopener" aria-label="Star on GitHub">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>
         <span>Star on GitHub</span>
       </a>
@@ -388,10 +391,10 @@
     <div class="hero-grid">
       <div>
         <div class="pill"><span class="dot"></span> v1.1.0 &middot; stable &middot; Apache-2.0</div>
-        <h1>Put AI to work without giving up control.</h1>
-        <p class="subtitle">An open-source harness for governed multi-agent work: side-effecting worker phases pass deterministic checks and an independent verifier, child commands run confined, and opt-in containment keeps declared sensitive work on models you control. Run local, private, or frontier brains, swapped by one line.</p>
+        <h1>Verify agent-produced changes before you merge them.</h1>
+        <p class="subtitle">Start with a fail-closed checks-plus-independent-verifier gate. Grow into governed multi-agent work with consent, enforced file ownership, confined child commands, human arbitration, and one tamper-evident audit. Run local, private, or frontier brains, swapped by one line.</p>
         <div class="cta-row">
-          <a href="#start" class="btn btn-primary">Install &amp; run your first workflow</a>
+          <a href="/ringer.html" class="btn btn-primary">Verify agent-produced work</a>
           <a href="https://github.com/snapsynapse/harnessie" class="btn btn-secondary" target="_blank" rel="noopener">Read the source</a>
         </div>
         <p class="hero-note">A verifier cannot waive a failed gate. Disagreements between agents are recorded, not averaged away. Configured models are swappable; scorecard bundles and runtime records separately earn public evidence. Because Harnessie is Apache-2.0 and self-hostable, the mechanisms are available to inspect.</p>
@@ -419,6 +422,25 @@
   </div>
 </section>
 
+<!-- VERIFY ADOPTION -->
+<section id="verify-adoption" class="alt">
+  <div class="container">
+    <div class="two-col" style="align-items:start;">
+      <div>
+        <p class="eyebrow">The smallest useful surface</p>
+        <h2 style="margin-bottom:1rem;">A gate any agent workflow can call</h2>
+        <p class="lede"><code>harnessie verify</code> runs deterministic checks first, then lets a fresh-context verifier judge the artifacts rather than the worker's reasoning. Exit 0 is verified, 1 is failed, and 2 means no verdict was earned.</p>
+      </div>
+      <div class="card big">
+        <h3>Ringer is the first adoption path</h3>
+        <p>Ringer already treats a task check's exit code as the contract. Harnessie composes at that seam, adding independent claim verification without replacing Ringer's parallel execution model.</p>
+        <p style="margin-top:0.75rem;"><a href="/ringer.html">Read the Ringer recipe and release boundaries &rarr;</a></p>
+        <p class="muted" style="margin-top:0.75rem;">Stable 1.1.0 accepts raw criteria. Current source adds evidence bundles and structured claim verdicts intended for the next minor release.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- WHAT -->
 <section id="what">
   <div class="container">
@@ -432,10 +454,10 @@
       <div>
         <p class="eyebrow">What you can count on, every run</p>
         <div class="count-grid">
-          <div class="card"><h4>It scopes first</h4><p>You authorize the run; a worker must accept its task packet before side-effecting tools unlock. Role, ownership, sandbox, and approval policy still mediate each call.</p></div>
-          <div class="card"><h4>It checks its work</h4><p>Nothing is done until a separate, independent step confirms it. "It said it worked" is never enough.</p></div>
-          <div class="card"><h4>You have the final say</h4><p>On a real judgment call the run stops and waits for a person. The machine never decides for you.</p></div>
-          <div class="card"><h4>It keeps the receipts</h4><p>Agent and operator events enter a hash-chained record. Edits to existing history break verification; preventing a complete history rewrite requires an external anchor.</p></div>
+          <div class="card"><h3>It scopes first</h3><p>You authorize the run; a worker must accept its task packet before side-effecting tools unlock. Role, ownership, sandbox, and approval policy still mediate each call.</p></div>
+          <div class="card"><h3>It checks its work</h3><p>Nothing is done until a separate, independent step confirms it. "It said it worked" is never enough.</p></div>
+          <div class="card"><h3>You have the final say</h3><p>On a real judgment call the run stops and waits for a person. The machine never decides for you.</p></div>
+          <div class="card"><h3>It keeps the receipts</h3><p>Agent and operator events enter a hash-chained record. Edits to existing history break verification; preventing a complete history rewrite requires an external anchor.</p></div>
         </div>
       </div>
     </div>
@@ -614,6 +636,7 @@ routing:
         <span class="head">Reference</span>
         <a href="/guide.html">User guide</a>
         <a href="/agent-file-ownership.html">File ownership</a>
+        <a href="/ringer.html">Ringer adoption</a>
         <a href="/brains.html">Brains: the receipts</a>
         <a href="/threat-model.html">Threat model</a>
         <a href="https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
@@ -631,6 +654,7 @@ routing:
         <a href="/agents.json">agents.json</a>
         <a href="/.well-known/security.txt">security.txt</a>
         <a href="/llms.txt">llms.txt</a>
+        <a href="/llm.txt">llm.txt alias</a>
         <a href="/.well-known/assistant-guide.txt">assistant-guide.txt</a>
       </div>
     </div>

@@ -137,6 +137,18 @@ Theme: turn the ownership invariant into a memorable, falsifiable product surfac
 
 Gate result: GREEN. The composed release gate, ownership adversarial corpus, exact package build, and fresh-install ownership inspection passed before release. After publication, the assistant guide's external DNS and repository-file anchors matched the final bytes and hosted GuideCheck re-earned Level 4 with zero blocking findings.
 
+### 1.2.0: Verify agent-produced changes (candidate)
+
+Theme: make the standalone verifier the smallest useful adoption surface while preserving the full harness as the governed growth path. Ringer is the first named composition target because its task-check contract already consumes process exit codes.
+
+- Evidence-bound intake: IMPLEMENTED ON `main`, NOT YET RELEASED. A v1 evidence bundle binds stable claim IDs to an exact Git revision and dirty state, content-addressed diffs and proof files, and recorded deterministic checks. Unsafe paths, stale state, missing bindings, and hash drift fail before model dispatch.
+- Structured claim verdicts: IMPLEMENTED ON `main`, NOT YET RELEASED. Required claims resolve to `reproduced`, `refuted`, or `not_verifiable`; overall exit 0/1/2 is derived from complete required-claim coverage. Legacy raw criteria remain compatible.
+- Provider and regression coverage: IMPLEMENTED ON `main`, NOT YET RELEASED. OpenAI Responses is a first-class adapter, compatibility handling covers completion-token parameter differences, synthetic Ringer fixtures exercise the intake seam, and deterministic trace metrics report work, denial, duplication, token, and claim-coverage signals.
+- Public truth: IN PROGRESS. README, website, machine declarations, Ringer guide, architecture, eval docs, and operating context must distinguish stable 1.1.0 artifacts from current source. The 1.1.0 assistant-guide bytes and external anchor stay unchanged until an atomic guide rotation during release.
+- Release train: NOT STARTED. Version bump, changelog cut, exact artifact build, signed provenance decision, PyPI publication, Verify Action propagation, Homebrew propagation, assistant-guide rotation, and external verification each retain their own release gates and authority.
+
+Gate result: OPEN. Do not mark shipped until the exact released artifacts, downstream pins, generated and machine surfaces, and external trust evidence agree.
+
 ### Post-1.0 candidates
 
 Deliberately after 1.0, not before:
