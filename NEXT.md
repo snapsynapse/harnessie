@@ -25,6 +25,7 @@ The deployed documentation-remediation head `388c490` has the following evidence
 - Recovery run `33583589070` checksum-verified the existing release assets and published those exact distributions to PyPI through the protected `pypi` environment. PyPI attestations and publisher identity verified, and a clean Python 3.13 public-index install exposed the evidence-bundle CLI contract.
 - Harnessie Verify Action v0.2.0 and stable `v0` resolve to `bc6f94f93cade0e722f525bd0b387005b88cd3a2`; its seven-job CI run `33584285698` passed.
 - Homebrew tap commit `118ca530971f3d4b5fb6100f117f14a96b464fb8` pins the PyPI 1.2.0 source distribution. Strict online audit, an installed 1.1.0 to 1.2.0 upgrade, formula test, linkage, metadata, and evidence-bundle CLI smoke all passed.
+- Repository-owned OpenSSF Scorecard run `33585734990` measured exact commit `2c00a7ddfc3d0e134f52f55b811ae630cea01403` at aggregate 5.9 after deterministic remediations. `audits/openssf-scorecard-2026-09-02.json` records every individual check and disposition; the aggregate is not a release gate.
 
 Skip counts depend on local sandbox and live-provider availability. Treat command outcomes and exact revisions as the contract, not fixed counts copied into future guides.
 
@@ -41,7 +42,6 @@ The repository, website, and agent-surface audit found one high-priority release
 ## Remaining release order
 
 1. Update the DNS TXT anchor to released guide SHA-256 `ff77d219add6f1cf6a22c4570830f9fbd70cedd59f3caa933fbd0c7ae3733421` and rerun hosted GuideCheck, then replace pending language only if all anchors agree.
-2. Record the current OpenSSF Scorecard result and dispositions after the repository-owned workflow's first authoritative run completes; do not add an aggregate-score badge without explaining its limits.
 
 ## External and optional checks
 

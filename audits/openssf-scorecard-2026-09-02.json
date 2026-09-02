@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "observed_at": "2026-09-02T03:06:19Z",
+  "repository": "github.com/snapsynapse/harnessie",
+  "commit": "2c00a7ddfc3d0e134f52f55b811ae630cea01403",
+  "workflow_run": "https://github.com/snapsynapse/harnessie/actions/runs/33585734990",
+  "public_result": "https://api.scorecard.dev/projects/github.com/snapsynapse/harnessie",
+  "scorecard": {
+    "version": "v5.5.0",
+    "commit": "c395761df6afe1a69e476bc60a013a94bcbc153f"
+  },
+  "aggregate_score": 5.9,
+  "aggregate_limit": "The aggregate is a discovery signal, not a release gate. Individual checks and their dispositions are authoritative.",
+  "checks": [
+    {"name": "Binary-Artifacts", "score": 10, "reason": "no binaries found in the repo", "disposition": "verified"},
+    {"name": "Branch-Protection", "score": 0, "reason": "branch protection not enabled for main", "disposition": "provider-policy decision required; do not enable rules that can deadlock the current maintainer workflow without an explicit review"},
+    {"name": "CII-Best-Practices", "score": 0, "reason": "no OpenSSF Best Practices badge effort detected", "disposition": "optional external enrollment; evaluate after the 1.2 adoption cycle rather than asserting conformance for a score"},
+    {"name": "CI-Tests", "score": -1, "reason": "no pull request found", "disposition": "unknown, not failed; CI is configured for pull requests but the young repository lacks enough observable PR history"},
+    {"name": "Code-Review", "score": 0, "reason": "0 of 30 approved changesets", "disposition": "maturity and governance signal; require a provider-policy decision before imposing review requirements on the current maintainer workflow"},
+    {"name": "Contributors", "score": 3, "reason": "one contributing organization detected", "disposition": "project maturity signal; do not manufacture organizational diversity"},
+    {"name": "Dangerous-Workflow", "score": 10, "reason": "no dangerous workflow patterns detected", "disposition": "verified"},
+    {"name": "Dependency-Update-Tool", "score": 10, "reason": "Dependabot detected", "disposition": "remediated in commit 2c00a7ddfc3d0e134f52f55b811ae630cea01403"},
+    {"name": "Fuzzing", "score": 0, "reason": "no fuzzer integration detected", "disposition": "real future engineering work; evaluate property-based and coverage-guided fuzzing for parsers, evidence bundles, and resume-state inputs"},
+    {"name": "License", "score": 10, "reason": "Apache-2.0 license detected", "disposition": "verified"},
+    {"name": "Maintained", "score": 0, "reason": "repository created within the last 90 days", "disposition": "age-based maturity signal; no corrective action is truthful"},
+    {"name": "Packaging", "score": 10, "reason": "GitHub Actions packaging workflow detected", "disposition": "verified"},
+    {"name": "Pinned-Dependencies", "score": 5, "reason": "all 29 GitHub Actions are commit-pinned; six pip install commands are not hash-pinned", "disposition": "actions remediated; evaluate a reproducible hashed CI dependency lock before the next core release without weakening the release gate's clean-install coverage"},
+    {"name": "SAST", "score": 10, "reason": "CodeQL detected", "disposition": "remediated in commit 2c00a7ddfc3d0e134f52f55b811ae630cea01403"},
+    {"name": "Security-Policy", "score": 10, "reason": "linked security policy detected", "disposition": "remediated in commit 2c00a7ddfc3d0e134f52f55b811ae630cea01403"},
+    {"name": "Signed-Releases", "score": 0, "reason": "GitHub Release signatures or provenance not detected", "disposition": "PyPI OIDC attestations for 1.2.0 are independently verified but are outside this check; add GitHub-native release-asset provenance in a future release workflow revision"},
+    {"name": "Token-Permissions", "score": 10, "reason": "workflow tokens follow least privilege", "disposition": "remediated in commit 2c00a7ddfc3d0e134f52f55b811ae630cea01403"},
+    {"name": "Vulnerabilities", "score": 10, "reason": "zero known unfixed vulnerabilities detected", "disposition": "verified at observation time"}
+  ]
+}

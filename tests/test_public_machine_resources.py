@@ -20,6 +20,7 @@ SECURITY = DOCS / ".well-known" / "security.txt"
 TRUST = DOCS / "MANIFEST.yaml"
 GUIDECHECK_RECEIPT = (
     ROOT / "audits" / "guidecheck-live-result-2026-08-21-v1.1.0.json")
+SCORECARD_RECORD = ROOT / "audits" / "openssf-scorecard-2026-09-02.json"
 
 
 def _project_version() -> str:
@@ -97,6 +98,21 @@ def test_current_guidecheck_receipt_earns_the_claimed_level():
         assert anchors[channel]["status"] == "present-matches"
         assert anchors[channel]["observed_sha256"] == (
             receipt["guide"]["sha256"])
+
+
+def test_scorecard_record_disposes_every_sub_10_check():
+    record = _json(SCORECARD_RECORD)
+    assert record["commit"] == "2c00a7ddfc3d0e134f52f55b811ae630cea01403"
+    assert record["scorecard"]["version"] == "v5.5.0"
+    assert record["aggregate_score"] == 5.9
+    checks = record["checks"]
+    assert len(checks) == 18
+    assert len({check["name"] for check in checks}) == len(checks)
+    assert all(check["disposition"] for check in checks if check["score"] < 10)
+    by_name = {check["name"]: check for check in checks}
+    for name in ("Dependency-Update-Tool", "SAST", "Security-Policy",
+                 "Token-Permissions"):
+        assert by_name[name]["score"] == 10
 
 
 def test_machine_resource_urls_follow_public_url_policy():
