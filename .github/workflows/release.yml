@@ -3,17 +3,23 @@ name: release
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing release tag whose attached distributions should be recovered to PyPI
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: release-${{ github.event.release.tag_name }}
+  group: release-${{ github.event.release.tag_name || inputs.release_tag }}
   cancel-in-progress: false
 
 jobs:
   build:
-    if: startsWith(github.event.release.tag_name, 'v')
+    if: github.event_name == 'release' && startsWith(github.event.release.tag_name, 'v')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -105,8 +111,9 @@ jobs:
       - name: Attach exact distributions and integrity evidence
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: gh release upload "$RELEASE_TAG" dist/* release/*
+        run: gh release upload "$RELEASE_TAG" dist/* release/* --repo "$GH_REPO"
 
   publish-pypi:
     needs: [build, attach-release-assets]
@@ -122,6 +129,54 @@ jobs:
           name: python-package-distributions
           path: dist/
       - name: Publish distributions with attestations
+        uses: pypa/gh-action-pypi-publish@a892a5a61159132606e93a2fa6f4358831b04d26 # v1.14.2
+        with:
+          packages-dir: dist/
+          attestations: true
+
+  recover-release-assets:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Download and verify exact GitHub Release distributions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          version="${RELEASE_TAG#v}"
+          test "$(gh release view "$RELEASE_TAG" --repo "$GH_REPO" --json isDraft --jq .isDraft)" = "false"
+          mkdir -p dist release
+          gh release download "$RELEASE_TAG" --repo "$GH_REPO" --pattern "harnessie-$version-py3-none-any.whl" --dir dist
+          gh release download "$RELEASE_TAG" --repo "$GH_REPO" --pattern "harnessie-$version.tar.gz" --dir dist
+          gh release download "$RELEASE_TAG" --repo "$GH_REPO" --pattern "harnessie-$version.cdx.json" --dir release
+          gh release download "$RELEASE_TAG" --repo "$GH_REPO" --pattern "harnessie-$version.SHA256SUMS" --dir release
+          sha256sum -c "release/harnessie-$version.SHA256SUMS"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: recovery-python-package-distributions
+          path: dist/
+          if-no-files-found: error
+          retention-days: 1
+
+  publish-pypi-recovery:
+    needs: recover-release-assets
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/harnessie/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: recovery-python-package-distributions
+          path: dist/
+      - name: Publish recovered distributions with attestations
         uses: pypa/gh-action-pypi-publish@a892a5a61159132606e93a2fa6f4358831b04d26 # v1.14.2
         with:
           packages-dir: dist/
