@@ -10,11 +10,11 @@ files:
   - path: docs/.well-known/security.txt
     sha256: 8987609c662c5b80d92843e8cb00489c281470a091e808bd7a1cee5aa0fe1387
   - path: docs/agents.json
-    sha256: eea8a0c95c7fc332500565736aeef8011cd33f65dc528d45e1cbddce0ec5263e
+    sha256: 4795ee0b3face28e692653d264090522d1dad368c0b38597c67158b89008827c
   - path: docs/api/v1/index.json
-    sha256: fc6645a498a3fca0c32190100bd52f3ea7ae371903c9a5964e452b0a942d324e
+    sha256: f86d912698fc778ca5164ca1796b057f8d8a19afbbe2237febe2decf1af9ae1b
   - path: docs/changelog.json
-    sha256: a6c0f60e7ae97261431e2759f21040441928f1e92a3af64d855de1646afe209a
+    sha256: b831e0dc2ad01d82b471b5fec875db7413f3e475e71b397e8ae228944f78b375
   - path: docs/llms.txt
     sha256: c5fbcf9457ca514b16522c93ba303ed932edb6f38f68d0a767f16d10611ec4b5
   - path: docs/llm.txt

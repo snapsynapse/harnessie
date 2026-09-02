@@ -17,8 +17,8 @@
   "release_context": {
     "stable_release": "1.2.0",
     "describes": "released 1.2.0 core",
-    "unreleased_changes_since_stable": false,
-    "note": "Harnessie 1.2.0 accepts raw criteria or evidence bundles and derives structured claim verdicts under the fail-closed verifier contract."
+    "unreleased_changes_since_stable": true,
+    "note": "Harnessie 1.2.0 accepts raw criteria or evidence bundles and derives structured claim verdicts under the fail-closed verifier contract. Main also contains post-release publishing-recovery maintenance that does not change this released CLI contract."
   },
   "global_options": {
     "--root": "Project root; defaults to the current working directory."

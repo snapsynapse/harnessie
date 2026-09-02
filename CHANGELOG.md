@@ -4,7 +4,14 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
-No unreleased changes.
+### Fixed
+
+- Release recovery can verify and republish the exact distributions already attached to a GitHub Release, while no-checkout asset jobs pass explicit repository identity to GitHub CLI.
+- The PyPI publishing action is pinned to the annotated upstream release tag's peeled commit, matching the immutable container digest available from the publisher.
+
+### Documentation
+
+- Release closeout records the exact 1.2.0 artifact digests, successful PyPI recovery and attestations, Verify Action v0.2.0 and stable `v0`, and the Homebrew 1.2.0 upgrade evidence without treating pending DNS/GuideCheck or OpenSSF evidence as complete.
 
 ## 1.2.0 (2026-09-01)
 

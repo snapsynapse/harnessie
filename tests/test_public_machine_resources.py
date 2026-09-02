@@ -57,7 +57,7 @@ def test_agents_json_describes_released_core_and_downstream_boundaries():
     assert data["product"]["version"] == _project_version()
     assert data["product"]["type"] == "local Python library and CLI"
     assert data["release_context"]["stable_release"] == _project_version()
-    assert data["release_context"]["unreleased_changes_since_stable"] is False
+    assert data["release_context"]["unreleased_changes_since_stable"] is True
     assert {item["id"] for item in data["capabilities"]} == {
         "review-checkout", "verify-claims", "validate-project",
         "inspect-ownership", "run-workflow"}
@@ -114,8 +114,10 @@ def test_machine_changelog_tracks_the_packaged_release():
     assert versions[0] == version
     assert len(versions) == len(set(versions))
     assert data["current"]["release"].endswith(f"/v{version}")
-    assert data["unreleased"]["status"] == "empty"
-    assert data["unreleased"]["summary"] == "No unreleased changes."
+    assert data["unreleased"]["status"] == "active"
+    assert data["unreleased"]["summary"] == (
+        "Trusted-publishing recovery maintenance and exact 1.2.0 "
+        "release-closeout evidence.")
 
 
 def test_public_verifier_copy_describes_the_released_evidence_contract():
@@ -147,7 +149,7 @@ def test_cli_manifest_is_complete_and_explicitly_not_hosted():
     assert data["release_context"] == {
         "stable_release": _project_version(),
         "describes": "released 1.2.0 core",
-        "unreleased_changes_since_stable": False,
+        "unreleased_changes_since_stable": True,
         "note": data["release_context"]["note"],
     }
     assert set(data["paths"]) == {

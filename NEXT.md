@@ -4,7 +4,7 @@
 
 Harnessie 1.2.0 is the stable core release on GitHub and PyPI. It contains OpenAI Responses support, v1 evidence-bundle intake, structured claim verdicts, deterministic Ringer regression fixtures, event-trace metrics, OpenAI-compatible token-parameter handling, and a portable shell-substitution regression test.
 
-Homebrew and Harnessie Verify Action are separately versioned downstreams. Their exact pins and release results must be recorded here after propagation. The 1.2.0 assistant guide is byte-identical across the repository and served copy and pinned by its sidecar, but its new DNS TXT and hosted GuideCheck result remain separate external closeout gates. The tracked 1.1.0 receipt is historical evidence only.
+Homebrew and Harnessie Verify Action are separately versioned downstreams. Both now consume the published 1.2.0 core through independently verified releases: Verify Action v0.2.0 and stable `v0`, plus the Homebrew tap formula at 1.2.0. The 1.2.0 assistant guide is byte-identical across the repository and served copy and pinned by its sidecar, but its new DNS TXT and hosted GuideCheck result remain separate external closeout gates. The tracked 1.1.0 receipt is historical evidence only.
 
 ## Adoption direction
 
@@ -20,7 +20,11 @@ The deployed documentation-remediation head `388c490` has the following evidence
 - `python3 -m harness.cli verify-inward-manifest`: 16 inward files passed.
 - Exact-head GitHub CI run `33578047382` and Pages deployment run `33578046788` passed.
 - Sixteen deployed page and machine-resource surfaces were byte-identical to the commit, and the production search contract reported ten sitemap pages with zero defects or infrastructure failures.
-- Release-closeout evidence for the exact 1.2.0 artifacts, PyPI attestations, downstream pins, DNS anchor, and hosted GuideCheck result is maintained in `RELEASE_NOTES-1.2.0.md` and updated as each independent surface completes.
+- Tag `v1.2.0` peels to release commit `5bb46378464d3636b43762ededc507beb8f7ddf8`; exact-tag CI run `33581149207` passed.
+- The GitHub Release carries the wheel, source distribution, CycloneDX 1.6 SBOM, and checksum record. Their SHA-256 digests are recorded in `RELEASE_NOTES-1.2.0.md`.
+- Recovery run `33583589070` checksum-verified the existing release assets and published those exact distributions to PyPI through the protected `pypi` environment. PyPI attestations and publisher identity verified, and a clean Python 3.13 public-index install exposed the evidence-bundle CLI contract.
+- Harnessie Verify Action v0.2.0 and stable `v0` resolve to `bc6f94f93cade0e722f525bd0b387005b88cd3a2`; its seven-job CI run `33584285698` passed.
+- Homebrew tap commit `118ca530971f3d4b5fb6100f117f14a96b464fb8` pins the PyPI 1.2.0 source distribution. Strict online audit, an installed 1.1.0 to 1.2.0 upgrade, formula test, linkage, metadata, and evidence-bundle CLI smoke all passed.
 
 Skip counts depend on local sandbox and live-provider availability. Treat command outcomes and exact revisions as the contract, not fixed counts copied into future guides.
 
@@ -36,10 +40,8 @@ The repository, website, and agent-surface audit found one high-priority release
 
 ## Remaining release order
 
-1. Confirm the exact release workflow, GitHub Release assets, PyPI files and attestations, and fresh public-index install against the recorded checksums.
-2. Propagate the published core to Verify Action and Homebrew only after the immutable PyPI artifacts verify.
-3. Update the DNS TXT anchor to the released guide hash and rerun hosted GuideCheck, then replace pending language only if the anchors agree.
-4. Record the current OpenSSF Scorecard result and dispositions when the repository-owned workflow produces its first authoritative result.
+1. Update the DNS TXT anchor to released guide SHA-256 `ff77d219add6f1cf6a22c4570830f9fbd70cedd59f3caa933fbd0c7ae3733421` and rerun hosted GuideCheck, then replace pending language only if all anchors agree.
+2. Record the current OpenSSF Scorecard result and dispositions when the repository-owned workflow produces its first authoritative result.
 
 ## External and optional checks
 

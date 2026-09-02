@@ -15,8 +15,8 @@
   "release_context": {
     "stable_release": "1.2.0",
     "describes": "released 1.2.0 core",
-    "unreleased_changes_since_stable": false,
-    "note": "Evidence bundles, structured claim verdicts, OpenAI Responses, Ringer regression fixtures, and trace metrics ship in core 1.2.0. Homebrew and Verify Action are separately propagated downstreams whose current pins are recorded in NEXT.md."
+    "unreleased_changes_since_stable": true,
+    "note": "Evidence bundles, structured claim verdicts, OpenAI Responses, Ringer regression fixtures, and trace metrics ship in core 1.2.0. Verify Action v0.2.0, stable v0, and the Homebrew 1.2.0 formula are verified downstreams; main also contains post-release publishing-recovery maintenance recorded in CHANGELOG.md."
   },
   "capabilities": [
     {

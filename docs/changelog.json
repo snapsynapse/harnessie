@@ -3,9 +3,9 @@
   "project": "Harnessie",
   "canonical": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md",
   "unreleased": {
-    "status": "empty",
+    "status": "active",
     "source": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md#unreleased",
-    "summary": "No unreleased changes."
+    "summary": "Trusted-publishing recovery maintenance and exact 1.2.0 release-closeout evidence."
   },
   "current": {
     "version": "1.2.0",
