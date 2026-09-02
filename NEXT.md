@@ -41,7 +41,7 @@ The repository, website, and agent-surface audit found one high-priority release
 ## Remaining release order
 
 1. Update the DNS TXT anchor to released guide SHA-256 `ff77d219add6f1cf6a22c4570830f9fbd70cedd59f3caa933fbd0c7ae3733421` and rerun hosted GuideCheck, then replace pending language only if all anchors agree.
-2. Record the current OpenSSF Scorecard result and dispositions when the repository-owned workflow produces its first authoritative result.
+2. Record the current OpenSSF Scorecard result and dispositions after the repository-owned workflow's first authoritative run completes; do not add an aggregate-score badge without explaining its limits.
 
 ## External and optional checks
 

@@ -116,7 +116,8 @@ def test_machine_changelog_tracks_the_packaged_release():
     assert data["current"]["release"].endswith(f"/v{version}")
     assert data["unreleased"]["status"] == "active"
     assert data["unreleased"]["summary"] == (
-        "Trusted-publishing recovery maintenance and exact 1.2.0 "
+        "Trusted-publishing recovery, repository-owned Scorecard measurement, "
+        "and exact 1.2.0 "
         "release-closeout evidence.")
 
 
