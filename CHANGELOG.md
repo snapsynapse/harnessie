@@ -6,6 +6,7 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ### Maintenance
 
+- Update the lock generator and release-tool pin to uv 0.11.15 to address GHSA-4gg8-gxpx-9rph (entry-point path traversal), surfaced when GitHub indexed the new lock files. Regenerate hashes with the patched generator.
 - Add reviewed SHA-256 runtime, development and release locks, offline drift validation, installed-build pin checks and a weekly patch-only refresh. Controlled builds disable dependency resolution and build isolation; a separate CI job retains public-constraint consumer coverage.
 - Attest all four final GitHub release asset classes and verify the original repository, workflow, tag and commit before attachment or recovery. Historical assets without original provenance refuse on the new recovery path. Hosted acceptance remains pending a release or authorized rehearsal.
 - Add bounded deterministic parser properties and permanent minimized regressions. Non-string claim statuses and NUL-containing evidence paths now produce documented refusals instead of uncaught exceptions. Verdict parser identity advances to 3, invalidating prior parser-specific scorecard claims.
