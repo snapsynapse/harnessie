@@ -87,6 +87,8 @@ def run_scenario(scenario: dict[str, Any], root: Path | None = None) -> EvalCase
         return _run_adversarial_scenario(scenario)
     if kind == "audit":
         return _run_audit_scenario(scenario)
+    if kind == "observer":
+        return _run_observer_scenario(scenario)
     if kind == "triage":
         return _run_triage_scenario(scenario)
     if kind == "parallel":
@@ -525,6 +527,55 @@ def _run_repo_hygiene_scenario(
         expected=expected,
         observed=problems or "ok",
     )
+
+
+def _run_observer_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
+    from .observer import observe_run
+
+    supported = {"expect_phase_statuses", "expect_outcome", "expect_observations",
+                 "expect_phase_count", "expect_files", "expect_workspace_empty",
+                 "expect_markdown_absent"}
+    expected = {key: value for key, value in scenario.items() if key.startswith("expect_")}
+    problems = []
+    unknown = set(expected) - supported
+    if unknown or not expected:
+        return EvalCaseResult(scenario["id"], False, expected, "unsupported or absent observer expectations")
+    with tempfile.TemporaryDirectory(prefix="harnessie-observer-eval-") as raw:
+        root = Path(raw)
+        run_dir = root / "runs" / "R"
+        workspace = root / "workspace"
+        workspace.mkdir()
+        log = EventLog(run_dir, echo=False)
+        for event in scenario.get("events", []):
+            log.emit(event["kind"], **{k: v for k, v in event.items() if k != "kind"})
+        log.close()
+        source = run_dir / "events.jsonl"
+        if "break_line" in scenario:
+            lines = source.read_text().splitlines()
+            index = scenario["break_line"] - 1
+            event = json.loads(lines[index])
+            event["prev"] = "broken-fixture-link"
+            lines[index] = json.dumps(event)
+            source.write_text("\n".join(lines) + "\n")
+        before = source.read_bytes()
+        result = observe_run(run_dir, workflow=scenario.get("workflow"))
+        observed = {
+            "expect_phase_statuses": {p["name"]: p["validation"]["status"] for p in result["phases"]},
+            "expect_outcome": result["outcome"],
+            "expect_observations": [o["id"] for o in result["observations"]],
+            "expect_phase_count": len(result["phases"]),
+            "expect_files": [name for name in scenario.get("expect_files", []) if (run_dir / name).is_file()],
+            "expect_workspace_empty": not any(workspace.iterdir()),
+            "expect_markdown_absent": [value for value in scenario.get("expect_markdown_absent", [])
+                                       if value not in (run_dir / "observer/narrative.md").read_text()],
+        }
+        for key, value in expected.items():
+            if observed[key] != value:
+                problems.append(f"{key} mismatch")
+        if source.read_bytes() != before:
+            problems.append("source journal changed")
+    return EvalCaseResult(scenario["id"], not problems, expected,
+                          {key: observed[key] for key in expected}, "; ".join(problems))
 
 
 def _run_audit_scenario(scenario: dict[str, Any]) -> EvalCaseResult:

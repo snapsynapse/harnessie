@@ -32,6 +32,7 @@ One module per boundary:
 | Agent loop | `harness/loop.py` | context, model call, permission-gated tool execution, enumerated stop conditions |
 | Workflow verification | `harness/verify.py` | deterministic checks, verifier agent, retry/reformulate/escalate ladder |
 | Standalone verification | `harness/verify_standalone.py`, `harness/verify_evidence.py` | fail-closed local intake gate, evidence-bundle preflight, structured claim verdicts, proof output, and 0/1/2 exit derivation |
+| Offline observation (unreleased) | `harness/observer.py` | derives cited metadata from a verified journal snapshot; no runner, model or governance participation; see [OBSERVER.md](OBSERVER.md) |
 | Trace evaluation | `harness/trace_eval.py` | deterministic work, denial, duplication, token, and claim-coverage metrics over admitted event traces |
 | Routing and budget | `harness/routing.py` | task_class to (tier, effort); default escalation ladder; sideways fallback; hard cost ceilings |
 | Cascade policy | `harness/cascade.py` | declared containment-aware routing policy (`config/cascade.yaml`): tier ladders, escalation reasons, contained-tier constraints, reserved work classes |

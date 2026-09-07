@@ -282,3 +282,45 @@ def test_unarbitrated_resume_stays_halted(tmp_path):
     ])
     _, outcomes = _run(tmp_path, "r5", [])
     assert [o.status for o in outcomes] == ["needs_arbitration"]
+
+
+def test_explicit_human_mode_halts_on_agreement_and_preserves_record(tmp_path):
+    _scaffold(tmp_path)
+    workflow = tmp_path / "workflows" / "adv.yaml"
+    workflow.write_text(workflow.read_text().replace(
+        "mode: adversarial", "mode: adversarial\n    arbitration: human"))
+    _, outcomes = _run(tmp_path, "human-agreement", [
+        _complete('{"stance": "recommend", "summary": "Yes."}', 1),
+        _complete('{"stance": "recommend", "summary": "Also yes."}', 2),
+        _complete(NO_OBJ, 3),
+        _complete(NO_OBJ, 4),
+    ])
+    assert [o.status for o in outcomes] == ["needs_arbitration"]
+    record = tmp_path / "runs/human-agreement/decisions/DR-decide.md"
+    original = record.read_bytes()
+    assert lint_record(original.decode())["status"] == "open"
+    runner = WorkflowRunner(project_root=tmp_path, run_id="human-agreement", echo=False)
+
+    def refuse_dispatch(*args, **kwargs):
+        raise AssertionError("resume must not regenerate reviewer positions")
+
+    runner._run_role = refuse_dispatch
+    outcomes = runner.run_workflow(workflow, goal="the thing")
+    assert [o.status for o in outcomes] == ["needs_arbitration"]
+    assert record.read_bytes() == original
+
+
+def test_status_flip_without_arbitration_metadata_cannot_resume(tmp_path):
+    _scaffold(tmp_path)
+    _run(tmp_path, "incomplete-arbitration", [
+        _complete('{"stance": "recommend", "summary": "Yes."}', 1),
+        _complete('{"stance": "oppose", "summary": "No."}', 2),
+        _complete(NO_OBJ, 3),
+        _complete(NO_OBJ, 4),
+    ])
+    record = tmp_path / "runs/incomplete-arbitration/decisions/DR-decide.md"
+    record.write_text(record.read_text().replace("status: open", "status: arbitrated"))
+    original = record.read_bytes()
+    _, outcomes = _run(tmp_path, "incomplete-arbitration", [])
+    assert [o.status for o in outcomes] == ["needs_arbitration"]
+    assert record.read_bytes() == original

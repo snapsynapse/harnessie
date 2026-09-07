@@ -40,7 +40,7 @@ harness structure carries the quality floor, the model carries the ceiling.
 - `config/` — `models.yaml` (tiers + routing + budgets: the ONLY file to edit to swap
   brains), `cascade.yaml`, `boundary.yaml`.
 - `OWNERSHIP.yaml` — ownership lanes + first-writer auto-claims; operator-owned.
-- `decisions/` — the repo's own AIDR records (AIDR-0001..0008).
+- `decisions/` — the repo's own AIDR records (AIDR-0001..0009; AIDR-0009 approves offline observation only, with bidding and commentary deferred).
 - `memory/` — project memory: `MEMORY.md` index + stamped facts with `verify_by` expiry.
 - `evals/` — deterministic scorecards over mock-brain golden/risky/recovery scenarios.
 - `examples/policy-compliance/` — worked end-to-end example with sample data.

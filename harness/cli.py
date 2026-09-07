@@ -88,6 +88,10 @@ def main(argv: list[str] | None = None) -> int:
         "audit", help="verify a run's event hash chain and print its governance timeline")
     p_audit.add_argument("run_id")
 
+    p_observe = sub.add_parser(
+        "observe", help="derive an offline, cited narrative from a run's event log")
+    p_observe.add_argument("run_id")
+
     p_eval = sub.add_parser("eval", help="run deterministic eval scorecards")
     p_eval.add_argument("suite", nargs="?", help="optional eval suite YAML path")
     p_eval.add_argument("--live", action="store_true",
@@ -172,6 +176,23 @@ def main(argv: list[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
     root = Path(args.root).resolve()
+
+    if args.cmd == "observe":
+        from .observer import ObserverError, observe_run, valid_run_id
+
+        try:
+            if not valid_run_id(args.run_id):
+                raise ObserverError("unsafe_path")
+            result = observe_run(root / "runs" / args.run_id)
+        except ObserverError as exc:
+            print(f"observation failed: {exc.code}", file=sys.stderr)
+            return 2
+        if not result["chain"]["ok"]:
+            print(f"observation failed: {result['chain']['diagnostic']}", file=sys.stderr)
+            return 2
+        print(f"observed {args.run_id}: {result['outcome']} "
+              f"(runs/{args.run_id}/observer/narrative.md)")
+        return 0
 
     if args.cmd == "ownership":
         from .ownership import OwnershipLedger

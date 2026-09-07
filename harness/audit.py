@@ -51,9 +51,14 @@ def verify_chain(run_dir: Path) -> dict[str, Any]:
     path = Path(run_dir) / "events.jsonl"
     if not path.exists():
         return {"ok": False, "length": 0, "breaks": [], "error": "no events log"}
+    lines = [l for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
+    return verify_chain_lines(lines)
+
+
+def verify_chain_lines(lines: list[str]) -> dict[str, Any]:
+    """Verify an already captured journal snapshot without reopening its path."""
     breaks: list[int] = []
     prev, seq = GENESIS, 0
-    lines = [l for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
     for n, line in enumerate(lines, 1):
         try:
             rec = json.loads(line)
@@ -61,9 +66,14 @@ def verify_chain(run_dir: Path) -> dict[str, Any]:
             breaks.append(n)
             prev, seq = line_hash(line), seq + 1
             continue
-        if rec.get("prev") != prev or rec.get("seq") != seq + 1:
+        if not isinstance(rec, dict):
             breaks.append(n)
-        prev, seq = line_hash(line), rec.get("seq", seq + 1)
+            prev, seq = line_hash(line), seq + 1
+            continue
+        if (rec.get("prev") != prev or type(rec.get("seq")) is not int
+                or rec.get("seq") != seq + 1):
+            breaks.append(n)
+        prev, seq = line_hash(line), seq + 1
     return {"ok": not breaks, "length": len(lines), "breaks": breaks}
 
 

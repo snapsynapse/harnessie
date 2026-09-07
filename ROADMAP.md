@@ -160,6 +160,8 @@ Deliberately after 1.0, not before:
 
 ### Post-1.2 supply-chain and evaluation candidates
 
+Concrete dependency-lock, release-provenance, parser-testing and sole-maintainer governance packets are in [the 2026-09-07 maintenance plan](audits/maintenance-packets-2026-09-07.md). Packet preparation is complete; implementation and provider activation remain separate.
+
 These are general roadmap items, not incomplete 1.2.0 release gates. The exact 1.2.0 artifacts, downstreams, and first OpenSSF measurement are already recorded in `RELEASE_NOTES-1.2.0.md` and `audits/openssf-scorecard-2026-09-02.json`.
 
 - Reproducible Python CI dependency locks. Evaluate a hash-pinned development and release-gate lock without weakening the current clean-install test against declared package constraints. Acceptance: the lock has a documented update path, CI installs it with hash verification, release artifact tests still exercise the declared public dependency range, and stale-lock drift fails deterministically.
@@ -167,6 +169,12 @@ These are general roadmap items, not incomplete 1.2.0 release gates. The exact 1
 - Parser and state fuzzing. Start with evidence bundles, structured verifier verdicts, workflow/schema documents, event journals, and resume-state inputs rather than adding a badge-only integration. Acceptance: a coverage-guided or property-based harness runs in CI on a bounded corpus, malformed input always refuses or returns a documented error, and any discovered crash becomes a permanent deterministic regression fixture.
 - Repository governance proportional to the maintainer model. Branch protection, required review, emergency recovery, and release permissions must be designed together rather than enabled to improve an aggregate score. Acceptance: the provider ruleset names required checks, prevents unreviewed unsafe paths, preserves a documented recovery route, and is exercised without deadlocking the current maintainer workflow.
 - OpenSSF Best Practices enrollment remains optional until its questionnaire would produce useful public operating evidence. Acceptance is truthful completion with citations and maintained answers, not the badge alone.
+
+## Controlled review and offline observation
+
+The offline observer is approved in [AIDR-0009](decisions/AIDR-0009-bid-rounds-and-run-observer.md), with a bounded [acceptance packet](audits/aidr-0009-preparation-2026-09-04.md). Its current-source implementation is documented in [OBSERVER.md](OBSERVER.md); it is not yet released. Bidding, commentary, runner integration and model selection are not part of that first slice.
+
+The [controlled-review assessment](audits/review-interoperability-2026-09-07.md) maps present enforcement and the gaps for portable AIDR output. Keep file links and standalone verification as the present composition surface. A live pilot needs fixed evidence and explicit human arbitration. An exporter needs an accepted namespace, attribution and failure-atomicity contract; neither is implemented by this assessment.
 
 ## Platform support
 

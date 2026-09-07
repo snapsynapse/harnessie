@@ -57,6 +57,7 @@ def smoke(wheel: Path) -> None:
         for command in (
             "approve-maiden",
             "ownership",
+            "observe",
             "verify-inward-manifest",
             "verify-manifest",
         ):
@@ -91,6 +92,18 @@ def smoke(wheel: Path) -> None:
             temp,
             contains="eval scorecard:",
         )
+        run(
+            [str(python), "-c",
+             "from pathlib import Path; from harness.events import EventLog; "
+             "import sys; log=EventLog(Path(sys.argv[1])/'runs'/'smoke', echo=False); "
+             "log.emit('workflow_start', run_id='smoke'); "
+             "log.emit('phase_start', phase='work'); "
+             "log.emit('phase_done', phase='work', status='needs_human'); "
+             "log.emit('workflow_done', statuses={'work':'needs_human'}); log.close()",
+             str(project)], temp,
+        )
+        run([str(cli), "--root", str(project), "observe", "smoke"],
+            temp, contains="observed smoke: needs_human")
 
 
 def main() -> int:
