@@ -1,0 +1,195 @@
+{
+  "site": "https://harnessie.com/",
+  "scope": "all ten sitemap routes; deployed baseline before final 1.3.0 changes",
+  "core_source_head": "103d12bd3911c03ed3689d2284a1cbd1d3810a1e",
+  "core_main": "2413c43278f08e128f80d711fd142a2286f3eaa2",
+  "tool_version": "3.1.0",
+  "tool_commit": "6af2c95a56ff058cddf0c6febc71512db1d6d19b",
+  "tool_hashes": {
+    "a11y-audit/scripts/scan.js": "5d6fad11e116adad2c68b68dfa8db440651058de6d8c7a9cb8838cb1abfa647d",
+    "a11y-audit/scripts/report.js": "99489a06d2cdaf6904ea4e0c4563f8d6403cb457fcd5744c99de1a302e818f05",
+    "a11y-audit/MANIFEST.yaml": "c9901d9a33a0b3e7da0b5dc97bcdbcf683ae2e8b6b4cd68af90c56bab146b694"
+  },
+  "node": "v26.7.0",
+  "lighthouse": "not run: Lighthouse CLI not installed",
+  "manual_testing": "not performed",
+  "source_files": {
+    "docs/index.html": "f0f3ae24c66683a1fac96a89284ee35f5da652550c7fcfccdef8c9a2c8599c72",
+    "docs/quickstart.html": "5ec3faa1f1d959862f89c426b4b88ca5a7c2a11ce160b61aa70dba4bbb05c6e4",
+    "docs/getting-started.html": "c340e1a1be3db7067aabfbcd785fb1f0ee8d4e15d19ec3a83b0c5710873c513e",
+    "docs/ladder.html": "5db2e31ed280f6c1c08aafc76cf3b90357f69b6b15d25bcf2ccd434cb9d43171",
+    "docs/guide.html": "45505c74dde12cd554fe3e05f75096019e123d74a38e2062b78a5aec1a4bfb47",
+    "docs/compare.html": "71ec2c7df887b3670cff9a340147ca688618d4d2c7a408d1b566c281904c79c3",
+    "docs/agent-file-ownership.html": "3a4bc7083093a2c000099d6fa9769251f1260fe21bc45ca4501449200fe73261",
+    "docs/brains.html": "36c876cb2f50b5ce0f4467507fa386af4155cb2dbe48188deef35ccda49aa77b",
+    "docs/threat-model.html": "0ced164a4d56aa95b79d3a7bf968243a719e5762d6225b91a9cf6081027fa042",
+    "docs/ringer.html": "592ccc0869b3ad713a01fb7eb4d2e8dcad43fe4b254e00d3176719020d17227e"
+  },
+  "live_readback_before": [
+    {
+      "url": "https://harnessie.com/",
+      "final_url": "https://harnessie.com/",
+      "status": 200,
+      "sha256": "f0f3ae24c66683a1fac96a89284ee35f5da652550c7fcfccdef8c9a2c8599c72",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/quickstart.html",
+      "final_url": "https://harnessie.com/quickstart.html",
+      "status": 200,
+      "sha256": "5ec3faa1f1d959862f89c426b4b88ca5a7c2a11ce160b61aa70dba4bbb05c6e4",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/getting-started.html",
+      "final_url": "https://harnessie.com/getting-started.html",
+      "status": 200,
+      "sha256": "c340e1a1be3db7067aabfbcd785fb1f0ee8d4e15d19ec3a83b0c5710873c513e",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/ladder.html",
+      "final_url": "https://harnessie.com/ladder.html",
+      "status": 200,
+      "sha256": "5db2e31ed280f6c1c08aafc76cf3b90357f69b6b15d25bcf2ccd434cb9d43171",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/guide.html",
+      "final_url": "https://harnessie.com/guide.html",
+      "status": 200,
+      "sha256": "45505c74dde12cd554fe3e05f75096019e123d74a38e2062b78a5aec1a4bfb47",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/compare.html",
+      "final_url": "https://harnessie.com/compare.html",
+      "status": 200,
+      "sha256": "71ec2c7df887b3670cff9a340147ca688618d4d2c7a408d1b566c281904c79c3",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/agent-file-ownership.html",
+      "final_url": "https://harnessie.com/agent-file-ownership.html",
+      "status": 200,
+      "sha256": "3a4bc7083093a2c000099d6fa9769251f1260fe21bc45ca4501449200fe73261",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/brains.html",
+      "final_url": "https://harnessie.com/brains.html",
+      "status": 200,
+      "sha256": "36c876cb2f50b5ce0f4467507fa386af4155cb2dbe48188deef35ccda49aa77b",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/threat-model.html",
+      "final_url": "https://harnessie.com/threat-model.html",
+      "status": 200,
+      "sha256": "0ced164a4d56aa95b79d3a7bf968243a719e5762d6225b91a9cf6081027fa042",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/ringer.html",
+      "final_url": "https://harnessie.com/ringer.html",
+      "status": 200,
+      "sha256": "592ccc0869b3ad713a01fb7eb4d2e8dcad43fe4b254e00d3176719020d17227e",
+      "matches_source": true
+    }
+  ],
+  "scan_started_at": "2026-09-07T23:32:24.951492+00:00",
+  "scan_exit_code": 2,
+  "scan_command": [
+    "node",
+    "/Users/snap/Git/skill-a11y-audit/a11y-audit/scripts/scan.js",
+    "--root",
+    "/Users/snap/Git/harnessie",
+    "--urls",
+    "https://harnessie.com/,https://harnessie.com/quickstart.html,https://harnessie.com/getting-started.html,https://harnessie.com/ladder.html,https://harnessie.com/guide.html,https://harnessie.com/compare.html,https://harnessie.com/agent-file-ownership.html,https://harnessie.com/brains.html,https://harnessie.com/threat-model.html,https://harnessie.com/ringer.html",
+    "--output",
+    "audits/accessibility/2026-09-07/scan.json",
+    "--summary",
+    "--fail-on",
+    "major"
+  ],
+  "scan_completed_at": "2026-09-07T23:32:39.510358+00:00",
+  "live_readback_after": [
+    {
+      "url": "https://harnessie.com/",
+      "final_url": "https://harnessie.com/",
+      "status": 200,
+      "sha256": "f0f3ae24c66683a1fac96a89284ee35f5da652550c7fcfccdef8c9a2c8599c72",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/quickstart.html",
+      "final_url": "https://harnessie.com/quickstart.html",
+      "status": 200,
+      "sha256": "5ec3faa1f1d959862f89c426b4b88ca5a7c2a11ce160b61aa70dba4bbb05c6e4",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/getting-started.html",
+      "final_url": "https://harnessie.com/getting-started.html",
+      "status": 200,
+      "sha256": "c340e1a1be3db7067aabfbcd785fb1f0ee8d4e15d19ec3a83b0c5710873c513e",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/ladder.html",
+      "final_url": "https://harnessie.com/ladder.html",
+      "status": 200,
+      "sha256": "5db2e31ed280f6c1c08aafc76cf3b90357f69b6b15d25bcf2ccd434cb9d43171",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/guide.html",
+      "final_url": "https://harnessie.com/guide.html",
+      "status": 200,
+      "sha256": "45505c74dde12cd554fe3e05f75096019e123d74a38e2062b78a5aec1a4bfb47",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/compare.html",
+      "final_url": "https://harnessie.com/compare.html",
+      "status": 200,
+      "sha256": "71ec2c7df887b3670cff9a340147ca688618d4d2c7a408d1b566c281904c79c3",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/agent-file-ownership.html",
+      "final_url": "https://harnessie.com/agent-file-ownership.html",
+      "status": 200,
+      "sha256": "3a4bc7083093a2c000099d6fa9769251f1260fe21bc45ca4501449200fe73261",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/brains.html",
+      "final_url": "https://harnessie.com/brains.html",
+      "status": 200,
+      "sha256": "36c876cb2f50b5ce0f4467507fa386af4155cb2dbe48188deef35ccda49aa77b",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/threat-model.html",
+      "final_url": "https://harnessie.com/threat-model.html",
+      "status": 200,
+      "sha256": "0ced164a4d56aa95b79d3a7bf968243a719e5762d6225b91a9cf6081027fa042",
+      "matches_source": true
+    },
+    {
+      "url": "https://harnessie.com/ringer.html",
+      "final_url": "https://harnessie.com/ringer.html",
+      "status": 200,
+      "sha256": "592ccc0869b3ad713a01fb7eb4d2e8dcad43fe4b254e00d3176719020d17227e",
+      "matches_source": true
+    }
+  ],
+  "evidence_sha256": {
+    "scan.json": "2d160291f52102089dfd863ad1c979d20bd6d5231386cc358733f5ffe54a85af",
+    "audit-2026-09-07.json": "76b32dc7beaa15cf560a71eb1a45f81e6ae2c8c5fa24929b3481dd9e3b6c3ac9",
+    "audit-2026-09-07.md": "f920c6aa336349f9caade56cb05158ffda3b345459beb9d1b0c98cdacfd21229",
+    "manual-checks.md": "a35e38c7c7a9a69ea96172a10b2729de41942948bc246ba887c89242a521d0d5",
+    "urls.json": "efbc42d0365bab93cd5eb7dddc668b1683a5d0d411f5b7408c13f2ac55c704d2"
+  }
+}

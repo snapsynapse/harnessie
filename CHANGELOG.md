@@ -19,6 +19,7 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ### Fixed
 
+- Make generated code blocks and scrolling tables keyboard-focusable with visible focus. Simplify homepage contrast backgrounds and replace redundant glyphs with decorative shapes while preserving their adjacent text. Local ten-route verification resolves four serious accessibility findings and 22 review candidates; 36 table/video candidates and manual release checks remain open.
 - Release recovery can verify and republish the exact distributions already attached to a GitHub Release, while no-checkout asset jobs pass explicit repository identity to GitHub CLI.
 - The PyPI publishing action is pinned to the annotated upstream release tag's peeled commit, matching the immutable container digest available from the publisher.
 - A repository-owned, fully commit-pinned OpenSSF Scorecard workflow publishes weekly and default-branch results, retains the SARIF artifact, and uploads findings to code scanning.

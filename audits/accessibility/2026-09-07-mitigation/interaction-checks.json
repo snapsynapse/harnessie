@@ -1,0 +1,273 @@
+{
+  "browser": "Chrome/152.0.7977.75",
+  "keyboard": [
+    {
+      "route": "quickstart.html",
+      "width": 1280,
+      "target": "pre:nth-child(19)",
+      "tabs": 30,
+      "overflow": 286,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    },
+    {
+      "route": "agent-file-ownership.html",
+      "width": 1280,
+      "target": "pre:nth-child(24)",
+      "tabs": 28,
+      "overflow": 1884,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    },
+    {
+      "route": "ringer.html",
+      "width": 1280,
+      "target": "pre:nth-child(14)",
+      "tabs": 22,
+      "overflow": 67,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "target": ".table-wrap",
+      "tabs": 17,
+      "overflow": 545,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    },
+    {
+      "route": "quickstart.html",
+      "width": 375,
+      "target": "pre:nth-child(19)",
+      "tabs": 30,
+      "overflow": 719,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    },
+    {
+      "route": "agent-file-ownership.html",
+      "width": 375,
+      "target": "pre:nth-child(24)",
+      "tabs": 28,
+      "overflow": 2317,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    },
+    {
+      "route": "ringer.html",
+      "width": 375,
+      "target": "pre:nth-child(14)",
+      "tabs": 22,
+      "overflow": 500,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "target": ".table-wrap",
+      "tabs": 17,
+      "overflow": 978,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    }
+  ],
+  "gradient": [
+    {
+      "selector": ".install-featured > h3",
+      "text": "Let an AI assistant inspect the evidence before you install",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(238, 245, 232)",
+      "fontSize": "19.2px",
+      "fontWeight": "700",
+      "ratio": 13.921413197814815,
+      "minimum": 3
+    },
+    {
+      "selector": ".install-featured > .lede:nth-child(3)",
+      "text": "Already working with an AI assistant? Point it at Harnessie's bounded review guide before deciding whether to install:",
+      "color": "rgb(58, 74, 61)",
+      "background": "rgb(238, 245, 232)",
+      "fontSize": "14.72px",
+      "fontWeight": "400",
+      "ratio": 8.470268904497606,
+      "minimum": 4.5
+    },
+    {
+      "selector": ".lede:nth-child(5)",
+      "text": "The 1.2.0 plain-text guide is byte-identical across the repository and served copy and carries a repository provenance sidecar. Its new hash must be re-anchored through DNS and hosted verification before it inherits any end-to-end level. The GuideCheck receipt for the prior 1.1.0 guide remains tracked as dated historical evidence. The guide requires the assistant to report the achieved level and hash, then get approval before its read-only review. It authorizes no install or run.",
+      "color": "rgb(58, 74, 61)",
+      "background": "rgb(238, 245, 232)",
+      "fontSize": "13.76px",
+      "fontWeight": "400",
+      "ratio": 8.470268904497606,
+      "minimum": 4.5
+    },
+    {
+      "selector": ".lede:nth-child(5) > a[href$=\"guidecheck.org/\"][rel=\"noopener\"][target=\"_blank\"]",
+      "text": "GuideCheck",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(238, 245, 232)",
+      "fontSize": "13.76px",
+      "fontWeight": "400",
+      "ratio": 5.795401306548266,
+      "minimum": 4.5
+    },
+    {
+      "selector": ".trust-chip:nth-child(1)",
+      "text": "Verifies before it acts",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(255, 255, 255)",
+      "fontSize": "12.48px",
+      "fontWeight": "400",
+      "ratio": 15.499703133065424,
+      "minimum": 4.5
+    },
+    {
+      "selector": ".trust-chip:nth-child(2)",
+      "text": "Read-only until you approve",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(255, 255, 255)",
+      "fontSize": "12.48px",
+      "fontWeight": "400",
+      "ratio": 15.499703133065424,
+      "minimum": 4.5
+    },
+    {
+      "selector": ".trust-chip:nth-child(3)",
+      "text": "Install and execution remain separate approvals",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(255, 255, 255)",
+      "fontSize": "12.48px",
+      "fontWeight": "400",
+      "ratio": 15.499703133065424,
+      "minimum": 4.5
+    }
+  ],
+  "decoration": [
+    {
+      "selector": ".chip:nth-child(1) > b",
+      "hidden": "true",
+      "text": "",
+      "context": "1.1 guide: GuideCheck Level 4 · historical hash independently pinned"
+    },
+    {
+      "selector": ".chip:nth-child(3) > b",
+      "hidden": "true",
+      "text": "",
+      "context": "Fails closed by default"
+    },
+    {
+      "selector": ".chip:nth-child(4) > b",
+      "hidden": "true",
+      "text": "",
+      "context": "Opt-in containment keeps declared sensitive work controlled"
+    },
+    {
+      "selector": ".chip:nth-child(5) > b",
+      "hidden": "true",
+      "text": "",
+      "context": "Hash-chained audit log"
+    },
+    {
+      "selector": ".chip:nth-child(6) > b",
+      "hidden": "true",
+      "text": "",
+      "context": "Child network denied by default"
+    },
+    {
+      "selector": "div:nth-child(4) > .g",
+      "hidden": "true",
+      "text": "",
+      "context": "orchestrate  decomposed → 3 task packets"
+    },
+    {
+      "selector": "div:nth-child(5) > .g",
+      "hidden": "true",
+      "text": "",
+      "context": "execute     worker consented · jailed"
+    },
+    {
+      "selector": "div:nth-child(7) > .g",
+      "hidden": "true",
+      "text": "",
+      "context": "audit       hash chain intact"
+    },
+    {
+      "selector": ".pl-arrow:nth-child(2)",
+      "hidden": "true",
+      "text": "",
+      "context": "Goalfrom the operator\n      \n      Orchestratedecompose into task packets\n      \n      Executeconsented workers, jailed\n      \n      Gatechecks + independent verifier\n      \n      Auditjournaled, hash-chained"
+    },
+    {
+      "selector": ".pl-arrow:nth-child(4)",
+      "hidden": "true",
+      "text": "",
+      "context": "Goalfrom the operator\n      \n      Orchestratedecompose into task packets\n      \n      Executeconsented workers, jailed\n      \n      Gatechecks + independent verifier\n      \n      Auditjournaled, hash-chained"
+    },
+    {
+      "selector": ".pl-arrow:nth-child(6)",
+      "hidden": "true",
+      "text": "",
+      "context": "Goalfrom the operator\n      \n      Orchestratedecompose into task packets\n      \n      Executeconsented workers, jailed\n      \n      Gatechecks + independent verifier\n      \n      Auditjournaled, hash-chained"
+    },
+    {
+      "selector": ".pl-arrow:nth-child(8)",
+      "hidden": "true",
+      "text": "",
+      "context": "Goalfrom the operator\n      \n      Orchestratedecompose into task packets\n      \n      Executeconsented workers, jailed\n      \n      Gatechecks + independent verifier\n      \n      Auditjournaled, hash-chained"
+    },
+    {
+      "selector": ".trust-chip:nth-child(1) > b",
+      "hidden": "true",
+      "text": "",
+      "context": "Verifies before it acts"
+    },
+    {
+      "selector": ".trust-chip:nth-child(2) > b",
+      "hidden": "true",
+      "text": "",
+      "context": "Read-only until you approve"
+    },
+    {
+      "selector": ".trust-chip:nth-child(3) > b",
+      "hidden": "true",
+      "text": "",
+      "context": "Install and execution remain separate approvals"
+    }
+  ]
+}

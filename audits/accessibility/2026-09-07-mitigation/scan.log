@@ -1,0 +1,4 @@
+axe-core: skill-deps (v4.12.1)
+puppeteer: skill-deps (v25.10.0)
+/Users/snap/Git/harnessie/audits/accessibility/2026-09-07-mitigation/scan.json
+a11y scan: major-findings result inconclusive (blocking-incomplete-review); review /Users/snap/Git/harnessie/audits/accessibility/2026-09-07-mitigation/scan.json

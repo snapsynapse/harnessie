@@ -1,0 +1,15 @@
+{
+  "index": 0,
+  "text": "pip install harnessie",
+  "overflow": 0,
+  "outline": "solid",
+  "outlineWidth": "3px",
+  "tabEntry": true,
+  "tabExit": true,
+  "tabs": 28,
+  "route": "/quickstart.html",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  }
+}

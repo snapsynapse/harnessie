@@ -264,7 +264,7 @@
     @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 
     /* Featured install */
-    .install-featured { position: relative; padding: 1.75rem 1.9rem; border: 1px solid #bcd3ae; border-radius: 14px; background: linear-gradient(180deg, #eef5e8 0%, #e7f0e0 100%); box-shadow: 0 10px 34px rgba(47,107,40,0.12); }
+    .install-featured { position: relative; padding: 1.75rem 1.9rem; border: 1px solid #bcd3ae; border-radius: 14px; background: #eef5e8; box-shadow: 0 10px 34px rgba(47,107,40,0.12); }
     .featured-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.32rem 0.8rem; background: var(--accent); color: #f2f7ee; border-radius: 999px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.01em; margin-bottom: 1rem; }
     .featured-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--lime); }
     .install-featured h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.01em; }
@@ -275,8 +275,10 @@
     .copy-btn { cursor: pointer; font-family: inherit; font-size: 0.82rem; font-weight: 600; padding: 0.6rem 1.1rem; border-radius: 9px; white-space: nowrap; border: 1px solid var(--accent); background: var(--accent); color: #f2f7ee; }
     .copy-btn.ghost { border-color: var(--border); background: var(--bg-alt); color: var(--text); }
     .trust-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-    .trust-chip { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.7rem; background: rgba(255,255,255,0.6); border: 1px solid #bcd3ae; border-radius: 8px; font-size: 0.78rem; color: var(--text); }
+    .trust-chip { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.7rem; background: #fff; border: 1px solid #bcd3ae; border-radius: 8px; font-size: 0.78rem; color: var(--text); }
     .trust-chip b { color: var(--accent); font-weight: 700; }
+    .decor-check { display: inline-block; flex-shrink: 0; width: 0.7em; height: 0.4em; border-left: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); vertical-align: 0.15em; }
+    .decor-dot { display: inline-block; width: 0.55em; height: 0.55em; border-radius: 50%; background: currentColor; vertical-align: 0.1em; }
 
     .sub-head { font-size: 1.05rem; font-weight: 700; margin: 2.75rem 0 0.4rem; letter-spacing: -0.01em; }
     .install-line { display: flex; align-items: center; gap: 0.7rem; margin: 0 0 2rem; flex-wrap: wrap; }
@@ -412,12 +414,12 @@
     </div>
 
     <div class="proof-strip">
-      <div class="chip"><b>&#10003;</b> 1.1 guide: GuideCheck Level 4 &middot; <span class="m">historical hash independently pinned</span></div>
+      <div class="chip"><b class="decor-check" aria-hidden="true"></b> 1.1 guide: GuideCheck Level 4 &middot; <span class="m">historical hash independently pinned</span></div>
       <div class="chip"><b>8</b> providers &middot; <span class="m">11 models, verified work</span></div>
-      <div class="chip"><b>&#10003;</b> Fails closed <span class="m">by default</span></div>
-      <div class="chip"><b>&#10003;</b> Opt-in containment <span class="m">keeps declared sensitive work controlled</span></div>
-      <div class="chip"><b>&#10003;</b> Hash-chained <span class="m">audit log</span></div>
-      <div class="chip"><b>&#10003;</b> Child network <span class="m">denied by default</span></div>
+      <div class="chip"><b class="decor-check" aria-hidden="true"></b> Fails closed <span class="m">by default</span></div>
+      <div class="chip"><b class="decor-check" aria-hidden="true"></b> Opt-in containment <span class="m">keeps declared sensitive work controlled</span></div>
+      <div class="chip"><b class="decor-check" aria-hidden="true"></b> Hash-chained <span class="m">audit log</span></div>
+      <div class="chip"><b class="decor-check" aria-hidden="true"></b> Child network <span class="m">denied by default</span></div>
     </div>
   </div>
 </section>
@@ -487,10 +489,10 @@
           <div><span class="g">$</span> harnessie run build-and-verify.yaml \</div>
           <div style="padding-left:1.1rem;" class="w">--goal <span class="s">"a CLI todo app with tests"</span></div>
           <div class="gap"></div>
-          <div><span class="g">&#9679;</span> orchestrate&nbsp;&nbsp;<span class="m">decomposed &rarr; 3 task packets</span></div>
-          <div><span class="g">&#9679;</span> execute&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="m">worker consented &middot; jailed</span></div>
+          <div><span class="g decor-dot" aria-hidden="true"></span> orchestrate&nbsp;&nbsp;<span class="m">decomposed &rarr; 3 task packets</span></div>
+          <div><span class="g decor-dot" aria-hidden="true"></span> execute&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="m">worker consented &middot; jailed</span></div>
           <div style="padding-left:1rem;" class="g">&#10003; pytest 12 passed&nbsp;&nbsp;&#10003; verifier PASS</div>
-          <div><span class="g">&#9679;</span> audit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="m">hash chain intact</span></div>
+          <div><span class="g decor-dot" aria-hidden="true"></span> audit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="m">hash chain intact</span></div>
           <div class="gap"></div>
           <div class="g" style="font-weight:600;">&#10003; complete&nbsp;&nbsp;<span class="s" style="font-weight:400;">run r-7f3a &middot; $0.04 &middot; 41s</span><span class="cursor"></span></div>
         </div>
@@ -499,13 +501,13 @@
 
     <div class="pipeline" id="pipeline">
       <div class="pl-stage"><strong>Goal</strong><span>from the operator</span></div>
-      <div class="pl-arrow">&rarr;</div>
+      <div class="pl-arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" focusable="false"><path d="M2 9h13M10 4l5 5-5 5" stroke="currentColor" stroke-width="2"/></svg></div>
       <div class="pl-stage"><strong>Orchestrate</strong><span>decompose into task packets</span></div>
-      <div class="pl-arrow">&rarr;</div>
+      <div class="pl-arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" focusable="false"><path d="M2 9h13M10 4l5 5-5 5" stroke="currentColor" stroke-width="2"/></svg></div>
       <div class="pl-stage"><strong>Execute</strong><span>consented workers, jailed</span></div>
-      <div class="pl-arrow">&rarr;</div>
+      <div class="pl-arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" focusable="false"><path d="M2 9h13M10 4l5 5-5 5" stroke="currentColor" stroke-width="2"/></svg></div>
       <div class="pl-stage"><strong>Gate</strong><span>checks + independent verifier</span></div>
-      <div class="pl-arrow">&rarr;</div>
+      <div class="pl-arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" focusable="false"><path d="M2 9h13M10 4l5 5-5 5" stroke="currentColor" stroke-width="2"/></svg></div>
       <div class="pl-stage"><strong>Audit</strong><span>journaled, hash-chained</span></div>
     </div>
 
@@ -533,9 +535,9 @@
       </div>
       <p class="lede" style="font-size:0.86rem; max-width:720px; margin-bottom:1rem;">The 1.2.0 plain-text guide is byte-identical across the repository and served copy and carries a repository provenance sidecar. Its new hash must be re-anchored through DNS and hosted verification before it inherits any end-to-end level. The <a href="https://guidecheck.org/" target="_blank" rel="noopener">GuideCheck</a> receipt for the prior 1.1.0 guide remains tracked as dated historical evidence. The guide requires the assistant to report the achieved level and hash, then get approval before its read-only review. It authorizes no install or run.</p>
       <div class="trust-chips">
-        <span class="trust-chip"><b>&#10003;</b> Verifies before it acts</span>
-        <span class="trust-chip"><b>&#10003;</b> Read-only until you approve</span>
-        <span class="trust-chip"><b>&#10003;</b> Install and execution remain separate approvals</span>
+        <span class="trust-chip"><b class="decor-check" aria-hidden="true"></b> Verifies before it acts</span>
+        <span class="trust-chip"><b class="decor-check" aria-hidden="true"></b> Read-only until you approve</span>
+        <span class="trust-chip"><b class="decor-check" aria-hidden="true"></b> Install and execution remain separate approvals</span>
       </div>
     </div>
 
