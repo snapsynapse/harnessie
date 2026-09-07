@@ -142,7 +142,7 @@ def convert(md: str) -> tuple[str, str, list[tuple[int, str, str]]]:
             while i < len(lines) and not lines[i].startswith("```"):
                 code.append(html.escape(lines[i]))
                 i += 1
-            out.append("<pre><code>" + "\n".join(code) + "</code></pre>")
+            out.append('<pre tabindex="0"><code>' + "\n".join(code) + "</code></pre>")
             i += 1
             continue
 
@@ -179,8 +179,11 @@ def convert(md: str) -> tuple[str, str, list[tuple[int, str, str]]]:
                         f"<td>{inline(html.escape(c))}</td>" for c in row)
                     + "</tr>"
                     for row in cells[1:])
+                table_label = (
+                    f'aria-labelledby="{headings[-1][1]}"'
+                    if headings else 'aria-label="Table"')
                 out.append(
-                    '<div class="table-wrap"><table>'
+                    f'<div class="table-wrap" tabindex="0" role="group" {table_label}><table>'
                     f"<thead><tr>{thead}</tr></thead>"
                     f"<tbody>{body_rows}</tbody></table></div>")
             continue
@@ -282,6 +285,7 @@ STYLES = """
     pre { background: var(--code-bg); color: var(--code-text); border: 1px solid var(--code-border); border-radius: 10px; padding: 1.1rem 1.2rem; overflow-x: auto; margin: 0 0 1.2rem; font-size: 0.82rem; line-height: 1.6; }
     pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
     .table-wrap { overflow-x: auto; margin: 0 0 1.2rem; border: 1px solid var(--border); border-radius: 10px; }
+    pre:focus-visible, .table-wrap:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
     table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
     th, td { padding: 0.6rem 0.85rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border-soft); }
     th { background: var(--bg-alt); font-weight: 600; border-bottom: 1px solid var(--border); }

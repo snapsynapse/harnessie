@@ -170,6 +170,12 @@ These are general roadmap items, not incomplete 1.2.0 release gates. The exact 1
 - Repository governance proportional to the maintainer model. Branch protection, required review, emergency recovery, and release permissions must be designed together rather than enabled to improve an aggregate score. Acceptance: the provider ruleset names required checks, prevents unreviewed unsafe paths, preserves a documented recovery route, and is exercised without deadlocking the current maintainer workflow.
 - OpenSSF Best Practices enrollment remains optional until its questionnaire would produce useful public operating evidence. Acceptance is truthful completion with citations and maintained answers, not the badge alone.
 
+### 1.3.0 accessibility review completion
+
+The [ten-route baseline audit](audits/accessibility/2026-09-07/audit-2026-09-07.md) found four confirmed serious keyboard-access issues and 58 incomplete review candidates. The [approved mitigation packet](audits/accessibility/2026-09-07/mitigation-plan.md) is implemented locally: a [fresh ten-route scan](audits/accessibility/2026-09-07-mitigation/audit-2026-09-07.md) has zero confirmed violations and resolves 22 homepage candidates. The gate remains inconclusive. Review the remaining 35 threat-model table contrast candidates and one homepage video-caption candidate, plus any new findings after further changes. Complete the targeted keyboard, zoom/reflow and screen-reader checks with dated evidence for the final changed routes. `NEXT.md` locates the temporary review queue.
+
+Acceptance: per-candidate dispositions backed by measurements or applicability evidence, accurate fresh automated results, and completed manual release checks. This placeholder tracks unfinished 1.3.0 readiness work; it is not a waiver or a post-release deferral. GuideCheck remains a separate pre-publication gate.
+
 ## Controlled review and offline observation
 
 The offline observer is approved in [AIDR-0009](decisions/AIDR-0009-bid-rounds-and-run-observer.md), with a bounded [acceptance packet](audits/aidr-0009-preparation-2026-09-04.md). Its current-source implementation is documented in [OBSERVER.md](OBSERVER.md); it is not yet released. Bidding, commentary, runner integration and model selection are not part of that first slice.

@@ -83,6 +83,7 @@
     pre { background: var(--code-bg); color: var(--code-text); border: 1px solid var(--code-border); border-radius: 10px; padding: 1.1rem 1.2rem; overflow-x: auto; margin: 0 0 1.2rem; font-size: 0.82rem; line-height: 1.6; }
     pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
     .table-wrap { overflow-x: auto; margin: 0 0 1.2rem; border: 1px solid var(--border); border-radius: 10px; }
+    pre:focus-visible, .table-wrap:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
     table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
     th, td { padding: 0.6rem 0.85rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border-soft); }
     th { background: var(--bg-alt); font-weight: 600; border-bottom: 1px solid var(--border); }
@@ -138,13 +139,13 @@
 <p>You do not need an API key, a credit card, or a cloud account to finish this quickstart.</p>
 <h2 id="step-1-get-harnessie">Step 1: Get Harnessie</h2>
 <p>One line installs the <code>harnessie</code> command from the Python package index:</p>
-<pre><code>pip install harnessie</code></pre>
+<pre tabindex="0"><code>pip install harnessie</code></pre>
 <p>If <code>pip</code> is not found, try <code>python3 -m pip install harnessie</code>. <code>pipx install harnessie</code> and <code>uv tool install harnessie</code> install the current 1.2.0 package without cloning the repository. The separately maintained Homebrew formula may lag briefly during release propagation, so verify its reported version before treating the install paths as equivalent.</p>
 <h2 id="step-2-let-the-tool-check-your-machine">Step 2: Let the tool check your machine</h2>
 <p>Create your own project and let Harnessie tell you whether everything is ready:</p>
-<pre><code>harnessie init my-first-project</code></pre>
+<pre tabindex="0"><code>harnessie init my-first-project</code></pre>
 <p>This scaffolds a small project (a config file, an example workflow, the agent instructions) and then runs a guided first check. You will see something like:</p>
-<pre><code>Guided first run — is this machine ready?
+<pre tabindex="0"><code>Guided first run — is this machine ready?
 
   [ok  ] Python: Python 3.12 meets the 3.11+ requirement.
   [ok  ] Sandbox: OS sandbox backend detected: seatbelt. Shell work will be confined.
@@ -156,13 +157,13 @@ You are ready. Run your first workflow:
 <p>Read each line. If Python is too old, it says so. If your computer has no sandbox (the safety cage around any command the AI runs), it says so plainly and explains that shell work will simply be blocked until you add one, which is protection, not breakage. The last line proves the harness works, using the mock model, for zero dollars.</p>
 <h2 id="step-3-run-your-first-real-workflow">Step 3: Run your first real workflow</h2>
 <p>Move into your project and run the built-in workflow, which plans a small change, makes it, and checks it:</p>
-<pre><code>cd my-first-project
+<pre tabindex="0"><code>cd my-first-project
 harnessie run workflows/build-and-verify.yaml --goal &quot;a to-do list saved to a text file&quot;</code></pre>
 <p>Before it starts, Harnessie prints a cost preview. Because the scaffold uses the mock model, it will say <code>MOCK (zero-dollar, nothing is billed)</code>. The built-in worker is new automation, so its first run is a maiden voyage: Harnessie makes and checks the proposed files under the ignored <code>.maiden/</code> runtime directory but does not change <code>workspace/</code>. The summary reports <code>needs_approval</code>, names the staged path, and gives the exact <code>harnessie approve-maiden &lt;run_id&gt; implement</code> command. Inspect the staged files, approve them, then resume with the same workflow and goal. Later runs of the unchanged phase contract write normally.</p>
 <p>To use a real, paid AI model later, you edit one file (<code>config/models.yaml</code>) and set the model&#x27;s key as an environment variable in your terminal. You never paste a key into a file. Harnessie refuses to start a paid run that has no spending ceiling, so you cannot accidentally run up a bill.</p>
 <h2 id="step-4-read-what-happened">Step 4: Read what happened</h2>
 <p>A run never just says &quot;done&quot;. Ask for a plain-language report:</p>
-<pre><code>harnessie report &lt;run_id&gt;</code></pre>
+<pre tabindex="0"><code>harnessie report &lt;run_id&gt;</code></pre>
 <p>Put your run&#x27;s id in place of <code>&lt;run_id&gt;</code>. The report tells you, in ordinary sentences, which steps completed, whether the run stopped and is waiting for you, and the single next thing to do. For the complete, hash-verified trail of every action, run <code>harnessie audit &lt;run_id&gt;</code>.</p>
 <h2 id="step-5-when-a-run-stops-and-waits-for-you">Step 5: When a run stops and waits for you</h2>
 <p>Silence is never treated as success. A run ends in a named condition, and each one names one action:</p>

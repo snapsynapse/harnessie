@@ -83,6 +83,7 @@
     pre { background: var(--code-bg); color: var(--code-text); border: 1px solid var(--code-border); border-radius: 10px; padding: 1.1rem 1.2rem; overflow-x: auto; margin: 0 0 1.2rem; font-size: 0.82rem; line-height: 1.6; }
     pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
     .table-wrap { overflow-x: auto; margin: 0 0 1.2rem; border: 1px solid var(--border); border-radius: 10px; }
+    pre:focus-visible, .table-wrap:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
     table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
     th, td { padding: 0.6rem 0.85rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border-soft); }
     th { background: var(--bg-alt); font-weight: 600; border-bottom: 1px solid var(--border); }
@@ -133,40 +134,40 @@
 <p>In more technical terms: Harnessie is a brain-agnostic multi-agent harness. An orchestrator decomposes a goal into task packets, cheap workers execute them inside a jailed workspace, and an independent verifier gates every phase before the next one starts. The structure carries the quality floor; the model carries the ceiling. You swap models by editing one YAML file.</p>
 <h2 id="1-install">1. Install</h2>
 <p>Requires Python 3.11 or newer. PyYAML and jsonschema install automatically; the model adapters are standard-library, so no vendor SDK is needed.</p>
-<pre><code>pip install harnessie          # or: pipx install / uv tool install
+<pre tabindex="0"><code>pip install harnessie          # or: pipx install / uv tool install
 harnessie init my-project      # scaffold + guided readiness check + zero-dollar mock run
 cd my-project</code></pre>
 <p>PyPI installs the current Harnessie 1.2.0 core release. The separately maintained Homebrew formula may lag briefly during release propagation; verify its reported version before treating the install paths as equivalent.</p>
 <p>Working on Harnessie itself (or wanting the test suite)? Install from source instead:</p>
-<pre><code>git clone https://github.com/snapsynapse/harnessie.git
+<pre tabindex="0"><code>git clone https://github.com/snapsynapse/harnessie.git
 cd harnessie
 pip install -e &quot;.[dev]&quot;</code></pre>
 <h2 id="2-prove-it-works-offline">2. Prove it works offline</h2>
 <p>The test suite and the eval scorecard both run against a deterministic mock brain with no network. Run them first; if they pass, the harness is sound on your machine before any API key is involved.</p>
-<pre><code>python3 -m pytest -q            # unit + integration suite, mock brain
+<pre tabindex="0"><code>python3 -m pytest -q            # unit + integration suite, mock brain
 python3 -m harness.cli eval     # deterministic eval scorecard
 python3 -m harness.cli verify-manifest</code></pre>
 <p>You should see the suite pass and the eval print one <code>PASS</code> line per scenario. Nothing here calls a provider or touches the network.</p>
 <h2 id="3-point-it-at-a-brain">3. Point it at a brain</h2>
 <p>Models live in <code>config/models.yaml</code> as named tiers. Out of the box the <code>frontier</code>, <code>mid</code>, and <code>cheap</code> tiers are Anthropic models and read their key from an environment variable; the <code>local</code> tier is any OpenAI-compatible endpoint (Ollama, vLLM, llama.cpp, and similar).</p>
 <p>Pick one:</p>
-<pre><code>export ANTHROPIC_API_KEY=...    # use the Anthropic tiers</code></pre>
+<pre tabindex="0"><code>export ANTHROPIC_API_KEY=...    # use the Anthropic tiers</code></pre>
 <p>Or run entirely local by leaving the key unset and routing task classes at the <code>local</code> tier in <code>config/models.yaml</code> (it already points at <code>http://localhost:11434/v1</code>). You never put a key in the file; the file names the environment variable, the harness reads it at run time.</p>
 <p>To smoke-test real providers before a workflow, opt in explicitly:</p>
-<pre><code>HARNESSIE_LIVE=1 \
+<pre tabindex="0"><code>HARNESSIE_LIVE=1 \
 HARNESSIE_OPENAI_COMPAT_BASE_URL=http://localhost:11434/v1 \
 python3 -m harness.cli eval --live</code></pre>
 <p>Without the flag and provider configuration, live rows are shown as skipped.</p>
 <h2 id="4-run-a-workflow">4. Run a workflow</h2>
 <p>The simplest built-in workflow plans a code change, implements it, and gates it on tests plus an independent verifier.</p>
-<pre><code>python3 -m harness.cli run workflows/build-and-verify.yaml \
+<pre tabindex="0"><code>python3 -m harness.cli run workflows/build-and-verify.yaml \
   --goal &quot;a CLI todo app with tests&quot;</code></pre>
 <p>Every run gets an id. The command prints it, and the run&#x27;s artifacts land under <code>runs/&lt;run_id&gt;/</code>.</p>
 <p>The built-in worker is a declared <code>phase_type</code>, so its first exact contract is a maiden voyage. Harnessie runs and verifies it in the ignored <code>.maiden/</code> runtime directory without changing <code>workspace/</code>, then reports <code>needs_approval</code>. Inspect the staged path named in the report, run <code>harnessie approve-maiden &lt;run_id&gt; implement</code>, and resume with the same workflow and goal. Later runs of that unchanged contract write normally.</p>
 <p>For a worked, data-backed example (assessing a policy against a list of obligations, with a verifier that catches fabricated citations) see <a href="https://github.com/snapsynapse/harnessie/blob/main/examples/policy-compliance/README.md">examples/policy-compliance/README.md</a>.</p>
 <h2 id="5-read-the-evidence">5. Read the evidence</h2>
 <p>A run never just says &quot;done&quot;. It leaves a journal, a hash-chained event log, and proof artifacts. Two commands read them back:</p>
-<pre><code>python3 -m harness.cli report &lt;run_id&gt;   # phases, results, proofs
+<pre tabindex="0"><code>python3 -m harness.cli report &lt;run_id&gt;   # phases, results, proofs
 python3 -m harness.cli audit  &lt;run_id&gt;   # verify the hash chain + governance timeline</code></pre>
 <p><code>report</code> shows what each phase did and where its proofs are. <code>audit</code> re-verifies the event log end to end (exit 0 clean, exit 1 if the chain was tampered with) and renders one composite timeline of agent and operator actions: consents, ownership claims and denials, structured refusals, gate verdicts, and any decision records.</p>
 <h2 id="6-when-a-run-stops">6. When a run stops</h2>
@@ -175,7 +176,7 @@ python3 -m harness.cli audit  &lt;run_id&gt;   # verify the hash chain + governa
 <p>Resume with <code>harnessie resume &lt;run_id&gt; &lt;workflow&gt; --goal &quot;...&quot;</code>. It re-runs only the phases that did not pass. The full table is in <a href="/guide.html#when-a-run-halts">the user guide</a>.</p>
 <h2 id="7-start-your-own-project">7. Start your own project</h2>
 <p>To scaffold a fresh project layout (config, workflows, agents, ownership) rather than working inside this repo:</p>
-<pre><code>harnessie init my-project</code></pre>
+<pre tabindex="0"><code>harnessie init my-project</code></pre>
 <h2 id="where-to-next">Where to next</h2>
 <ul><li><a href="/guide.html">User guide</a>: the complete guide, concepts to extension.</li><li><a href="https://github.com/snapsynapse/harnessie/blob/main/ARCHITECTURE.md">ARCHITECTURE.md</a>: why the harness is shaped this way, with the source-to-decision map.</li><li><a href="https://github.com/snapsynapse/harnessie/blob/main/GOVERNANCE.md">GOVERNANCE.md</a>: consent, ownership, contested decisions, and the audit model.</li><li><a href="https://github.com/snapsynapse/harnessie/blob/main/SECURITY.md">SECURITY.md</a>: the prompt-injection and secret-handling model, and the sandbox backends.</li></ul>
   </main>

@@ -66,6 +66,18 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 
 ## 5. Tag and publish
 
+- [ ] For 1.3.0, satisfy Sam's 2026-09-07 pre-publication GuideCheck gate:
+      final served guide, sidecar, repository pins and DNS TXT agree, and a
+      dated hosted result verifies those exact bytes. GuideCheck execution
+      is outside the current preparation tranche. Complete it before
+      publishing the GitHub Release, which triggers the package workflow,
+      and before PyPI, Verify Action or Homebrew publication. If immutable
+      tag identity is needed, create the approved tag first, then verify
+      the guide while the GitHub Release remains unpublished. Any guide
+      byte change invalidates the earlier result. The protected `pypi`
+      environment remains a second publication checkpoint; recovery must
+      respect this requirement as well. This is an operator checklist gate,
+      not a newly implemented workflow enforcement check.
 - [ ] Commit steps 2-3 on `main` and push.
 - [ ] Record the release-signing decision for this version. If signed tags or
       commits are required, verify the signature from a clean clone before
@@ -113,7 +125,8 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 - [ ] OPERATOR: update the DNS TXT anchor `_assistant-guide.harnessie.com`
       to `v=1; sha256=<guide-sha256>`, single record, then confirm it
       resolves (DoH) and run the hosted GuideCheck verifier for the Level 4
-      re-confirmation.
+      re-confirmation. For 1.3.0 this must be completed at the earlier
+      pre-publication checkpoint, not deferred to downstream closeout.
 
 ## 6. Close out
 

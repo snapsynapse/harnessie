@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-07",
+  "tool": "a11y-audit report.js v6",
+  "standard": {
+    "id": "wcag21-aa",
+    "name": "WCAG 2.1 AA"
+  },
+  "pages": [
+    "http://127.0.0.1:54051/",
+    "http://127.0.0.1:54051/quickstart.html",
+    "http://127.0.0.1:54051/getting-started.html",
+    "http://127.0.0.1:54051/ladder.html",
+    "http://127.0.0.1:54051/guide.html",
+    "http://127.0.0.1:54051/compare.html",
+    "http://127.0.0.1:54051/agent-file-ownership.html",
+    "http://127.0.0.1:54051/brains.html",
+    "http://127.0.0.1:54051/threat-model.html",
+    "http://127.0.0.1:54051/ringer.html"
+  ],
+  "lighthouse": {
+    "status": "skipped",
+    "reason": "Lighthouse is a separate optional audit step"
+  },
+  "summary": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0
+  },
+  "violations": [],
+  "matrix": {
+    "1.1.1": "pass",
+    "1.2.1": "manual",
+    "1.2.2": "manual",
+    "1.2.3": "manual",
+    "1.2.4": "manual",
+    "1.2.5": "manual",
+    "1.3.1": "pass",
+    "1.3.2": "manual",
+    "1.3.3": "manual",
+    "1.3.4": "manual",
+    "1.3.5": "not-applicable",
+    "1.4.1": "pass",
+    "1.4.2": "not-applicable",
+    "1.4.3": "manual",
+    "1.4.4": "pass",
+    "1.4.5": "manual",
+    "1.4.10": "manual",
+    "1.4.11": "manual",
+    "1.4.12": "pass",
+    "1.4.13": "manual",
+    "2.1.1": "pass",
+    "2.1.2": "manual",
+    "2.1.4": "manual",
+    "2.2.1": "not-applicable",
+    "2.2.2": "not-applicable",
+    "2.3.1": "manual",
+    "2.4.1": "pass",
+    "2.4.2": "pass",
+    "2.4.3": "manual",
+    "2.4.4": "pass",
+    "2.4.5": "manual",
+    "2.4.6": "manual",
+    "2.4.7": "manual",
+    "2.5.1": "manual",
+    "2.5.2": "manual",
+    "2.5.3": "manual",
+    "2.5.4": "manual",
+    "3.1.1": "pass",
+    "3.1.2": "not-applicable",
+    "3.2.1": "manual",
+    "3.2.2": "manual",
+    "3.2.3": "manual",
+    "3.2.4": "manual",
+    "3.3.1": "manual",
+    "3.3.2": "not-applicable",
+    "3.3.3": "manual",
+    "3.3.4": "manual",
+    "4.1.1": "manual",
+    "4.1.2": "pass",
+    "4.1.3": "manual"
+  },
+  "audit_evidence": {
+    "violations": {
+      "counts": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0,
+        "unknown": 0,
+        "total": 0
+      },
+      "rules": []
+    },
+    "incomplete": {
+      "counts": {
+        "critical": 1,
+        "serious": 35,
+        "moderate": 0,
+        "minor": 0,
+        "unknown": 0,
+        "total": 36
+      },
+      "rules": [
+        {
+          "rule": "video-caption",
+          "impact": "critical",
+          "instances": 1,
+          "url": "http://127.0.0.1:54051/",
+          "tags": [
+            "cat.text-alternatives",
+            "wcag2a",
+            "wcag122",
+            "section508",
+            "section508.22.a",
+            "TTv5",
+            "TT17.a",
+            "EN-301-549",
+            "EN-9.1.2.2",
+            "RGAAv4",
+            "RGAA-4.3.1"
+          ],
+          "best_practice_only": false
+        },
+        {
+          "rule": "color-contrast",
+          "impact": "serious",
+          "instances": 35,
+          "url": "http://127.0.0.1:54051/threat-model.html",
+          "tags": [
+            "cat.color",
+            "wcag2aa",
+            "wcag143",
+            "TTv5",
+            "TT13.c",
+            "EN-301-549",
+            "EN-9.1.4.3",
+            "ACT",
+            "RGAAv4",
+            "RGAA-3.2.1"
+          ],
+          "best_practice_only": false
+        }
+      ]
+    }
+  },
+  "expected_url": "https://harnessie.com/",
+  "runtime_url": "http://127.0.0.1:54051",
+  "axe_version": "4.12.1",
+  "acceptance": {
+    "mode": "major",
+    "status": "inconclusive",
+    "major_impacts": [
+      "critical",
+      "serious"
+    ],
+    "confirmed_major_instances": 0,
+    "nonblocking_instances": 0,
+    "best_practice_only_instances": 0,
+    "unknown_impact_instances": 0,
+    "blocking_incomplete_instances": 36,
+    "advisory_incomplete_instances": 0,
+    "scan_error_count": 0,
+    "reasons": [
+      "blocking-incomplete-review"
+    ]
+  },
+  "criterion_review": {
+    "1.2.2": "needs-review",
+    "1.4.3": "needs-review"
+  }
+}
