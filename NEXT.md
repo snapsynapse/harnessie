@@ -1,5 +1,20 @@
 # Current state and next work
 
+## Approved follow-up source
+
+The approved follow-up was prepared on `codex/approved-followup` at remote-main base `d64d985`, incorporating the preparation changes from `feature/bidding-and-observer` at `9b30f40`. The original feature branch and its four preparation commits are preserved. On September 7, Sam authorized staging, signed commit, push, PR creation and merge after passing checks. Git history and the PR record establish delivery state; source approval does not authorize a package release.
+
+[AIDR-0009](decisions/AIDR-0009-bid-rounds-and-run-observer.md) is arbitrated by Sam on 2026-09-07: approve the most conservative offline-observer slice and defer bidding, aligning with Codex and Antigravity rather than Claude's broader approval scope. The record contains his attributed verbatim decision, all five position sections and six preserved objections/conditions. The design draft is supporting evidence, not a second record; do not reuse 0009 for another proposal.
+
+## Approved follow-up, 2026-09-07
+
+1. Offline observer: implemented in current source under the accepted [preparation contract](audits/aidr-0009-preparation-2026-09-04.md); see [OBSERVER.md](OBSERVER.md). It reads a verified journal snapshot and writes cited derived artifacts. Bidding, commentary, follow mode, automatic runner integration and selection remain deferred. The new command is not in the published 1.2.0 package. No version bump or publication is authorized by implementation approval.
+2. Controlled review: [source mapping, synthetic proof and proposed AIDR export contract](audits/review-interoperability-2026-09-07.md) prepared. No exporter or live panel is implemented. Any such work requires a separate accepted packet.
+3. Maintenance: [dependency-lock, release-provenance, parser-testing and sole-maintainer policy packets](audits/maintenance-packets-2026-09-07.md) prepared for implementation review. Provider settings remain unchanged.
+4. GuideCheck and a11y-audit are owned by a concurrent session. Coordinate shared-file edits; do not rotate the guide or regenerate its trust artifacts here.
+
+Final candidate verification is recorded in [the observer implementation audit](audits/observer-implementation-2026-09-07.md). Expected failures belong to deferred features, not the implemented offline observer. The original feature branch still preserves the preparation history.
+
 ## Release boundary
 
 Harnessie 1.2.0 is the stable core release on GitHub and PyPI. It contains OpenAI Responses support, v1 evidence-bundle intake, structured claim verdicts, deterministic Ringer regression fixtures, event-trace metrics, OpenAI-compatible token-parameter handling, and a portable shell-substitution regression test.
@@ -45,8 +60,8 @@ The repository, website, and agent-surface audit found one high-priority release
 
 ## Specific follow-up sessions
 
-1. Review Dependabot pull requests [#4](https://github.com/snapsynapse/harnessie/pull/4), [#5](https://github.com/snapsynapse/harnessie/pull/5), [#6](https://github.com/snapsynapse/harnessie/pull/6), and [#7](https://github.com/snapsynapse/harnessie/pull/7). Merge only updates whose immutable commits, release tags, diffs, and required checks verify; otherwise close with a recorded rationale. Consolidate future GitHub Actions updates if separate PR churn outweighs review clarity.
-2. Decide the `main` branch and review policy as a provider-governance session. Model the current maintainer path before enabling rules, require the exact CI and security checks that should gate merges, preserve an explicit emergency path, and verify the ruleset does not deadlock release recovery.
+1. Dependabot queue reconciled on 2026-09-07: #6 and #7 merged; #4, #5 and #8 closed. GitHub reported no open PRs. Remote main is `d64d985`; its CI run `33591645491`, CodeQL run `33951091471` and Pages run `33591644325` passed. This is provider evidence, not a new local package or live-byte verification.
+2. Sam confirmed sole-maintainer operation. Review the proposed required-check and emergency-recovery policy in the maintenance packet before any provider change. The current `prime` ruleset blocks deletion and force-push only.
 
 ## External and optional checks
 
@@ -55,6 +70,8 @@ The repository, website, and agent-surface audit found one high-priority release
 - GitHub repository description and discovery topics now reflect the verifier-first adoption wedge. The canonical homepage, Issues-on, and Wiki-off settings remain correct; Discussions remain disabled.
 
 ## Session start commands
+
+For starting Codex, Claude Code, Google Antigravity CLI, direct Ollama, direct Harnessie-to-Ollama, or an optional Ollama-backed Codex session from a terminal, follow `TERMINAL_SESSIONS.md`. The guide distinguishes outer coding-agent sessions, direct model conversations, and governed `harnessie run` execution.
 
 Literal
 ```bash

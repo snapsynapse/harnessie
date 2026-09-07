@@ -15,6 +15,18 @@ def test_baseline_eval_suite_passes():
     assert scorecard["passed"] == scorecard["total"]
 
 
+def test_observer_eval_suite_passes_and_rejects_wrong_expectations():
+    from harness.evals import run_scenario
+    path = ROOT / "evals" / "observer.yaml"
+    suite = yaml.safe_load(path.read_text())
+    scorecard = run_eval_suite(ROOT, path)
+    assert scorecard["total"] == len(suite["scenarios"]) > 0
+    assert scorecard["passed"] == scorecard["total"]
+    fixture = suite["scenarios"][0]
+    assert not run_scenario({**fixture, "expect_outcome": "invented_success"}).passed
+    assert not run_scenario({**fixture, "expect_unknown_contract": True}).passed
+
+
 def test_redteam_eval_suite_passes():
     scorecard = run_eval_suite(ROOT, ROOT / "evals" / "redteam.yaml")
     assert scorecard["total"] == 3

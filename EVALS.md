@@ -8,7 +8,7 @@ Harnessie evals are YAML scorecards under `evals/`. They are deliberately small,
 ## Scenario contract
 Every scenario has:
 - `id`: stable snake-case identifier, unique within the suite.
-- `kind`: one of `verdict`, `loop`, `workflow`, `resume`, `ownership`, `plugin`, `adversarial`, `audit`, `triage`, `parallel`, `blast_radius`, `inward_manifest`, `maiden_voyage`, or `repo_hygiene`.
+- `kind`: one of `verdict`, `loop`, `workflow`, `resume`, `ownership`, `plugin`, `adversarial`, `audit`, `triage`, `parallel`, `blast_radius`, `inward_manifest`, `maiden_voyage`, `observer`, or `repo_hygiene`.
 - Expected result fields, which depend on `kind`.
 ## Suites
 - `evals/baseline.yaml`: core harness guarantees (verdicts, stop conditions, gates, resume).
@@ -20,11 +20,17 @@ Every scenario has:
 - `evals/redteam.yaml`: published break-it targets for the exfiltration claims (SECURITY.md "Break it"). Canary credentials enter as attacker input; passing proves they reach no workspace artifact and never appear anywhere in the events log.
 - `evals/gate-integrity.yaml`: meta-gates that prove a claimed harness check actually ran and earned the result, including synthetic Ringer-style change intake and duplicate-denial recovery behavior.
 - `evals/canary-leak.yaml`: evaluation-integrity canaries that distinguish the intended gate signal from a coincidental green result.
+- `evals/pending/`: scorecards written before their scenario kind exists. Not globbed by the default runner. Each moves up one directory in the change that ships its kind; a suite left there after its kind ships is unprocessed work. See CONTRIBUTING.md rule 6.
 
-The current default baseline is 51 deterministic scenarios. Treat the command result as the contract rather than hard-coding that count into stable release guides.
+The current default baseline includes the eight offline observer scenarios. Treat the command result as the contract rather than hard-coding that count into stable release guides.
 
 Standalone verification also emits `proofs/trace-metrics.json`. `harness/trace_eval.py` derives step, token, denial, duplicate-tool-call, and claim-coverage metrics without treating a missing or malformed counter as success. Focused Ringer fixtures live in the test suite and do not depend on a private or ignored contribution queue.
+- `evals/observer.yaml`: deterministic offline observation, including crashed/halted input, chain refusal, citations, declared-write drift and payload omission.
+
 ## Scenario kinds
+### observer
+Uses synthetic event journals and the offline observer with no model calls. Assertions cover phase statuses, outcome, findings, phase count, output files, empty workspace and absent payload canaries. Unknown expectation keys fail explicitly.
+
 ### verdict
 Exercises verifier verdict parsing only.
 - Input: `report`

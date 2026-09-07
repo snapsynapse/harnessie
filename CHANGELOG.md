@@ -4,6 +4,12 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+### Added
+
+- Add deterministic offline `harnessie observe RUN_ID` under Sam's observer-only AIDR-0009 arbitration. Verify journal snapshots before emitting cited JSON/Markdown, preserve source bytes, refuse unsafe paths and malformed input, retain halt/incomplete states, and omit raw payloads. Bidding, commentary, follow mode and runner integration remain deferred.
+- Activate eight deterministic observer evals and CLI, path, replay and privacy acceptance tests. Extend fresh-install smoke to observe a halted run from the built wheel.
+- Synthetic checks prove explicit human arbitration halts even on agreement, preserves the decision on unarbitrated resume without reviewer redispatch, and refuses a status-only arbitration edit.
+
 ### Fixed
 
 - Release recovery can verify and republish the exact distributions already attached to a GitHub Release, while no-checkout asset jobs pass explicit repository identity to GitHub CLI.
@@ -12,6 +18,8 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 - CI and PR-verifier workflows declare read-only token defaults and pin every action to an immutable commit; Dependabot now covers Python and GitHub Actions dependencies, CodeQL supplies repository-owned Python SAST, and the security policy links directly to private reporting.
 
 ### Documentation
+
+- Reconcile the completed Dependabot queue, record the conservatively arbitrated observer scope, map controlled-review/AIDR interoperability, and prepare bounded maintenance packets for dependency locks, release provenance, parser testing and sole-maintainer governance.
 
 - Release closeout records the exact 1.2.0 artifact digests, successful PyPI recovery and attestations, Verify Action v0.2.0 and stable `v0`, and the Homebrew 1.2.0 upgrade evidence without treating the pending DNS/GuideCheck gate as complete.
 - The first repository-owned OpenSSF Scorecard result records exact commit, tool version, aggregate 5.9, and every individual-check disposition without presenting the aggregate as a release gate.

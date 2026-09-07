@@ -1,0 +1,125 @@
+# Bid rounds (AIDR-0009). Kind `bid`: a phase dict, one scripted bid report
+# per candidate tier, optional synthetic events for outcome scoring.
+# Expected: normalized bid per tier, the dispatch tier for the mode, and
+# calibration counts. Mock brain, no network.
+suite: bidding
+scenarios:
+  - id: bid_absent_key_byte_identical
+    kind: bid
+    phase: { name: implement, task_class: implement, task: "x" }
+    expect_events_absent_kinds: [bid_round_start, bid_recorded, bid_outcome]
+    expect_dispatch_tier: mid
+
+  - id: bid_record_no_routing_change
+    kind: bid
+    phase:
+      name: implement
+      task_class: implement
+      task: "x"
+      verify: { checks: [{ name: tests, command: "true" }] }
+      bid: { mode: record, candidates: [local, mid] }
+    bids:
+      local: '{"bid": "yes", "confidence": 0.9, "premortem": [{"failure": "f", "cites": ["check:tests"], "mitigation": "m"}]}'
+      mid: '{"bid": "no"}'
+    expect_bids: { local: yes, mid: no }
+    expect_dispatch_tier: mid
+
+  - id: bid_unparseable_is_no_bid
+    kind: bid
+    phase: { name: implement, task_class: implement, task: "x", bid: { mode: record, candidates: [local] } }
+    bids: { local: "sure, easy" }
+    expect_bids: { local: no_bid }
+    expect_dispatch_tier: mid
+
+  - id: bid_yes_without_premortem_is_no_bid
+    kind: bid
+    phase: { name: implement, task_class: implement, task: "x", bid: { mode: record, candidates: [local] } }
+    bids: { local: '{"bid": "yes", "confidence": 0.8}' }
+    expect_bids: { local: no_bid }
+    expect_dispatch_tier: mid
+
+  - id: bid_premortem_uncited_is_no_bid
+    kind: bid
+    phase:
+      name: implement
+      task_class: implement
+      task: "x"
+      verify: { checks: [{ name: tests, command: "true" }] }
+      bid: { mode: record, candidates: [local] }
+    bids:
+      local: '{"bid": "yes", "premortem": [{"failure": "tests might fail", "cites": ["vibes"], "mitigation": "m"}]}'
+    expect_bids: { local: no_bid }
+    expect_dispatch_tier: mid
+
+  - id: bid_premortem_unmitigated_degrades
+    kind: bid
+    phase:
+      name: implement
+      task_class: implement
+      task: "x"
+      verify: { checks: [{ name: tests, command: "true" }] }
+      bid: { mode: record, candidates: [local] }
+    bids:
+      local: '{"bid": "yes", "premortem": [{"failure": "f", "cites": ["check:tests"]}]}'
+    expect_bids: { local: conditional }
+    expect_dispatch_tier: mid
+
+  - id: bid_select_bounded_by_candidates
+    kind: bid
+    phase:
+      name: implement
+      task_class: implement
+      task: "x"
+      verify: { checks: [{ name: tests, command: "true" }] }
+      bid: { mode: select, candidates: [mid] }
+    bids:
+      local: '{"bid": "yes", "premortem": [{"failure": "f", "cites": ["check:tests"], "mitigation": "m"}]}'
+      mid: '{"bid": "no"}'
+    expect_dispatch_tier: mid
+    expect_events_present_kinds: [bid_fallback]
+
+  - id: bid_select_contained_never_egresses
+    kind: bid
+    contained: true
+    phase:
+      name: implement
+      task_class: implement
+      task: "x"
+      verify: { checks: [{ name: tests, command: "true" }] }
+      bid: { mode: select, candidates: [cheap, local] }
+    bids:
+      cheap: '{"bid": "yes", "premortem": [{"failure": "f", "cites": ["check:tests"], "mitigation": "m"}]}'
+      local: '{"bid": "yes", "premortem": [{"failure": "f", "cites": ["check:tests"], "mitigation": "m"}]}'
+    expect_bidder_calls: { cheap: 0, local: 1 }
+    expect_dispatch_tier: local
+
+  - id: bid_select_budget_fallback
+    kind: bid
+    phase:
+      name: implement
+      task_class: implement
+      task: "x"
+      bid: { mode: select, candidates: [local, mid], max_usd: 0.0 }
+    bids: { local: '{"bid": "no"}', mid: '{"bid": "no"}' }
+    expect_dispatch_tier: mid
+    expect_events_present_kinds: [bid_fallback]
+
+  - id: bid_reserved_class_refuses
+    kind: bid
+    reserved: [arbitration]
+    phase: { name: decide, task_class: arbitration, task: "x", bid: { mode: record, candidates: [local] } }
+    expect_status: needs_human
+    expect_events_absent_kinds: [bid_round_start]
+
+  - id: bid_outcome_overclaim_scored
+    kind: bid
+    phase:
+      name: implement
+      task_class: implement
+      task: "x"
+      verify: { checks: [{ name: tests, command: "false" }], max_attempts: 1 }
+      bid: { mode: record, candidates: [mid] }
+    bids:
+      mid: '{"bid": "yes", "confidence": 1.0, "premortem": [{"failure": "f", "cites": ["check:tests"], "mitigation": "m"}]}'
+    expect_status: needs_human
+    expect_metrics: { overclaim: 1, honored: 0, premortem_hit_rate: 1.0 }

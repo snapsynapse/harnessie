@@ -1,0 +1,90 @@
+# Run observer (AIDR-0009). Kind `observer`: a synthetic event list is
+# written through the real EventLog (honest seq/prev), optionally broken
+# afterwards, then observed. Expected: phase statuses, observation ids, and
+# where output lands. Mock brain, no network.
+suite: observer
+scenarios:
+  - id: observer_reads_crashed_run
+    kind: observer
+    events:
+      - { kind: workflow_start, name: wf, run_id: R, goal: g }
+      - { kind: phase_start, phase: plan }
+      - { kind: phase_done, phase: plan, status: passed }
+      - { kind: phase_start, phase: implement }
+    expect_phase_statuses: { plan: passed, implement: in_progress }
+    expect_outcome: in_progress
+
+  - id: observer_refuses_broken_chain
+    kind: observer
+    events:
+      - { kind: workflow_start, name: wf, run_id: R, goal: g }
+      - { kind: phase_start, phase: plan }
+      - { kind: phase_done, phase: plan, status: passed }
+    break_line: 2
+    expect_observations: [chain_break]
+    expect_phase_count: 0
+
+  - id: observer_flags_escalation_without_failure
+    kind: observer
+    events:
+      - { kind: workflow_start, name: wf, run_id: R, goal: g }
+      - { kind: phase_start, phase: implement }
+      - { kind: routing_trace, agent: implementer, tier: mid, effort: medium, alt: 0, model: m, provider: mock, outcome: task_complete }
+      - { kind: routing_trace, agent: implementer, tier: frontier, effort: medium, alt: 0, model: f, provider: mock, outcome: task_complete }
+      - { kind: phase_done, phase: implement, status: passed }
+      - { kind: workflow_done, run_id: R }
+    expect_observations: [escalation_without_lower_rung_failure]
+
+  - id: observer_earned_escalation_is_silent
+    kind: observer
+    events:
+      - { kind: workflow_start, name: wf, run_id: R, goal: g }
+      - { kind: phase_start, phase: implement }
+      - { kind: routing_trace, agent: implementer, tier: mid, effort: medium, alt: 0, model: m, provider: mock, outcome: task_complete }
+      - { kind: gate_verdict, attempt: 1, passed: false, reasons: no }
+      - { kind: routing_trace, agent: implementer, tier: frontier, effort: medium, alt: 0, model: f, provider: mock, outcome: task_complete }
+      - { kind: phase_done, phase: implement, status: passed }
+      - { kind: workflow_done, run_id: R }
+    expect_observations: []
+
+  - id: observer_flags_scope_drift
+    kind: observer
+    workflow: { phases: [{ name: implement, writes: [docs/] }] }
+    events:
+      - { kind: workflow_start, name: wf, run_id: R, goal: g }
+      - { kind: phase_start, phase: implement }
+      - { kind: ownership_claimed, agent: implementer, path: src/a.py }
+      - { kind: phase_done, phase: implement, status: passed }
+      - { kind: workflow_done, run_id: R }
+    expect_observations: [scope_drift]
+
+  - id: observer_output_outside_workspace
+    kind: observer
+    events:
+      - { kind: workflow_start, name: wf, run_id: R, goal: g }
+      - { kind: phase_start, phase: plan }
+      - { kind: phase_done, phase: plan, status: passed }
+      - { kind: workflow_done, run_id: R }
+    expect_files: [observer/narrative.json, observer/narrative.md]
+    expect_workspace_empty: true
+
+  - id: observer_omits_raw_payload_canaries
+    kind: observer
+    events:
+      - { kind: workflow_start, name: wf, run_id: R, goal: CANARY_GOAL_742 }
+      - { kind: phase_start, phase: plan }
+      - { kind: tool_result, tool: read_file, content: CANARY_TOOL_742 }
+      - { kind: model_turn, role: worker, content: CANARY_PROSE_742 }
+      - { kind: phase_done, phase: plan, status: passed }
+      - { kind: workflow_done, run_id: R }
+    expect_outcome: completed
+    expect_markdown_absent: [CANARY_GOAL_742, CANARY_TOOL_742, CANARY_PROSE_742]
+
+  - id: observer_unknown_event_keeps_run_in_progress
+    kind: observer
+    events:
+      - { kind: workflow_start, name: wf, run_id: R, goal: g }
+      - { kind: phase_start, phase: implement }
+      - { kind: future_unknown_kind, payload: opaque }
+    expect_phase_statuses: { implement: in_progress }
+    expect_outcome: in_progress

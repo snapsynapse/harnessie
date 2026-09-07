@@ -28,6 +28,7 @@ Harnessie uses an eval-first change process. Read [EVALS.md](EVALS.md) for the s
 3. Keep policy in the harness. Role permissions, consent, ownership, and sandboxing are enforced at dispatch, so no prompt can opt out. Do not move a guarantee into a role prompt.
 4. Fail closed. A control that cannot be enforced on a platform is refused, never skipped. New capabilities follow the same rule.
 5. Green before commit. `python3 -m pytest -q` and `python3 -m harness.cli eval` both pass on the commit you propose.
+6. Falsifiers before implementation. When a decision record is open, its tests may land before its code as strict expected failures using `pytest.mark.xfail(strict=True)` naming the record and implementation slice. Group markers by independently approved slice; use a module-level marker only when the whole file belongs to one slice. The first passing marked test fails the suite until its marker is reviewed. Remove markers only for implemented, approved behavior after confirming the intended red failure and the passing result. Deferred slices retain strict markers. Never convert them to skips or stub the code to satisfy them. Eval scorecards for a scenario kind that does not exist yet wait under `evals/pending/` and move into `evals/` in the same change that ships the kind.
 
 ## Consequential and contested changes
 
