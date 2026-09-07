@@ -4,6 +4,12 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+### Maintenance
+
+- Add reviewed SHA-256 runtime, development and release locks, offline drift validation, installed-build pin checks and a weekly patch-only refresh. Controlled builds disable dependency resolution and build isolation; a separate CI job retains public-constraint consumer coverage.
+- Attest all four final GitHub release asset classes and verify the original repository, workflow, tag and commit before attachment or recovery. Historical assets without original provenance refuse on the new recovery path. Hosted acceptance remains pending a release or authorized rehearsal.
+- Add bounded deterministic parser properties and permanent minimized regressions. Non-string claim statuses and NUL-containing evidence paths now produce documented refusals instead of uncaught exceptions. Verdict parser identity advances to 3, invalidating prior parser-specific scorecard claims.
+
 ### Added
 
 - Add deterministic offline `harnessie observe RUN_ID` under Sam's observer-only AIDR-0009 arbitration. Verify journal snapshots before emitting cited JSON/Markdown, preserve source bytes, refuse unsafe paths and malformed input, retain halt/incomplete states, and omit raw payloads. Bidding, commentary, follow mode and runner integration remain deferred.

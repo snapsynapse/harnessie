@@ -1,0 +1,7 @@
+{
+  "generator": "uv",
+  "generator_version": "0.11.8",
+  "python": "3.12",
+  "environments": ["linux-x86_64", "darwin-arm64", "darwin-x86_64"],
+  "release": ["uv==0.11.8", "cyclonedx-bom==7.3.1"]
+}

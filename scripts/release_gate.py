@@ -34,8 +34,13 @@ def main() -> int:
     parser.add_argument(
         "--skip-core", action="store_true",
         help="skip pytest, evals, manifests, and ecosystem validation")
+    parser.add_argument(
+        "--locked-build", action="store_true",
+        help="use the preinstalled hash-locked build backend without build isolation")
     args = parser.parse_args()
     try:
+        if args.locked_build:
+            run([sys.executable, "scripts/dependency_locks.py", "--installed", "release"])
         if not args.skip_core:
             for command in (
                 [sys.executable, "-m", "pytest", "-q"],
@@ -54,6 +59,7 @@ def main() -> int:
                 prefix="harnessie-release-gate-") as raw:
             dist = Path(raw)
             run(module_or_command("build", "pyproject-build")
+                + (["--no-isolation"] if args.locked_build else [])
                 + ["--outdir", str(dist)])
             run(module_or_command("twine", "twine")
                 + ["check", *[str(path) for path in sorted(dist.iterdir())]])

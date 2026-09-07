@@ -11,6 +11,7 @@ Every scenario has:
 - `kind`: one of `verdict`, `loop`, `workflow`, `resume`, `ownership`, `plugin`, `adversarial`, `audit`, `triage`, `parallel`, `blast_radius`, `inward_manifest`, `maiden_voyage`, `observer`, or `repo_hygiene`.
 - Expected result fields, which depend on `kind`.
 ## Suites
+- `evals/parser-safety.yaml`: malformed structured-claim status refusals plus the valid required-claim control. Verdict parser identity is 3; earlier parser-specific scorecards require rerunning.
 - `evals/baseline.yaml`: core harness guarantees (verdicts, stop conditions, gates, resume).
 - `evals/governance.yaml`: the v0.2 governance layer (consent, ownership, adversarial contest, audit). Written red before the implementation per the eval-first change discipline (GOVERNANCE.md §6); a governance feature without a red-then-green scenario pair does not merge.
 - `evals/operability.yaml`: the operability and write-safety layer (headless approval policy, invalid-policy fail-closed behavior, parallel phase workspaces, parallel failure halts, audit-chain survival under concurrency, and atomic blast-radius rollback).
@@ -28,6 +29,9 @@ Standalone verification also emits `proofs/trace-metrics.json`. `harness/trace_e
 - `evals/observer.yaml`: deterministic offline observation, including crashed/halted input, chain refusal, citations, declared-write drift and payload omission.
 
 ## Scenario kinds
+
+The bounded property pilot in `tests/test_parser_properties.py` runs 200 deterministic examples per property, without a database or network/model calls. Generated JSON has at most three nested container levels, strings up to 80 characters, collections up to three entries, and file payloads up to 512 bytes. Each example has a 500 ms deadline; target suite runtime is below 60 seconds. It covers evidence digests, path refusal before model/check dispatch, arbitrary claim shapes and complete required-claim coverage. Minimized crashes are retained in `tests/fixtures/parser-regressions/` and ordinary deterministic tests. This is a scoped property suite, not evidence of comprehensive fuzzing or live-provider acceptance.
+
 ### observer
 Uses synthetic event journals and the offline observer with no model calls. Assertions cover phase statuses, outcome, findings, phase count, output files, empty workspace and absent payload canaries. Unknown expectation keys fail explicitly.
 

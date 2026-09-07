@@ -53,7 +53,7 @@ class CheckResult:
 # verdict object wins; fail closed otherwise). Part of a proven
 # brain's bundle identity: bump on ANY behavior change to the parser, because
 # a scorecard earned under one parsing contract says nothing about another.
-PARSER_VERSION = "2"
+PARSER_VERSION = "3"
 
 
 CLAIM_STATUSES = frozenset({"reproduced", "refuted", "not_verifiable"})
@@ -194,7 +194,7 @@ def _parse_claims(obj: dict) -> Verdict:
         seen_ids.add(claim_id)
 
         status = raw.get("status")
-        if status not in CLAIM_STATUSES:
+        if not isinstance(status, str) or status not in CLAIM_STATUSES:
             return _failed_parse(
                 f"invalid structured verdict (failing closed): claim "
                 f"{claim_id!r} has unknown status {status!r}")

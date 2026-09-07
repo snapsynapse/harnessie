@@ -11,7 +11,7 @@ def test_legacy_contract_remains_compatible():
     passed = parse_verdict('{"passed": true, "reasons": "checked"}')
     failed = parse_verdict('{"passed": false, "reasons": "broken"}')
 
-    assert PARSER_VERSION == "2"
+    assert PARSER_VERSION == "3"
     assert passed.passed is True
     assert passed.overall_status == "verified"
     assert passed.reasons == "checked"
