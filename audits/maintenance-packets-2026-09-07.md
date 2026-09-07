@@ -1,6 +1,6 @@
 # Post-1.2 maintenance implementation packets
 
-Date: 2026-09-07. Scope: Harnessie. These are implementation proposals prepared under the approved planning pass. No dependency, workflow, provider rule, or release has been changed by these packets.
+Date: 2026-09-07. Scope: Harnessie. The proposals below preserve their preparation baseline. Sam subsequently approved packets 1–3; their local implementation and verification are recorded in [the implementation audit](maintenance-implementation-2026-09-07.md). Packet 4 remains a proposal. No provider rule or release has been changed.
 
 ## 1. Hash-verified CI dependencies
 

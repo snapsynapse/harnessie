@@ -160,7 +160,7 @@ Deliberately after 1.0, not before:
 
 ### Post-1.2 supply-chain and evaluation candidates
 
-Concrete dependency-lock, release-provenance, parser-testing and sole-maintainer governance packets are in [the 2026-09-07 maintenance plan](audits/maintenance-packets-2026-09-07.md). Packet preparation is complete; implementation and provider activation remain separate.
+Concrete dependency-lock, release-provenance, parser-testing and sole-maintainer governance packets are in [the 2026-09-07 maintenance plan](audits/maintenance-packets-2026-09-07.md). Sam approved the first three; current-source implementation and verification are recorded in [the maintenance audit](audits/maintenance-implementation-2026-09-07.md). Hosted acceptance remains distinct from local results. Sole-maintainer provider activation remains a separate proposal.
 
 These are general roadmap items, not incomplete 1.2.0 release gates. The exact 1.2.0 artifacts, downstreams, and first OpenSSF measurement are already recorded in `RELEASE_NOTES-1.2.0.md` and `audits/openssf-scorecard-2026-09-02.json`.
 

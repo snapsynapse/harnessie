@@ -1,0 +1,32 @@
+name: dependency-lock-refresh
+
+on:
+  schedule:
+    - cron: '17 9 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  propose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - name: Generate a reviewable refresh with the reviewed generator
+        run: |
+          python scripts/dependency_locks.py
+          python -m pip install --require-hashes --only-binary=:all: -r requirements/release.txt
+          python scripts/dependency_locks.py --update --upgrade
+          git diff -- requirements > dependency-lock-refresh.patch
+      - name: Preserve proposal without changing the repository
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: dependency-lock-refresh
+          path: dependency-lock-refresh.patch
+          retention-days: 14

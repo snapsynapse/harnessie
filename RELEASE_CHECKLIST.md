@@ -7,6 +7,9 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 
 ## 1. Land the release content
 
+- [ ] `python3 scripts/dependency_locks.py` passes; locked CI/build environments
+      and the separate public-constraint consumer job both pass. See
+      `requirements/README.md` for installation and update boundaries.
 - [ ] `python3 scripts/release_gate.py` passes. This composes the source
       checks below with generated-doc verification, an isolated wheel/sdist
       build, metadata and private-surface inspection, and a fresh-venv CLI
@@ -88,6 +91,11 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 - [ ] Verify the immutable PyPI files, integrity metadata, attestations, and a
       fresh `pip install harnessie` from the live index against the recorded
       artifact digests.
+- [ ] Download the GitHub wheel, source archive, SBOM and checksum record and
+      run `scripts/verify_release_provenance.py` against the independently
+      resolved release tag and commit. Record all four verified digests.
+      Follow `RELEASE_PROVENANCE.md`; recovery must verify original build
+      provenance and must not re-attest downloaded historical bytes.
 - [ ] OPERATOR: test the released core version in
       `snapsynapse/harnessie-verify-action`, update the default
       `harnessie-version` pin in `action.yml`, run its full CI, and release a

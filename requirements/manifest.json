@@ -1,0 +1,23 @@
+{
+  "generator": {
+    "environments": [
+      "linux-x86_64",
+      "darwin-arm64",
+      "darwin-x86_64"
+    ],
+    "generator": "uv",
+    "generator_version": "0.11.8",
+    "python": "3.12",
+    "release": [
+      "uv==0.11.8",
+      "cyclonedx-bom==7.3.1"
+    ]
+  },
+  "input_sha256": "eed9e74d354b03bcca7ce9124f04c5b85da53f3a030cc3e37d545643d2597828",
+  "locks": {
+    "dev": "e874fd7d68137693e884fbb8207fbdd6c315a1428ff363dc2afb45d543957935",
+    "release": "95f898166722c5b88b3e7e6b3940b43068a56355a810f69df154cbd3749a4fb8",
+    "runtime": "21d04923d4089f6ef3b1ed536fcd9a5975f8d8e858c261edc80f1cb337f70b1a"
+  },
+  "schema_version": 1
+}

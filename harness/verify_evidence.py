@@ -138,7 +138,7 @@ def _resolve_file(root: Path, value: str, location: str) -> tuple[Path | None,
                                                                    list[EvidenceProblem]]:
     problems: list[EvidenceProblem] = []
     relative = PurePosixPath(value)
-    if ("\\" in value or relative.is_absolute() or ".." in relative.parts
+    if ("\x00" in value or "\\" in value or relative.is_absolute() or ".." in relative.parts
             or "." in relative.parts):
         return None, [EvidenceProblem(
             location, "file.unsafe_path",

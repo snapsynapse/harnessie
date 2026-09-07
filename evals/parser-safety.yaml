@@ -1,0 +1,14 @@
+name: structured-verdict-parser-safety
+scenarios:
+  - id: required_claim_list_status_refuses_without_crashing
+    kind: verdict
+    report: '{"claims":[{"id":"c","status":[]}]}'
+    expect_passed: false
+  - id: required_claim_object_status_refuses_without_crashing
+    kind: verdict
+    report: '{"claims":[{"id":"c","status":{}}]}'
+    expect_passed: false
+  - id: valid_required_claim_still_passes_after_status_guard
+    kind: verdict
+    report: '{"claims":[{"id":"c","status":"reproduced"}]}'
+    expect_passed: true
