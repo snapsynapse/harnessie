@@ -5,8 +5,7 @@
   "unreleased": {
     "status": "active",
     "source": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md#unreleased",
-    "summary": "Source-only open-record AIDR exporter, strict refusal and evidence checks, installed mock consumer example, and documentation/discovery integration. Stable package remains 1.3.1.",
-    "target_version": "1.4.1"
+    "summary": "No changes recorded."
   },
   "current": {
     "version": "1.4.1",

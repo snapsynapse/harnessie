@@ -1,5 +1,7 @@
 # Release checklist
 
+Current execution: [Harnessie 1.4.1](audits/release-1.4.1.md), with publication pending.
+
 Latest completed execution: [Harnessie 1.3.1](audits/release-1.3.1.md), including core GitHub/PyPI, Verify Action 0.2.1 and Homebrew 1.3.1. The checklist below remains the reusable release procedure.
 
 The promotion path for a tagged Harnessie release. Steps that touch the

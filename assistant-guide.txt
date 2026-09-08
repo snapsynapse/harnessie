@@ -19,8 +19,8 @@ verifier-conformance: human-verifiable-assistant-guide-verifier >=2.0.0, <3.0.0
 
 Task scope
 Read a local Harnessie checkout, its Golden Rule, verification surface, and
-offline observer and source-only AIDR exporter before authorizing execution.
-This 1.4.1 guide is unreleased; its registry URL targets the pending release.
+offline observer and AIDR exporter before authorizing execution.
+This guide covers Harnessie 1.4.1; check the registry for publication status.
 This guide authorizes only the structured read-only actions below. It does not
 install software, execute project code, call providers, or change files.
 

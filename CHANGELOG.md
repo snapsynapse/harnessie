@@ -4,9 +4,13 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
-Target version: **1.4.1**. Package and guide use the same version; publication is pending.
+No changes recorded.
 
-- Add source-only `harnessie export-aidr` for existing open contested-phase records, with an explicit destination and human arbiter declaration. Preserve recorded positions and objections, normalize participant-instance identity with role provenance, bind consumed source and evidence hashes, and refuse arbitration content, ambiguous records, unsafe paths, and destination collisions. The export remains open, uses no models, and does not alter runner behavior. Export-time hashes and structural validation do not establish original authorship, independence, or human arbitration; recorded objection truncation remains disclosed. This command is not included in published 1.3.1.
+## 1.4.1 (2026-09-08)
+
+Publication pending. Package and guide use 1.4.1; final release validation, publication, hosted guide acceptance, and downstream propagation remain pending. See [release notes](RELEASE_NOTES-1.4.1.md) for the dated local evidence and its limits.
+
+- Add `harnessie export-aidr` for a strict subset of existing open contested-phase records, with an explicit destination and human arbiter declaration. Preserve recorded positions and objections, normalize participant-instance identity with role provenance, bind consumed source and evidence hashes, and refuse arbitration content, ambiguous records, unsafe paths, and destination collisions. The export remains open, uses no models, and does not alter runner behavior. Export-time hashes and structural validation do not establish original authorship, independence, or human arbitration; recorded objection truncation remains disclosed. This command is not included in published 1.3.1.
 - Integrate the exporter's operator-issued file-write boundary and strict source subset across engineering and user documentation. Document its four deterministic eval cases, unsupported-platform refusal, and the executable mock-run example with installed CLI export, pinned AIDR lint, unchanged source bytes, and preserved arbitration halt. No model calls does not make this direct filesystem operation read-only or place it under runner ownership/consent mediation.
 
 ## 1.3.1 (2026-09-08)

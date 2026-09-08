@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "repository": "https://github.com/snapsynapse/harnessie",
+  "profile": "package",
+  "authority": "R2",
+  "start_head": "2dc316ece292b6e510750188275f8d5b8c04f526",
+  "candidate_head": null,
+  "candidate_version": "1.4.1",
+  "updated_at": "2026-09-08T20:34:03.701291+00:00",
+  "steps": [
+    {
+      "id": "candidate",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "local_gate",
+      "status": "completed",
+      "evidence": "Full release_gate.py passed: 718 passed,1 skipped,28 xfailed;66/66 evals; manifests/schema,isolated wheel/sdist,Twine,artifact inspection,fresh installed consumer. Final PR CI pending."
+    },
+    {
+      "id": "pr_ci",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "merge_pages",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "signed_tag",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "guidecheck",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "siteline",
+      "status": "completed",
+      "evidence": "audits/release-1.4.1/siteline.json:97/100 A,scanned2026-09-08T20:32:15.101Z; final guide wording changes require independent live-byte verification."
+    },
+    {
+      "id": "github_release",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "assets_provenance",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "pypi",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "verify_action",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "homebrew",
+      "status": "not_started",
+      "evidence": null
+    }
+  ]
+}

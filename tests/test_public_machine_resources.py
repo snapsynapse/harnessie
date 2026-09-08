@@ -155,8 +155,7 @@ def test_machine_changelog_tracks_the_packaged_release():
     assert len(versions) == len(set(versions))
     assert data["current"]["release"].endswith(f"/v{version}")
     assert data["unreleased"]["status"] == "active"
-    assert "AIDR" in data["unreleased"]["summary"]
-    assert "source" in data["unreleased"]["summary"].lower()
+    assert data["unreleased"]["summary"] == "No changes recorded."
     assert data["current"]["status"] in {"pending-publication", "published"}
     if data["current"]["status"] == "pending-publication":
         assert data["current"]["released"] is None
