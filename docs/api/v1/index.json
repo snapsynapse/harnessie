@@ -6,21 +6,21 @@
     "transport": "command line",
     "hosted": false,
     "network_service": false,
-    "description": "Machine-readable synopsis of the Harnessie 1.3.0 source CLI. This is not a hosted HTTP API."
+    "description": "Machine-readable synopsis of the Harnessie 1.3.1 source CLI. This is not a hosted HTTP API."
   },
   "package": {
     "name": "harnessie",
-    "version": "1.3.0",
+    "version": "1.3.1",
     "registry": "https://pypi.org/project/harnessie/",
     "source": "https://github.com/snapsynapse/harnessie"
   },
   "release_context": {
-    "source_version": "1.3.0",
+    "source_version": "1.3.1",
     "stable_release": "1.2.0",
     "publication_status": "pending",
-    "describes": "1.3.0 source; 1.2.0 remains published until release propagation completes",
+    "describes": "1.3.1 source; 1.2.0 remains published until release propagation completes",
     "unreleased_changes_since_stable": true,
-    "note": "Offline observation and maintenance belong to 1.3.0. Verify Action and Homebrew remain separately propagated downstreams; consult NEXT.md for verified pins."
+    "note": "The 1.3.0 build stopped before package publication. Corrective 1.3.1 includes the same offline observer and maintenance scope plus the provenance CLI fix. Verify Action and Homebrew propagate separately."
   },
   "global_options": {
     "--root": "Project root; defaults to the current working directory."

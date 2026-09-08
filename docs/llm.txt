@@ -4,7 +4,7 @@ A brain-agnostic multi-agent harness. The harness structure carries the quality 
 
 ## Release state
 
-Source version: Harnessie 1.3.0. Published core remains 1.2.0 until release propagation completes. Version 1.3.0 adds offline observation of existing run journals with cited JSON/Markdown and no model calls. It accepts raw verification criteria or v1 evidence bundles and provides structured required-claim verdicts under the fail-closed 0/1/2 verifier exit contract.
+Source version: Harnessie 1.3.1. Published core remains 1.2.0 until release propagation completes. Version 1.3.0 adds offline observation of existing run journals with cited JSON/Markdown and no model calls. It accepts raw verification criteria or v1 evidence bundles and provides structured required-claim verdicts under the fail-closed 0/1/2 verifier exit contract.
 
 Downstream release boundary: Homebrew and Harnessie Verify Action are separately propagated. Check NEXT.md for their verified pins before attributing the 1.2.0 evidence-bundle contract to those install surfaces.
 
@@ -27,7 +27,7 @@ An orchestrator decomposes a goal into task packets with acceptance criteria and
 
 ## Install
 
-pip install harnessie; also available through pipx or uv tool install. PyPI carries core 1.2.0. Homebrew and Harnessie Verify Action are separately propagated downstreams. The guided mock run makes no provider call and spends no model money, but installation and scaffolding do use the package index and local filesystem. An AI-assisted review path exists at https://harnessie.com/.well-known/assistant-guide.txt; verify it, report the achieved level and SHA-256, and get explicit human approval before any action. The current 1.3.0 guide selects profile 2.0.0. Hosted Level 4 verified the final guide/sidecar bytes and qualifying DNS TXT on 2026-09-08 UTC with zero blocking findings. The 1.2.0 receipt is historical evidence, not conformance for these new bytes.
+pip install harnessie; also available through pipx or uv tool install. PyPI carries core 1.2.0. Homebrew and Harnessie Verify Action are separately propagated downstreams. The guided mock run makes no provider call and spends no model money, but installation and scaffolding do use the package index and local filesystem. An AI-assisted review path exists at https://harnessie.com/.well-known/assistant-guide.txt; verify it, report the achieved level and SHA-256, and get explicit human approval before any action. The current 1.3.1 guide selects profile 2.0.0. Final DNS and hosted verification are pending; earlier receipts are historical evidence for different bytes.
 
 ## Key files
 
@@ -48,7 +48,7 @@ pip install harnessie; also available through pipx or uv tool install. PyPI carr
 - Stable v1 workflow schema: https://harnessie.com/schemas/v1/workflow.schema.json
 - Schema compatibility contract: https://github.com/snapsynapse/harnessie/blob/main/SCHEMA_COMPATIBILITY.md
 - Plugin contract: https://github.com/snapsynapse/harnessie/blob/main/PLUGIN_CONTRACT.md
-- [Assistant Guide](https://harnessie.com/.well-known/assistant-guide.txt): bounded 1.3.0 checkout review under profile 2.0.0; hosted Level 4 verified 2026-09-08 UTC with zero blocking findings. Receipt: https://github.com/snapsynapse/harnessie/blob/main/audits/release-1.3.0/guidecheck-prepublication.json
+- [Assistant Guide](https://harnessie.com/.well-known/assistant-guide.txt): bounded 1.3.1 checkout review under profile 2.0.0; final hosted verification pending.
 - [Offline observer](https://github.com/snapsynapse/harnessie/blob/main/OBSERVER.md): 1.3.0 journal snapshot verification and cited summaries, with output writes and no model calls.
 
 ## Support and machine handoff

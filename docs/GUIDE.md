@@ -51,7 +51,7 @@ Python 3.11 or newer. PyYAML and jsonschema install with Harnessie. Install from
 pip install harnessie   # or: pipx install harnessie / uv tool install harnessie
 ```
 
-This documentation covers Harnessie 1.3.0 source. Check the published package version before using new commands; release propagation is recorded in NEXT.md. The separately maintained Homebrew formula and Harnessie Verify Action may lag briefly during release propagation; `NEXT.md` records their verified pins.
+This documentation covers Harnessie 1.3.1 source. Check the published package version before using new commands; release propagation is recorded in NEXT.md. The separately maintained Homebrew formula and Harnessie Verify Action may lag briefly during release propagation; `NEXT.md` records their verified pins.
 
 Developing on the harness itself (or wanting the test suite), install from source:
 

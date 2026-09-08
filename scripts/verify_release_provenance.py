@@ -47,8 +47,11 @@ def verify_release(root: Path, tag: str, commit: str, *, run=subprocess.run) -> 
         if recorded != {name: digests[name] for name in names}:
             raise ProvenanceError("release checksum mismatch or missing asset")
         for name in digests:
+            # gh makes signer-workflow and cert-identity mutually exclusive.
+            # The exact certificate identity already binds repository, workflow
+            # path and tag; the digest checks below also bind both commits.
             command = ["gh", "attestation", "verify", str(root / name),
-                       "--repo", REPOSITORY, "--signer-workflow", WORKFLOW,
+                       "--repo", REPOSITORY,
                        "--cert-identity", f"https://github.com/{WORKFLOW}@refs/tags/{tag}",
                        "--source-ref", f"refs/tags/{tag}", "--source-digest", commit,
                        "--signer-digest", commit, "--deny-self-hosted-runners",
