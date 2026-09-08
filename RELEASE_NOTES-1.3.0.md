@@ -26,7 +26,7 @@ Draft for the approved 1.3.0 release scope. Not published. Stable package metada
 | Exact-candidate tests, evals, manifests, generated docs and package consumer | Pending; maintenance CI is earlier baseline evidence |
 | Integrated a11y source and automated findings | [Baseline audit](audits/accessibility/2026-09-07/audit-2026-09-07.md) completed: 4 serious violations and 58 incomplete candidates; [local mitigation](audits/accessibility/2026-09-07-mitigation/audit-2026-09-07.md) resolves all 4 violations and 22 candidates; gate remains inconclusive on 36 candidates |
 | Keyboard, 200% zoom/reflow and screen-reader evidence | [Targeted manual plan](audits/accessibility/2026-09-07/manual-checks.md) prepared; tests not performed; the 1.2.0 waiver does not carry forward |
-| Final guide bytes, sidecar, repository pins, DNS TXT and hosted GuideCheck | Required before package publication; execution outside current tranche |
+| Final guide bytes, sidecar, repository pins, DNS TXT and hosted GuideCheck | Current 1.2.0 guide reverified separately; [profile-2.0.0 candidate](audits/guidecheck/2026-09-08/README.md) prepared locally. Final served/DNS/hosted acceptance required before package publication |
 | Live discovery/Siteline evidence | Pending reconciliation against release checklist |
 | Four final release-asset digests and original-build verification | Pending |
 | PyPI integrity, attestations and clean public-index consumer | Pending |

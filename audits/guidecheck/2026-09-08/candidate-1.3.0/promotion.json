@@ -1,0 +1,27 @@
+{
+  "status": "draft; not deployed; do not apply DNS yet",
+  "guide_profile_version": "2.0.0",
+  "guide_version": "1.3.0",
+  "guide_bytes": 7766,
+  "guide_sha256": "5e00fa6903e0d42c49e9a25c08eec19116b04bf01ee0daf8c4d7d754b58b0793",
+  "files": [
+    {
+      "path": "assistant-guide.txt",
+      "sha256": "5e00fa6903e0d42c49e9a25c08eec19116b04bf01ee0daf8c4d7d754b58b0793"
+    },
+    {
+      "path": "docs/.well-known/assistant-guide.txt",
+      "sha256": "5e00fa6903e0d42c49e9a25c08eec19116b04bf01ee0daf8c4d7d754b58b0793"
+    },
+    {
+      "path": "docs/.well-known/assistant-guide-manifest.txt",
+      "sha256": "34967a37b6bfe68864b38237971ebcfa890c5b9f39bb1c490c6226d53159db76"
+    }
+  ],
+  "dns": {
+    "type": "TXT",
+    "host": "_assistant-guide",
+    "ttl": "Automatic",
+    "value": "v=1; sha256=5e00fa6903e0d42c49e9a25c08eec19116b04bf01ee0daf8c4d7d754b58b0793; url=https://harnessie.com/.well-known/assistant-guide.txt"
+  }
+}

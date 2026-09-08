@@ -27,6 +27,8 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ### Documentation
 
+- Close the 1.2.0 guide DNS gate with dated hosted Level 4 evidence under profile 0.7.1. Prepare a separate 1.3.0/profile-2.0.0 guide with accurate provider, observer and verification boundaries; final deployment and hosted acceptance remain pending.
+
 - Reconcile the completed Dependabot queue, record the conservatively arbitrated observer scope, map controlled-review/AIDR interoperability, and prepare bounded maintenance packets for dependency locks, release provenance, parser testing and sole-maintainer governance.
 
 - Release closeout records the exact 1.2.0 artifact digests, successful PyPI recovery and attestations, Verify Action v0.2.0 and stable `v0`, and the Homebrew 1.2.0 upgrade evidence without treating the pending DNS/GuideCheck gate as complete.

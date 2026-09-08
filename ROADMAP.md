@@ -170,6 +170,10 @@ These are general roadmap items, not incomplete 1.2.0 release gates. The exact 1
 - Repository governance proportional to the maintainer model. Branch protection, required review, emergency recovery, and release permissions must be designed together rather than enabled to improve an aggregate score. Acceptance: the provider ruleset names required checks, prevents unreviewed unsafe paths, preserves a documented recovery route, and is exercised without deadlocking the current maintainer workflow.
 - OpenSSF Best Practices enrollment remains optional until its questionnaire would produce useful public operating evidence. Acceptance is truthful completion with citations and maintained answers, not the badge alone.
 
+### 1.3.0 GuideCheck completion
+
+Sam unblocked GuideCheck on 2026-09-07. The [current 1.2.0 guide earned hosted Level 4 under profile 0.7.1](audits/guidecheck/2026-09-08/README.md) after his Namecheap DNS update. A separate 1.3.0 guide and sidecar select profile 2.0.0 and pass local content checks; they are not deployed. Acceptance: coordinated version/docs/trust promotion, reachable immutable tag identity, exact served/repository bytes, Sam-applied DNS rotation, and hosted profile-2.0.0 Level 4 with zero blocking findings before package publication. The current receipt cannot qualify future bytes.
+
 ### 1.3.0 accessibility review completion
 
 The [ten-route baseline audit](audits/accessibility/2026-09-07/audit-2026-09-07.md) found four confirmed serious keyboard-access issues and 58 incomplete review candidates. The [approved mitigation packet](audits/accessibility/2026-09-07/mitigation-plan.md) is implemented locally: a [fresh ten-route scan](audits/accessibility/2026-09-07-mitigation/audit-2026-09-07.md) has zero confirmed violations and resolves 22 homepage candidates. The gate remains inconclusive. Review the remaining 35 threat-model table contrast candidates and one homepage video-caption candidate, plus any new findings after further changes. Complete the targeted keyboard, zoom/reflow and screen-reader checks with dated evidence for the final changed routes. `NEXT.md` locates the temporary review queue.

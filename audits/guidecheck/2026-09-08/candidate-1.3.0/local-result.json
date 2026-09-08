@@ -1,0 +1,58 @@
+{
+  "compact_report": "Verifier: guidecheck-reference-local 2.0.0\nGuide: audits/guidecheck/2026-09-08/candidate-1.3.0/assistant-guide.txt\nProfile: 2.0.0 (declared 2.0.0)\nContent policy: corrected-content-1\nAnchor policy: 1.0.0-strict\nQualifying anchors: 0\nLevel: 3\nSHA-256: 5e00fa6903e0d42c49e9a25c08eec19116b04bf01ee0daf8c4d7d754b58b0793\nBlocking findings: 1\nWarnings: 0\nHash pinned: no\nProceed? no",
+  "findings": [
+    {
+      "id": "metadata.last-reviewed.age",
+      "message": "last-reviewed is 1 days old",
+      "severity": "info"
+    },
+    {
+      "id": "anchor.independent.missing",
+      "message": "no fetched qualifying independent anchor is available for Level 4",
+      "severity": "error"
+    }
+  ],
+  "guide": {
+    "achieved_level": 3,
+    "bytes": 7766,
+    "level5_ready": false,
+    "sha256": "5e00fa6903e0d42c49e9a25c08eec19116b04bf01ee0daf8c4d7d754b58b0793"
+  },
+  "input": {
+    "evaluation_mode": "local-file",
+    "manifest_path": "audits/guidecheck/2026-09-08/candidate-1.3.0/assistant-guide-manifest.txt",
+    "path": "audits/guidecheck/2026-09-08/candidate-1.3.0/assistant-guide.txt"
+  },
+  "local_evaluation": {
+    "evaluated_at": "2026-09-08T01:15:27.340996Z"
+  },
+  "manifest": {
+    "bytes_match": true,
+    "fetched": false,
+    "guide_sha256": "5e00fa6903e0d42c49e9a25c08eec19116b04bf01ee0daf8c4d7d754b58b0793",
+    "hash_match": true,
+    "path": "audits/guidecheck/2026-09-08/candidate-1.3.0/assistant-guide-manifest.txt",
+    "sha256": "34967a37b6bfe68864b38237971ebcfa890c5b9f39bb1c490c6226d53159db76",
+    "valid": true
+  },
+  "profile_selection": {
+    "anchor_policy": "1.0.0-strict",
+    "content_policy": "corrected-content-1",
+    "declared_version": "2.0.0",
+    "evaluated_policy": "2.0.0"
+  },
+  "qualifying_anchor_count": 0,
+  "summary": {
+    "blocking_findings": 1,
+    "infos": 1,
+    "warnings": 0
+  },
+  "verifier": {
+    "guide_profile": "human-verifiable-assistant-guide",
+    "guide_profile_version": "2.0.0",
+    "name": "guidecheck-reference-local",
+    "verifier_profile": "human-verifiable-assistant-guide-verifier",
+    "verifier_profile_version": "2.0.0",
+    "version": "2.0.0"
+  }
+}

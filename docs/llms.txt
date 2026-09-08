@@ -27,7 +27,7 @@ An orchestrator decomposes a goal into task packets with acceptance criteria and
 
 ## Install
 
-pip install harnessie; also available through pipx or uv tool install. PyPI carries core 1.2.0. Homebrew and Harnessie Verify Action are separately propagated downstreams. The guided mock run makes no provider call and spends no model money, but installation and scaffolding do use the package index and local filesystem. An AI-assisted review path exists at https://harnessie.com/.well-known/assistant-guide.txt; verify it, report the achieved level and SHA-256, and get explicit human approval before any action. The current 1.2.0 guide is repository-pinned but awaits its external DNS and hosted-verifier re-anchor; the hosted 1.1.0 GuideCheck receipt remains dated historical evidence only.
+pip install harnessie; also available through pipx or uv tool install. PyPI carries core 1.2.0. Homebrew and Harnessie Verify Action are separately propagated downstreams. The guided mock run makes no provider call and spends no model money, but installation and scaffolding do use the package index and local filesystem. An AI-assisted review path exists at https://harnessie.com/.well-known/assistant-guide.txt; verify it, report the achieved level and SHA-256, and get explicit human approval before any action. The current 1.2.0 guide earned hosted GuideCheck Level 4 under profile 0.7.1 on 2026-09-08 UTC with matching sidecar, DNS and repository hashes, zero blocking findings, and two response-header warnings. This does not establish profile 2.0.0 conformance or software safety.
 
 ## Key files
 
@@ -48,7 +48,7 @@ pip install harnessie; also available through pipx or uv tool install. PyPI carr
 - Stable v1 workflow schema: https://harnessie.com/schemas/v1/workflow.schema.json
 - Schema compatibility contract: https://github.com/snapsynapse/harnessie/blob/main/SCHEMA_COMPATIBILITY.md
 - Plugin contract: https://github.com/snapsynapse/harnessie/blob/main/PLUGIN_CONTRACT.md
-- [Assistant Guide](https://harnessie.com/.well-known/assistant-guide.txt): bounded, human-verifiable 1.2.0 guide for reviewing a Harnessie checkout before authorizing a run; repository and served bytes agree with the sidecar, while external DNS and hosted verification remain pending. Historical 1.1.0 receipt: https://github.com/snapsynapse/harnessie/blob/main/audits/guidecheck-live-result-2026-08-21-v1.1.0.json
+- [Assistant Guide](https://harnessie.com/.well-known/assistant-guide.txt): bounded, human-verifiable 1.2.0 guide for reviewing a Harnessie checkout before authorizing a run; repository and served bytes agree with the sidecar and DNS TXT. Hosted Level 4 under profile 0.7.1 verified 2026-09-08 UTC. Current receipt: https://github.com/snapsynapse/harnessie/blob/main/audits/guidecheck/2026-09-08/hosted-1.2.0-after-dns.json
 
 ## Support and machine handoff
 

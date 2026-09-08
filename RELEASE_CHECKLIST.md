@@ -44,8 +44,10 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 ## 3. GuideCheck resync (if the guide changed)
 
 - [ ] `assistant-guide.txt`: bump `guide-version`, `applies-to`,
-      `registry-url`, `last-reviewed`; correct the verification counts in the
-      acceptance checklist to match step 1.
+      `registry-url`, `last-reviewed`; update the verification language in the
+      acceptance checklist to require actual results and tested revision, not
+      fixed historical test counts. Select the intended GuideCheck profile
+      explicitly; profile 2.0.0 requires matching profile selectors in its sidecar.
 - [ ] Copy to `docs/.well-known/assistant-guide.txt` (must be byte-identical).
 - [ ] `docs/.well-known/assistant-guide-manifest.txt`: recompute
       `guide-sha256` and `guide-bytes`; set `guide-version` and
@@ -68,12 +70,15 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 
 - [ ] For 1.3.0, satisfy Sam's 2026-09-07 pre-publication GuideCheck gate:
       final served guide, sidecar, repository pins and DNS TXT agree, and a
-      dated hosted result verifies those exact bytes. GuideCheck execution
-      is outside the current preparation tranche. Complete it before
+      dated hosted result verifies those exact bytes under profile 2.0.0.
+      GuideCheck is now in scope; see the candidate and current-guide evidence
+      in audits/guidecheck/2026-09-08/README.md. Complete final acceptance before
       publishing the GitHub Release, which triggers the package workflow,
       and before PyPI, Verify Action or Homebrew publication. If immutable
       tag identity is needed, create the approved tag first, then verify
-      the guide while the GitHub Release remains unpublished. Any guide
+      the guide while the GitHub Release remains unpublished. Independently
+      check its immutable tag-source URL and tag-to-commit identity; require
+      profile 2.0.0 in the hosted request. Any guide
       byte change invalidates the earlier result. The protected `pypi`
       environment remains a second publication checkpoint; recovery must
       respect this requirement as well. This is an operator checklist gate,

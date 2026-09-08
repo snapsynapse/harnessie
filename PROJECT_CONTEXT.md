@@ -80,4 +80,4 @@ write only what you own. The read-only `harnessie ownership` command explains th
 ledger decision, and the zero-model collision example proves a second agent cannot
 overwrite the first agent's artifact through the built-in write path.
 
-The 1.1.0 assistant guide re-earned hosted GuideCheck Level 4 on 2026-08-21 UTC with zero blocking findings. That receipt remains historical evidence. The 1.2.0 guide must earn its own matching served bytes, sidecar, independently controlled DNS TXT, and hosted-verifier result before any current end-to-end level is claimed.
+The 1.2.0 assistant guide earned hosted GuideCheck Level 4 under profile 0.7.1 on 2026-09-08 UTC with zero blocking findings and two response-header warnings. The [current receipt](audits/guidecheck/2026-09-08/hosted-1.2.0-after-dns.json) matches served, sidecar, DNS TXT and repository bytes. Prior receipts remain historical. The prepared 1.3.0 guide selects profile 2.0.0 and must earn its own hosted result after deployment and DNS rotation.

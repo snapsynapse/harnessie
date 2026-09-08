@@ -19,7 +19,8 @@ CLI_MANIFEST = DOCS / "api" / "v1" / "index.json"
 SECURITY = DOCS / ".well-known" / "security.txt"
 TRUST = DOCS / "MANIFEST.yaml"
 GUIDECHECK_RECEIPT = (
-    ROOT / "audits" / "guidecheck-live-result-2026-08-21-v1.1.0.json")
+    ROOT / "audits" / "guidecheck" / "2026-09-08" /
+    "hosted-1.2.0-after-dns.json")
 SCORECARD_RECORD = ROOT / "audits" / "openssf-scorecard-2026-09-02.json"
 
 
@@ -74,7 +75,9 @@ def test_agents_json_describes_released_core_and_downstream_boundaries():
     guide_status = capabilities["review-checkout"]["integrity_status"]
     assert "1.2.0 DNS TXT" in guide_status["external_anchor"]
     assert guide_status["current_end_to_end_level"].startswith(
-        "Pending external re-verification")
+        "Level 4 under profile 0.7.1")
+    assert guide_status["current_receipt"].endswith(
+        "/" + GUIDECHECK_RECEIPT.relative_to(ROOT).as_posix())
     assert guide_status["historical_receipt"].endswith(
         "/audits/guidecheck-live-result-2026-08-21-v1.1.0.json")
     assert capabilities["inspect-ownership"]["side_effects"] == "read-only"
@@ -84,13 +87,16 @@ def test_agents_json_describes_released_core_and_downstream_boundaries():
 def test_current_guidecheck_receipt_earns_the_claimed_level():
     receipt = _json(GUIDECHECK_RECEIPT)
     assert receipt["outcome"] == "evaluated"
-    assert receipt["guide"] == {
-        "bytes": 7947,
-        "sha256": (
-            "f7d45f62f2941f5541d1342be0fc037c1ef7fc3e06f44ad39cf94a5b50e5080d"),
-        "achieved_level": 4,
-        "level5_ready": True,
-    }
+    guide = (ROOT / "assistant-guide.txt").read_bytes()
+    assert receipt["input"]["evaluation_mode"] == "public-web"
+    assert receipt["guide"]["bytes"] == len(guide)
+    assert receipt["guide"]["sha256"] == hashlib.sha256(guide).hexdigest()
+    assert receipt["guide"]["achieved_level"] == 4
+    assert receipt["verifier"]["guide_profile_version"] == re.search(
+        rb"^profile-version: (.+)$", guide, re.M).group(1).decode()
+    assert receipt["manifest"]["fetched"] is True
+    assert receipt["manifest"]["hash_match"] is True
+    assert receipt["manifest"]["bytes_match"] is True
     assert receipt["summary"]["blocking_findings"] == 0
     anchors = {
         item["channel"]: item for item in receipt["cross_channel_anchors"]}
@@ -216,8 +222,8 @@ def test_public_discovery_links_expose_support_and_machine_resources():
         assert f"https://harnessie.com{path}" in llms
     assert "Contact support" in html
     assert "Report a vulnerability" in html
-    assert "1.1 guide: GuideCheck Level 4" in html
-    assert "historical hash independently pinned" in html
+    assert "1.2 guide: GuideCheck Level 4" in html
+    assert "profile 0.7.1, hash independently pinned" in html
     assert "historical evidence" in html
     assert "opt-in containment" in html.lower()
     assert "operator-trusted in-process code" in html
