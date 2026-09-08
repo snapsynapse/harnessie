@@ -188,7 +188,7 @@ Acceptance: per-candidate dispositions backed by measurements or applicability e
 
 The offline observer is approved in [AIDR-0009](decisions/AIDR-0009-bid-rounds-and-run-observer.md), with a bounded [acceptance packet](audits/aidr-0009-preparation-2026-09-04.md). Its implementation shipped in 1.3.1 and is documented in [OBSERVER.md](OBSERVER.md). Bidding, commentary, runner integration and model selection are not part of that first slice.
 
-The [controlled-review assessment](audits/review-interoperability-2026-09-07.md) maps present enforcement and the gaps for portable AIDR output. Keep file links and standalone verification as the present composition surface. A live pilot needs fixed evidence and explicit human arbitration. An exporter needs an accepted namespace, attribution and failure-atomicity contract; neither is implemented by this assessment.
+The [controlled-review assessment](audits/review-interoperability-2026-09-07.md) maps present enforcement and the gaps for portable AIDR output. Sam accepted a separate offline open-record exporter packet on 2026-09-08. The [unreleased source command](AIDR_EXPORT.md) preserves recorded dissent and source bytes, maps participant instances, binds consumed evidence and refuses arbitration or unsafe destinations. [Implementation evidence](audits/aidr-export-implementation-2026-09-08.md) records acceptance and provenance limits. This does not change the published 1.3.1 release. A live pilot still needs fixed evidence, named participants, provider opt-in and explicit human arbitration; arbitration import and broader source formats remain deferred.
 
 ## Platform support
 

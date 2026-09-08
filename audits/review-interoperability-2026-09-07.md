@@ -44,3 +44,7 @@ A future exporter must stage output outside the final destination, lint under a 
 ## Disposition
 
 Use file links and `harnessie verify` as the present integration seam. A live controlled-panel pilot, exporter, new scheduler, terminal controller, or external conformance claim requires its own accepted scope. The mapping does not amend Turnfile or AIDR and does not retroactively improve old review provenance.
+
+## Subsequent implementation
+
+On 2026-09-08 Sam accepted the separate [offline open-record exporter packet](aidr-export-implementation-2026-09-08.md). Its source-only implementation follows [AIDR_EXPORT.md](../AIDR_EXPORT.md); live panels, arbitration import and broader source formats remain outside it. The dated assessment and synthetic evidence above remain unchanged.

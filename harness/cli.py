@@ -92,6 +92,17 @@ def main(argv: list[str] | None = None) -> int:
         "observe", help="derive an offline, cited narrative from a run's event log")
     p_observe.add_argument("run_id")
 
+    p_export = sub.add_parser(
+        "export-aidr", help="export an existing open phase decision to AIDR without running models")
+    p_export.add_argument("run_id", metavar="RUN_ID")
+    p_export.add_argument("phase", metavar="PHASE")
+    p_export.add_argument(
+        "--output", required=True, metavar="decisions/AIDR-NNNN-short-slug.md",
+        help="unused AIDR filename in the project's existing decisions directory")
+    p_export.add_argument(
+        "--arbiter", required=True, metavar="HUMAN_HANDLE",
+        help="explicit human arbiter declaration (does not authenticate identity)")
+
     p_eval = sub.add_parser("eval", help="run deterministic eval scorecards")
     p_eval.add_argument("suite", nargs="?", help="optional eval suite YAML path")
     p_eval.add_argument("--live", action="store_true",
@@ -175,6 +186,20 @@ def main(argv: list[str] | None = None) -> int:
                         help="skip the guided readiness check and zero-dollar mock run")
 
     args = parser.parse_args(argv)
+
+    if args.cmd == "export-aidr":
+        from .aidr_export import AIDRExportError, export_aidr
+
+        try:
+            result = export_aidr(root=Path(args.root), run_id=args.run_id,
+                                 phase=args.phase, output=args.output,
+                                 arbiter=args.arbiter)
+        except AIDRExportError as exc:
+            print(json.dumps({"status": "refused", "code": exc.code}, sort_keys=True))
+            return 2
+        print(json.dumps(result, sort_keys=True))
+        return 0
+
     root = Path(args.root).resolve()
 
     if args.cmd == "observe":

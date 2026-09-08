@@ -1,0 +1,2 @@
+include AIDR_EXPORT.md
+recursive-include tests/fixtures/aidr-0.1.0 *.md *.mjs *.json LICENSE

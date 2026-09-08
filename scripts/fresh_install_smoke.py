@@ -10,6 +10,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import yaml
+
 
 def run(
     argv: list[str],
@@ -42,7 +44,9 @@ def run(
 
 def smoke(wheel: Path) -> None:
     with tempfile.TemporaryDirectory(prefix="harnessie-install-smoke-") as raw:
-        temp = Path(raw)
+        # macOS exposes tempfile's default /var path through a symlink. Use the
+        # real fixture root because the exporter deliberately refuses aliases.
+        temp = Path(raw).resolve()
         venv = temp / "venv"
         subprocess.run(
             [sys.executable, "-m", "venv", str(venv)], check=True)
@@ -58,6 +62,7 @@ def smoke(wheel: Path) -> None:
             "approve-maiden",
             "ownership",
             "observe",
+            "export-aidr",
             "verify-inward-manifest",
             "verify-manifest",
         ):
@@ -104,6 +109,40 @@ def smoke(wheel: Path) -> None:
         )
         run([str(cli), "--root", str(project), "observe", "smoke"],
             temp, contains="observed smoke: needs_human")
+        run([str(python), "-c", """
+from pathlib import Path
+import sys
+from harness.adversarial import PositionRecord, assemble_record
+root = Path(sys.argv[1])
+(root / 'decisions').mkdir(exist_ok=True)
+source = root / 'runs/smoke/decisions/DR-work.md'
+source.parent.mkdir()
+source.write_text(assemble_record(
+    record_id='DR-work', title='Synthetic installed export',
+    question='Adopt this synthetic change?', context='Installed package smoke.',
+    arbiter='synthetic-human-tester', date='2026-09-08',
+    positions=[PositionRecord('worker', 'worker', 'mock', 'mock', 'oppose',
+                              'Preserve evidence.', 'Retain the original objection.')],
+    objections=[{'by': 'worker', 'to': 'the record', 'text': 'Evidence may be lost.'}],
+    evidence=['runs/smoke/events.jsonl — hash-chained event log evidencing isolated position generation']),
+    encoding='utf-8')
+""", str(project)], temp)
+        source = project / "runs/smoke/decisions/DR-work.md"
+        source_bytes = source.read_bytes()
+        evidence_bytes = (project / "runs/smoke/events.jsonl").read_bytes()
+        export_command = [str(cli), "--root", str(project), "export-aidr", "smoke", "work",
+                          "--output", "decisions/AIDR-9999-synthetic-installed.md",
+                          "--arbiter", "synthetic-human-tester"]
+        run(export_command, temp, contains='"status": "exported"')
+        output = project / "decisions/AIDR-9999-synthetic-installed.md"
+        exported = output.read_bytes()
+        run(export_command, temp, expected=2, contains='"status": "refused"')
+        if source.read_bytes() != source_bytes or output.read_bytes() != exported \
+                or (project / "runs/smoke/events.jsonl").read_bytes() != evidence_bytes:
+            raise RuntimeError("installed export changed source, evidence or existing destination")
+        if yaml.safe_load(exported.decode().split("---\n", 2)[1])["status"] != "open" \
+                or b"Evidence may be lost." not in exported:
+            raise RuntimeError("installed export lost open status or dissent")
 
 
 def main() -> int:

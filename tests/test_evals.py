@@ -33,6 +33,19 @@ def test_redteam_eval_suite_passes():
     assert scorecard["passed"] == scorecard["total"]
 
 
+def test_aidr_export_eval_pair_is_falsifiable():
+    from harness.evals import run_scenario
+    path = ROOT / "evals/aidr-export.yaml"
+    scenarios = yaml.safe_load(path.read_text())["scenarios"]
+    scorecard = run_eval_suite(ROOT, path)
+    assert scorecard["total"] == len(scenarios) == 4
+    assert scorecard["passed"] == scorecard["total"]
+    for scenario in scenarios:
+        wrong = "refused" if scenario["expect_status"] == "exported" else "exported"
+        assert not run_scenario({**scenario, "expect_status": wrong}).passed
+    assert not run_scenario({**scenarios[0], "expect_unknown": True}).passed
+
+
 def test_parallel_timing_eval_separates_parallel_from_sequential_execution():
     suite = yaml.safe_load(
         (ROOT / "evals" / "operability.yaml").read_text(encoding="utf-8"))

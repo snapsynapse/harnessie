@@ -4,7 +4,7 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
-No changes recorded.
+- Add source-only `harnessie export-aidr` for existing open contested-phase records, with an explicit destination and human arbiter declaration. Preserve recorded positions and objections, normalize participant-instance identity with role provenance, bind consumed source and evidence hashes, and refuse arbitration content, ambiguous records, unsafe paths, and destination collisions. The export remains open, uses no models, and does not alter runner behavior. Export-time hashes and structural validation do not establish original authorship, independence, or human arbitration; recorded objection truncation remains disclosed. This command is not included in published 1.3.1.
 
 ## 1.3.1 (2026-09-08)
 
