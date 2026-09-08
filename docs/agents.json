@@ -14,11 +14,11 @@
   },
   "release_context": {
     "source_version": "1.3.1",
-    "stable_release": "1.2.0",
-    "publication_status": "pending",
-    "describes": "1.3.1 source; 1.2.0 remains published until release propagation completes",
-    "unreleased_changes_since_stable": true,
-    "note": "The 1.3.0 build stopped before package publication. Corrective 1.3.1 includes the same offline observer and maintenance scope plus the provenance CLI fix. Verify Action and Homebrew propagate separately."
+    "stable_release": "1.3.1",
+    "publication_status": "published",
+    "describes": "Published Harnessie 1.3.1 core",
+    "unreleased_changes_since_stable": false,
+    "note": "Core 1.3.1 is published on GitHub and PyPI. Verify Action 0.2.1 and stable v0 pin core 1.3.1; Homebrew serves 1.3.1. Engine wrappers retain their independent release train."
   },
   "capabilities": [
     {
@@ -32,9 +32,9 @@
       "side_effects": "The guide authorizes read-only inspection only. Installation, code execution, and mutation require a separate human-approved task.",
       "integrity_status": {
         "served_copy": "1.3.1 repository and served guide copies are byte-identical and pinned by the provenance sidecar",
-        "external_anchor": "Final 1.3.1 DNS TXT and hosted profile-2.0.0 verification pending",
-        "current_end_to_end_level": "Pending external re-verification for the 1.3.1 guide",
-        "current_receipt": null,
+        "external_anchor": "DNS TXT matches the final guide SHA-256; hosted profile-2.0.0 verification completed on 2026-09-08 UTC",
+        "current_end_to_end_level": "Level 4 under profile 2.0.0; zero blocking findings",
+        "current_receipt": "https://github.com/snapsynapse/harnessie/blob/main/audits/release-1.3.1/guidecheck-prepublication.json",
         "historical_receipt": "https://github.com/snapsynapse/harnessie/blob/main/audits/release-1.3.0/guidecheck-prepublication.json"
       }
     },

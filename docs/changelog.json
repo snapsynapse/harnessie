@@ -9,16 +9,16 @@
   },
   "current": {
     "version": "1.3.1",
-    "released": null,
-    "status": "pending-publication",
+    "released": "2026-09-08",
+    "status": "published",
     "summary": "The offline observer and maintenance release, with the provenance CLI identity-selector correction needed for publication.",
     "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.3.1"
   },
   "history": [
     {
       "version": "1.3.1",
-      "released": null,
-      "status": "pending-publication",
+      "released": "2026-09-08",
+      "status": "published",
       "summary": "The offline observer and maintenance release, with the provenance CLI identity-selector correction needed for publication.",
       "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.3.1"
     },

@@ -93,27 +93,19 @@ PyPI promotion and live-provider calls are deliberate operator acts, never headl
 
 ## Current state (2026-09-08)
 
-- Source targets corrective 1.3.1. Sam authorized full release publication and explicitly
-  deferred remaining accessibility review. Before publishing or reporting
-  completion, read `audits/release-1.3.1.md` for exact gate and provider state.
-  Final profile-2.0.0 GuideCheck remains required before the GitHub Release.
-
-
-- Version 1.2.0 is the stable core release on GitHub and PyPI. It includes OpenAI
-  Responses support, v1 evidence bundles, structured claim verdicts, deterministic
-  Ringer fixtures, trace metrics, and compatibility fixes.
-- Homebrew and `snapsynapse/harnessie-verify-action@v0` are separately propagated
-  downstreams. `NEXT.md` records their exact verified pins and any temporary lag.
-- The current 1.3.1 guide selects profile 2.0.0; final hosted verification is pending.
-  The 1.2.0 hosted Level 4 receipt is historical evidence only.
-- The latest pre-release documentation baseline was 483 passed, 9 skipped, 51/51
-  deterministic evals, 21 outward trust files, and 16 inward files.
-  Counts are observations, not a permanent contract; rerun the gates before claiming
-  current status.
-- The lead adoption surface is `harnessie verify` for agent-produced changes. Ringer
-  is the first named composition target through its existing exit-code check contract;
-  the full harness is the growth path for consent, ownership, containment, arbitration,
-  and tamper-evident run audits.
-- CI (`.github/workflows/ci.yml`) proves Linux bubblewrap, macOS, Linux no-backend
-  fail-closed behavior, package artifacts, and fresh installation. `NEXT.md` records
-  the exact current work order and release authority boundaries.
+- Core 1.3.1 is published on GitHub and PyPI, with original-build attestations and
+  a clean Python 3.13 public-index consumer verified. It includes offline observation,
+  dependency locks, provenance enforcement, bounded parser fixes and accessibility repairs.
+- Verify Action 0.2.1 and stable v0 pin core 1.3.1; Homebrew serves 1.3.1.
+  Engine wrappers remain independently released at 0.1.0.
+- The final 1.3.1 guide earned hosted Level 4 under profile 2.0.0 with zero blockers.
+  Any guide byte change requires a new sidecar, trust pins, DNS and hosted receipt.
+- Sam explicitly deferred the remaining accessibility review as nonblocking.
+  Zero confirmed automated violations with 36 incomplete candidates is inconclusive,
+  not an accessibility pass. Keep the temporary review queue until processed.
+- `audits/release-1.3.1.md` records immutable release and provider evidence;
+  `NEXT.md` names remaining work. Test counts are dated observations, not contracts.
+- The lead adoption surface remains `harnessie verify` for agent-produced changes.
+  Ringer composes through its existing process-exit contract. Bidding, commentary,
+  follow mode, automatic runner integration and model selection remain deferred
+  under Sam's AIDR-0009 arbitration.
