@@ -8,11 +8,11 @@ Harnessie evals are YAML scorecards under `evals/`. They are deliberately small,
 ## Scenario contract
 Every scenario has:
 - `id`: stable snake-case identifier, unique within the suite.
-- `kind`: one of `verdict`, `loop`, `workflow`, `resume`, `ownership`, `plugin`, `adversarial`, `audit`, `triage`, `parallel`, `blast_radius`, `inward_manifest`, `maiden_voyage`, `observer`, `aidr_export`, or `repo_hygiene`. `aidr_export` is unreleased source functionality, absent from published 1.3.1.
+- `kind`: one of `verdict`, `loop`, `workflow`, `resume`, `ownership`, `plugin`, `adversarial`, `audit`, `triage`, `parallel`, `blast_radius`, `inward_manifest`, `maiden_voyage`, `observer`, `aidr_export`, or `repo_hygiene`. `aidr_export` was added in 1.4.1.
 - Expected result fields, which depend on `kind`.
 ## Suites
 - `evals/parser-safety.yaml`: malformed structured-claim status refusals plus the valid required-claim control. Verdict parser identity is 3; earlier parser-specific scorecards require rerunning.
-- `evals/aidr-export.yaml`: four source-only cases for open dissent preservation, partial-arbitration refusal, destination ID collision, and broken evidence. Every case checks existing-file preservation and permits only the expected output artifact.
+- `evals/aidr-export.yaml`: four cases for open dissent preservation, partial-arbitration refusal, destination ID collision, and broken evidence. Every case checks existing-file preservation and permits only the expected output artifact.
 - `evals/baseline.yaml`: core harness guarantees (verdicts, stop conditions, gates, resume).
 - `evals/governance.yaml`: the v0.2 governance layer (consent, ownership, adversarial contest, audit). Written red before the implementation per the eval-first change discipline (GOVERNANCE.md §6); a governance feature without a red-then-green scenario pair does not merge.
 - `evals/operability.yaml`: the operability and write-safety layer (headless approval policy, invalid-policy fail-closed behavior, parallel phase workspaces, parallel failure halts, audit-chain survival under concurrency, and atomic blast-radius rollback).

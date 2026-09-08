@@ -6,7 +6,7 @@ Roadmap items are intent, not commitments. Dates are omitted deliberately; miles
 
 ## Released so far
 
-Versions 0.1.0 through 1.2.0 are shipped; the current core release is 1.3.1. The current source version is 1.4.1. The 1.3 feature scope shipped in corrective 1.3.1 after the preserved 1.3.0 build stopped before package publication. It retains the stable 1.x authoring and plugin contracts while making evidence-bound verification of agent-produced changes the smallest useful adoption surface. This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
+The current core release is 1.4.1, published and verified on GitHub and PyPI. The current source version is 1.4.1. It adds offline open-record AIDR export while retaining the stable 1.x authoring and plugin contracts and evidence-bound verification as the smallest adoption surface. Earlier milestones below are historical; the 1.3 scope shipped in corrective 1.3.1 after the preserved 1.3.0 build stopped before publication. This file records release themes, acceptance bars, and remaining work. [CHANGELOG.md](CHANGELOG.md) records what landed, and [release execution](audits/release-1.4.1.md) records current delivery evidence.
 
 ## Guiding priorities
 
@@ -174,25 +174,27 @@ These are general roadmap items, not incomplete 1.2.0 release gates. The exact 1
 
 The conservative offline observer, approved maintenance packets 1-3, accessibility repairs and final GuideCheck integration are published in core 1.3.1. GitHub/PyPI original-build assets, Verify Action 0.2.1/stable v0 and Homebrew 1.3.1 are independently verified. The signed 1.3.0 tag remains intact; its provenance CLI flag conflict was corrected in 1.3.1. See [release evidence](audits/release-1.3.1.md).
 
-### 1.3.1 GuideCheck completion - COMPLETE
+### 1.3.1 GuideCheck completion - HISTORICAL COMPLETE
 
-Sam applied the final Namecheap DNS value after deployment. The 1.3.1 guide earned [hosted Level 4 under profile 2.0.0](audits/release-1.3.1/guidecheck-prepublication.json) on 2026-09-08 UTC with zero blocking findings before the GitHub Release. Served guide, sidecar, repository and DNS agree on the final bytes; the signed immutable tag identity was checked from a clean clone. Earlier receipts remain historical.
+Sam applied the final Namecheap DNS value after deployment. The 1.3.1 guide earned [hosted Level 4 under profile 2.0.0](audits/release-1.3.1/guidecheck-prepublication.json) on 2026-09-08 UTC with zero blocking findings before the GitHub Release. Served guide, sidecar, repository and DNS agreed on those release bytes; the signed immutable tag identity was checked from a clean clone. This receipt is historical for the earlier guide.
 
 ### Accessibility review completion - DEFERRED FOLLOW-UP
 
 The [ten-route baseline audit](audits/accessibility/2026-09-07/audit-2026-09-07.md) found four confirmed serious keyboard-access issues and 58 incomplete review candidates. The [approved mitigation packet](audits/accessibility/2026-09-07/mitigation-plan.md) is shipped: a [fresh ten-route scan](audits/accessibility/2026-09-07-mitigation/audit-2026-09-07.md) has zero confirmed violations and resolves 22 homepage candidates. The gate remains inconclusive. Review the remaining 35 threat-model table contrast candidates and one homepage video-caption candidate, plus any new findings after further changes. Complete the targeted keyboard, zoom/reflow and screen-reader checks with dated evidence for the final changed routes. `NEXT.md` locates the temporary review queue.
 
-Acceptance: per-candidate dispositions backed by measurements or applicability evidence, accurate fresh automated results, and completed manual release checks. Sam explicitly deferred this review on 2026-09-07 local time and authorized full release publication. For 1.3.1, track it as post-release follow-up; the automated gate remains inconclusive and no manual pass is claimed. GuideCheck remains a separate pre-publication gate.
+Acceptance: per-candidate dispositions backed by measurements or applicability evidence, accurate fresh automated results, and completed manual release checks. Sam deferred this review for 1.3.1 and retained that deferral when authorizing the 1.4.1 release sequence. Track it as post-release follow-up; the automated gate remains inconclusive and no fresh automated or manual pass is claimed. GuideCheck acceptance is separate from accessibility acceptance.
 
 ## Controlled review and offline observation
 
 The offline observer is approved in [AIDR-0009](decisions/AIDR-0009-bid-rounds-and-run-observer.md), with a bounded [acceptance packet](audits/aidr-0009-preparation-2026-09-04.md). Its implementation shipped in 1.3.1 and is documented in [OBSERVER.md](OBSERVER.md). Bidding, commentary, runner integration and model selection are not part of that first slice.
 
-The [controlled-review assessment](audits/review-interoperability-2026-09-07.md) maps present enforcement and the gaps for portable AIDR output. Sam accepted a separate offline open-record exporter packet on 2026-09-08. The [unreleased source command](AIDR_EXPORT.md) preserves recorded dissent and source bytes, maps participant instances, binds consumed evidence and refuses arbitration or unsafe destinations. [Implementation evidence](audits/aidr-export-implementation-2026-09-08.md) records acceptance and provenance limits. This does not change the published 1.3.1 release. A live pilot still needs fixed evidence, named participants, provider opt-in and explicit human arbitration; arbitration import and broader source formats remain deferred.
+The [controlled-review assessment](audits/review-interoperability-2026-09-07.md) mapped enforcement and gaps for portable AIDR output. Sam accepted a separate offline open-record exporter packet on 2026-09-08, shipped in 1.4.1. The [export command](AIDR_EXPORT.md) preserves recorded dissent and source bytes, maps participant instances, binds consumed evidence and refuses arbitration or unsafe destinations. [Implementation evidence](audits/aidr-export-implementation-2026-09-08.md) records acceptance and provenance limits. A live pilot still needs fixed evidence, named participants, provider opt-in and explicit human arbitration; arbitration import and broader source formats remain deferred.
 
-### Pre-release completion before the 1.4.1 candidate
+### 1.4.1: Offline open-record AIDR export - SHIPPED
 
-Accepted 2026-09-08: explicit `unsupported_platform` refusals before project I/O; a real mock runner through the installed exporter and pinned AIDR linter, preserving dissent and the human halt; documentation and machine-discovery parity; and current planning. [Completion evidence](audits/aidr-pre-release-completion-2026-09-08.md) carries the verification results. Sam selected 1.4.1 for both package and guide, with publication status recorded separately, with hosted verification pending for the new bytes. Version identities are synchronized; final release gates and external publication follow this packet. Accessibility is deferred for this session; changed-route acceptance or a release-specific human disposition remains required before new publication.
+Core 1.4.1 is published and verified on GitHub and PyPI. It includes strict open-record export, `unsupported_platform` refusals before project I/O, the installed mock-runner/export/reference-lint example, and documentation/discovery parity. [Release execution](audits/release-1.4.1.md) records final evidence; [pre-release completion](audits/aidr-pre-release-completion-2026-09-08.md) remains a dated implementation snapshot. The final guide earned [hosted Level 4 under profile 2.0.0](audits/release-1.4.1/guidecheck-prepublication.json) with zero blocking findings.
+
+Verify Action 0.2.2 and stable `v0` are published at `9f18d70017f395ef4d15ac5746e30ac633f00f8e`, pinning core 1.4.1. Homebrew 1.4.1 is published at tap commit `953760f3968200f99658bfb068609532cb9fbf4d`, with the real upgrade, formula tests, and installed version verified. Engine wrappers remain independently released at 0.1.0. Accessibility remains deferred with no new pass claim.
 
 ## Platform support
 

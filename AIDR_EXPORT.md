@@ -1,6 +1,6 @@
 # Offline AIDR export
 
-`harnessie export-aidr` exports one existing open Harnessie contested-phase record into an explicitly named AIDR file. This command is unreleased source functionality and is not included in the published PyPI 1.3.1 package. Use a checkout containing this command and its installed Python dependencies on a POSIX system supporting `flock`, no-follow file access, and hard links, such as macOS or Linux. Export does not require Node, model credentials, or a running workflow.
+`harnessie export-aidr`, added in Harnessie 1.4.1, exports one existing open contested-phase record into an explicitly named AIDR file. Use Harnessie 1.4.1 or newer on a POSIX system supporting `flock`, no-follow file access, and hard links, such as macOS or Linux. The 1.4.1 GitHub release and PyPI distributions are published and independently verified. Export does not require Node, model credentials, or a running workflow.
 
 The command is an operator-issued file write outside the workflow runner, ownership ledger, tool registry, consent lock, and approval policy. An assistant invoking it needs authorization for the destination write. No model calls does not make it read-only. Source input is handled by the export parser rather than the registry's quarantine and secret-redaction path.
 
@@ -51,7 +51,7 @@ Keep the source tree and destination directory under operator control during exp
 | An altered event hash chain | Refuse with `invalid_evidence` |
 | An unquoted code fence or nested heading that the runtime allowed in source prose | Refuse with `invalid_record`; unsupported input is not silently rewritten |
 
-The [executable example](examples/aidr-export/README.md) and [demo.py](examples/aidr-export/demo.py) construct a real mock-run record, use the installed `harnessie` command to export it, run the pinned AIDR reference linter, and check that source bytes remain unchanged and the original run still halts for arbitration. The example also exercises refused inputs. Its linter step requires Node; the exporter itself does not. Follow the example's setup for a source installation containing this unreleased command.
+The [executable example](examples/aidr-export/README.md) and [demo.py](examples/aidr-export/demo.py) construct a real mock-run record, use the installed `harnessie` command to export it, run the pinned AIDR reference linter, and check that source bytes remain unchanged and the original run still halts for arbitration. The example also exercises refused inputs. Its linter step requires Node; the exporter itself does not. Follow the example's setup using a 1.4.1 or newer checkout or source distribution.
 
 ## Evidence limits
 

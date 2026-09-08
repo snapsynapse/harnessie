@@ -1,0 +1,23 @@
+{
+  "assets": {
+    "dist/harnessie-1.4.1-py3-none-any.whl": "2094c7793a0fde76226d5782b0785311d9dbc955998a0c7237580f43b1066dd5",
+    "dist/harnessie-1.4.1.tar.gz": "4348ca226397a79d317dc619374b75019a43f8f660b30d3410d83d2cbf925d85",
+    "release/harnessie-1.4.1.SHA256SUMS": "11476d68a6e6f82f7e205457d11262e2eedb456cc90380ad25ec25796384b229",
+    "release/harnessie-1.4.1.cdx.json": "228a15e401cd337dc8acd7bc2264ea176162d02d2f13e0490e2a94cb9e1307c2"
+  },
+  "commit": "296deed2f91cd4c8eeecad82b83f137dd029ea26",
+  "repository": "snapsynapse/harnessie",
+  "tag": "v1.4.1",
+  "verified": true,
+  "workflow": "snapsynapse/harnessie/.github/workflows/release.yml",
+  "checked_at": "2026-09-08T20:50:24.436000+00:00",
+  "workflow_run": "https://github.com/snapsynapse/harnessie/actions/runs/34276711096",
+  "github_release_published_at": "2026-09-08T20:45:54Z",
+  "certificate_identity": "https://github.com/snapsynapse/harnessie/.github/workflows/release.yml@refs/tags/v1.4.1",
+  "source_ref": "refs/tags/v1.4.1",
+  "source_digest": "296deed2f91cd4c8eeecad82b83f137dd029ea26",
+  "signer_digest": "296deed2f91cd4c8eeecad82b83f137dd029ea26",
+  "deny_self_hosted_runners": true,
+  "predicate_type": "https://slsa.dev/provenance/v1",
+  "verification_script_sha256": "f66db23c3aed8c896cc1016355ed07988afe2ffc4cfbe50df4d0a8a32ff07565"
+}

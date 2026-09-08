@@ -1,8 +1,10 @@
 # Release checklist
 
-Current execution: [Harnessie 1.4.1](audits/release-1.4.1.md), with publication pending.
+Current completed release: [Harnessie 1.4.1](audits/release-1.4.1.md). Core GitHub/PyPI publication and verification are complete. Verify Action 0.2.2 and stable `v0` are published at `9f18d70017f395ef4d15ac5746e30ac633f00f8e`, pinning core 1.4.1. Homebrew 1.4.1 is published at tap commit `953760f3968200f99658bfb068609532cb9fbf4d`, with the real upgrade, formula tests, and installed version verified. Engine wrappers remain independently released at 0.1.0.
 
-Latest completed execution: [Harnessie 1.3.1](audits/release-1.3.1.md), including core GitHub/PyPI, Verify Action 0.2.1 and Homebrew 1.3.1. The checklist below remains the reusable release procedure.
+The final 1.4.1 guide earned [hosted Level 4 under profile 2.0.0](audits/release-1.4.1/guidecheck-prepublication.json) with zero blocking findings before publication. Its frozen bytes remain unchanged. Sam retained the accessibility deferral for this release sequence; no fresh accessibility pass is claimed.
+
+Historical completed execution: [Harnessie 1.3.1](audits/release-1.3.1.md), including core GitHub/PyPI, Verify Action 0.2.1 and Homebrew 1.3.1. The checklist below remains the reusable release procedure; current results live in the dated execution record.
 
 The promotion path for a tagged Harnessie release. Steps that touch the
 network or public state (PyPI, GitHub releases, DNS) are operator acts and

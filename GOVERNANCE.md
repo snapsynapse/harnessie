@@ -97,7 +97,7 @@ Arbitration is human-only, mechanically: no harness code path writes the Arbitra
 
 Independence statement (recorded in every decision record, after the AIDR recipe practice of stating what the runner actually guaranteed): positions run in isolated model contexts within one harness process; isolation is code-enforced for context and tools, behavioral for everything a shared filesystem could leak; the hash-chained events log is the evidence it held.
 
-### Offline AIDR export (unreleased source)
+### Offline AIDR export (1.4.1)
 
 `harnessie export-aidr` is an operator-issued file-write command, outside the runner, ownership ledger, tool registry, consent lock, and approval policy. The operator explicitly supplies a source run and phase, an unused destination ID/filename, and a declared human arbiter. The command does not authenticate that declaration or grant an agent authority to write operator-owned files. An external assistant invoking it needs authorization for the file write; the absence of model calls does not make the command read-only.
 

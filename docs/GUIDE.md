@@ -8,7 +8,7 @@ The complete guide to running, configuring, and extending Harnessie. If you are 
 - [Core concepts](#core-concepts)
 - [Installation and requirements](#installation-and-requirements)
 - [The CLI](#the-cli)
-- [Offline AIDR export (unreleased source)](#offline-aidr-export-unreleased-source)
+- [Offline AIDR export](#offline-aidr-export)
 - [What governs a run](#what-governs-a-run)
 - [Writing a workflow](#writing-a-workflow)
 - [Configuring brains](#configuring-brains)
@@ -52,7 +52,7 @@ Python 3.11 or newer. PyYAML and jsonschema install with Harnessie. Install from
 pip install harnessie   # or: pipx install harnessie / uv tool install harnessie
 ```
 
-This documentation covers unreleased Harnessie 1.4.1 source. The published package remains 1.3.1. `export-aidr` requires a source installation containing that command; it is absent from the published 1.3.1 package. The separately maintained Homebrew formula and Harnessie Verify Action have their own release pins; `NEXT.md` records verified propagation.
+This documentation covers Harnessie 1.4.1, published and verified on GitHub and PyPI. `export-aidr` requires version 1.4.1 or newer. The separately maintained Homebrew formula and Harnessie Verify Action have their own release pins; `NEXT.md` records verified propagation.
 
 Developing on the harness itself (or wanting the test suite), install from source:
 
@@ -74,7 +74,7 @@ All commands are subcommands of `python3 -m harness.cli` (or `harnessie` once in
 | `resume <run_id> <workflow> --goal "..."` | Resume a run from its journal. Re-runs only phases that did not pass. Repeat the original `--plugin NAME` set exactly; name, version, entry-point target, or tool drift refuses before model dispatch. |
 | `report <run_id>` | Plain-language run summary: outcome, per-phase status, and on a halt the one named next action. `--raw` appends the raw journal, events, and proof listing. |
 | `observe <run_id>` | In 1.3.0, verify an existing local journal snapshot and write cited JSON/Markdown under its observer directory. No model calls or runner integration. Exit 0 means summary production succeeded, including for halted runs; invalid inputs exit 2. See [the observer contract](https://github.com/snapsynapse/harnessie/blob/main/OBSERVER.md). |
-| `export-aidr RUN_ID PHASE --output decisions/AIDR-NNNN-short-slug.md --arbiter HUMAN_HANDLE` | Unreleased source: write one supported open phase record to an explicitly named, unused AIDR destination. Requires a declared human arbiter; does not author arbitration. Prints JSON: exit 0 exported, exit 2 refused. See [Offline AIDR export](#offline-aidr-export-unreleased-source). |
+| `export-aidr RUN_ID PHASE --output decisions/AIDR-NNNN-short-slug.md --arbiter HUMAN_HANDLE` | Added in 1.4.1: write one supported open phase record to an explicitly named, unused AIDR destination. Requires a declared human arbiter; does not author arbitration. Prints JSON: exit 0 exported, exit 2 refused. See [Offline AIDR export](#offline-aidr-export). |
 | `audit <run_id>` | Verify the hash chain and render the governance timeline. Exit 0 clean, 1 broken chain, 2 run not found. |
 | `eval [suite]` | Run the deterministic eval scorecards (optionally one suite YAML). |
 | `eval --live` | Run opt-in live provider scorecards; skipped visibly unless `HARNESSIE_LIVE=1` and provider configuration are present. |
@@ -86,7 +86,7 @@ All commands are subcommands of `python3 -m harness.cli` (or `harnessie` once in
 | `approve-maiden <run_id> <phase>` | Promote one verified maiden-voyage proposal after checking the audit chain, staged hashes, and unchanged target. Exit 2 on any drift. |
 | `init [path]` | Scaffold a minimal project layout, then run the guided readiness check: Python version, sandbox backend detection, API-key guidance, and a zero-dollar mock run that must be green. `--no-verify` skips the guided check for scripted scaffolding. |
 
-## Offline AIDR export (unreleased source)
+## Offline AIDR export
 
 Use `export-aidr` to export an existing open contested-phase record into the project's existing `decisions/` directory. Supply the run, phase, unused AIDR filename, and human arbiter declaration explicitly. The [export contract](../AIDR_EXPORT.md) provides the command, supported source subset, limits, and refusal details. The [executable example](../examples/aidr-export/README.md), implemented in [demo.py](../examples/aidr-export/demo.py), creates a mock-run record, invokes the installed CLI, checks the output with the pinned AIDR linter, and verifies unchanged source bytes and a still-halted run.
 
@@ -357,7 +357,7 @@ Harnessie's guarantees live in code at the tool and registry layer, so no role p
 - Containment boundary (opt-in). When enabled in `config/boundary.yaml`, structured PII is stripped to placeholders before any egress and a secret in an egress payload halts the run; unstructured sensitive data is kept on your controlled tiers by contained routing. See [The containment boundary](#the-containment-boundary).
 - Structured refusals. Every denial returns a machine-readable refusal (`error`, `boundary`, `detail`, `why`) and emits an audit event, so refusals are actionable data for the model and legible entries for the operator.
 
-These controls govern workflow execution. The operator-issued [offline AIDR exporter](#offline-aidr-export-unreleased-source) writes directly outside the runner and registry, with its own strict input and filesystem checks. The full threat model, the honest limits of each layer, and the per-platform backend table are in [SECURITY.md](../SECURITY.md).
+These controls govern workflow execution. The operator-issued [offline AIDR exporter](#offline-aidr-export) writes directly outside the runner and registry, with its own strict input and filesystem checks. The full threat model, the honest limits of each layer, and the per-platform backend table are in [SECURITY.md](../SECURITY.md).
 
 ## Extending the harness
 
