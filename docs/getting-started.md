@@ -16,7 +16,7 @@ harnessie init my-project      # scaffold + guided readiness check + zero-dollar
 cd my-project
 ```
 
-This documentation covers Harnessie 1.3.1 source. Check the published package version before using new commands; release propagation is recorded in NEXT.md. The separately maintained Homebrew formula may lag briefly during release propagation; verify its reported version before treating the install paths as equivalent.
+This documentation covers unreleased Harnessie 1.4.1 source. Check the published package version before using new commands; release propagation is recorded in NEXT.md. The separately maintained Homebrew formula may lag briefly during release propagation; verify its reported version before treating the install paths as equivalent.
 
 Working on Harnessie itself (or wanting the test suite)? Install from source instead:
 

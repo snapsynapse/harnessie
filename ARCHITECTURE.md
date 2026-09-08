@@ -32,7 +32,8 @@ One module per boundary:
 | Agent loop | `harness/loop.py` | context, model call, permission-gated tool execution, enumerated stop conditions |
 | Workflow verification | `harness/verify.py` | deterministic checks, verifier agent, retry/reformulate/escalate ladder |
 | Standalone verification | `harness/verify_standalone.py`, `harness/verify_evidence.py` | fail-closed local intake gate, evidence-bundle preflight, structured claim verdicts, proof output, and 0/1/2 exit derivation |
-| Offline observation (unreleased) | `harness/observer.py` | derives cited metadata from a verified journal snapshot; no runner, model or governance participation; see [OBSERVER.md](OBSERVER.md) |
+| Offline observation (published in 1.3.1) | `harness/observer.py` | derives cited metadata from a verified journal snapshot; no runner, model or governance participation; see [OBSERVER.md](OBSERVER.md) |
+| Offline AIDR export (unreleased source) | `harness/aidr_export.py` | operator-issued export of one supported open phase record into a new AIDR file; strict parsing, source/evidence hashes, structural validation and exclusive publication; see [AIDR_EXPORT.md](AIDR_EXPORT.md) |
 | Trace evaluation | `harness/trace_eval.py` | deterministic work, denial, duplication, token, and claim-coverage metrics over admitted event traces |
 | Routing and budget | `harness/routing.py` | task_class to (tier, effort); default escalation ladder; sideways fallback; hard cost ceilings |
 | Cascade policy | `harness/cascade.py` | declared containment-aware routing policy (`config/cascade.yaml`): tier ladders, escalation reasons, contained-tier constraints, reserved work classes |
@@ -83,6 +84,8 @@ Contested phases (`mode: adversarial`, v0.2) run a different loop for decisions 
 Outer loop (`WorkflowRunner.run_workflow`): declared phases, journaled results, resume-on-crash, halt on `needs_human` / `needs_arbitration` / `needs_approval` so later phases never build on unverified, unarbitrated, or unapproved work. A worker phase with `phase_type` runs its first exact contract in a staged workspace. The operator command promotes that verified snapshot only if the target workspace and ownership ledger still match their proposal baselines.
 
 ## 4. Memory and data layer
+
+The source-only `export-aidr` command runs outside these loops. It reads a strict subset of generated open records and their event evidence, then writes an explicitly named file directly under the project root's existing `decisions/` directory. This operator-issued filesystem write does not pass through the runner, ownership ledger, tool registry, consent lock, or model dispatch. No model calls means no model execution; the command still writes an artifact. The source record and run state remain unchanged, and the destination has empty Arbitration. Export-time hashes bind consumed bytes; model/provider and independence statements retain their source-reported status. The [executable example](examples/aidr-export/README.md) demonstrates the installed CLI against a mock-run record and the pinned AIDR reference linter.
 
 Four stores, all files, all inspectable:
 

@@ -367,3 +367,22 @@ def test_blockquoted_headings_and_unicode_prose_remain_preserved(record):
     source.write_text(source.read_text().replace('First line.', prose))
     result = run_export(root)
     assert prose in (root / result['output']).read_text()
+
+
+@pytest.mark.parametrize('missing', ['fcntl', 'O_NOFOLLOW', 'O_DIRECTORY', 'O_NONBLOCK',
+                                     'link', 'supports_dir_fd', 'supports_follow_symlinks'])
+def test_unsupported_platform_refuses_before_input_access(record, monkeypatch, missing):
+    import harness.aidr_export as module
+    if missing == 'fcntl':
+        monkeypatch.setattr(module, 'fcntl', None)
+    elif missing in ('supports_dir_fd', 'supports_follow_symlinks'):
+        monkeypatch.setattr(module.os, missing, set())
+    else:
+        monkeypatch.delattr(module.os, missing)
+    def forbidden(*args, **kwargs):
+        raise AssertionError('unsupported platform accessed the project')
+    monkeypatch.setattr(module, '_safe_path', forbidden)
+    monkeypatch.setattr(module, '_read', forbidden)
+    with pytest.raises(AIDRExportError) as exc:
+        run_export(record[0])
+    assert exc.value.code == 'unsupported_platform'

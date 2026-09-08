@@ -5,16 +5,24 @@
   "unreleased": {
     "status": "active",
     "source": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md#unreleased",
-    "summary": "No changes recorded."
+    "summary": "Source-only open-record AIDR exporter, strict refusal and evidence checks, installed mock consumer example, and documentation/discovery integration. Stable package remains 1.3.1.",
+    "target_version": "1.4.1"
   },
   "current": {
-    "version": "1.3.1",
-    "released": "2026-09-08",
-    "status": "published",
-    "summary": "The offline observer and maintenance release, with the provenance CLI identity-selector correction needed for publication.",
-    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.3.1"
+    "version": "1.4.1",
+    "released": null,
+    "status": "pending-publication",
+    "summary": "Source-only open-record AIDR exporter, strict refusal and evidence checks, installed mock consumer example, and documentation/discovery integration. Stable package remains 1.3.1.",
+    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.4.1"
   },
   "history": [
+    {
+      "version": "1.4.1",
+      "released": null,
+      "status": "pending-publication",
+      "summary": "Source-only open-record AIDR exporter, strict refusal and evidence checks, installed mock consumer example, and documentation/discovery integration. Stable package remains 1.3.1.",
+      "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.4.1"
+    },
     {
       "version": "1.3.1",
       "released": "2026-09-08",

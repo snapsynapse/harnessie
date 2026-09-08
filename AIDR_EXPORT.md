@@ -2,6 +2,8 @@
 
 `harnessie export-aidr` exports one existing open Harnessie contested-phase record into an explicitly named AIDR file. This command is unreleased source functionality and is not included in the published PyPI 1.3.1 package. Use a checkout containing this command and its installed Python dependencies on a POSIX system supporting `flock`, no-follow file access, and hard links, such as macOS or Linux. Export does not require Node, model credentials, or a running workflow.
 
+The command is an operator-issued file write outside the workflow runner, ownership ledger, tool registry, consent lock, and approval policy. An assistant invoking it needs authorization for the destination write. No model calls does not make it read-only. Source input is handled by the export parser rather than the registry's quarantine and secret-redaction path.
+
 ## Invocation
 
 Select the source run and phase, reserve an unused AIDR ID in the project's existing `decisions/` directory, and declare the human who will arbitrate. The source is `runs/RUN_ID/decisions/DR-PHASE.md`. The destination must be directly inside the project root's `decisions/` directory, with a filename of the form `AIDR-NNNN-short-slug.md`.
@@ -24,6 +26,8 @@ Success prints one JSON object on standard output with `status: "exported"`, the
 
 An export refusal prints one JSON object on standard output with `status: "refused"` and a machine-readable `code`, then exits 2. Argument syntax errors use the CLI's normal usage diagnostic on standard error and also exit 2. Export does not overwrite an existing destination. A repeat attempt against the same destination refuses; deterministic content is not an overwrite permission.
 
+Platforms without the required POSIX primitives refuse with `code: "unsupported_platform"` and exit 2. There is no native Windows exporter implementation.
+
 ## Accepted source and preservation
 
 The source must be an unambiguous open `DR-PHASE` record with valid identities, resolvable run evidence, and an empty Arbitration section. Any decided metadata or arbitration content refuses export, including content in a record still marked open. Missing evidence, malformed structures, unsafe paths, symlink paths, and destination ID or filename collisions also refuse.
@@ -35,6 +39,19 @@ The export preserves recorded position prose and objections, keeping initial pos
 The destination stays open with empty Arbitration. The command does not resume the runner, initialize models, call providers, or modify the source record, event log, or workflow state. It performs structural validation against the pinned AIDR 0.1.0 export contract before publishing the new file. Reference-linter tests establish structural compatibility for the tested artifacts, not semantic adequacy or blanket AIDR conformance.
 
 Keep the source tree and destination directory under operator control during export. An advisory directory lock coordinates cooperating exporters, and exclusive hard-link publication prevents overwriting the destination. These controls do not confine hostile concurrent filesystem writers. Source and evidence bytes are rechecked immediately before publication. No directories are created by the command.
+
+## Supported and refused examples
+
+| Input or operation | Result |
+|---|---|
+| Canonical open record with repeated reviewer roles, recorded dissent, and its intact emitted event reference | Export with distinct participant-instance identities, retained original roles, and empty Arbitration |
+| Open record with any partial Arbitration prose | Refuse with `arbitration_present` |
+| Arbitrated/superseded status or decided metadata | Refuse; export never transfers or authors a human decision |
+| A used destination ID, including a different slug under that ID | Refuse with `destination_collision`; existing file remains unchanged |
+| An altered event hash chain | Refuse with `invalid_evidence` |
+| An unquoted code fence or nested heading that the runtime allowed in source prose | Refuse with `invalid_record`; unsupported input is not silently rewritten |
+
+The [executable example](examples/aidr-export/README.md) and [demo.py](examples/aidr-export/demo.py) construct a real mock-run record, use the installed `harnessie` command to export it, run the pinned AIDR reference linter, and check that source bytes remain unchanged and the original run still halts for arbitration. The example also exercises refused inputs. Its linter step requires Node; the exporter itself does not. Follow the example's setup for a source installation containing this unreleased command.
 
 ## Evidence limits
 

@@ -155,3 +155,29 @@ raise SystemExit(main(sys.argv[1:]))
     assert result.returncode == 0, result.stdout + result.stderr
     assert json.loads(result.stdout)["status"] == "exported"
     assert result.stderr == ""
+
+
+def test_missing_fcntl_is_clean_cli_refusal_in_fresh_process(tmp_path):
+    script = r'''
+import importlib.abc
+import sys
+class MissingFcntl(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname == 'fcntl':
+            raise ModuleNotFoundError('synthetic missing POSIX module')
+sys.meta_path.insert(0, MissingFcntl())
+from harness.cli import main
+from pathlib import Path
+def no_project_access(*args, **kwargs):
+    raise AssertionError('unsupported export accessed project inputs')
+Path.lstat = no_project_access
+Path.stat = no_project_access
+raise SystemExit(main(sys.argv[1:]))
+'''
+    result = subprocess.run([sys.executable, '-c', script, *arguments(tmp_path)],
+                            cwd=Path(__file__).resolve().parents[1],
+                            text=True, capture_output=True, check=False)
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert json.loads(result.stdout) == {'status': 'refused', 'code': 'unsupported_platform'}
+    assert result.stderr == ''
+    assert not list(tmp_path.iterdir())

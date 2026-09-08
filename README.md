@@ -23,7 +23,7 @@ pip install harnessie                # or: pipx install / uv tool install
 harnessie init my-project            # scaffold + guided readiness check + zero-dollar mock run
 ```
 
-This source tree targets core 1.3.1, adding offline run observation and release-integrity improvements. Check the [release status](https://github.com/snapsynapse/harnessie/releases) and installed version before using new commands. Homebrew and Harnessie Verify are separately versioned downstreams; see [NEXT.md](NEXT.md) for their verified pins and propagation status.
+The published core package is 1.3.1; this unreleased 1.4.1 source tree contains the AIDR exporter described below. Check the [release status](https://github.com/snapsynapse/harnessie/releases) and installed version before using new commands. Homebrew and Harnessie Verify are separately versioned downstreams; see [NEXT.md](NEXT.md) for their verified pins and propagation status.
 
 To gate pull requests on claim-by-claim verification without installing anything locally, the standalone verifier also ships as a GitHub Action: [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify). Harnessie 1.2.0 accepts raw criteria or a v1 evidence bundle that binds stable claim IDs to an exact Git state, content-addressed proofs, and recorded deterministic checks. Its structured verdicts distinguish reproduced, refuted, and not-verifiable claims before the exit code gates the merge. The Action's separately released pin is reported in [NEXT.md](NEXT.md).
 
@@ -54,7 +54,7 @@ Worked examples: [policy compliance](examples/policy-compliance/README.md) exerc
 - [docs/ringer.md](docs/ringer.md): the Ringer adoption path, including the shared exit-code contract and a recipe for verifying agent-produced changes.
 - [PLUGIN_CONTRACT.md](PLUGIN_CONTRACT.md): the versioned, opt-in tool extension contract and its explicit in-process trust boundary.
 - [docs/brains.md](docs/brains.md): the brain-agnostic receipt, the models actually run under the harness with a link to the record that proves each.
-- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run. The 1.3.1 guide earned [hosted Level 4 under profile 2.0.0](audits/release-1.3.1/guidecheck-prepublication.json) on 2026-09-08 UTC, with zero blockers and matching served, sidecar, DNS and repository bytes. The 1.3.0 receipt remains historical evidence for different bytes. Conformance does not establish software safety.
+- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run or export. Source guide revision `1.4.1` is unreleased, and validation and hosted acceptance of its changed bytes remain pending. The [1.3.1 hosted Level 4 receipt under profile 2.0.0](audits/release-1.3.1/guidecheck-prepublication.json), dated 2026-09-08 UTC, is historical evidence for the earlier guide; it does not cover this revision. The published package remains 1.3.1. Conformance does not establish software safety.
 - [docs/agents.json](docs/agents.json), [docs/api/v1/index.json](docs/api/v1/index.json), [docs/changelog.json](docs/changelog.json), and [docs/.well-known/security.txt](docs/.well-known/security.txt): machine-readable capability, local CLI, release-history, and private security-report handoffs. The declarations explicitly do not advertise a hosted API, service, or MCP server.
 
 The engineering references below (ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP) sit at the repo root; the user-facing guides live under `docs/`.
@@ -98,7 +98,7 @@ Harnessie 1.3.1 adds `harnessie observe RUN_ID` for an existing local run. It ve
 
 ## Offline AIDR export (unreleased source)
 
-The source checkout adds `harnessie export-aidr RUN_ID PHASE --output decisions/AIDR-NNNN-short-slug.md --arbiter HUMAN_HANDLE` to export an existing open phase decision without model calls or runner changes. It preserves recorded dissent, binds consumed source and evidence hashes, and leaves Arbitration empty. This command is not in the published PyPI 1.3.1 package. See [AIDR_EXPORT.md](AIDR_EXPORT.md) for invocation, refusals, and provenance limits.
+The source checkout adds `harnessie export-aidr RUN_ID PHASE --output decisions/AIDR-NNNN-short-slug.md --arbiter HUMAN_HANDLE` to export a supported open phase decision without model calls or runner changes. It is an operator-issued file write outside the runner's ownership and consent controls. It preserves recorded dissent, binds consumed source and evidence hashes, and leaves Arbitration empty. This command is not in the published PyPI 1.3.1 package. See [AIDR_EXPORT.md](AIDR_EXPORT.md) for invocation, strict source limits, refusals, and provenance qualifications. The [executable example](examples/aidr-export/README.md) demonstrates a mock run through installed CLI export and pinned-reference lint while preserving the source and its arbitration halt.
 
 ## Requirements
 
