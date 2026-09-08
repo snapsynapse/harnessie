@@ -16,11 +16,11 @@
   },
   "release_context": {
     "source_version": "1.3.1",
-    "stable_release": "1.2.0",
-    "publication_status": "pending",
-    "describes": "1.3.1 source; 1.2.0 remains published until release propagation completes",
-    "unreleased_changes_since_stable": true,
-    "note": "The 1.3.0 build stopped before package publication. Corrective 1.3.1 includes the same offline observer and maintenance scope plus the provenance CLI fix. Verify Action and Homebrew propagate separately."
+    "stable_release": "1.3.1",
+    "publication_status": "published",
+    "describes": "Published Harnessie 1.3.1 core",
+    "unreleased_changes_since_stable": false,
+    "note": "Core 1.3.1 is published on GitHub and PyPI. Verify Action 0.2.1 and stable v0 pin core 1.3.1; Homebrew serves 1.3.1. Engine wrappers retain their independent release train."
   },
   "global_options": {
     "--root": "Project root; defaults to the current working directory."

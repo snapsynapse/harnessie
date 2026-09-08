@@ -54,7 +54,7 @@ Worked examples: [policy compliance](examples/policy-compliance/README.md) exerc
 - [docs/ringer.md](docs/ringer.md): the Ringer adoption path, including the shared exit-code contract and a recipe for verifying agent-produced changes.
 - [PLUGIN_CONTRACT.md](PLUGIN_CONTRACT.md): the versioned, opt-in tool extension contract and its explicit in-process trust boundary.
 - [docs/brains.md](docs/brains.md): the brain-agnostic receipt, the models actually run under the harness with a link to the record that proves each.
-- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run. The 1.3.1 guide selects profile 2.0.0 with matching guide/sidecar bytes; its final DNS and hosted checkpoint is pending. The [1.3.0 receipt](audits/release-1.3.0/guidecheck-prepublication.json) is historical evidence for different bytes. Conformance does not establish software safety.
+- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run. The 1.3.1 guide earned [hosted Level 4 under profile 2.0.0](audits/release-1.3.1/guidecheck-prepublication.json) on 2026-09-08 UTC, with zero blockers and matching served, sidecar, DNS and repository bytes. The 1.3.0 receipt remains historical evidence for different bytes. Conformance does not establish software safety.
 - [docs/agents.json](docs/agents.json), [docs/api/v1/index.json](docs/api/v1/index.json), [docs/changelog.json](docs/changelog.json), and [docs/.well-known/security.txt](docs/.well-known/security.txt): machine-readable capability, local CLI, release-history, and private security-report handoffs. The declarations explicitly do not advertise a hosted API, service, or MCP server.
 
 The engineering references below (ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP) sit at the repo root; the user-facing guides live under `docs/`.
@@ -94,7 +94,7 @@ Dogfooding this repo under Claude Code uses a local `.claude/` (subagent defs, a
 
 ## Offline run observation
 
-Harnessie 1.3.0 adds `harnessie observe RUN_ID` for an existing local run. It verifies a journal snapshot and writes cited JSON and Markdown summaries without calling models, changing the source journal, or resuming the runner. Exit 0 means observation succeeded, not that the run passed. See [OBSERVER.md](OBSERVER.md) for input limits, refusal behavior, output paths, and deferred features.
+Harnessie 1.3.1 adds `harnessie observe RUN_ID` for an existing local run. It verifies a journal snapshot and writes cited JSON and Markdown summaries without calling models, changing the source journal, or resuming the runner. Exit 0 means observation succeeded, not that the run passed. See [OBSERVER.md](OBSERVER.md) for input limits, refusal behavior, output paths, and deferred features.
 
 ## Requirements
 

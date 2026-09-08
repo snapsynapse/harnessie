@@ -1,0 +1,1 @@
+{"version": "1.3.1", "index": "https://pypi.org/simple", "python": "3.13", "verified": true, "checks": ["isolated import", "observer help", "evidence bundle help", "scaffold", "inward manifest", "halted run observer preserves journal"], "checked_at": "2026-09-08T02:18:30.859713+00:00"}

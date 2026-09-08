@@ -14,7 +14,7 @@ means the operator does not need to be a developer (declared token/dollar ceilin
 named halt conditions each with one plain operator action, disagreement surfaced as a
 human decision rather than a silent merge).
 
-Shipped as the `harnessie` Python package (Apache-2.0, stable 1.2.0). The verifier also
+Shipped as the `harnessie` Python package (Apache-2.0, stable 1.3.1). The verifier also
 ships standalone as a separately versioned GitHub Action (Harnessie Verify) for gating
 PRs. Core 1.2.0 includes evidence-bound intake and structured required-claim verdicts.
 
@@ -50,14 +50,14 @@ PRs. Core 1.2.0 includes evidence-bound intake and structured required-claim ver
 Copyright Snap Synapse LLC (author Sam Rogers, subscriptions@snapsynapse.com), with
 trademark and PAICE.work PBC spec/code carveouts recorded in NOTICE.
 
-## Current status (2026-09-01)
+## Current status (2026-09-08)
 
-Active and healthy. v1.2.0 is the stable core release on PyPI and GitHub. It adds
+Active and healthy. v1.3.1 is the stable core release on PyPI and GitHub. It adds offline observation, release-integrity enforcement and parser refusal fixes, building on
 OpenAI Responses support, evidence bundles, structured claim verdicts, Ringer
 regression fixtures, and event-trace metrics. Homebrew and the separately owned Verify
 Action are independent propagation surfaces whose verified pins are recorded in
 NEXT.md. The docs site is
-live, and the dated 2026-08-05 Siteline scan scored it A, 97/100. Public-facing doc pages under `docs/` are generated
+live, and the dated 2026-09-08 Siteline scan scored it A, 97/100. Public-facing doc pages under `docs/` are generated
 from markdown via `scripts/build_docs_html.py` (edit markdown, rebuild, commit both).
 AIDR-0008 is arbitrated and executed in the independent engine-wrappers release train.
 See NEXT.md for current source and release state and CHANGELOG.md for shipped history.
@@ -80,8 +80,8 @@ write only what you own. The read-only `harnessie ownership` command explains th
 ledger decision, and the zero-model collision example proves a second agent cannot
 overwrite the first agent's artifact through the built-in write path.
 
-The 1.2.0 assistant guide earned hosted GuideCheck Level 4 under profile 0.7.1 on 2026-09-08 UTC with zero blocking findings and two response-header warnings. The [current receipt](audits/guidecheck/2026-09-08/hosted-1.2.0-after-dns.json) matches served, sidecar, DNS TXT and repository bytes. Prior receipts remain historical. The prepared 1.3.0 guide selects profile 2.0.0 and must earn its own hosted result after deployment and DNS rotation.
+The final 1.3.1 assistant guide earned [hosted GuideCheck Level 4 under profile 2.0.0](audits/release-1.3.1/guidecheck-prepublication.json) on 2026-09-08 UTC with zero blocking findings. Served, sidecar, DNS TXT and repository bytes agree. Earlier guide receipts remain historical.
 
-## 1.3.0 publication in progress
+## 1.3.1 release completion
 
-Source and guide now target 1.3.0. Sam authorized full publishing and deferred the remaining accessibility review as nonblocking. The current published version and final evidence are tracked in [release execution](audits/release-1.3.0.md); historical 1.2.0 results do not qualify the new guide.
+Sam authorized full publishing and deferred the remaining accessibility review as nonblocking. Core 1.3.1, Verify Action 0.2.1/stable v0 and Homebrew 1.3.1 are published and verified. The original signed 1.3.0 tag remains intact after its build stopped before package upload. [Release execution](audits/release-1.3.1.md) records exact identities, tests and residual follow-up.

@@ -1,0 +1,24 @@
+{
+  "version": "1.3.1",
+  "workflow_run": "https://github.com/snapsynapse/harnessie/actions/runs/34179342988",
+  "status": "verified",
+  "attestation_verifier": "pypi-attestations 0.0.30",
+  "files": [
+    {
+      "filename": "harnessie-1.3.1-py3-none-any.whl",
+      "sha256": "2de49487168fd58ac77c8a7aa44a024a0adb0239571fc2f0292966c9dd5d42cd",
+      "url": "https://files.pythonhosted.org/packages/d4/21/69fd481ee43ac5791639a389963923845d63c278188e7f7a5055892380a0/harnessie-1.3.1-py3-none-any.whl",
+      "uploaded_at": "2026-09-08T02:17:14.094645Z",
+      "attestation_verified": true,
+      "matches_github_asset": true
+    },
+    {
+      "filename": "harnessie-1.3.1.tar.gz",
+      "sha256": "fe250f5c86f993ec9af5723e85f42c57f0889c195ad2e57726d8782f827bb520",
+      "url": "https://files.pythonhosted.org/packages/aa/cd/e56b658981d7517967a18ecf35c21f63555aa69041f9f59c343e466f645c/harnessie-1.3.1.tar.gz",
+      "uploaded_at": "2026-09-08T02:17:15.665681Z",
+      "attestation_verified": true,
+      "matches_github_asset": true
+    }
+  ]
+}

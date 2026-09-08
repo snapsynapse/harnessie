@@ -6,7 +6,7 @@ Roadmap items are intent, not commitments. Dates are omitted deliberately; miles
 
 ## Released so far
 
-Versions 0.1.0 through 1.2.0 are shipped; the current core release is 1.2.0. The current source version is 1.3.1, with publication authorized and in progress. It retains the stable 1.x authoring and plugin contracts while making evidence-bound verification of agent-produced changes the smallest useful adoption surface. This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
+Versions 0.1.0 through 1.2.0 are shipped; the current core release is 1.3.1. The current source version is 1.3.1. The 1.3 feature scope shipped in corrective 1.3.1 after the preserved 1.3.0 build stopped before package publication. It retains the stable 1.x authoring and plugin contracts while making evidence-bound verification of agent-produced changes the smallest useful adoption surface. This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
 
 ## Guiding priorities
 
@@ -170,19 +170,23 @@ These are general roadmap items, not incomplete 1.2.0 release gates. The exact 1
 - Repository governance proportional to the maintainer model. Branch protection, required review, emergency recovery, and release permissions must be designed together rather than enabled to improve an aggregate score. Acceptance: the provider ruleset names required checks, prevents unreviewed unsafe paths, preserves a documented recovery route, and is exercised without deadlocking the current maintainer workflow.
 - OpenSSF Best Practices enrollment remains optional until its questionnaire would produce useful public operating evidence. Acceptance is truthful completion with citations and maintained answers, not the badge alone.
 
-### 1.3.0 GuideCheck completion
+### 1.3.1: Offline observation and release integrity - SHIPPED
 
-Sam unblocked GuideCheck on 2026-09-07. The [current 1.2.0 guide earned hosted Level 4 under profile 0.7.1](audits/guidecheck/2026-09-08/README.md) after his Namecheap DNS update. A separate 1.3.0 guide and sidecar select profile 2.0.0 and pass local content checks; they are not deployed. Acceptance: coordinated version/docs/trust promotion, reachable immutable tag identity, exact served/repository bytes, Sam-applied DNS rotation, and hosted profile-2.0.0 Level 4 with zero blocking findings before package publication. The current receipt cannot qualify future bytes.
+The conservative offline observer, approved maintenance packets 1-3, accessibility repairs and final GuideCheck integration are published in core 1.3.1. GitHub/PyPI original-build assets, Verify Action 0.2.1/stable v0 and Homebrew 1.3.1 are independently verified. The signed 1.3.0 tag remains intact; its provenance CLI flag conflict was corrected in 1.3.1. See [release evidence](audits/release-1.3.1.md).
 
-### 1.3.0 accessibility review completion
+### 1.3.1 GuideCheck completion - COMPLETE
 
-The [ten-route baseline audit](audits/accessibility/2026-09-07/audit-2026-09-07.md) found four confirmed serious keyboard-access issues and 58 incomplete review candidates. The [approved mitigation packet](audits/accessibility/2026-09-07/mitigation-plan.md) is implemented locally: a [fresh ten-route scan](audits/accessibility/2026-09-07-mitigation/audit-2026-09-07.md) has zero confirmed violations and resolves 22 homepage candidates. The gate remains inconclusive. Review the remaining 35 threat-model table contrast candidates and one homepage video-caption candidate, plus any new findings after further changes. Complete the targeted keyboard, zoom/reflow and screen-reader checks with dated evidence for the final changed routes. `NEXT.md` locates the temporary review queue.
+Sam applied the final Namecheap DNS value after deployment. The 1.3.1 guide earned [hosted Level 4 under profile 2.0.0](audits/release-1.3.1/guidecheck-prepublication.json) on 2026-09-08 UTC with zero blocking findings before the GitHub Release. Served guide, sidecar, repository and DNS agree on the final bytes; the signed immutable tag identity was checked from a clean clone. Earlier receipts remain historical.
+
+### Accessibility review completion - DEFERRED FOLLOW-UP
+
+The [ten-route baseline audit](audits/accessibility/2026-09-07/audit-2026-09-07.md) found four confirmed serious keyboard-access issues and 58 incomplete review candidates. The [approved mitigation packet](audits/accessibility/2026-09-07/mitigation-plan.md) is shipped: a [fresh ten-route scan](audits/accessibility/2026-09-07-mitigation/audit-2026-09-07.md) has zero confirmed violations and resolves 22 homepage candidates. The gate remains inconclusive. Review the remaining 35 threat-model table contrast candidates and one homepage video-caption candidate, plus any new findings after further changes. Complete the targeted keyboard, zoom/reflow and screen-reader checks with dated evidence for the final changed routes. `NEXT.md` locates the temporary review queue.
 
 Acceptance: per-candidate dispositions backed by measurements or applicability evidence, accurate fresh automated results, and completed manual release checks. Sam explicitly deferred this review on 2026-09-07 local time and authorized full release publication. Track it as post-release follow-up; the automated gate remains inconclusive and no manual pass is claimed. GuideCheck remains a separate pre-publication gate.
 
 ## Controlled review and offline observation
 
-The offline observer is approved in [AIDR-0009](decisions/AIDR-0009-bid-rounds-and-run-observer.md), with a bounded [acceptance packet](audits/aidr-0009-preparation-2026-09-04.md). Its current-source implementation is documented in [OBSERVER.md](OBSERVER.md); it is not yet released. Bidding, commentary, runner integration and model selection are not part of that first slice.
+The offline observer is approved in [AIDR-0009](decisions/AIDR-0009-bid-rounds-and-run-observer.md), with a bounded [acceptance packet](audits/aidr-0009-preparation-2026-09-04.md). Its implementation shipped in 1.3.1 and is documented in [OBSERVER.md](OBSERVER.md). Bidding, commentary, runner integration and model selection are not part of that first slice.
 
 The [controlled-review assessment](audits/review-interoperability-2026-09-07.md) maps present enforcement and the gaps for portable AIDR output. Keep file links and standalone verification as the present composition surface. A live pilot needs fixed evidence and explicit human arbitration. An exporter needs an accepted namespace, attribution and failure-atomicity contract; neither is implemented by this assessment.
 

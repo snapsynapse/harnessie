@@ -4,14 +4,15 @@
   "profile": "package",
   "authority": "R2",
   "start_head": "bc40ae94265180e21498cbd6dff4f23b52342593",
-  "candidate_head": null,
+  "candidate_head": "6ddf84429ab8fbfa9ec96e59b283cf7cb341dd6f",
   "candidate_version": "1.3.1",
-  "updated_at": "2026-09-08T02:06:04.964232+00:00",
+  "updated_at": "2026-09-08T02:28:08.797413+00:00",
   "steps": [
     {
       "id": "candidate",
-      "status": "ready",
-      "evidence": "Corrective 1.3.1 source prepared over bc40ae9; signed 1.3.0 history preserved."
+      "status": "completed",
+      "evidence": "Corrective release commit 6ddf84429ab8fbfa9ec96e59b283cf7cb341dd6f",
+      "head": "6ddf84429ab8fbfa9ec96e59b283cf7cb341dd6f"
     },
     {
       "id": "local_gate",
@@ -20,53 +21,60 @@
     },
     {
       "id": "pr_ci",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "PR 16; all platform, package and CodeQL checks passed at 1cd6888a2e4e8b045ca0efcce6be6b20c31fe640.",
+      "head": "1cd6888a2e4e8b045ca0efcce6be6b20c31fe640"
     },
     {
       "id": "merge_pages",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "Exact merge CI 34179004951 and Pages 34179004273 passed; all 22 live resources match and ten-page production search has zero defects.",
+      "head": "6ddf84429ab8fbfa9ec96e59b283cf7cb341dd6f"
     },
     {
       "id": "signed_tag",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "Tag object 692af124afe8cd9971fc51347067016b6980ec83 peels to 6ddf84429ab8fbfa9ec96e59b283cf7cb341dd6f; SSH signature verified in clean clone; tag-source URL HTTP 200.",
+      "head": "6ddf84429ab8fbfa9ec96e59b283cf7cb341dd6f"
     },
     {
       "id": "guidecheck",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "audits/release-1.3.1/guidecheck-prepublication.json; profile 2.0.0, Level 4, zero blockers, final guide SHA ef62ac6ecc50f1f277dda119299d1b145e0aae66a51bcf47ba233e23c072409b.",
+      "head": "6ddf84429ab8fbfa9ec96e59b283cf7cb341dd6f"
     },
     {
       "id": "siteline",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "Dated 2026-09-08 97/100 A receipt in audits/release-1.3.0/siteline.json; corrective version retains site structure; final live bytes and search verified independently.",
+      "head": "6ddf84429ab8fbfa9ec96e59b283cf7cb341dd6f"
     },
     {
       "id": "github_release",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "https://github.com/snapsynapse/harnessie/releases/tag/v1.3.1; release 384404763 published 2026-09-08T02:14:04Z.",
+      "head": "6ddf84429ab8fbfa9ec96e59b283cf7cb341dd6f"
     },
     {
       "id": "assets_provenance",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "Original build and attachment jobs passed in run 34179342988. Independently downloaded all four GitHub assets; exact workflow/tag/source/signer identity and checksums verified in audits/release-1.3.1/github-provenance.json.",
+      "head": "6ddf84429ab8fbfa9ec96e59b283cf7cb341dd6f"
     },
     {
       "id": "pypi",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "Release workflow 34179342988 succeeded; both PyPI files match original GitHub assets, both pypi-attestations verifications passed, protected pypi publisher identity is correct and Python 3.13 public-index consumer passed. See audits/release-1.3.1/pypi-integrity.json and pypi-consumer.json."
     },
     {
       "id": "verify_action",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "Signed v0.2.1 and stable v0 resolve to 97ed2264818fc4c620c03de5cc9522965318079b; seven exact-merge CI jobs passed. GitHub release 384407346 published. See audits/release-1.3.1/downstream.json."
     },
     {
       "id": "homebrew",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "PR 2 merged as 630021462ef961669a0802d090c7c77c65190932. Exact PyPI sdist pin, strict online audit, real upgrade, formula test, linkage and installed CLI passed. Both tap checkouts synchronized."
     }
   ]
 }
