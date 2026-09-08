@@ -38,3 +38,5 @@ No release blocker remains from the approved session scope. Accessibility review
 ## Publication metadata closeout
 
 Current-source docs now identify core 1.3.1, Action 0.2.1/stable v0 and Homebrew 1.3.1 as published; the final guide receipt is linked from human and machine surfaces. The guide and sidecar bytes remain unchanged. Closeout regression checks passed: 572 tests, one skip, 28 expected failures, 21 trust files, generated-doc freshness, four-component ecosystem validation with matching downstream pins, and ten-page search contract with zero defects.
+
+The first closeout CI attempt found that shortening NEXT.md removed required headings and verification commands. Those sections were restored without changing the evaluation contract; all 62 deterministic evaluations then passed locally. This affected documentation closeout only, after the released package and its exact-tag gates had passed.
