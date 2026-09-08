@@ -97,9 +97,17 @@ Arbitration is human-only, mechanically: no harness code path writes the Arbitra
 
 Independence statement (recorded in every decision record, after the AIDR recipe practice of stating what the runner actually guaranteed): positions run in isolated model contexts within one harness process; isolation is code-enforced for context and tools, behavioral for everything a shared filesystem could leak; the hash-chained events log is the evidence it held.
 
+### Offline AIDR export (unreleased source)
+
+`harnessie export-aidr` is an operator-issued file-write command, outside the runner, ownership ledger, tool registry, consent lock, and approval policy. The operator explicitly supplies a source run and phase, an unused destination ID/filename, and a declared human arbiter. The command does not authenticate that declaration or grant an agent authority to write operator-owned files. An external assistant invoking it needs authorization for the file write; the absence of model calls does not make the command read-only.
+
+Only the [documented strict open-record subset](AIDR_EXPORT.md) is admitted. Export preserves recorded positions and objections, including upstream truncation, and keeps Arbitration empty. It refuses any arbitration content or decided metadata rather than copying or authoring a human decision. The exported record cannot unlock the original run: no source record, journal, or runner state changes. Human arbitration remains a separate action on the governing record.
+
+Source/evidence hashes establish the consumed export-time snapshot. Reported model/provider identities, context-isolation statements, and a structurally valid hash chain do not authenticate authorship, prove independent review, or establish that the prose answers the decision. The [mock-run example](examples/aidr-export/README.md) and its [demo](examples/aidr-export/demo.py) exercise preservation and continued halt alongside pinned-reference structural validation.
+
 ## 5. Audit: tamper-evident log, replayable governance
 
-Every governance action already flows through `events.jsonl`. v0.2 makes that log tamper-evident and gives the operator a single verb to interrogate it.
+Run governance actions flow through `events.jsonl`. v0.2 makes that log tamper-evident and gives the operator a single verb to interrogate it. Offline exports report their hashes separately and do not append to the source run's log.
 
 - Hash chain: each event carries `seq` and `prev` — the SHA-256 of the previous event's exact serialized line (`genesis` for the first). Any post-hoc edit, deletion, or reorder breaks every subsequent link.
 - `harnessie audit <run_id>`: verifies the chain end to end, then renders the governance timeline, including inward-manifest checks, maiden proposals and approvals, consents, ownership, structured refusals, change requests, injection flags, blast-radius usage and breaches, gate verdicts, approval grants and denials, operator arbitration, memory maintenance, and decision records. One composite timeline of agent and human actions. Exit 0 clean, exit 1 broken chain, exit 2 run not found.

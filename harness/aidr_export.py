@@ -9,7 +9,6 @@ writers. No runner, provider, registry or model is initialized by this module.
 from __future__ import annotations
 
 import datetime
-import fcntl
 import hashlib
 import json
 import os
@@ -19,6 +18,15 @@ import stat
 import tempfile
 
 import yaml
+
+try:
+    import fcntl
+except ImportError:  # Native Windows has no POSIX advisory directory locking.
+    fcntl = None
+
+# Preserve capability identities independently of instrumentation wrappers.
+_DIR_FD_FUNCTIONS = tuple(getattr(os, name, None) for name in ('link', 'unlink'))
+_LINK_FUNCTION = getattr(os, 'link', None)
 
 TARGET_SPEC = '0.1.0'
 MAX_SOURCE_BYTES = 2 * 1024 * 1024
@@ -40,6 +48,20 @@ class AIDRExportError(ValueError):
 
 def _fail(code: str) -> None:
     raise AIDRExportError(code)
+
+
+def _require_platform() -> None:
+    """Refuse unsupported primitives before reading or writing project data."""
+    if (os.name != 'posix' or fcntl is None
+            or not callable(getattr(fcntl, 'flock', None))
+            or not isinstance(getattr(fcntl, 'LOCK_EX', None), int)
+            or any(not isinstance(getattr(os, name, None), int)
+                   for name in ('O_NOFOLLOW', 'O_DIRECTORY', 'O_NONBLOCK'))
+            or any(not callable(getattr(os, name, None))
+                   for name in ('open', 'link', 'unlink', 'fstat', 'fsync', 'close'))
+            or not all(fn in getattr(os, 'supports_dir_fd', ()) for fn in _DIR_FD_FUNCTIONS)
+            or _LINK_FUNCTION not in getattr(os, 'supports_follow_symlinks', ())):
+        _fail('unsupported_platform')
 
 
 def _digest(data: bytes) -> str:
@@ -321,6 +343,7 @@ def export_aidr(root: Path, run_id: str, phase: str, output: str, arbiter: str) 
     are created. The advisory directory lock serializes this exporter, while an
     exclusive hard link publishes a fully validated sibling file atomically.
     """
+    _require_platform()
     stage = None
     directory_fd = None
     try:

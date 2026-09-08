@@ -1,0 +1,112 @@
+{
+  "date": "2026-09-08",
+  "scope": "AIDR pre-release completion",
+  "status": "locally_verified",
+  "base_commit": "5c157999af2aaaa5eec67752f5a3cf023132d5bd",
+  "branch": "codex/aidr-pre-release-completion",
+  "verification_stage": "pre_commit",
+  "published_package_version": "1.3.1",
+  "new_package_published": false,
+  "candidate_prepared": false,
+  "checks": {
+    "pytest": {
+      "passed": 718,
+      "skipped": 1,
+      "xfailed": 28,
+      "python": "3.13.9",
+      "platform": "macOS",
+      "os_sandbox_access": true
+    },
+    "deterministic_evals": {
+      "passed": 66,
+      "total": 66
+    },
+    "focused_exporter_tests": 144,
+    "discovery_guide_version_tests": 24,
+    "schema_documents": 9,
+    "trust_files": 21,
+    "inward_files": 16,
+    "ecosystem_components": 4,
+    "generated_pages": 9,
+    "search_pages": 10,
+    "search_defects": 0,
+    "dependency_locks": "passed",
+    "build": "passed",
+    "twine": "passed",
+    "artifact_inspection": "passed",
+    "fresh_install_smoke": "passed",
+    "artifact_source_bytes": "match",
+    "independent_verifier": {
+      "status": "pass",
+      "focused_tests_passed": 168,
+      "fresh_install_smoke": "passed",
+      "source_and_artifact_digests": "match",
+      "guide_local_result": "Level 3 with sole missing independent anchor finding",
+      "native_windows": "simulated capability absence only, no native Windows run",
+      "model_provider_independence_claimed": false
+    }
+  },
+  "guide": {
+    "version": "1.4.0-dev.1",
+    "local_achieved_level": 3,
+    "local_exit_code": 1,
+    "blocking_findings": [
+      "anchor.independent.missing"
+    ],
+    "current_hosted_receipt": null,
+    "local_receipt": "audits/aidr-pre-release-completion-2026-09-08/guidecheck-local.json",
+    "historical_receipt": "audits/release-1.3.1/guidecheck-prepublication.json"
+  },
+  "source_sha256": {
+    "AIDR_EXPORT.md": "03bf1867b66813725416ee549f2827d3cfa074409d4166e3613db288b9569090",
+    "ARCHITECTURE.md": "6a672ca1431e266ec4c80079d66e6305049d8c81dd9c254c0022e5fa27252eba",
+    "CHANGELOG.md": "1ef879ba5aabb9d87daaadda40e6b631e07e8466141c82e4f7f7c222c31c93be",
+    "EVALS.md": "f90b882c77db7966f190f818302540840ffe823a085e7ad877c6a49436b8be53",
+    "GOVERNANCE.md": "a9f435a5f7438b58147165d27d5b7ba54d07e67f3aa4468716347d96c3b51e1d",
+    "MANIFEST.in": "1b7916b6b1f50f8d1f0e23ac6dea3e85e8e8bf725d8143f2d125fcc6bfce266c",
+    "NEXT.md": "11885db4069b6d3273a206a12cd14934683306753c596f49849994e175cd5233",
+    "PROJECT_CONTEXT.md": "c568a564bc61e58f711076cb686c8b1710351f0ea81f46f863542c75b60f8869",
+    "README.md": "a1acbf80609dedcd59e9dfe23dc46eaab33b8ab5d987b97db46eea619d5af258",
+    "ROADMAP.md": "22e70c38c4637f13a03766f5ae4cbcd480498a855dc2dbb7dd30f8e8d266e271",
+    "SECURITY.md": "aa5338c6e842f6bf790d70910c9985df2490a8aa839b9f97a2aa1fe73f9f0e9a",
+    "assistant-guide.txt": "f51cb30d178f0605d24754dc41969f13e92ed0ac92868c9e36de191c268d86fb",
+    "docs/.well-known/assistant-guide-manifest.txt": "c4af7ee16ae696a67226c19b9ab5800efb4e2987cf143ed99bdc1e91ad4a557a",
+    "docs/.well-known/assistant-guide.txt": "f51cb30d178f0605d24754dc41969f13e92ed0ac92868c9e36de191c268d86fb",
+    "docs/GUIDE.md": "89d0d969aae9023f0539bc824728913a0034bea88b6e89b819ad7b71a2e41d7f",
+    "docs/MANIFEST.yaml": "5bdfc7f76e085567a765636f4f7d6fff8a375ca1588c83520508d8207e6db5d2",
+    "docs/agents.json": "e7e36f2411891022bdf47340f18a646344d241ffe259da02b293f2ef69ccb84b",
+    "docs/api/v1/index.json": "f55d7fcb5df9b5e60b300a9afda95228df29057be02cc4d40d0c0387a76cd160",
+    "docs/changelog.json": "c15a28cbfc1cff60301c438f30053e7f97ba413102d39e5af461fd400a716209",
+    "docs/guide.html": "f4ed1ded7bda938b8f2b947152e5fbcc8725e4fecdfb0939338b9b5edab2e2bf",
+    "docs/index.html": "8276e84b454992055e0910abf0f9aa009630eea303412907681c610054de02c0",
+    "docs/llm.txt": "9a80524e94bd6c4811ff4e83e2e037605c48463666c114831a15460d6e6a3617",
+    "docs/llms.txt": "9a80524e94bd6c4811ff4e83e2e037605c48463666c114831a15460d6e6a3617",
+    "harness/aidr_export.py": "7c705ff1fdd7358a08e04dae7d7827f68911d1f6b474c92a80cad34347ae8535",
+    "scripts/fresh_install_smoke.py": "2837c92f27a45aecd97ff9cc1abd1edecb498c41dbe62896c3a0e16e80cb708f",
+    "tests/test_aidr_export.py": "9a412d589b3461d127b6e0996e294520fe17b3b94c266ea4183ab3e7b36b5846",
+    "tests/test_aidr_export_cli.py": "b0735190475c83719265e3417b4fa39e196dba0fd397a7ffb87c0314d0224516",
+    "tests/test_public_machine_resources.py": "55c67a489dac9905e4dfd60eaef25a311a4d3b79a1fb65fa68e75fe0b31586ff",
+    "tests/test_version_sync.py": "4560ebe72182de31982cc17037f847ee453d30495f1d7cbb0803f12ce8b2944d",
+    "examples/aidr-export/demo.py": "0cbc267017cfc6d2a00b362ef984c02889e3a6dbdc6bcb8e9382415b0a0555a2",
+    "examples/aidr-export/README.md": "fb68c1cfb2a0aa83661d4e122006f4a6c454a2cbe7a3b7e9a26736578dd692e2",
+    "tests/test_aidr_export_demo.py": "70f454e1ac089afaee9a4b59211fb6fd595778a8024ac6cf98a518cdb289d5dc"
+  },
+  "artifacts": {
+    "harnessie-1.3.1.tar.gz": "e2f421042cc04de33cb94406818d2261b8fbe900a0243b6902dbea1970f3ca48",
+    "harnessie-1.3.1-py3-none-any.whl": "e0051acc7890579bfbd86041c5956e30791d3e4bce40f054ee2e178b9de022dc"
+  },
+  "artifact_note": "Development artifacts with unchanged source version field; not published 1.3.1 distributions. Never upload as replacements.",
+  "deferred": [
+    "accessibility",
+    "live panels",
+    "arbitration import",
+    "broader source formats",
+    "bidding",
+    "commentary",
+    "follow mode",
+    "runner integration",
+    "model selection",
+    "MCP",
+    "provider policy"
+  ]
+}

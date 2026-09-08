@@ -66,7 +66,7 @@ def test_agents_json_describes_released_core_and_downstream_boundaries():
         data["release_context"]["publication_status"] == "pending")
     assert {item["id"] for item in data["capabilities"]} == {
         "review-checkout", "verify-claims", "validate-project",
-        "inspect-ownership", "run-workflow", "observe-run"}
+        "inspect-ownership", "run-workflow", "observe-run", "export-open-aidr"}
     assert data["boundaries"] == {
         "hosted_api": False,
         "hosted_service": False,
@@ -78,7 +78,7 @@ def test_agents_json_describes_released_core_and_downstream_boundaries():
     assert capabilities["review-checkout"]["human_approval_required"] is True
     guide_status = capabilities["review-checkout"]["integrity_status"]
     assert guide_status["historical_receipt"].endswith(
-        "/audits/release-1.3.0/guidecheck-prepublication.json")
+        "/audits/release-1.3.1/guidecheck-prepublication.json")
     if guide_status["current_receipt"] is None:
         assert guide_status["current_end_to_end_level"].startswith("Pending")
     else:
@@ -155,7 +155,8 @@ def test_machine_changelog_tracks_the_packaged_release():
     assert len(versions) == len(set(versions))
     assert data["current"]["release"].endswith(f"/v{version}")
     assert data["unreleased"]["status"] == "active"
-    assert data["unreleased"]["summary"] == "No changes recorded."
+    assert "AIDR" in data["unreleased"]["summary"]
+    assert "source" in data["unreleased"]["summary"].lower()
     assert data["current"]["status"] in {"pending-publication", "published"}
     if data["current"]["status"] == "pending-publication":
         assert data["current"]["released"] is None
@@ -191,7 +192,7 @@ def test_cli_manifest_is_complete_and_explicitly_not_hosted():
     assert set(data["paths"]) == {
         "run", "resume", "report", "audit", "eval", "verify-manifest",
         "verify-inward-manifest", "approve-maiden", "verify", "init", "validate",
-        "ownership", "observe",
+        "ownership", "observe", "export-aidr",
     }
     for command, contract in data["paths"].items():
         assert contract["synopsis"].startswith(f"harnessie {command}")
@@ -235,7 +236,7 @@ def test_public_discovery_links_expose_support_and_machine_resources():
         assert f"https://harnessie.com{path}" in llms
     assert "Contact support" in html
     assert "Report a vulnerability" in html
-    assert "1.3 guide: profile 2.0.0" in html
+    assert "Source guide: profile 2.0.0" in html
     assert "hosted verification pending" in html or "hosted Level 4" in html
     assert "historical evidence" in html
     assert "opt-in containment" in html.lower()
@@ -327,3 +328,19 @@ def test_trust_bundle_pins_all_machine_resources():
         assert rel in pins
         digest = hashlib.sha256((ROOT / rel).read_bytes()).hexdigest()
         assert pins[rel] == digest
+
+
+def test_export_discovery_distinguishes_source_availability_and_write_boundary():
+    data = _json(AGENTS)
+    export = next(c for c in data["capabilities"] if c["id"] == "export-open-aidr")
+    command = _json(CLI_MANIFEST)["paths"]["export-aidr"]
+    assert export["command"] == command["synopsis"]
+    assert export["status"] == command["status"] == "source-unreleased"
+    assert data["release_context"]["publication_status"] == "pending"
+    assert export["network_default"] == "not used"
+    assert export["exit_codes"] == {"0": "exported", "2": "refused"}
+    assert "Writes one" in export["side_effects"]
+    assert "halted" in export["side_effects"]
+    assert "arbitration" in export["description"]
+    assert data["discovery"]["aidr_export"].endswith("/AIDR_EXPORT.md")
+    assert "AIDR_EXPORT.md" in (ROOT / "assistant-guide.txt").read_text()

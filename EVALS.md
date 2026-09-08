@@ -8,10 +8,11 @@ Harnessie evals are YAML scorecards under `evals/`. They are deliberately small,
 ## Scenario contract
 Every scenario has:
 - `id`: stable snake-case identifier, unique within the suite.
-- `kind`: one of `verdict`, `loop`, `workflow`, `resume`, `ownership`, `plugin`, `adversarial`, `audit`, `triage`, `parallel`, `blast_radius`, `inward_manifest`, `maiden_voyage`, `observer`, or `repo_hygiene`.
+- `kind`: one of `verdict`, `loop`, `workflow`, `resume`, `ownership`, `plugin`, `adversarial`, `audit`, `triage`, `parallel`, `blast_radius`, `inward_manifest`, `maiden_voyage`, `observer`, `aidr_export`, or `repo_hygiene`. `aidr_export` is unreleased source functionality, absent from published 1.3.1.
 - Expected result fields, which depend on `kind`.
 ## Suites
 - `evals/parser-safety.yaml`: malformed structured-claim status refusals plus the valid required-claim control. Verdict parser identity is 3; earlier parser-specific scorecards require rerunning.
+- `evals/aidr-export.yaml`: four source-only cases for open dissent preservation, partial-arbitration refusal, destination ID collision, and broken evidence. Every case checks existing-file preservation and permits only the expected output artifact.
 - `evals/baseline.yaml`: core harness guarantees (verdicts, stop conditions, gates, resume).
 - `evals/governance.yaml`: the v0.2 governance layer (consent, ownership, adversarial contest, audit). Written red before the implementation per the eval-first change discipline (GOVERNANCE.md §6); a governance feature without a red-then-green scenario pair does not merge.
 - `evals/operability.yaml`: the operability and write-safety layer (headless approval policy, invalid-policy fail-closed behavior, parallel phase workspaces, parallel failure halts, audit-chain survival under concurrency, and atomic blast-radius rollback).
@@ -34,6 +35,16 @@ The bounded property pilot in `tests/test_parser_properties.py` runs 200 determi
 
 ### observer
 Uses synthetic event journals and the offline observer with no model calls. Assertions cover phase statuses, outcome, findings, phase count, output files, empty workspace and absent payload canaries. Unknown expectation keys fail explicitly.
+
+### aidr_export
+
+Exercises the exporter against an assembled synthetic record and event log in a temporary project. The source and any pre-existing destination must remain byte-identical. An accepted export must stay open, retain recorded dissent, and contain no fabricated arbitration metadata. No model calls are made, but a successful case writes an output file.
+
+- Input: `source_case`, one of `open`, `partial_arbitration`, `id_collision`, or `broken_evidence`.
+- Expected: `expect_status`, either `exported` or `refused`. Unknown `expect_` fields and unsupported source cases fail explicitly.
+- Use `open` with `exported`; pair the three refusal fixtures with `refused`. The partial-arbitration text is a synthetic rejection fixture, not a human decision.
+
+These four cases test the local function boundary. The [end-to-end example](examples/aidr-export/README.md) separately creates a real mock-run record, invokes the installed CLI, runs the pinned AIDR reference linter, and checks that source bytes and the run's arbitration halt survive. Node is needed for that reference-linter check, not for export itself. Structural success does not establish authorship, independent review, or semantic adequacy.
 
 ### verdict
 Exercises verifier verdict parsing only.

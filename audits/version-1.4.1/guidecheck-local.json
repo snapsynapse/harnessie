@@ -1,0 +1,58 @@
+{
+  "compact_report": "Verifier: guidecheck-reference-local 2.0.0\nGuide: assistant-guide.txt\nProfile: 2.0.0 (declared 2.0.0)\nContent policy: corrected-content-1\nAnchor policy: 1.0.0-strict\nQualifying anchors: 0\nLevel: 3\nSHA-256: 28b5fdb28d9809ec9c40312465c92e4171202e8fba9a5ea2aa17f68bf9a4117a\nBlocking findings: 1\nWarnings: 0\nHash pinned: no\nProceed? no",
+  "findings": [
+    {
+      "id": "metadata.last-reviewed.age",
+      "message": "last-reviewed is 0 days old",
+      "severity": "info"
+    },
+    {
+      "id": "anchor.independent.missing",
+      "message": "no fetched qualifying independent anchor is available for Level 4",
+      "severity": "error"
+    }
+  ],
+  "guide": {
+    "achieved_level": 3,
+    "bytes": 8048,
+    "level5_ready": false,
+    "sha256": "28b5fdb28d9809ec9c40312465c92e4171202e8fba9a5ea2aa17f68bf9a4117a"
+  },
+  "input": {
+    "evaluation_mode": "local-file",
+    "manifest_path": "docs/.well-known/assistant-guide-manifest.txt",
+    "path": "assistant-guide.txt"
+  },
+  "local_evaluation": {
+    "evaluated_at": "2026-09-08T19:44:26.456135Z"
+  },
+  "manifest": {
+    "bytes_match": true,
+    "fetched": false,
+    "guide_sha256": "28b5fdb28d9809ec9c40312465c92e4171202e8fba9a5ea2aa17f68bf9a4117a",
+    "hash_match": true,
+    "path": "docs/.well-known/assistant-guide-manifest.txt",
+    "sha256": "0e93b91f5b4eaacf5cc57a3513dcaacc28b5b4c81dcabcfc1c6a163556a8a827",
+    "valid": true
+  },
+  "profile_selection": {
+    "anchor_policy": "1.0.0-strict",
+    "content_policy": "corrected-content-1",
+    "declared_version": "2.0.0",
+    "evaluated_policy": "2.0.0"
+  },
+  "qualifying_anchor_count": 0,
+  "summary": {
+    "blocking_findings": 1,
+    "infos": 1,
+    "warnings": 0
+  },
+  "verifier": {
+    "guide_profile": "human-verifiable-assistant-guide",
+    "guide_profile_version": "2.0.0",
+    "name": "guidecheck-reference-local",
+    "verifier_profile": "human-verifiable-assistant-guide-verifier",
+    "verifier_profile_version": "2.0.0",
+    "version": "2.0.0"
+  }
+}

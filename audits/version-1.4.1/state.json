@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "repository": "snapsynapse/harnessie",
+  "profile": "package",
+  "authority": "R1",
+  "start_head": "5c157999af2aaaa5eec67752f5a3cf023132d5bd",
+  "candidate_head": null,
+  "candidate_version": "1.4.1",
+  "updated_at": "2026-09-08T19:45:45.610985+00:00",
+  "steps": [
+    {
+      "id": "version-propagation",
+      "status": "completed",
+      "evidence": "audits/version-1.4.1-preparation.md; working-tree fingerprint fea8dc318c7e8d21740dfca588f5198a9f1730a52d2f8c224557a125dcc50f14"
+    },
+    {
+      "id": "focused-verification-and-package-smoke",
+      "status": "completed",
+      "evidence": "audits/version-1.4.1-preparation.md"
+    },
+    {
+      "id": "full-candidate-release-gate",
+      "status": "not_started",
+      "evidence": "Version-only verification completed; full candidate gate remains subsequent delivery."
+    },
+    {
+      "id": "hosted-guide-acceptance",
+      "status": "not_started",
+      "evidence": "Local Level 3 only; new independent anchor and hosted verification pending."
+    },
+    {
+      "id": "publication",
+      "status": "not_started",
+      "evidence": "No commit, push, tag, release, registry upload or deployment in this version-only pass."
+    }
+  ]
+}
