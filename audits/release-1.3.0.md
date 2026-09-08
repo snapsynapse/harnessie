@@ -39,3 +39,13 @@ The current Scorecard review found the already scoped branch-policy/sole-maintai
 ### Final guide verification before packaging
 
 After Sam updated the final Namecheap value, [hosted GuideCheck](release-1.3.0/guidecheck-prepublication.json) fetched the 7,766-byte 1.3.0 guide at 2026-09-08T01:41:49.634507Z and earned Level 4 under profile 2.0.0 with zero blocking findings. Guide SHA-256 is `5e00fa6903e0d42c49e9a25c08eec19116b04bf01ee0daf8c4d7d754b58b0793`; the fetched sidecar matches and DNS is the one qualifying independent anchor. Repository bytes match but do not qualify independently. Four warnings are retained: two response-header limits, unestablished repository independence, and the expected pre-publication PyPI URL 404. The DNS anchor meets the independent-channel requirement without the registry. No runtime Level 5 claim follows from `level5_ready`. The immutable tag-source URL will be checked after the final tag is created and before GitHub Release publication.
+
+### Signed tag and GitHub publication
+
+[PR 15](https://github.com/snapsynapse/harnessie/pull/15) passed exact-head checks and merged as `bc40ae94265180e21498cbd6dff4f23b52342593`; its exact-merge platform/package/CodeQL/Scorecard checks and Pages passed. All [22 served resources](release-1.3.0/live-prepublication.json) matched that revision. Signed tag `v1.3.0`, object `d760edb39eca38e5eb56b0da2e6ae6830d992ff6`, peels to that commit. A clean shallow clone verified the ED25519 signature using the existing configured public key. The sidecar tag-source URL returned HTTP 200 before publication.
+
+[GitHub release 384397522](https://github.com/snapsynapse/harnessie/releases/tag/v1.3.0) was published at 2026-09-08T01:49:25Z. This started the asset-build and protected-publisher workflow; their outcomes are recorded separately below.
+
+### Failed publication and corrective version
+
+[Release run 34177934310](https://github.com/snapsynapse/harnessie/actions/runs/34177934310) passed exact-tag tests, built all four assets and signed their provenance, then failed before upload because GitHub CLI rejects simultaneous `--signer-workflow` and `--cert-identity`. No assets were attached and nothing reached PyPI. The signed tag remains unchanged. The correction retains the exact certificate identity, both commit checks, tag ref and hosted-runner restriction; 11 policy tests pass and a real CLI negative control accepts the corrected flags and refuses a file without attestations. The assistant selected corrective version 1.3.1 within the authorized full-publication task to preserve the immutable 1.3.0 tag and original-build identity. See [1.3.1 execution](release-1.3.1.md).

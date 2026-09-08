@@ -24,7 +24,7 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 - [ ] `python3 -m harness.cli verify-inward-manifest` passes.
 - [ ] `python3 -m harness.cli validate` passes all shipped authoring documents.
 - [ ] `git diff --check` clean.
-- [x] For 1.3.0, Sam explicitly deferred the remaining accessibility review
+- [x] For the 1.3.0 scope and corrective 1.3.1 package, Sam explicitly deferred the remaining accessibility review
       and authorized publication; see audits/release-1.3.0.md. Preserve the
       36 unresolved candidates and manual work as follow-up, without a pass claim.
       For later releases, manual accessibility evidence should cover changed routes:
@@ -71,7 +71,7 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 
 ## 5. Tag and publish
 
-- [ ] For 1.3.0, satisfy Sam's 2026-09-07 pre-publication GuideCheck gate:
+- [ ] For the 1.3 release scope, satisfy Sam's 2026-09-07 pre-publication GuideCheck gate:
       final served guide, sidecar, repository pins and DNS TXT agree, and a
       dated hosted result verifies those exact bytes under profile 2.0.0.
       GuideCheck is now in scope; see the candidate and current-guide evidence

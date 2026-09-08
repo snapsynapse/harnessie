@@ -8,6 +8,8 @@ After final bytes exist, the release build attests the wheel, source archive, Cy
 
 The verifier requires exactly the expected wheel, source archive and SBOM entries in the checksum record. Missing files, links, changed bytes, duplicate entries and unexpected paths refuse before GitHub verification. The checksum file is also an attested subject.
 
+GitHub CLI identity selectors are mutually exclusive. Use the exact `--cert-identity`, which binds the workflow path and tag, rather than combining it with `--signer-workflow`.
+
 Each of four `gh attestation verify` calls enforces the Harnessie repository, `.github/workflows/release.yml` signer, exact certificate identity, tag ref, source commit and signer commit, SLSA provenance predicate and GitHub-hosted runners. Digests are rechecked before a receipt is returned. A valid signature from a different source/workflow is insufficient. A receipt records verification; it is not a new signed attestation.
 
 Use a new directory containing downloaded `dist/` and `release/` files. Obtain the expected commit from the independently checked release tag, not an unverified artifact.

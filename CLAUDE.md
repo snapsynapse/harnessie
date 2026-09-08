@@ -16,7 +16,7 @@ harness structure carries the quality floor, the model carries the ceiling.
 
 ## Stack
 
-- Python 3.11+ (packaged as `harnessie`, source version 1.3.0, Apache-2.0).
+- Python 3.11+ (packaged as `harnessie`, source version 1.3.1, Apache-2.0).
 - Runtime dependencies: PyYAML and jsonschema. Model adapters remain stdlib-only (no vendor SDK).
 - Dev dependency: pytest 8+. Console entry point: `harnessie = harness.cli:main`.
 - OS sandbox: macOS `sandbox-exec` (Seatbelt); Linux bubblewrap / firejail / docker.
@@ -93,9 +93,9 @@ PyPI promotion and live-provider calls are deliberate operator acts, never headl
 
 ## Current state (2026-09-08)
 
-- Source targets 1.3.0. Sam authorized full release publication and explicitly
+- Source targets corrective 1.3.1. Sam authorized full release publication and explicitly
   deferred remaining accessibility review. Before publishing or reporting
-  completion, read `audits/release-1.3.0.md` for exact gate and provider state.
+  completion, read `audits/release-1.3.1.md` for exact gate and provider state.
   Final profile-2.0.0 GuideCheck remains required before the GitHub Release.
 
 
@@ -104,7 +104,7 @@ PyPI promotion and live-provider calls are deliberate operator acts, never headl
   Ringer fixtures, trace metrics, and compatibility fixes.
 - Homebrew and `snapsynapse/harnessie-verify-action@v0` are separately propagated
   downstreams. `NEXT.md` records their exact verified pins and any temporary lag.
-- The current 1.3.0 guide selects profile 2.0.0; hosted Level 4 was verified before publication.
+- The current 1.3.1 guide selects profile 2.0.0; final hosted verification is pending.
   The 1.2.0 hosted Level 4 receipt is historical evidence only.
 - The latest pre-release documentation baseline was 483 passed, 9 skipped, 51/51
   deterministic evals, 21 outward trust files, and 16 inward files.

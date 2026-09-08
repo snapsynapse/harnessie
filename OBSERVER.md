@@ -1,6 +1,6 @@
 # Offline observer
 
-Available in Harnessie 1.3.0 source and packages built from it. AIDR-0009 authorizes the deterministic offline slice only. Check the installed version before use; the 1.2.0 package does not contain this command.
+Introduced in Harnessie 1.3.0 source; published packages start at the corrective 1.3.1 release. AIDR-0009 authorizes the deterministic offline slice only. Check the installed version before use; the 1.2.0 package does not contain this command.
 
 The observer reads one existing run journal and writes derived JSON and Markdown. It does not construct models, load plugins, start a runner, append events, alter routing, or grant approval. Exit 0 means observation succeeded, not that the run passed. A halted run can be observed successfully.
 

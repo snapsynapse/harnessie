@@ -1,7 +1,7 @@
 profile: human-verifiable-assistant-guide
 profile-version: 2.0.0
 guide-path: /.well-known/assistant-guide.txt
-guide-version: 1.3.0
-guide-sha256: 5e00fa6903e0d42c49e9a25c08eec19116b04bf01ee0daf8c4d7d754b58b0793
+guide-version: 1.3.1
+guide-sha256: ef62ac6ecc50f1f277dda119299d1b145e0aae66a51bcf47ba233e23c072409b
 guide-bytes: 7766
-immutable-release-url: https://github.com/snapsynapse/harnessie/tree/v1.3.0
+immutable-release-url: https://github.com/snapsynapse/harnessie/tree/v1.3.1

@@ -6,7 +6,7 @@ Roadmap items are intent, not commitments. Dates are omitted deliberately; miles
 
 ## Released so far
 
-Versions 0.1.0 through 1.2.0 are shipped; the current core release is 1.2.0. The current source version is 1.3.0, with publication authorized and in progress. It retains the stable 1.x authoring and plugin contracts while making evidence-bound verification of agent-produced changes the smallest useful adoption surface. This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
+Versions 0.1.0 through 1.2.0 are shipped; the current core release is 1.2.0. The current source version is 1.3.1, with publication authorized and in progress. It retains the stable 1.x authoring and plugin contracts while making evidence-bound verification of agent-produced changes the smallest useful adoption surface. This file is the forward view only: what each release's theme and acceptance bar were, and what comes next. The authoritative record of what actually landed in each version lives in [CHANGELOG.md](CHANGELOG.md), not here.
 
 ## Guiding priorities
 

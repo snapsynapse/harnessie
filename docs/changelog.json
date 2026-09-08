@@ -8,17 +8,24 @@
     "summary": "No changes recorded."
   },
   "current": {
-    "version": "1.3.0",
+    "version": "1.3.1",
     "released": null,
     "status": "pending-publication",
-    "summary": "Offline run observation, hash-locked maintenance, original-build provenance enforcement, parser refusal fixes and accessibility repairs.",
-    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.3.0"
+    "summary": "The offline observer and maintenance release, with the provenance CLI identity-selector correction needed for publication.",
+    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.3.1"
   },
   "history": [
     {
-      "version": "1.3.0",
+      "version": "1.3.1",
       "released": null,
       "status": "pending-publication",
+      "summary": "The offline observer and maintenance release, with the provenance CLI identity-selector correction needed for publication.",
+      "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.3.1"
+    },
+    {
+      "version": "1.3.0",
+      "released": null,
+      "status": "publication-failed",
       "summary": "Offline run observation, hash-locked maintenance, original-build provenance enforcement, parser refusal fixes and accessibility repairs.",
       "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.3.0"
     },

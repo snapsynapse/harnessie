@@ -6,6 +6,12 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 No changes recorded.
 
+## 1.3.1 (2026-09-08)
+
+Correct the release provenance CLI invocation: GitHub CLI treats `--signer-workflow` and `--cert-identity` as mutually exclusive. Retain the exact certificate identity, which already names the repository, workflow and tag, plus source/signer commit checks and the hosted-runner restriction. Add a regression assertion that exactly one identity selector is passed.
+
+The 1.3.0 tag and failed workflow remain immutable history; its build stopped before asset attachment or PyPI publication. This corrective release carries the same feature scope and the publication-tool fix.
+
 ## 1.3.0 (2026-09-08)
 
 Theme: offline run observation and release integrity. Publication status and exact evidence are recorded in `audits/release-1.3.0.md`.

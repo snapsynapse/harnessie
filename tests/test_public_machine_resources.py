@@ -78,7 +78,7 @@ def test_agents_json_describes_released_core_and_downstream_boundaries():
     assert capabilities["review-checkout"]["human_approval_required"] is True
     guide_status = capabilities["review-checkout"]["integrity_status"]
     assert guide_status["historical_receipt"].endswith(
-        "/audits/guidecheck/2026-09-08/hosted-1.2.0-after-dns.json")
+        "/audits/release-1.3.0/guidecheck-prepublication.json")
     if guide_status["current_receipt"] is None:
         assert guide_status["current_end_to_end_level"].startswith("Pending")
     else:

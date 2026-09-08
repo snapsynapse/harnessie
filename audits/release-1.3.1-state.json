@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "repository": "https://github.com/snapsynapse/harnessie",
+  "profile": "package",
+  "authority": "R2",
+  "start_head": "bc40ae94265180e21498cbd6dff4f23b52342593",
+  "candidate_head": null,
+  "candidate_version": "1.3.1",
+  "updated_at": "2026-09-08T02:06:04.964232+00:00",
+  "steps": [
+    {
+      "id": "candidate",
+      "status": "ready",
+      "evidence": "Corrective 1.3.1 source prepared over bc40ae9; signed 1.3.0 history preserved."
+    },
+    {
+      "id": "local_gate",
+      "status": "completed",
+      "evidence": "Locked release gate: 572 passed, 1 skipped, 28 xfailed; 62/62 evals; wheel/sdist inspection, Twine and fresh install passed. Search contract: 10 pages, zero defects."
+    },
+    {
+      "id": "pr_ci",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "merge_pages",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "signed_tag",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "guidecheck",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "siteline",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "github_release",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "assets_provenance",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "pypi",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "verify_action",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "homebrew",
+      "status": "not_started",
+      "evidence": null
+    }
+  ]
+}

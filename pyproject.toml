@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "harnessie"
-version = "1.3.0"
+version = "1.3.1"
 description = "Verify agent-produced changes with evidence-bound, fail-closed gates, then govern multi-agent work with ownership, consent, containment, and tamper-evident audit."
 readme = "README.md"
 requires-python = ">=3.11"

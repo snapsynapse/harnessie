@@ -33,7 +33,12 @@ def test_every_asset_requires_original_identity(tmp_path):
     for command in calls:
         assert command[command.index("--source-digest") + 1] == COMMIT
         assert command[command.index("--source-ref") + 1] == "refs/tags/v1.3.0"
-        assert command[command.index("--signer-workflow") + 1] == "snapsynapse/harnessie/.github/workflows/release.yml"
+        assert command[command.index("--cert-identity") + 1] == (
+            "https://github.com/snapsynapse/harnessie/.github/workflows/release.yml@refs/tags/v1.3.0")
+        identity_selectors = {"--cert-identity", "--cert-identity-regex",
+                              "--signer-repo", "--signer-workflow"}
+        assert identity_selectors.intersection(command) == {"--cert-identity"}
+        assert command[command.index("--signer-digest") + 1] == COMMIT
         assert "--deny-self-hosted-runners" in command
 
 

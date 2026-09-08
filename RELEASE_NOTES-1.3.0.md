@@ -1,5 +1,7 @@
 # Harnessie 1.3.0: offline run observation and release integrity
 
+Publication failed before asset upload or PyPI. The signed tag is preserved; the corrective package release is 1.3.1. See [the failure and correction](audits/release-1.3.1.md).
+
 Release scope authorized by Sam. Publication is in progress; exact results are recorded in [release execution](audits/release-1.3.0.md). Source and guide identity are 1.3.0.
 
 ## Included changes

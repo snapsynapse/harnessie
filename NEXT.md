@@ -17,7 +17,11 @@ Final candidate verification is recorded in [the observer implementation audit](
 
 The [bounded mitigation plan](audits/accessibility/2026-09-07/mitigation-plan.md) was approved and implemented locally: all four confirmed keyboard issues and 22 homepage review candidates have verified resolutions. Eight automated desktop/narrow keyboard cases and seven contrast measurements pass; full manual acceptance is still pending. The temporary local queue is `handoffs/2026-09-07-accessibility-review.md`, covering the same 36 remaining candidates verified by the candidate rescan. It is intentionally unprocessed and gitignored; durable baseline evidence lives in the audit directory, and the acceptance bar lives on the roadmap. Migrate completed review evidence into the audit directory and delete the handoff when its queue is exhausted.
 
-## Active release execution
+## Active corrective release
+
+The signed 1.3.0 tag is preserved. Its release workflow built and attested assets but the provenance CLI rejected mutually exclusive identity flags before upload or PyPI publication. The corrected invocation retains the exact certificate identity and both commit checks. Publication continues as 1.3.1 with the same approved feature scope and accessibility deferral; see [corrective release execution](audits/release-1.3.1.md).
+
+## 1.3.0 release attempt
 
 Sam authorized full 1.3.0 package publishing on 2026-09-07 local time and deferred the remaining accessibility review. Source version and guide are now 1.3.0; publication is pending the exact-candidate, live GuideCheck and release workflow gates. See [release execution](audits/release-1.3.0.md).
 
