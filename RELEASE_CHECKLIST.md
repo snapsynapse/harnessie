@@ -24,7 +24,10 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 - [ ] `python3 -m harness.cli verify-inward-manifest` passes.
 - [ ] `python3 -m harness.cli validate` passes all shipped authoring documents.
 - [ ] `git diff --check` clean.
-- [ ] Manual accessibility evidence is current for changed public routes:
+- [x] For 1.3.0, Sam explicitly deferred the remaining accessibility review
+      and authorized publication; see audits/release-1.3.0.md. Preserve the
+      36 unresolved candidates and manual work as follow-up, without a pass claim.
+      For later releases, manual accessibility evidence should cover changed routes:
       keyboard-only navigation and controls, 200% zoom/reflow, and at least
       one screen-reader pass. Record the date, route set, OS, browser, and
       assistive technology; do not substitute Lighthouse for this check.

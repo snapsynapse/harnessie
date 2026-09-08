@@ -16,7 +16,7 @@ harness structure carries the quality floor, the model carries the ceiling.
 
 ## Stack
 
-- Python 3.11+ (packaged as `harnessie`, stable version 1.2.0, Apache-2.0).
+- Python 3.11+ (packaged as `harnessie`, source version 1.3.0, Apache-2.0).
 - Runtime dependencies: PyYAML and jsonschema. Model adapters remain stdlib-only (no vendor SDK).
 - Dev dependency: pytest 8+. Console entry point: `harnessie = harness.cli:main`.
 - OS sandbox: macOS `sandbox-exec` (Seatbelt); Linux bubblewrap / firejail / docker.
@@ -91,15 +91,21 @@ Live provider scorecards are opt-in and never part of the default suite; without
 `HARNESSIE_LIVE=1` plus provider config they report `SKIP` and exit clean. Pages/DNS/
 PyPI promotion and live-provider calls are deliberate operator acts, never headless.
 
-## Current state (2026-09-01)
+## Current state (2026-09-08)
+
+- Source targets 1.3.0. Sam authorized full release publication and explicitly
+  deferred remaining accessibility review. Before publishing or reporting
+  completion, read `audits/release-1.3.0.md` for exact gate and provider state.
+  Final profile-2.0.0 GuideCheck remains required before the GitHub Release.
+
 
 - Version 1.2.0 is the stable core release on GitHub and PyPI. It includes OpenAI
   Responses support, v1 evidence bundles, structured claim verdicts, deterministic
   Ringer fixtures, trace metrics, and compatibility fixes.
 - Homebrew and `snapsynapse/harnessie-verify-action@v0` are separately propagated
   downstreams. `NEXT.md` records their exact verified pins and any temporary lag.
-- The 1.2.0 assistant guide is repository-pinned but does not inherit the historical
-  1.1.0 GuideCheck level until its new DNS TXT and hosted-verifier anchors agree.
+- The current 1.3.0 guide selects profile 2.0.0; hosted verification is pending.
+  The 1.2.0 hosted Level 4 receipt is historical evidence only.
 - The latest pre-release documentation baseline was 483 passed, 9 skipped, 51/51
   deterministic evals, 21 outward trust files, and 16 inward files.
   Counts are observations, not a permanent contract; rerun the gates before claiming

@@ -23,7 +23,7 @@ pip install harnessie                # or: pipx install / uv tool install
 harnessie init my-project            # scaffold + guided readiness check + zero-dollar mock run
 ```
 
-PyPI carries the current 1.2.0 core release. Homebrew and Harnessie Verify are separately versioned downstreams; see [NEXT.md](NEXT.md) for their verified pins and propagation status.
+This source tree targets core 1.3.0, adding offline run observation and release-integrity improvements. Check the [release status](https://github.com/snapsynapse/harnessie/releases) and installed version before using new commands. Homebrew and Harnessie Verify are separately versioned downstreams; see [NEXT.md](NEXT.md) for their verified pins and propagation status.
 
 To gate pull requests on claim-by-claim verification without installing anything locally, the standalone verifier also ships as a GitHub Action: [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify). Harnessie 1.2.0 accepts raw criteria or a v1 evidence bundle that binds stable claim IDs to an exact Git state, content-addressed proofs, and recorded deterministic checks. Its structured verdicts distinguish reproduced, refuted, and not-verifiable claims before the exit code gates the merge. The Action's separately released pin is reported in [NEXT.md](NEXT.md).
 
@@ -54,7 +54,7 @@ Worked examples: [policy compliance](examples/policy-compliance/README.md) exerc
 - [docs/ringer.md](docs/ringer.md): the Ringer adoption path, including the shared exit-code contract and a recipe for verifying agent-produced changes.
 - [PLUGIN_CONTRACT.md](PLUGIN_CONTRACT.md): the versioned, opt-in tool extension contract and its explicit in-process trust boundary.
 - [docs/brains.md](docs/brains.md): the brain-agnostic receipt, the models actually run under the harness with a link to the record that proves each.
-- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run. Hosted GuideCheck verified the 1.2.0 guide at Level 4 under profile 0.7.1 on 2026-09-08 UTC, with matching sidecar, DNS TXT and repository bytes, zero blocking findings, and two response-header warnings; the [exact hosted receipt](audits/guidecheck/2026-09-08/hosted-1.2.0-after-dns.json) is tracked. This does not establish software safety or profile 2.0.0 conformance.
+- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run. The 1.3.0 guide selects profile 2.0.0 and has matching local guide/sidecar hashes. Its final hosted verification is pending; the [1.2.0 receipt](audits/guidecheck/2026-09-08/hosted-1.2.0-after-dns.json) is historical evidence only. Conformance does not establish software safety.
 - [docs/agents.json](docs/agents.json), [docs/api/v1/index.json](docs/api/v1/index.json), [docs/changelog.json](docs/changelog.json), and [docs/.well-known/security.txt](docs/.well-known/security.txt): machine-readable capability, local CLI, release-history, and private security-report handoffs. The declarations explicitly do not advertise a hosted API, service, or MCP server.
 
 The engineering references below (ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP) sit at the repo root; the user-facing guides live under `docs/`.
@@ -91,6 +91,10 @@ docs/               the live served tree (harnessie.com via GitHub Pages): landi
 ```
 
 Dogfooding this repo under Claude Code uses a local `.claude/` (subagent defs, a `/run-workflow` command, a pytest hook). Per repo convention `.claude/` is gitignored, so it does not ship; the canonical role prompts it wraps live in `agents/`, and the CLI is the primary interface.
+
+## Offline run observation
+
+Harnessie 1.3.0 adds `harnessie observe RUN_ID` for an existing local run. It verifies a journal snapshot and writes cited JSON and Markdown summaries without calling models, changing the source journal, or resuming the runner. Exit 0 means observation succeeded, not that the run passed. See [OBSERVER.md](OBSERVER.md) for input limits, refusal behavior, output paths, and deferred features.
 
 ## Requirements
 

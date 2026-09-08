@@ -5,15 +5,23 @@
   "unreleased": {
     "status": "active",
     "source": "https://github.com/snapsynapse/harnessie/blob/main/CHANGELOG.md#unreleased",
-    "summary": "Trusted-publishing recovery, repository-owned Scorecard measurement, and exact 1.2.0 release-closeout evidence."
+    "summary": "No changes recorded."
   },
   "current": {
-    "version": "1.2.0",
-    "released": "2026-09-01",
-    "summary": "Evidence-bound verification of agent-produced changes, structured claim verdicts, OpenAI Responses, Ringer regression fixtures, and deterministic trace metrics.",
-    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.2.0"
+    "version": "1.3.0",
+    "released": null,
+    "status": "pending-publication",
+    "summary": "Offline run observation, hash-locked maintenance, original-build provenance enforcement, parser refusal fixes and accessibility repairs.",
+    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.3.0"
   },
   "history": [
+    {
+      "version": "1.3.0",
+      "released": null,
+      "status": "pending-publication",
+      "summary": "Offline run observation, hash-locked maintenance, original-build provenance enforcement, parser refusal fixes and accessibility repairs.",
+      "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.3.0"
+    },
     {
       "version": "1.2.0",
       "released": "2026-09-01",
@@ -57,5 +65,5 @@
       "release": "https://github.com/snapsynapse/harnessie/releases/tag/v0.6.0"
     }
   ],
-  "last_updated": "2026-09-01"
+  "last_updated": "2026-09-08"
 }

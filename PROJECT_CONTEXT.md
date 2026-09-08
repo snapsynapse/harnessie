@@ -81,3 +81,7 @@ ledger decision, and the zero-model collision example proves a second agent cann
 overwrite the first agent's artifact through the built-in write path.
 
 The 1.2.0 assistant guide earned hosted GuideCheck Level 4 under profile 0.7.1 on 2026-09-08 UTC with zero blocking findings and two response-header warnings. The [current receipt](audits/guidecheck/2026-09-08/hosted-1.2.0-after-dns.json) matches served, sidecar, DNS TXT and repository bytes. Prior receipts remain historical. The prepared 1.3.0 guide selects profile 2.0.0 and must earn its own hosted result after deployment and DNS rotation.
+
+## 1.3.0 publication in progress
+
+Source and guide now target 1.3.0. Sam authorized full publishing and deferred the remaining accessibility review as nonblocking. The current published version and final evidence are tracked in [release execution](audits/release-1.3.0.md); historical 1.2.0 results do not qualify the new guide.

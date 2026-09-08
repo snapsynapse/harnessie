@@ -4,6 +4,12 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+No changes recorded.
+
+## 1.3.0 (2026-09-08)
+
+Theme: offline run observation and release integrity. Publication status and exact evidence are recorded in `audits/release-1.3.0.md`.
+
 ### Maintenance
 
 - Update the lock generator and release-tool pin to uv 0.11.15 to address GHSA-4gg8-gxpx-9rph (entry-point path traversal), surfaced when GitHub indexed the new lock files. Regenerate hashes with the patched generator.
