@@ -24,13 +24,17 @@ The initial signed 1.3.0 tag remains unchanged. Its workflow stopped before asse
 
 All external closeout gates are complete: final GuideCheck, core GitHub/PyPI integrity and separately tested Action/Homebrew propagation. Documentation closeout uses the same exact-commit CI and deployed-byte verification requirements.
 
+## Current source packet
+
+Sam accepted the offline open-record AIDR exporter on 2026-09-08 and kept accessibility deferred. The source checkout adds [export-aidr](AIDR_EXPORT.md): one existing open decision, an explicitly named unused destination, preserved recorded dissent, unique participant attribution and export-time evidence hashes. It refuses arbitration content, ambiguous records and unsafe publication; it does not call models or change runner behavior. [Implementation evidence](audits/aidr-export-implementation-2026-09-08.md) records the local acceptance results and limits. This is unreleased source work, not part of the published 1.3.1 package; no new release or downstream pin change is implied.
+
 ## Remaining work
 
 No release blocker remains from the approved session scope. These items remain deferred or require a separately accepted packet:
 
 - Accessibility review: 35 threat-model table contrast candidates, one homepage video-caption applicability candidate, and manual keyboard, 200% zoom/reflow and screen-reader checks. Sam explicitly deferred this as nonblocking. The [mitigation audit](audits/accessibility/2026-09-07-mitigation/audit-2026-09-07.md) has zero confirmed violations and 36 incomplete candidates; its gate remains inconclusive. The temporary queue is `handoffs/2026-09-07-accessibility-review.md`, intentionally unprocessed and gitignored. Migrate completed dispositions into the audit directory and delete the handoff when the queue is exhausted. The [roadmap](ROADMAP.md) retains the acceptance bar.
 - Bidding, commentary, follow mode, automatic runner integration and model selection remain deferred under AIDR-0009.
-- A live controlled-review pilot or AIDR exporter needs a fixed evidence packet, attribution and namespace rules, failure-atomicity acceptance, and human arbitration where needed.
+- A live controlled-review pilot still needs a fixed evidence packet, named participants, provider opt-in and human arbitration. The accepted offline exporter packet above covers open records only; arbitration import and broader source formats remain outside it.
 - The sole-maintainer required-check and emergency-recovery proposal remains optional. No new provider-policy settings were activated by this release.
 
 ## Adoption direction

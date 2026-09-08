@@ -1,0 +1,19 @@
+# Offline export: paired admissible and refusal cases, with source preservation.
+suite: aidr-export
+scenarios:
+  - id: aidr_export_preserves_open_dissent
+    kind: aidr_export
+    source_case: open
+    expect_status: exported
+  - id: aidr_export_refuses_partial_arbitration
+    kind: aidr_export
+    source_case: partial_arbitration
+    expect_status: refused
+  - id: aidr_export_refuses_reserved_namespace
+    kind: aidr_export
+    source_case: id_collision
+    expect_status: refused
+  - id: aidr_export_refuses_broken_evidence
+    kind: aidr_export
+    source_case: broken_evidence
+    expect_status: refused

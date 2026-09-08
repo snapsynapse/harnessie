@@ -96,6 +96,10 @@ Dogfooding this repo under Claude Code uses a local `.claude/` (subagent defs, a
 
 Harnessie 1.3.1 adds `harnessie observe RUN_ID` for an existing local run. It verifies a journal snapshot and writes cited JSON and Markdown summaries without calling models, changing the source journal, or resuming the runner. Exit 0 means observation succeeded, not that the run passed. See [OBSERVER.md](OBSERVER.md) for input limits, refusal behavior, output paths, and deferred features.
 
+## Offline AIDR export (unreleased source)
+
+The source checkout adds `harnessie export-aidr RUN_ID PHASE --output decisions/AIDR-NNNN-short-slug.md --arbiter HUMAN_HANDLE` to export an existing open phase decision without model calls or runner changes. It preserves recorded dissent, binds consumed source and evidence hashes, and leaves Arbitration empty. This command is not in the published PyPI 1.3.1 package. See [AIDR_EXPORT.md](AIDR_EXPORT.md) for invocation, refusals, and provenance limits.
+
 ## Requirements
 
 Python 3.11+, PyYAML, and the Python JSON Schema validator are installed automatically by any install path above. The model adapters remain stdlib-only and need no vendor SDK. The OS sandbox uses native macOS `sandbox-exec` when it can actually apply a Seatbelt profile; on Linux it uses bubblewrap, firejail, or docker (in that order of preference). Every backend is admitted only after a startup smoke test proves it can confine here; a present-but-unusable backend, and any platform with none (Windows), fails closed so shell-using workflows are blocked rather than run unconfined (see [SECURITY.md](SECURITY.md)).

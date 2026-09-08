@@ -89,6 +89,8 @@ def run_scenario(scenario: dict[str, Any], root: Path | None = None) -> EvalCase
         return _run_audit_scenario(scenario)
     if kind == "observer":
         return _run_observer_scenario(scenario)
+    if kind == "aidr_export":
+        return _run_aidr_export_scenario(scenario)
     if kind == "triage":
         return _run_triage_scenario(scenario)
     if kind == "parallel":
@@ -110,6 +112,75 @@ def run_scenario(scenario: dict[str, Any], root: Path | None = None) -> EvalCase
         observed=kind,
         notes="unknown scenario kind",
     )
+
+
+def _run_aidr_export_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
+    """Export governance: open evidence can move; arbitration never does.
+
+    Malformed arbitration text is a synthetic refusal fixture, not a decision.
+    """
+    from .adversarial import PositionRecord, assemble_record
+    from .aidr_export import AIDRExportError, export_aidr
+
+    expected = scenario.get("expect_status")
+    fixture = scenario.get("source_case")
+    if expected not in ("exported", "refused") or fixture not in (
+            "open", "partial_arbitration", "id_collision", "broken_evidence") or any(
+                k.startswith("expect_") and k != "expect_status" for k in scenario):
+        return EvalCaseResult(scenario["id"], False, expected, "invalid export scenario")
+    with tempfile.TemporaryDirectory(prefix="harnessie-aidr-eval-") as raw:
+        root = Path(raw).resolve()
+        run = root / "runs/R"
+        record = run / "decisions/DR-decide.md"
+        record.parent.mkdir(parents=True)
+        (root / "decisions").mkdir()
+        log = EventLog(run, echo=False)
+        log.emit("workflow_start", name="synthetic", run_id="R")
+        log.emit("needs_arbitration", phase="decide")
+        log.close()
+        source = assemble_record(
+            record_id="DR-decide", title="Synthetic export decision",
+            question="Adopt this synthetic change?", context="Governance fixture.",
+            arbiter="synthetic-human-tester", date="2026-09-08",
+            positions=[PositionRecord("worker", "worker", "mock", "mock", "oppose",
+                                      "Preserve evidence.", "Do not discard dissent.")],
+            objections=[{"by": "worker", "to": "the record", "text": "Evidence could be lost."}],
+            evidence=["runs/R/events.jsonl — hash-chained event log evidencing isolated position generation"])
+        if fixture == "partial_arbitration":
+            source = source.replace("## Arbitration\n", "## Arbitration\n\nINCOMPLETE_SYNTHETIC_INPUT\n")
+        record.write_text(source, encoding="utf-8")
+        if fixture == "id_collision":
+            (root / "decisions/AIDR-9999-reserved.md").write_text("reserved by another writer\n")
+        if fixture == "broken_evidence":
+            evidence = run / "events.jsonl"
+            evidence.write_text(evidence.read_text().replace('"prev": "genesis"', '"prev": "broken"'))
+        original = {p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()}
+        output = root / "decisions/AIDR-9999-synthetic.md"
+        try:
+            result = export_aidr(root=root, run_id="R", phase="decide",
+                                 output=output.relative_to(root).as_posix(),
+                                 arbiter="synthetic-human-tester")
+            status = result["status"]
+        except AIDRExportError:
+            status = "refused"
+        problems = []
+        if status != expected:
+            problems.append(f"status={status}")
+        for name, data in original.items():
+            if not (root / name).is_file() or (root / name).read_bytes() != data:
+                problems.append("existing evidence changed")
+        current = {p.relative_to(root) for p in root.rglob("*") if p.is_file()}
+        permitted = set(original) | ({output.relative_to(root)} if status == "exported" else set())
+        if current != permitted:
+            problems.append("unexpected output artifact")
+        if status == "exported":
+            text = output.read_text()
+            if yaml.safe_load(text.split("---\n", 2)[1])["status"] != "open" \
+                    or "Evidence could be lost." not in text:
+                problems.append("status or dissent not preserved")
+            if "decided_by:" in text:
+                problems.append("arbitration fabricated")
+        return EvalCaseResult(scenario["id"], not problems, expected, problems or status)
 
 
 def _run_plugin_scenario(scenario: dict[str, Any]) -> EvalCaseResult:

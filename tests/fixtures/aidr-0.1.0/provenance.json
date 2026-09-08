@@ -1,0 +1,11 @@
+{
+  "repository": "https://github.com/snapsynapse/aidr",
+  "revision": "a67c41d339d3e70bc3baaf07e652f9cf9d13a5bb",
+  "spec_version": "0.1.0",
+  "files": {
+    "SPEC.md": "09b509b69e5a287b9885985e095007408dd7375f6bb9c47ce3e6b555175b8f75",
+    "LICENSE": "321a78a5da9493d2540cfee9bda330db05c76bbae110104d99115c1480bb6097",
+    "tools/aidr-lint.mjs": "7e52ca7f8534e4815c3d4b6001f362145d39d558f2a3ad03d4f0b2d387847b68",
+    "tools/lib/aidr-core.mjs": "40fac05b244ef808291168c60e345c903eb55b29aac189a8894f14253eab36a7"
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "date": "2026-09-08",
+  "scope": "offline open-record AIDR exporter",
+  "status": "locally_verified",
+  "base_commit": "f1e5be1ca2cd964b5b2e6a7dcf0f007e215bf679",
+  "branch": "codex/open-aidr-exporter",
+  "verification_stage": "pre_commit",
+  "package_published": false,
+  "target_spec": {
+    "version": "0.1.0",
+    "revision": "a67c41d339d3e70bc3baaf07e652f9cf9d13a5bb",
+    "reference_fixture": "tests/fixtures/aidr-0.1.0/provenance.json"
+  },
+  "checks": {
+    "pytest": {
+      "passed": 708,
+      "skipped": 1,
+      "xfailed": 28,
+      "python": "3.13.9",
+      "platform": "macOS",
+      "os_sandbox_access": true
+    },
+    "deterministic_evals": {
+      "passed": 66,
+      "total": 66
+    },
+    "independent_verifier": {
+      "status": "pass",
+      "focused_tests_passed": 135,
+      "model_provider_independence_claimed": false
+    },
+    "schema_documents": 9,
+    "trust_files": 21,
+    "inward_files": 16,
+    "ecosystem_components": 4,
+    "generated_pages": 9,
+    "search_pages": 10,
+    "search_defects": 0,
+    "build": "passed",
+    "twine": "passed",
+    "artifact_inspection": "passed",
+    "fresh_install_smoke": "passed"
+  },
+  "source_sha256": {
+    "harness/aidr_export.py": "c8b191a9a52cd6d72fdf9da85fc3d9bffc4abe8fd13fea4dd78b4d418d1ceba1",
+    "harness/cli.py": "c154517758042bb9380004be5675960e3251a1601857e39c7cdbae129ffe25a4",
+    "harness/evals.py": "5d12d90fcda1222686d8a7d533eae15825623732294672f762d31be279acd626",
+    "tests/test_aidr_export.py": "fece44353a2ee0fc50fb42d7ad4f55b297fb33c342afc870cc1d3294abb6bd33",
+    "tests/test_aidr_export_cli.py": "34d1e91c65fccb57897da93471d5b34ef64118bb65cf949c80058616a818f6c4",
+    "tests/test_aidr_export_reference.py": "d2317efa323a6d639e32aac57b139c2ac140e2683b6fc1efa4e88f7d67b53f1e",
+    "tests/test_evals.py": "4c46858f21042e7626ebec22ebbcbd3c09ba50f2417339c6e56f6573df369fd8",
+    "evals/aidr-export.yaml": "48a50a9d6ae2630396770ea4d054e3f160f59ade058f9012fd490bcddea4e27e",
+    "scripts/check_release_artifacts.py": "1b9c65955b5d457e5a08a7a130a34c3abbcbfbcd0de7cf6b91aba252bdcbbb90",
+    "scripts/fresh_install_smoke.py": "77ebf06063b6391bf71b9e4bbbd1e79633bbbd953123cf4d7700e6be93e1baa7",
+    "MANIFEST.in": "81e248ced0186c7fe4998fd3656f8444d4bbc830629829c860c5e823301e6195",
+    "AIDR_EXPORT.md": "ce2a0ea03a594d25b91770f4d9d2460af71aa3ce4478d57c8f997fc86a5781b3"
+  },
+  "local_development_artifacts": {
+    "harnessie-1.3.1.tar.gz": "1c8e481996626e50984310b7af2cf73c0439e07c07cdb42325b3d3011401567a",
+    "harnessie-1.3.1-py3-none-any.whl": "bddcccb72017f042cc577596b1bae46ef328f7f39aeaba95c6eb0a1aadd63dad"
+  },
+  "limitations": [
+    "POSIX filesystem primitives required",
+    "strict generated-record Markdown subset only",
+    "reported human/model identities are not authenticated",
+    "export-time hashes do not authenticate original generation",
+    "existing objection truncation is retained",
+    "cooperative filesystem locking does not constrain arbitrary hostile writers",
+    "accessibility remains deferred",
+    "no live model/provider or external publication checks"
+  ]
+}

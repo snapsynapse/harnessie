@@ -26,6 +26,7 @@ FORBIDDEN_PARTS = frozenset({
 })
 FORBIDDEN_NAMES = frozenset({"roadmap-private.md"})
 REQUIRED_PACKAGE_FILES = frozenset({
+    "harness/aidr_export.py",
     "harness/inward_manifest.py",
     "harness/maiden.py",
     "harness/schema.py",
