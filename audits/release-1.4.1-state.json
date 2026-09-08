@@ -4,39 +4,44 @@
   "profile": "package",
   "authority": "R2",
   "start_head": "2dc316ece292b6e510750188275f8d5b8c04f526",
-  "candidate_head": null,
+  "candidate_head": "296deed2f91cd4c8eeecad82b83f137dd029ea26",
   "candidate_version": "1.4.1",
-  "updated_at": "2026-09-08T20:34:03.701291+00:00",
+  "updated_at": "2026-09-08T21:06:46.943440+00:00",
   "steps": [
     {
       "id": "candidate",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "PR20 merged as 296deed2f91cd4c8eeecad82b83f137dd029ea26; release notes, changelog and final guide included.",
+      "head": "296deed2f91cd4c8eeecad82b83f137dd029ea26"
     },
     {
       "id": "local_gate",
       "status": "completed",
-      "evidence": "Full release_gate.py passed: 718 passed,1 skipped,28 xfailed;66/66 evals; manifests/schema,isolated wheel/sdist,Twine,artifact inspection,fresh installed consumer. Final PR CI pending."
+      "evidence": "Full release_gate.py passed: 718 passed, 1 skipped, 28 xfailed; 66/66 evals; manifests/schema, isolated wheel/sdist, Twine, artifact inspection and fresh installed consumer. Exact release CI also passed."
     },
     {
       "id": "pr_ci",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "All PR20 platform, package and CodeQL checks passed at signed commit 84b26ef74f174d6f4ff9a7c2e232ae80d5ea0ab5.",
+      "head": "84b26ef74f174d6f4ff9a7c2e232ae80d5ea0ab5"
     },
     {
       "id": "merge_pages",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "Exact-merge CI34275863991, CodeQL34275863990, Scorecard34275863970 and Pages34275862484 passed; 23 live resources match and ten-page production search has zero defects.",
+      "head": "296deed2f91cd4c8eeecad82b83f137dd029ea26"
     },
     {
       "id": "signed_tag",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "Signed tag object8d04b94efa685fcc840852be775d2cf2163d4680 resolves to296deed2f91cd4c8eeecad82b83f137dd029ea26; clean-clone SSH verification passed; immutable guide URL200 and exact bytes match. See release-1.4.1/tag-verification.txt.",
+      "head": "296deed2f91cd4c8eeecad82b83f137dd029ea26"
     },
     {
       "id": "guidecheck",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "audits/release-1.4.1/guidecheck-prepublication.json: profile2.0.0, Level4, zero blocking findings, qualifying DNS anchor and matching source/sidecar, final hash7ab4c0a952109ea10257b1a9859533778261291605ce386708bccb305bbf09dc.",
+      "head": "296deed2f91cd4c8eeecad82b83f137dd029ea26"
     },
     {
       "id": "siteline",
@@ -45,28 +50,28 @@
     },
     {
       "id": "github_release",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "https://github.com/snapsynapse/harnessie/releases/tag/v1.4.1; published2026-09-08T20:45:54Z, release workflow34276711096."
     },
     {
       "id": "assets_provenance",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "release-1.4.1/github-provenance.json: all four original GitHub assets verified against signed tag v1.4.1 and commit 296deed2f91cd4c8eeecad82b83f137dd029ea26."
     },
     {
       "id": "pypi",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "release-1.4.1/pypi-integrity.json and pypi-consumer.json: both distributions match GitHub assets and pass publisher verification; fresh public-index Python 3.13.9 install and installed export demonstration passed after transient index propagation."
     },
     {
       "id": "verify_action",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "release-1.4.1/verify-action.json: signed 0.2.2 and stable v0 resolve to 9f18d70017f395ef4d15ac5746e30ac633f00f8e; seven exact-merge fixtures passed; release published and remote refs verified."
     },
     {
       "id": "homebrew",
-      "status": "not_started",
-      "evidence": null
+      "status": "completed",
+      "evidence": "release-1.4.1/homebrew.json: PR3 merged at 953760f3968200f99658bfb068609532cb9fbf4d; strict online audit, real upgrade, formula/linkage tests and installed exporter demonstration passed. Remote/source/active formula bytes match; installed 1.4.1 verified. No hosted tap CI configured."
     }
   ]
 }

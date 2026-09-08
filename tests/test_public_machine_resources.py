@@ -334,8 +334,8 @@ def test_export_discovery_distinguishes_source_availability_and_write_boundary()
     export = next(c for c in data["capabilities"] if c["id"] == "export-open-aidr")
     command = _json(CLI_MANIFEST)["paths"]["export-aidr"]
     assert export["command"] == command["synopsis"]
-    assert export["status"] == command["status"] == "source-unreleased"
-    assert data["release_context"]["publication_status"] == "pending"
+    assert export["status"] == command["status"] == "live"
+    assert data["release_context"]["publication_status"] == "published"
     assert export["network_default"] == "not used"
     assert export["exit_codes"] == {"0": "exported", "2": "refused"}
     assert "Writes one" in export["side_effects"]

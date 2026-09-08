@@ -16,7 +16,7 @@ harness structure carries the quality floor, the model carries the ceiling.
 
 ## Stack
 
-- Python 3.11+ (packaged as `harnessie`, source version 1.3.1, Apache-2.0).
+- Python 3.11+ (packaged as `harnessie`, stable version 1.4.1, Apache-2.0).
 - Runtime dependencies: PyYAML and jsonschema. Model adapters remain stdlib-only (no vendor SDK).
 - Dev dependency: pytest 8+. Console entry point: `harnessie = harness.cli:main`.
 - OS sandbox: macOS `sandbox-exec` (Seatbelt); Linux bubblewrap / firejail / docker.
@@ -93,18 +93,28 @@ PyPI promotion and live-provider calls are deliberate operator acts, never headl
 
 ## Current state (2026-09-08)
 
-- Core 1.3.1 is published on GitHub and PyPI, with original-build attestations and
-  a clean Python 3.13 public-index consumer verified. It includes offline observation,
-  dependency locks, provenance enforcement, bounded parser fixes and accessibility repairs.
-- Verify Action 0.2.1 and stable v0 pin core 1.3.1; Homebrew serves 1.3.1.
+- Core 1.4.1 is published and verified on GitHub and PyPI, with original-build
+  provenance and package attestations. It includes strict open-record AIDR export,
+  platform refusal, and the installed mock consumer example. Export is an
+  operator-issued file write outside runner ownership/consent mediation; it
+  makes no model calls and keeps Arbitration empty.
+- Verify Action 0.2.2 and stable `v0` are published at
+  `9f18d70017f395ef4d15ac5746e30ac633f00f8e`, pinning core 1.4.1.
+  Homebrew 1.4.1 is published at tap commit
+  `953760f3968200f99658bfb068609532cb9fbf4d`; the real upgrade, formula tests,
+  and installed version are verified.
   Engine wrappers remain independently released at 0.1.0.
-- The final 1.3.1 guide earned hosted Level 4 under profile 2.0.0 with zero blockers.
-  Any guide byte change requires a new sidecar, trust pins, DNS and hosted receipt.
-- Sam explicitly deferred the remaining accessibility review as nonblocking.
+- The final 1.4.1 guide earned hosted Level 4 under profile 2.0.0 with zero blockers;
+  see `audits/release-1.4.1/guidecheck-prepublication.json`. Preserve its frozen
+  bytes during release closeout. Any later guide change requires a new sidecar,
+  trust pins, independent anchor, and hosted receipt.
+- Sam retained the accessibility deferral for this release sequence.
   Zero confirmed automated violations with 36 incomplete candidates is inconclusive,
-  not an accessibility pass. Keep the temporary review queue until processed.
-- `audits/release-1.3.1.md` records immutable release and provider evidence;
-  `NEXT.md` names remaining work. Test counts are dated observations, not contracts.
+  not an accessibility pass. No fresh automated or manual pass is claimed.
+  Keep the temporary review queue until processed.
+- `audits/release-1.4.1.md` records current release and provider evidence;
+  `audits/release-1.3.1.md` remains historical. `NEXT.md` names remaining work.
+  Test counts are dated observations, not contracts.
 - The lead adoption surface remains `harnessie verify` for agent-produced changes.
   Ringer composes through its existing process-exit contract. Bidding, commentary,
   follow mode, automatic runner integration and model selection remain deferred

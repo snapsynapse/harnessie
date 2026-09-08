@@ -1,0 +1,64 @@
+{
+  "version": "1.4.1",
+  "status": "verified",
+  "verified": true,
+  "index": "https://pypi.org/simple",
+  "python": "3.13.9",
+  "checked_at": "2026-09-08T20:56:19.957672+00:00",
+  "cwd": "/private/tmp/harnessie-1.4.1-independent-7jv_95uh",
+  "venv": "/private/tmp/harnessie-1.4.1-independent-7jv_95uh/consumer",
+  "pythonpath_present": false,
+  "pip_config_disabled": true,
+  "cache_used": false,
+  "installed_module": "/private/tmp/harnessie-1.4.1-independent-7jv_95uh/consumer/lib/python3.13/site-packages/harness/__init__.py",
+  "installed_wheel_sha256": "2094c7793a0fde76226d5782b0785311d9dbc955998a0c7237580f43b1066dd5",
+  "installed_download_url": "https://files.pythonhosted.org/packages/a1/da/0de1e546b829a295b8801944628cb1625570190c530e48f458900de9015d/harnessie-1.4.1-py3-none-any.whl",
+  "runtime_matches_original_github_wheel": true,
+  "install_attempts": 2,
+  "initial_attempt": "public simple-index propagation lag; unchanged second attempt succeeded",
+  "checks": [
+    "empty environment baseline",
+    "public-index exact-version installation",
+    "dependency consistency",
+    "isolated import from fresh venv",
+    "CLI help",
+    "actual MockModel workflow through installed export CLI",
+    "pinned AIDR 0.1.0 reference lint",
+    "source and journal unchanged through export",
+    "original run resume remains halted without model calls",
+    "unsupported source format safely refused"
+  ],
+  "demo_source_commit": "296deed2f91cd4c8eeecad82b83f137dd029ea26",
+  "demo": {
+    "actors": "scripted MockModel only",
+    "cli": "/private/tmp/harnessie-1.4.1-independent-7jv_95uh/consumer/bin/harnessie",
+    "export": {
+      "evidence_sha256": "72a7158008442052cc8e0b4aaa66d24b2289e3dd9807b7e9ccc95c792a49a042",
+      "output": "decisions/AIDR-9999-synthetic-mock-review.md",
+      "output_sha256": "19d209fc6901860515010f39bd6007455af3f09cec0a41ffb11eda003eb61f15",
+      "source_sha256": "2a245e84873013d28896d4206a2c0e01dbd8d8b859919431014d9d75ae1126aa",
+      "status": "exported",
+      "target_spec": "0.1.0"
+    },
+    "export_preserved_inputs": true,
+    "format_refusal": {
+      "code": "invalid_record",
+      "status": "refused"
+    },
+    "format_refusal_preserved_inputs": true,
+    "harness_module": "/private/tmp/harnessie-1.4.1-independent-7jv_95uh/consumer/lib/python3.13/site-packages/harness/__init__.py",
+    "initial_status": "needs_arbitration",
+    "live_model_calls": 0,
+    "mock_model_calls": 8,
+    "participant_labels": [
+      "implementer",
+      "implementer-2"
+    ],
+    "reference_revision": "a67c41d339d3e70bc3baaf07e652f9cf9d13a5bb",
+    "reference_spec": "0.1.0",
+    "resume_model_calls": 0,
+    "resume_status": "needs_arbitration",
+    "status": "passed",
+    "temporary_root": "/private/var/folders/fs/whz53jxd5396cbxxhk9jbgjr0000gn/T/harnessie-aidr-mock-h1e0zrl_"
+  }
+}

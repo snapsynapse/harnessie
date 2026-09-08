@@ -1,0 +1,36 @@
+{
+  "commit": "296deed2f91cd4c8eeecad82b83f137dd029ea26",
+  "run": 34275863970,
+  "findings": [
+    {
+      "rule": "BranchProtectionID",
+      "message": "score is 3: branch protection is not maximal on development and all release branches:\nWarn: could not determine whether codeowners review is allowed\nWarn: no status checks found to merge onto branch 'main'\nWarn: PRs are not required to make changes on branch 'main'; or we don't have data to detect it.If you think it might be the latter, make sure to run Scorecard with a PAT or use Repo Rules (that are always public) instead of Branch Protection settings\nClick Remediation section below to solve this issue",
+      "disposition": "Existing sole-maintainer governance limitation remains explicit; this release used PR and exact-commit CI gates. No provider-policy mutation authorized by the release."
+    },
+    {
+      "rule": "PinnedDependenciesID",
+      "message": "score is 9: pipCommand not pinned by hash\nClick Remediation section below to solve this issue",
+      "disposition": "Public-constraint consumer lane intentionally resolves normal pip constraints; separate controlled release lane uses reviewed hash locks."
+    },
+    {
+      "rule": "FuzzingID",
+      "message": "score is 0: project is not fuzzed:\nWarn: no fuzzer integrations found\nClick Remediation section below to solve this issue",
+      "disposition": "No recognized continuous fuzzing integration; bounded parser property tests are not represented as one."
+    },
+    {
+      "rule": "MaintainedID",
+      "message": "score is 0: project was created within the last 90 days. Please review its contents carefully:\nWarn: Repository was created within the last 90 days.\nClick Remediation section below to solve this issue",
+      "disposition": "Repository age is below the detector threshold, not a functional release failure."
+    },
+    {
+      "rule": "CodeReviewID",
+      "message": "score is 0: Found 0/13 approved changesets -- score normalized to 0\nClick Remediation section below to solve this issue",
+      "disposition": "No qualifying approved changesets detected; human merge and independent agent review are separate evidence and are not substituted for GitHub approval count."
+    },
+    {
+      "rule": "CIIBestPracticesID",
+      "message": "score is 0: no effort to earn an OpenSSF best practices badge detected\nClick Remediation section below to solve this issue",
+      "disposition": "No OpenSSF best-practices badge claimed."
+    }
+  ]
+}

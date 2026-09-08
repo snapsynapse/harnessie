@@ -14,7 +14,7 @@ means the operator does not need to be a developer (declared token/dollar ceilin
 named halt conditions each with one plain operator action, disagreement surfaced as a
 human decision rather than a silent merge).
 
-Shipped as the `harnessie` Python package (Apache-2.0, stable 1.3.1). The verifier also
+Shipped as the `harnessie` Python package (Apache-2.0, stable 1.4.1). The verifier also
 ships standalone as a separately versioned GitHub Action (Harnessie Verify) for gating
 PRs. Core 1.2.0 includes evidence-bound intake and structured required-claim verdicts.
 
@@ -52,11 +52,12 @@ trademark and PAICE.work PBC spec/code carveouts recorded in NOTICE.
 
 ## Current status (2026-09-08)
 
-Active and healthy. v1.3.1 is the stable core release on PyPI and GitHub. It adds offline observation, release-integrity enforcement and parser refusal fixes, building on
-OpenAI Responses support, evidence bundles, structured claim verdicts, Ringer
-regression fixtures, and event-trace metrics. Homebrew and the separately owned Verify
-Action are independent propagation surfaces whose verified pins are recorded in
-NEXT.md. The docs site is
+Core 1.4.1 is published and verified on PyPI and GitHub. It adds strict offline
+open-record AIDR export, preserving recorded dissent and source evidence while
+leaving human Arbitration empty. Verify Action 0.2.2 and stable `v0` pin core
+1.4.1. Homebrew 1.4.1 is published, with the real upgrade, formula tests,
+and installed version verified. Engine wrappers remain independently released at 0.1.0.
+NEXT.md records the current propagation evidence. The docs site is
 live, and the dated 2026-09-08 Siteline scan scored it A, 97/100. Public-facing doc pages under `docs/` are generated
 from markdown via `scripts/build_docs_html.py` (edit markdown, rebuild, commit both).
 AIDR-0008 is arbitrated and executed in the independent engine-wrappers release train.
@@ -80,12 +81,12 @@ write only what you own. The read-only `harnessie ownership` command explains th
 ledger decision, and the zero-model collision example proves a second agent cannot
 overwrite the first agent's artifact through the built-in write path.
 
-The final 1.3.1 assistant guide earned [hosted GuideCheck Level 4 under profile 2.0.0](audits/release-1.3.1/guidecheck-prepublication.json) on 2026-09-08 UTC with zero blocking findings. Served, sidecar, DNS TXT and repository bytes agreed for those release bytes. That receipt is now historical for the changed source guide; fresh hosted acceptance is pending.
+The final 1.4.1 assistant guide earned [hosted GuideCheck Level 4 under profile 2.0.0](audits/release-1.4.1/guidecheck-prepublication.json) on 2026-09-08 UTC with zero blocking findings and a qualifying DNS anchor. Its frozen bytes remain the release artifact. The [1.3.1 receipt](audits/release-1.3.1/guidecheck-prepublication.json) is historical evidence for the earlier guide.
 
-## 1.3.1 release completion
+## Historical 1.3.1 release completion
 
 Sam authorized full publishing and deferred the remaining accessibility review as nonblocking. Core 1.3.1, Verify Action 0.2.1/stable v0 and Homebrew 1.3.1 are published and verified. The original signed 1.3.0 tag remains intact after its build stopped before package upload. [Release execution](audits/release-1.3.1.md) records exact identities, tests and residual follow-up.
 
-## Current source completion
+## 1.4.1 release completion
 
-The open-record exporter merged in PR #18 at `5c157999af2aaaa5eec67752f5a3cf023132d5bd`. The approved pre-release completion adds unsupported-platform refusal, a reproducible installed mock consumer example and full human/machine documentation integration. Package 1.3.1 remains the published baseline; export is source-only until a new release. Sam selected 1.4.1 for both source package and guide, with publication status recorded separately. The changed guide requires deployment, an independent anchor and hosted verification before a new Level 4 claim. See [completion evidence](audits/aidr-pre-release-completion-2026-09-08.md) and [NEXT.md](NEXT.md) for the candidate boundary. Accessibility remains deferred this session; no new manual acceptance is claimed.
+The exporter and completion work shipped in core 1.4.1 at `296deed2f91cd4c8eeecad82b83f137dd029ea26`, with verified GitHub/PyPI artifacts and final hosted guide acceptance. Verify Action 0.2.2 and stable `v0` are published at `9f18d70017f395ef4d15ac5746e30ac633f00f8e`; Homebrew 1.4.1 is published at tap commit `953760f3968200f99658bfb068609532cb9fbf4d`. All three release paths are verified. See [release execution](audits/release-1.4.1.md) and [NEXT.md](NEXT.md) for current evidence. Accessibility remains deferred this session; no fresh automated or manual acceptance is claimed.

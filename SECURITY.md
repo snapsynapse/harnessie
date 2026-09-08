@@ -114,7 +114,7 @@ A worker phase may declare `phase_type`. Harnessie hashes the exact normalized p
 
 `harnessie approve-maiden <run_id> <phase>` is the only promotion path. It refuses if the run audit chain is broken, the proposal or staged artifacts changed, the staged ownership ledger changed, or the target workspace or ownership ledger moved since staging. Successful promotion is audited and journaled before resume. The control is opt-in for legacy compatibility. Parallel phases refuse `phase_type` until group-level promotion semantics exist; adversarial phases are already read-only and cannot declare it. The honest limit is the existing audit limit: an attacker able to rewrite the complete event chain and all proposal artifacts can forge the local history.
 
-## Offline AIDR export boundary (unreleased source)
+## Offline AIDR export boundary (1.4.1)
 
 `harnessie export-aidr` performs an operator-issued file write outside the workflow runner. It does not use the ownership ledger, tool registry, consent lock, child-process sandbox, or model dispatch. No model calls does not mean read-only. The caller supplies an existing source run, phase, unused destination under the existing root `decisions/` directory, and a human arbiter declaration; the declaration is not identity authentication.
 

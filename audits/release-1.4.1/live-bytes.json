@@ -1,0 +1,191 @@
+{
+  "checked_at": "2026-09-08T20:38:57.060159+00:00",
+  "commit": "296deed2f91cd4c8eeecad82b83f137dd029ea26",
+  "checks": [
+    {
+      "path": "docs/.well-known/assistant-guide.txt",
+      "url": "https://harnessie.com/.well-known/assistant-guide.txt",
+      "http_status": 200,
+      "expected_sha256": "7ab4c0a952109ea10257b1a9859533778261291605ce386708bccb305bbf09dc",
+      "observed_sha256": "7ab4c0a952109ea10257b1a9859533778261291605ce386708bccb305bbf09dc",
+      "matches": true
+    },
+    {
+      "path": "docs/.well-known/assistant-guide-manifest.txt",
+      "url": "https://harnessie.com/.well-known/assistant-guide-manifest.txt",
+      "http_status": 200,
+      "expected_sha256": "b7129d8267286ab13eb699145e686f23dfb45114da634bcd9e09539d83664005",
+      "observed_sha256": "b7129d8267286ab13eb699145e686f23dfb45114da634bcd9e09539d83664005",
+      "matches": true
+    },
+    {
+      "path": "docs/.well-known/security.txt",
+      "url": "https://harnessie.com/.well-known/security.txt",
+      "http_status": 200,
+      "expected_sha256": "8987609c662c5b80d92843e8cb00489c281470a091e808bd7a1cee5aa0fe1387",
+      "observed_sha256": "8987609c662c5b80d92843e8cb00489c281470a091e808bd7a1cee5aa0fe1387",
+      "matches": true
+    },
+    {
+      "path": "docs/agents.json",
+      "url": "https://harnessie.com/agents.json",
+      "http_status": 200,
+      "expected_sha256": "b95d4a8821974c7bd378dd11f84c10a0191c33e8a19139af88db704ab5de26ae",
+      "observed_sha256": "b95d4a8821974c7bd378dd11f84c10a0191c33e8a19139af88db704ab5de26ae",
+      "matches": true
+    },
+    {
+      "path": "docs/api/v1/index.json",
+      "url": "https://harnessie.com/api/v1/index.json",
+      "http_status": 200,
+      "expected_sha256": "04be550a4ff283d4e6f437469ad478409c628bf70539eab11b9103ce7b4a6937",
+      "observed_sha256": "04be550a4ff283d4e6f437469ad478409c628bf70539eab11b9103ce7b4a6937",
+      "matches": true
+    },
+    {
+      "path": "docs/changelog.json",
+      "url": "https://harnessie.com/changelog.json",
+      "http_status": 200,
+      "expected_sha256": "9186db7faf32f57f45b99eeed7d9b36802b5ef67844f4fac73ad306777c33f95",
+      "observed_sha256": "9186db7faf32f57f45b99eeed7d9b36802b5ef67844f4fac73ad306777c33f95",
+      "matches": true
+    },
+    {
+      "path": "docs/llms.txt",
+      "url": "https://harnessie.com/llms.txt",
+      "http_status": 200,
+      "expected_sha256": "cf931db98531e0e3e7346763e6fe44ab42f2425c05e7f22b0c4e090d0fccaebb",
+      "observed_sha256": "cf931db98531e0e3e7346763e6fe44ab42f2425c05e7f22b0c4e090d0fccaebb",
+      "matches": true
+    },
+    {
+      "path": "docs/llm.txt",
+      "url": "https://harnessie.com/llm.txt",
+      "http_status": 200,
+      "expected_sha256": "cf931db98531e0e3e7346763e6fe44ab42f2425c05e7f22b0c4e090d0fccaebb",
+      "observed_sha256": "cf931db98531e0e3e7346763e6fe44ab42f2425c05e7f22b0c4e090d0fccaebb",
+      "matches": true
+    },
+    {
+      "path": "docs/robots.txt",
+      "url": "https://harnessie.com/robots.txt",
+      "http_status": 200,
+      "expected_sha256": "88588b10d194d3d62ad9a4463f05a80f645ed1e7b23c59b10087cb28dd5a57f6",
+      "observed_sha256": "88588b10d194d3d62ad9a4463f05a80f645ed1e7b23c59b10087cb28dd5a57f6",
+      "matches": true
+    },
+    {
+      "path": "docs/schemas/v1/approval-policy.schema.json",
+      "url": "https://harnessie.com/schemas/v1/approval-policy.schema.json",
+      "http_status": 200,
+      "expected_sha256": "3caaa9fa6ca60710908d778d3db394f508f79f9235b21986b6009a6680f238c9",
+      "observed_sha256": "3caaa9fa6ca60710908d778d3db394f508f79f9235b21986b6009a6680f238c9",
+      "matches": true
+    },
+    {
+      "path": "docs/schemas/v1/boundary.schema.json",
+      "url": "https://harnessie.com/schemas/v1/boundary.schema.json",
+      "http_status": 200,
+      "expected_sha256": "1a4cebc8d795b8153474ce0c474492a03c9402c5df3505be44e0667ffc74e2c6",
+      "observed_sha256": "1a4cebc8d795b8153474ce0c474492a03c9402c5df3505be44e0667ffc74e2c6",
+      "matches": true
+    },
+    {
+      "path": "docs/schemas/v1/cascade.schema.json",
+      "url": "https://harnessie.com/schemas/v1/cascade.schema.json",
+      "http_status": 200,
+      "expected_sha256": "55029ca611439f8d72881087d261a0071045f596cd7fd81483d220d7ddf68da2",
+      "observed_sha256": "55029ca611439f8d72881087d261a0071045f596cd7fd81483d220d7ddf68da2",
+      "matches": true
+    },
+    {
+      "path": "docs/schemas/v1/models.schema.json",
+      "url": "https://harnessie.com/schemas/v1/models.schema.json",
+      "http_status": 200,
+      "expected_sha256": "61fa32c1b90414a4c0ab033f032009063c9685f85f6841886366e7e23b5cfcac",
+      "observed_sha256": "61fa32c1b90414a4c0ab033f032009063c9685f85f6841886366e7e23b5cfcac",
+      "matches": true
+    },
+    {
+      "path": "docs/schemas/v1/ownership.schema.json",
+      "url": "https://harnessie.com/schemas/v1/ownership.schema.json",
+      "http_status": 200,
+      "expected_sha256": "b0a7eedcec428585f4b7c9c62fcbd878dabd8aee6e12b8ea8de07b69616a7832",
+      "observed_sha256": "b0a7eedcec428585f4b7c9c62fcbd878dabd8aee6e12b8ea8de07b69616a7832",
+      "matches": true
+    },
+    {
+      "path": "docs/schemas/v1/verify-evidence.schema.json",
+      "url": "https://harnessie.com/schemas/v1/verify-evidence.schema.json",
+      "http_status": 200,
+      "expected_sha256": "76bfdc6488419ca4c6caeceb4a7cec02922800229f35478c6794823fbdbdc240",
+      "observed_sha256": "76bfdc6488419ca4c6caeceb4a7cec02922800229f35478c6794823fbdbdc240",
+      "matches": true
+    },
+    {
+      "path": "docs/schemas/v1/workflow.schema.json",
+      "url": "https://harnessie.com/schemas/v1/workflow.schema.json",
+      "http_status": 200,
+      "expected_sha256": "0797501a99b1b4d1086ddca1987fb674775eb3f6975905f4d863bb3f08966a76",
+      "observed_sha256": "0797501a99b1b4d1086ddca1987fb674775eb3f6975905f4d863bb3f08966a76",
+      "matches": true
+    },
+    {
+      "path": "docs/sitemap.xml",
+      "url": "https://harnessie.com/sitemap.xml",
+      "http_status": 200,
+      "expected_sha256": "438b954374577d2b4f064498b88ab2f8a438db5bbafa2cc19967135e4e16bd90",
+      "observed_sha256": "438b954374577d2b4f064498b88ab2f8a438db5bbafa2cc19967135e4e16bd90",
+      "matches": true
+    },
+    {
+      "path": "docs/CNAME",
+      "url": "https://harnessie.com/CNAME",
+      "http_status": 200,
+      "expected_sha256": "6dc81288045a60be46e3eaf407380328466b8ce98c769fe1e637f69c97d5a97a",
+      "observed_sha256": "6dc81288045a60be46e3eaf407380328466b8ce98c769fe1e637f69c97d5a97a",
+      "matches": true
+    },
+    {
+      "path": "docs/site.webmanifest",
+      "url": "https://harnessie.com/site.webmanifest",
+      "http_status": 200,
+      "expected_sha256": "1127123e2126d51aafdfca4cd4f1198b8d3a1b666386df5347902ca761e637ee",
+      "observed_sha256": "1127123e2126d51aafdfca4cd4f1198b8d3a1b666386df5347902ca761e637ee",
+      "matches": true
+    },
+    {
+      "path": "docs/favicon.svg",
+      "url": "https://harnessie.com/favicon.svg",
+      "http_status": 200,
+      "expected_sha256": "1f29157ca6f4f45e9983aa81c0b6869e9ea49ba32fe043a9a7007feade4d334d",
+      "observed_sha256": "1f29157ca6f4f45e9983aa81c0b6869e9ea49ba32fe043a9a7007feade4d334d",
+      "matches": true
+    },
+    {
+      "path": "docs/index.html",
+      "url": "https://harnessie.com/index.html",
+      "http_status": 200,
+      "expected_sha256": "00ca70f29b4962fa23742208fcafc1d7142dae1bd9a18ab9b3d5f77c9cb1c05b",
+      "observed_sha256": "00ca70f29b4962fa23742208fcafc1d7142dae1bd9a18ab9b3d5f77c9cb1c05b",
+      "matches": true
+    },
+    {
+      "path": "docs/guide.html",
+      "url": "https://harnessie.com/guide.html",
+      "http_status": 200,
+      "expected_sha256": "0c5202d097947c4a2645dff2f8d56e5cb8cb3263838543c3f7d03f516fa76503",
+      "observed_sha256": "0c5202d097947c4a2645dff2f8d56e5cb8cb3263838543c3f7d03f516fa76503",
+      "matches": true
+    },
+    {
+      "path": "docs/getting-started.html",
+      "url": "https://harnessie.com/getting-started.html",
+      "http_status": 200,
+      "expected_sha256": "2d835c3d52777b8e11c32beb71709ae0375f16d3552ff7edd8d198caa08018d2",
+      "observed_sha256": "2d835c3d52777b8e11c32beb71709ae0375f16d3552ff7edd8d198caa08018d2",
+      "matches": true
+    }
+  ],
+  "all_match": true
+}

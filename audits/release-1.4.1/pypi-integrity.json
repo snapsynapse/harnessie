@@ -1,0 +1,46 @@
+{
+  "version": "1.4.1",
+  "status": "verified",
+  "checked_at": "2026-09-08T20:52:29.682009+00:00",
+  "workflow_run": "https://github.com/snapsynapse/harnessie/actions/runs/34276711096",
+  "workflow_status": "completed",
+  "workflow_conclusion": "success",
+  "source_commit": "296deed2f91cd4c8eeecad82b83f137dd029ea26",
+  "attestation_verifier": "pypi-attestations 0.0.30",
+  "files": [
+    {
+      "filename": "harnessie-1.4.1-py3-none-any.whl",
+      "sha256": "2094c7793a0fde76226d5782b0785311d9dbc955998a0c7237580f43b1066dd5",
+      "url": "https://files.pythonhosted.org/packages/a1/da/0de1e546b829a295b8801944628cb1625570190c530e48f458900de9015d/harnessie-1.4.1-py3-none-any.whl",
+      "uploaded_at": "2026-09-08T20:51:33.980555Z",
+      "matches_github_asset": true,
+      "downloaded_bytes_sha256_verified": true,
+      "attestation_verified": true,
+      "attestation_exit_code": 0,
+      "publisher": {
+        "kind": "GitHub",
+        "repository": "snapsynapse/harnessie",
+        "workflow": "release.yml",
+        "environment": "pypi"
+      },
+      "provenance_url": "https://pypi.org/integrity/harnessie/1.4.1/harnessie-1.4.1-py3-none-any.whl/provenance"
+    },
+    {
+      "filename": "harnessie-1.4.1.tar.gz",
+      "sha256": "4348ca226397a79d317dc619374b75019a43f8f660b30d3410d83d2cbf925d85",
+      "url": "https://files.pythonhosted.org/packages/bd/d3/5a58603a52897a776f1d73a83e91fe62404f40ce6f43189625cf93527bb8/harnessie-1.4.1.tar.gz",
+      "uploaded_at": "2026-09-08T20:51:35.417109Z",
+      "matches_github_asset": true,
+      "downloaded_bytes_sha256_verified": true,
+      "attestation_verified": true,
+      "attestation_exit_code": 0,
+      "publisher": {
+        "kind": "GitHub",
+        "repository": "snapsynapse/harnessie",
+        "workflow": "release.yml",
+        "environment": "pypi"
+      },
+      "provenance_url": "https://pypi.org/integrity/harnessie/1.4.1/harnessie-1.4.1.tar.gz/provenance"
+    }
+  ]
+}

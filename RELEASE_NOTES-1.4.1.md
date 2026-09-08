@@ -1,6 +1,6 @@
 # Harnessie 1.4.1: offline open-record AIDR export
 
-Prepared on 2026-09-08 UTC. Publication is pending. Package and assistant guide both use 1.4.1; the published core remains 1.3.1 until this release completes. Version 1.4.0 was intentionally skipped.
+Published on GitHub on 2026-09-08 UTC at signed tag `v1.4.1`, pointing to `296deed2f91cd4c8eeecad82b83f137dd029ea26`, with original-build assets attached. Both PyPI distributions match those assets, pass publisher-attestation verification and install from the public index in a fresh Python 3.13 environment. Package and assistant guide both use 1.4.1. Version 1.4.0 was intentionally skipped.
 
 Harnessie 1.4.1 adds deterministic export of a supported open contested-phase record to an explicitly named AIDR file. It carries recorded dissent into a separate artifact while preserving the original decision and its run state.
 
@@ -21,18 +21,23 @@ Model/provider metadata and arbiter declarations are reported identities, not au
 
 ## Verification status
 
-The complete local candidate gate passed: 718 tests, one live-provider skip, 28 expected failures, 66/66 evals, manifests and schemas, isolated distributions, metadata/artifact inspection and a fresh installed consumer. [Release execution](audits/release-1.4.1.md) tracks the subsequent exact-commit and publication gates.
+The [release execution audit](audits/release-1.4.1.md) records the local candidate gate, exact-commit CI, artifact validation, installed-consumer checks, and deployment evidence. CI, CodeQL, Scorecard, and Pages passed on release commit `296deed`. The earlier [completion](audits/aidr-pre-release-completion-2026-09-08.md) and [version preparation](audits/version-1.4.1-preparation.md) audits remain dated evidence for their own snapshots. All four GitHub assets passed provenance verification against the signed tag and release commit. Both PyPI distributions passed publisher verification; the fresh public-index consumer passed the installed export example. Verify Action 0.2.2 passed all seven exact-merge fixtures.
 
-The dated [pre-release completion audit](audits/aidr-pre-release-completion-2026-09-08.md) records 718 passed tests, one live-provider opt-in skip, 28 expected failures for deferred features, and 66/66 deterministic evals. It also records independent focused verification and a fresh installed-wheel walkthrough. These results describe that reviewed snapshot, before the final 1.4.1 version and release-document changes; they are not a claim that the final release gate has passed.
-
-The subsequent [1.4.1 preparation audit](audits/version-1.4.1-preparation.md) records 32 focused tests, 66/66 evals, local wheel/source builds, artifact inspection, and fresh installed-wheel smoke for its versioned snapshot. Final exact-commit CI, release-artifact inspection, original-build provenance, GitHub/PyPI publication, and post-publication checks remain pending.
-
-The local 1.4.1 GuideCheck result achieved Level 3 with `anchor.independent.missing` unresolved. Current hosted Level 4 acceptance remains pending. The [1.3.1 hosted receipt](audits/release-1.3.1/guidecheck-prepublication.json) is historical evidence for different guide bytes. No new hosted or accessibility conformance pass is claimed here.
+The final 8,036-byte guide earned [hosted GuideCheck Level 4 under profile 2.0.0](audits/release-1.4.1/guidecheck-prepublication.json) with zero blocking findings and a qualifying DNS anchor. Its frozen SHA-256 is `7ab4c0a952109ea10257b1a9859533778261291605ce386708bccb305bbf09dc`. The [1.3.1 receipt](audits/release-1.3.1/guidecheck-prepublication.json) remains historical evidence for different guide bytes. Guide conformance does not establish software safety or accessibility conformance.
 
 ## Deferred work and downstreams
 
 Accessibility remains deferred for this session. The prior queue retains 35 table-contrast candidates, one video-caption applicability candidate, and manual checks; earlier evidence does not establish acceptance for newly changed routes.
 
-Verify Action 0.2.1/stable `v0` currently pins core 1.3.1, and Homebrew currently serves 1.3.1. Their separate propagation and verification await core publication. Engine wrappers remain on their independent 0.1.0 release train.
+Verify Action 0.2.2 and stable `v0` pin core 1.4.1 at `9f18d70017f395ef4d15ac5746e30ac633f00f8e`. Homebrew 1.4.1 passed strict audit, a real upgrade, formula and linkage tests, and the installed exporter demonstration; it is published in tap merge `953760f3968200f99658bfb068609532cb9fbf4d`. Engine wrappers remain on their independent 0.1.0 release train.
 
 Live review panels, arbitration import, broader source-format support, bidding, commentary, follow mode, automatic runner integration, model selection, and provider-policy changes remain deferred. No real human arbitration record was changed by the exporter delivery.
+
+## Original release assets
+
+| Asset | SHA-256 |
+|---|---|
+| `harnessie-1.4.1-py3-none-any.whl` | `2094c7793a0fde76226d5782b0785311d9dbc955998a0c7237580f43b1066dd5` |
+| `harnessie-1.4.1.tar.gz` | `4348ca226397a79d317dc619374b75019a43f8f660b30d3410d83d2cbf925d85` |
+| `harnessie-1.4.1.SHA256SUMS` | `11476d68a6e6f82f7e205457d11262e2eedb456cc90380ad25ec25796384b229` |
+| `harnessie-1.4.1.cdx.json` | `228a15e401cd337dc8acd7bc2264ea176162d02d2f13e0490e2a94cb9e1307c2` |

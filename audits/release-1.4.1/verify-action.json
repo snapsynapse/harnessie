@@ -1,0 +1,17 @@
+{
+  "version": "0.2.2",
+  "core_default": "1.4.1",
+  "commit": "9f18d70017f395ef4d15ac5746e30ac633f00f8e",
+  "signed_tag_object": "2eb583c056cbe847cc9dd725237106b01337f19f",
+  "stable_v0": "9f18d70017f395ef4d15ac5746e30ac633f00f8e",
+  "previous_stable_v0": "97ed2264818fc4c620c03de5cc9522965318079b",
+  "promotion": "compare-and-swap force-with-lease",
+  "release_url": "https://github.com/snapsynapse/harnessie-verify-action/releases/tag/v0.2.2",
+  "published_at": "2026-09-08T21:02:59Z",
+  "ci_url": "https://github.com/snapsynapse/harnessie-verify-action/actions/runs/34277873775",
+  "fixture_jobs_passed": 7,
+  "signature_verified": true,
+  "remote_refs_verified": true,
+  "live_model_verdict": false,
+  "transient_failure": "First PR fixture attempt hit PyPI index propagation; unchanged rerun and all exact-merge jobs passed."
+}
