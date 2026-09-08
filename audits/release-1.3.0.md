@@ -27,3 +27,15 @@ Publication is authorized and in progress. The machine-readable state is [releas
 ### Local candidate gate
 
 The full hash-locked release gate passed with 572 tests, one environment-dependent skip, 28 expected failures for deferred features, 62/62 deterministic evals, nine authoring documents, 21 outward and 16 inward manifest entries, nine generated docs, wheel/sdist inspection and a fresh-install observer smoke. The search contract covered ten pages with zero defects or infrastructure failures. The initial run exposed missing required release-boundary wording in NEXT.md; the corrected full rerun passed. These are candidate results, not published-artifact evidence.
+
+### Candidate delivery and live discovery
+
+Signed candidate commit `437612ce174e4c0cfdb2b5513978a21e9a6a4de4` passed [CI](https://github.com/snapsynapse/harnessie/actions/runs/34177214851) and [CodeQL](https://github.com/snapsynapse/harnessie/actions/runs/34177214733), then [PR 14](https://github.com/snapsynapse/harnessie/pull/14) merged as `27baa3015eb93c8ebf979ae8a425a95ea568ca86`. Exact-merge CI, CodeQL, Scorecard and [Pages](https://github.com/snapsynapse/harnessie/actions/runs/34177326461) passed. The optional model verifier supplies no independent model-review evidence when its configured invocation is skipped.
+
+[Live Siteline](release-1.3.0/siteline.json) measured 97/100, grade A, at 2026-09-08T01:40:11.850Z using scanner 2.0.0 and rubric 2.3.0. This meets the 90+ release bar. Its CTA warning has no concrete target evidence and remains an opportunity; the scanner's inferred SaaS/commerce classification is not a product claim. This is a homepage and discovery-resource scan, not a full-site accessibility audit. The [production search check](release-1.3.0/production-search.log) covered ten sitemap pages with zero defects and infrastructure failures.
+
+The current Scorecard review found the already scoped branch-policy/sole-maintainer, optional coverage-guided fuzzing and badge gaps, repository-age limits, and a public-constraint installation pin warning. Controlled dependency locks and separate consumer-resolution coverage remain intentional. No provider-policy expansion was made for the score.
+
+### Final guide verification before packaging
+
+After Sam updated the final Namecheap value, [hosted GuideCheck](release-1.3.0/guidecheck-prepublication.json) fetched the 7,766-byte 1.3.0 guide at 2026-09-08T01:41:49.634507Z and earned Level 4 under profile 2.0.0 with zero blocking findings. Guide SHA-256 is `5e00fa6903e0d42c49e9a25c08eec19116b04bf01ee0daf8c4d7d754b58b0793`; the fetched sidecar matches and DNS is the one qualifying independent anchor. Repository bytes match but do not qualify independently. Four warnings are retained: two response-header limits, unestablished repository independence, and the expected pre-publication PyPI URL 404. The DNS anchor meets the independent-channel requirement without the registry. No runtime Level 5 claim follows from `level5_ready`. The immutable tag-source URL will be checked after the final tag is created and before GitHub Release publication.
