@@ -19,7 +19,8 @@ CLI_MANIFEST = DOCS / "api" / "v1" / "index.json"
 SECURITY = DOCS / ".well-known" / "security.txt"
 TRUST = DOCS / "MANIFEST.yaml"
 GUIDECHECK_RECEIPT = (
-    ROOT / "audits" / "guidecheck-live-result-2026-08-21-v1.1.0.json")
+    ROOT / "audits" / "guidecheck" / "2026-09-08" /
+    "hosted-1.2.0-after-dns.json")
 SCORECARD_RECORD = ROOT / "audits" / "openssf-scorecard-2026-09-02.json"
 
 
@@ -57,11 +58,15 @@ def test_agents_json_describes_released_core_and_downstream_boundaries():
     data = _json(AGENTS)
     assert data["product"]["version"] == _project_version()
     assert data["product"]["type"] == "local Python library and CLI"
-    assert data["release_context"]["stable_release"] == _project_version()
-    assert data["release_context"]["unreleased_changes_since_stable"] is True
+    assert data["release_context"]["source_version"] == _project_version()
+    assert data["release_context"]["publication_status"] in {"pending", "published"}
+    if data["release_context"]["publication_status"] == "published":
+        assert data["release_context"]["stable_release"] == _project_version()
+    assert data["release_context"]["unreleased_changes_since_stable"] is (
+        data["release_context"]["publication_status"] == "pending")
     assert {item["id"] for item in data["capabilities"]} == {
         "review-checkout", "verify-claims", "validate-project",
-        "inspect-ownership", "run-workflow"}
+        "inspect-ownership", "run-workflow", "observe-run"}
     assert data["boundaries"] == {
         "hosted_api": False,
         "hosted_service": False,
@@ -72,25 +77,42 @@ def test_agents_json_describes_released_core_and_downstream_boundaries():
     capabilities = {item["id"]: item for item in data["capabilities"]}
     assert capabilities["review-checkout"]["human_approval_required"] is True
     guide_status = capabilities["review-checkout"]["integrity_status"]
-    assert "1.2.0 DNS TXT" in guide_status["external_anchor"]
-    assert guide_status["current_end_to_end_level"].startswith(
-        "Pending external re-verification")
     assert guide_status["historical_receipt"].endswith(
-        "/audits/guidecheck-live-result-2026-08-21-v1.1.0.json")
+        "/audits/guidecheck/2026-09-08/hosted-1.2.0-after-dns.json")
+    if guide_status["current_receipt"] is None:
+        assert guide_status["current_end_to_end_level"].startswith("Pending")
+    else:
+        assert guide_status["current_end_to_end_level"].startswith("Level 4")
+    assert capabilities["observe-run"]["command"] == "harnessie observe RUN_ID"
+    assert "Writes derived" in capabilities["observe-run"]["side_effects"]
     assert capabilities["inspect-ownership"]["side_effects"] == "read-only"
     assert capabilities["run-workflow"]["human_arbitration_required"] is True
 
 
 def test_current_guidecheck_receipt_earns_the_claimed_level():
-    receipt = _json(GUIDECHECK_RECEIPT)
+    status = _json(AGENTS)["capabilities"][0]["integrity_status"]
+    if status["current_receipt"] is None:
+        assert status["current_end_to_end_level"].startswith("Pending")
+        assert "hosted verification pending" in (DOCS / "index.html").read_text()
+        return
+    prefix = "https://github.com/snapsynapse/harnessie/blob/main/"
+    assert status["current_receipt"].startswith(prefix)
+    path = (ROOT / status["current_receipt"].removeprefix(prefix)).resolve()
+    assert path.is_relative_to(ROOT / "audits")
+    receipt = _json(path)
     assert receipt["outcome"] == "evaluated"
-    assert receipt["guide"] == {
-        "bytes": 7947,
-        "sha256": (
-            "f7d45f62f2941f5541d1342be0fc037c1ef7fc3e06f44ad39cf94a5b50e5080d"),
-        "achieved_level": 4,
-        "level5_ready": True,
-    }
+    guide = (ROOT / "assistant-guide.txt").read_bytes()
+    assert receipt["input"]["evaluation_mode"] == "public-web"
+    assert receipt["guide"]["bytes"] == len(guide)
+    assert receipt["guide"]["sha256"] == hashlib.sha256(guide).hexdigest()
+    assert receipt["guide"]["achieved_level"] == 4
+    assert receipt["verifier"]["guide_profile_version"] == re.search(
+        rb"^profile-version: (.+)$", guide, re.M).group(1).decode()
+    sidecar = (DOCS / ".well-known" / "assistant-guide-manifest.txt").read_bytes()
+    assert receipt["manifest"]["sha256"] == hashlib.sha256(sidecar).hexdigest()
+    assert receipt["manifest"]["fetched"] is True
+    assert receipt["manifest"]["hash_match"] is True
+    assert receipt["manifest"]["bytes_match"] is True
     assert receipt["summary"]["blocking_findings"] == 0
     anchors = {
         item["channel"]: item for item in receipt["cross_channel_anchors"]}
@@ -131,10 +153,10 @@ def test_machine_changelog_tracks_the_packaged_release():
     assert len(versions) == len(set(versions))
     assert data["current"]["release"].endswith(f"/v{version}")
     assert data["unreleased"]["status"] == "active"
-    assert data["unreleased"]["summary"] == (
-        "Trusted-publishing recovery, repository-owned Scorecard measurement, "
-        "and exact 1.2.0 "
-        "release-closeout evidence.")
+    assert data["unreleased"]["summary"] == "No changes recorded."
+    assert data["current"]["status"] in {"pending-publication", "published"}
+    if data["current"]["status"] == "pending-publication":
+        assert data["current"]["released"] is None
 
 
 def test_public_verifier_copy_describes_the_released_evidence_contract():
@@ -163,16 +185,11 @@ def test_cli_manifest_is_complete_and_explicitly_not_hosted():
     assert data["interface"]["kind"] == "local process interface"
     assert data["interface"]["hosted"] is False
     assert data["interface"]["network_service"] is False
-    assert data["release_context"] == {
-        "stable_release": _project_version(),
-        "describes": "released 1.2.0 core",
-        "unreleased_changes_since_stable": True,
-        "note": data["release_context"]["note"],
-    }
+    assert data["release_context"] == _json(AGENTS)["release_context"]
     assert set(data["paths"]) == {
         "run", "resume", "report", "audit", "eval", "verify-manifest",
         "verify-inward-manifest", "approve-maiden", "verify", "init", "validate",
-        "ownership",
+        "ownership", "observe",
     }
     for command, contract in data["paths"].items():
         assert contract["synopsis"].startswith(f"harnessie {command}")
@@ -216,8 +233,8 @@ def test_public_discovery_links_expose_support_and_machine_resources():
         assert f"https://harnessie.com{path}" in llms
     assert "Contact support" in html
     assert "Report a vulnerability" in html
-    assert "1.1 guide: GuideCheck Level 4" in html
-    assert "historical hash independently pinned" in html
+    assert "1.3 guide: profile 2.0.0" in html
+    assert "hosted verification pending" in html or "hosted Level 4" in html
     assert "historical evidence" in html
     assert "opt-in containment" in html.lower()
     assert "operator-trusted in-process code" in html

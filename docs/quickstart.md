@@ -26,7 +26,7 @@ One line installs the `harnessie` command from the Python package index:
 pip install harnessie
 ```
 
-If `pip` is not found, try `python3 -m pip install harnessie`. `pipx install harnessie` and `uv tool install harnessie` install the current 1.2.0 package without cloning the repository. The separately maintained Homebrew formula may lag briefly during release propagation, so verify its reported version before treating the install paths as equivalent.
+If `pip` is not found, try `python3 -m pip install harnessie`. `pipx install harnessie` and `uv tool install harnessie` install the current published package without cloning the repository. Offline observation requires 1.3.0 or later; check the installed version during release propagation. The separately maintained Homebrew formula may lag briefly during release propagation, so verify its reported version before treating the install paths as equivalent.
 
 ## Step 2: Let the tool check your machine
 

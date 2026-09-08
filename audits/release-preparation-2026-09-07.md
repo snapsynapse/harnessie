@@ -1,6 +1,6 @@
 # Next stable release preparation
 
-Scope: Harnessie core, with downstream sequencing references. Prepared 2026-09-07. Sam approved the 1.3.0 preparation scope on 2026-09-07 and clarified that the completed work is the skill-a11y-audit 3.1.0 tool release. The Harnessie audit must still be performed using that tool. Markdown plus JSON output is approved. GuideCheck remains outside this implementation tranche, but its final matching result is required before 1.3.0 package publication, including PyPI and Homebrew. This is local preparation authority, not stable-release publication authority.
+Scope: Harnessie core, with downstream sequencing references. Prepared 2026-09-07. Sam approved the 1.3.0 preparation scope on 2026-09-07 and clarified that the completed work is the skill-a11y-audit 3.1.0 tool release. The Harnessie automated baseline and approved mitigation are complete; 36 review candidates and manual acceptance remain open. Markdown plus JSON output is approved. Sam subsequently unblocked GuideCheck: [current-guide verification and the separate 1.3.0 candidate](guidecheck/2026-09-08/README.md) are recorded. Final matching profile-2.0.0 hosted evidence is required before 1.3.0 package publication, including PyPI and Homebrew. This is local preparation authority, not stable-release publication authority.
 
 ## Verified preparation baseline
 
@@ -23,7 +23,7 @@ The editable candidate copy is now [RELEASE_NOTES-1.3.0.md](../RELEASE_NOTES-1.3
 
 ## Version and public-surface map
 
-The package identity and guide identity are coupled by `tests/test_version_sync.py`. The current tranche leaves guide changes out of scope, so retain coherent 1.2.0 source metadata until the approved release preparation reaches the coordinated guide update. Do not bump only package metadata and break the parity contract.
+The package identity and guide identity are coupled by `tests/test_version_sync.py`. The separately prepared 1.3.0 guide now selects profile 2.0.0. Retain coherent 1.2.0 source metadata until the coordinated guide/version/docs update; the candidate lives outside the served tree meanwhile. Do not bump only package metadata and break the parity contract.
 
 | Group | Files or producer | Required treatment |
 |---|---|---|
@@ -51,7 +51,7 @@ The package identity and guide identity are coupled by `tests/test_version_sync.
 
 ## Questions and remaining boundaries
 
-- Accepted: 1.3.0 scope, Harnessie audit using released a11y-audit 3.1.0 with Markdown plus JSON, and GuideCheck required before package publication while outside this implementation tranche.
+- Accepted: 1.3.0 scope, Harnessie audit using released a11y-audit 3.1.0 with Markdown plus JSON, and GuideCheck now unblocked and required before package publication. Sam owns Namecheap DNS edits; the assistant prepares exact values and checks propagation and hosted results.
 - Resolved: the completed task delivered the audit tool; no completed Harnessie site or manual audit was claimed.
-- Completed: [automated ten-route baseline audit](accessibility/2026-09-07/audit-2026-09-07.md), source/live-byte provenance and targeted manual plan. The approved [local mitigation](accessibility/2026-09-07-mitigation/audit-2026-09-07.md) resolves four serious violations and 22 candidates. The gate is inconclusive on 36 remaining candidates. Still pending: their review, manual tests, coordinated version/guide files, exact-candidate qualification, separately scoped GuideCheck, hosted provenance acceptance and stable-release publication authority.
+- Completed: [automated ten-route baseline audit](accessibility/2026-09-07/audit-2026-09-07.md), source/live-byte provenance and targeted manual plan. The approved [local mitigation](accessibility/2026-09-07-mitigation/audit-2026-09-07.md) resolves four serious violations and 22 candidates. The gate is inconclusive on 36 remaining candidates. Still pending: their review, manual tests, coordinated version/guide promotion, exact-candidate qualification, final profile-2.0.0 hosted GuideCheck, hosted provenance acceptance and stable-release publication authority.
 - Prepared locally: this packet, draft 1.3.0 notes, current-work routing in `NEXT.md`, and the explicit pre-publication GuideCheck checkpoint in `RELEASE_CHECKLIST.md`. No version bump, guide rotation, provider policy, downstream pin, tag, package publication or external model call occurred.

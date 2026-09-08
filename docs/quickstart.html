@@ -140,7 +140,7 @@
 <h2 id="step-1-get-harnessie">Step 1: Get Harnessie</h2>
 <p>One line installs the <code>harnessie</code> command from the Python package index:</p>
 <pre tabindex="0"><code>pip install harnessie</code></pre>
-<p>If <code>pip</code> is not found, try <code>python3 -m pip install harnessie</code>. <code>pipx install harnessie</code> and <code>uv tool install harnessie</code> install the current 1.2.0 package without cloning the repository. The separately maintained Homebrew formula may lag briefly during release propagation, so verify its reported version before treating the install paths as equivalent.</p>
+<p>If <code>pip</code> is not found, try <code>python3 -m pip install harnessie</code>. <code>pipx install harnessie</code> and <code>uv tool install harnessie</code> install the current published package without cloning the repository. Offline observation requires 1.3.0 or later; check the installed version during release propagation. The separately maintained Homebrew formula may lag briefly during release propagation, so verify its reported version before treating the install paths as equivalent.</p>
 <h2 id="step-2-let-the-tool-check-your-machine">Step 2: Let the tool check your machine</h2>
 <p>Create your own project and let Harnessie tell you whether everything is ready:</p>
 <pre tabindex="0"><code>harnessie init my-first-project</code></pre>

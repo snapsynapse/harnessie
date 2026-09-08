@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "repository": "https://github.com/snapsynapse/harnessie",
+  "profile": "package",
+  "authority": "R2",
+  "start_head": "98283d1393353041686199b7ee638b10a3fbcf36",
+  "candidate_head": null,
+  "candidate_version": "1.3.0",
+  "updated_at": "2026-09-08T01:35:23.986438+00:00",
+  "steps": [
+    {
+      "id": "candidate",
+      "status": "ready",
+      "evidence": "Coherent 1.3.0 candidate; full locked gate: 572 passed, 1 skipped, 28 xfailed; 62 evals; manifests/build/consumer pass. Guide sha256 5e00fa6903e0d42c49e9a25c08eec19116b04bf01ee0daf8c4d7d754b58b0793."
+    },
+    {
+      "id": "local_gate",
+      "status": "ready",
+      "evidence": "Coherent 1.3.0 candidate; full locked gate: 572 passed, 1 skipped, 28 xfailed; 62 evals; manifests/build/consumer pass. Guide sha256 5e00fa6903e0d42c49e9a25c08eec19116b04bf01ee0daf8c4d7d754b58b0793."
+    },
+    {
+      "id": "pr_ci",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "merge_pages",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "signed_tag",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "guidecheck",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "siteline",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "github_release",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "assets_provenance",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "pypi",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "verify_action",
+      "status": "not_started",
+      "evidence": null
+    },
+    {
+      "id": "homebrew",
+      "status": "not_started",
+      "evidence": null
+    }
+  ]
+}

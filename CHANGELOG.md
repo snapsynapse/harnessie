@@ -4,6 +4,12 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+No changes recorded.
+
+## 1.3.0 (2026-09-08)
+
+Theme: offline run observation and release integrity. Publication status and exact evidence are recorded in `audits/release-1.3.0.md`.
+
 ### Maintenance
 
 - Update the lock generator and release-tool pin to uv 0.11.15 to address GHSA-4gg8-gxpx-9rph (entry-point path traversal), surfaced when GitHub indexed the new lock files. Regenerate hashes with the patched generator.
@@ -26,6 +32,8 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 - CI and PR-verifier workflows declare read-only token defaults and pin every action to an immutable commit; Dependabot now covers Python and GitHub Actions dependencies, CodeQL supplies repository-owned Python SAST, and the security policy links directly to private reporting.
 
 ### Documentation
+
+- Close the 1.2.0 guide DNS gate with dated hosted Level 4 evidence under profile 0.7.1. Prepare a separate 1.3.0/profile-2.0.0 guide with accurate provider, observer and verification boundaries; final deployment and hosted acceptance remain pending.
 
 - Reconcile the completed Dependabot queue, record the conservatively arbitrated observer scope, map controlled-review/AIDR interoperability, and prepare bounded maintenance packets for dependency locks, release provenance, parser testing and sole-maintainer governance.
 

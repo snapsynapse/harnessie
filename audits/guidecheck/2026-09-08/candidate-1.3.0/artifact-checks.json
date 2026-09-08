@@ -1,0 +1,55 @@
+{
+  "checked_at": "2026-09-08T01:20:15.659593+00:00",
+  "status": "passed",
+  "byte_profile": {
+    "bytes": 7766,
+    "lines": 196,
+    "maximum_line_bytes": 86
+  },
+  "manifest_and_promotion_match": true,
+  "selected_profile": "2.0.0",
+  "expected_local_level4_blocker": "anchor.independent.missing",
+  "read_only_action_targets": [
+    {
+      "id": "read-readme",
+      "command": "sed -n 1,120p README.md",
+      "target_sha256": "57e365d5b3d6303a2c2d9c3c69c65489e2e747546ce5ddd3da75fa55a72c7f28"
+    },
+    {
+      "id": "read-security",
+      "command": "sed -n 1,140p SECURITY.md",
+      "target_sha256": "91761698e25ba9209b1b222f4674c3f202f5ea80fd388a24fa487d8cfca75d1b"
+    },
+    {
+      "id": "read-governance",
+      "command": "sed -n 1,160p GOVERNANCE.md",
+      "target_sha256": "4714564d9768d4a145a28a9f6fc041280525817f4c0686b1353c9515bea1bd35"
+    },
+    {
+      "id": "read-models-config",
+      "command": "cat config/models.yaml",
+      "target_sha256": "7035c2c3c410270984aa8d29494a31aa42873ae7104905330e05d37c2738a2ba"
+    },
+    {
+      "id": "read-ownership",
+      "command": "cat OWNERSHIP.yaml",
+      "target_sha256": "650b08daa7c06939f8a80f6e337c36c90dd0cc23476478a9d8db24dbb9eb9cb3"
+    },
+    {
+      "id": "read-plugin-contract",
+      "command": "sed -n 1,180p PLUGIN_CONTRACT.md",
+      "target_sha256": "fe2728d1e8d57869f3be1c3c33e453a63f2435ac230975fdd111f3b18d889160"
+    },
+    {
+      "id": "read-threat-model",
+      "command": "sed -n 1,80p docs/threat-model.md",
+      "target_sha256": "66d7d99ffe692886e2f8598ed2420652778fa4e7506a77c89c9c9c0c2c9c87ea"
+    },
+    {
+      "id": "read-observer",
+      "command": "sed -n 1,100p OBSERVER.md",
+      "target_sha256": "4b54d6ce0250de00e95dfde630a55dabbad49709156c04d2639473b0fc696eef"
+    }
+  ],
+  "guide_actions_executed": false
+}

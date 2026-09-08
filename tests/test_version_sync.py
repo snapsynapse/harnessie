@@ -37,7 +37,7 @@ def test_package_version_matches_pyproject():
     assert __version__ == version
     roadmap = (ROOT / "ROADMAP.md").read_text(encoding="utf-8")
     plugin = (ROOT / "PLUGIN_CONTRACT.md").read_text(encoding="utf-8")
-    assert f"current core release is {version}" in roadmap
+    assert f"current source version is {version}" in roadmap
     assert "Status: stable for the Harnessie 1.x line." in plugin
 
 

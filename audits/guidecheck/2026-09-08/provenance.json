@@ -1,0 +1,26 @@
+{
+  "scope": "Harnessie GuideCheck evidence and unpublished candidate",
+  "source_head": "8d89e417b0c9deb4f7c565f3af10b858a439e8ee",
+  "remote_main_observed": "a734a8f28fd9955b3a152ed15e96742b3c370a92",
+  "source_worktree": "status-copy preparation; published guide unchanged",
+  "guidecheck_release": "https://github.com/snapsynapse/guidecheck/releases/tag/v2.0.0",
+  "guidecheck_commit": "0991c18ec6dd8b966d67bab9802f6559e7e74b91",
+  "guidecheck_python": "Python 3.14.7",
+  "current_guide_dns_changed_by": "Sam through Namecheap",
+  "current_guide_profile": "0.7.1",
+  "candidate_guide_profile": "2.0.0",
+  "candidate_published": false,
+  "release_published": false,
+  "files": {
+    "README.md": "ec18ce8955daa1b95e5febaa1e8f63144519166611ba1fcfdbecdf803e79eaf3",
+    "candidate-1.3.0/artifact-checks.json": "85777faf9d9c1370c0b70a666b8e2accf5ee6606f8728d120ae1085756fd98e6",
+    "candidate-1.3.0/assistant-guide-manifest.txt": "34967a37b6bfe68864b38237971ebcfa890c5b9f39bb1c490c6226d53159db76",
+    "candidate-1.3.0/assistant-guide.txt": "5e00fa6903e0d42c49e9a25c08eec19116b04bf01ee0daf8c4d7d754b58b0793",
+    "candidate-1.3.0/local-result.json": "5ba4eccc7eff9c25a6037582d28627e7c12aca470066f96a88ae025fa2df133b",
+    "candidate-1.3.0/promotion.json": "b7e61cc8dc6e85e2e5101f327840b6ea9260a76570ee7e48bfdf5dc41e0928ef",
+    "dns-after.json": "7dabfabaec489257fcd7b33b7ef36d7003cea33a0679159a2134930033077035",
+    "dns-before.json": "3e24365e44e2b3027294206f9b4985f4f88390e40a6f2f5a5b28522a85deb517",
+    "hosted-1.2.0-after-dns.json": "5f62d2cccf76a48552d05ab7d5ac2c8f052d209a046b5d92193d20a72c1605b8",
+    "hosted-1.2.0-before-dns.json": "2f43e865fae80cc8f95cf5ce72549fcd98ebd2851c2bc355d9e34c14f5f7aa1a"
+  }
+}

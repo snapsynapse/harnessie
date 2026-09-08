@@ -51,7 +51,7 @@ Python 3.11 or newer. PyYAML and jsonschema install with Harnessie. Install from
 pip install harnessie   # or: pipx install harnessie / uv tool install harnessie
 ```
 
-PyPI carries the current 1.2.0 core release. The separately maintained Homebrew formula and Harnessie Verify Action may lag briefly during release propagation; `NEXT.md` records their verified pins.
+This documentation covers Harnessie 1.3.0 source. Check the published package version before using new commands; release propagation is recorded in NEXT.md. The separately maintained Homebrew formula and Harnessie Verify Action may lag briefly during release propagation; `NEXT.md` records their verified pins.
 
 Developing on the harness itself (or wanting the test suite), install from source:
 
@@ -72,6 +72,7 @@ All commands are subcommands of `python3 -m harness.cli` (or `harnessie` once in
 | `run <workflow> --goal "..."` | Run a workflow from a goal. Prints a pre-run cost preview first (LIVE vs MOCK, ceilings, worst case) and refuses a live run with no budget ceiling; ends with a plain-language summary and the run id. Repeat `--plugin NAME` to admit an installed `harnessie.tools.v1` plugin explicitly. |
 | `resume <run_id> <workflow> --goal "..."` | Resume a run from its journal. Re-runs only phases that did not pass. Repeat the original `--plugin NAME` set exactly; name, version, entry-point target, or tool drift refuses before model dispatch. |
 | `report <run_id>` | Plain-language run summary: outcome, per-phase status, and on a halt the one named next action. `--raw` appends the raw journal, events, and proof listing. |
+| `observe <run_id>` | In 1.3.0, verify an existing local journal snapshot and write cited JSON/Markdown under its observer directory. No model calls or runner integration. Exit 0 means summary production succeeded, including for halted runs; invalid inputs exit 2. See [the observer contract](https://github.com/snapsynapse/harnessie/blob/main/OBSERVER.md). |
 | `audit <run_id>` | Verify the hash chain and render the governance timeline. Exit 0 clean, 1 broken chain, 2 run not found. |
 | `eval [suite]` | Run the deterministic eval scorecards (optionally one suite YAML). |
 | `eval --live` | Run opt-in live provider scorecards; skipped visibly unless `HARNESSIE_LIVE=1` and provider configuration are present. |
