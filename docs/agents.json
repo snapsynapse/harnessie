@@ -32,9 +32,9 @@
       "side_effects": "The guide authorizes read-only inspection only. Installation, code execution, and mutation require a separate human-approved task.",
       "integrity_status": {
         "served_copy": "1.3.0 repository and served guide copies are byte-identical and pinned by the provenance sidecar",
-        "external_anchor": "Final 1.3.0 DNS TXT and hosted profile-2.0.0 verification pending",
-        "current_end_to_end_level": "Pending external re-verification for the 1.3.0 guide",
-        "current_receipt": null,
+        "external_anchor": "1.3.0 DNS TXT matches the served guide and qualifies independently under profile 2.0.0; repository bytes corroborate the hash",
+        "current_end_to_end_level": "Level 4 under profile 2.0.0; zero blocking findings; warnings and limits retained in the exact receipt",
+        "current_receipt": "https://github.com/snapsynapse/harnessie/blob/main/audits/release-1.3.0/guidecheck-prepublication.json",
         "historical_receipt": "https://github.com/snapsynapse/harnessie/blob/main/audits/guidecheck/2026-09-08/hosted-1.2.0-after-dns.json"
       }
     },

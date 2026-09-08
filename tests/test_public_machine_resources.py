@@ -106,6 +106,8 @@ def test_current_guidecheck_receipt_earns_the_claimed_level():
     assert receipt["guide"]["bytes"] == len(guide)
     assert receipt["guide"]["sha256"] == hashlib.sha256(guide).hexdigest()
     assert receipt["guide"]["achieved_level"] == 4
+    assert receipt["profile_selection"]["evaluated_policy"] == "2.0.0"
+    assert receipt["qualifying_anchor_count"] >= 1
     assert receipt["verifier"]["guide_profile_version"] == re.search(
         rb"^profile-version: (.+)$", guide, re.M).group(1).decode()
     sidecar = (DOCS / ".well-known" / "assistant-guide-manifest.txt").read_bytes()

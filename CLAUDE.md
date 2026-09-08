@@ -104,7 +104,7 @@ PyPI promotion and live-provider calls are deliberate operator acts, never headl
   Ringer fixtures, trace metrics, and compatibility fixes.
 - Homebrew and `snapsynapse/harnessie-verify-action@v0` are separately propagated
   downstreams. `NEXT.md` records their exact verified pins and any temporary lag.
-- The current 1.3.0 guide selects profile 2.0.0; hosted verification is pending.
+- The current 1.3.0 guide selects profile 2.0.0; hosted Level 4 was verified before publication.
   The 1.2.0 hosted Level 4 receipt is historical evidence only.
 - The latest pre-release documentation baseline was 483 passed, 9 skipped, 51/51
   deterministic evals, 21 outward trust files, and 16 inward files.
