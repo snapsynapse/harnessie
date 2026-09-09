@@ -288,8 +288,12 @@ def test_homepage_preserves_lighthouse_accessibility_repairs():
     generated = (DOCS / "ringer.html").read_text(encoding="utf-8")
     assert ".doc-toc .toc-title" in generated
     assert "color: var(--text-muted);" in generated
-    assert ".doc-content p a, .doc-content li a, footer p a" in generated
+    assert ".doc-content p a, .doc-content li a, .doc-content td a, footer p a" in generated
     assert "text-decoration: underline; text-underline-offset: 0.14em;" in generated
+    assert '<img class="still"' in html and 'alt="The Harnessie mascot:' in html
+    assert '<video class="hero-clip" autoplay muted playsinline preload="auto" aria-hidden="true">' in html
+    assert 'aria-label="Animated Harnessie mascot' not in html
+    assert '<button type="button" class="video-toggle" aria-label="Pause the animation">' in html
 
 
 def test_agent_file_ownership_claim_is_bounded_and_falsifiable():
