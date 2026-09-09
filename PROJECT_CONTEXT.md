@@ -50,7 +50,7 @@ PRs. Core 1.2.0 includes evidence-bound intake and structured required-claim ver
 Copyright Snap Synapse LLC (author Sam Rogers, subscriptions@snapsynapse.com), with
 trademark and PAICE.work PBC spec/code carveouts recorded in NOTICE.
 
-## Current status (2026-09-08)
+## Current status (2026-09-09)
 
 Core 1.4.1 is published and verified on PyPI and GitHub. It adds strict offline
 open-record AIDR export, preserving recorded dissent and source evidence while
@@ -89,4 +89,4 @@ Sam authorized full publishing and deferred the remaining accessibility review a
 
 ## 1.4.1 release completion
 
-The exporter and completion work shipped in core 1.4.1 at `296deed2f91cd4c8eeecad82b83f137dd029ea26`, with verified GitHub/PyPI artifacts and final hosted guide acceptance. Verify Action 0.2.2 and stable `v0` are published at `9f18d70017f395ef4d15ac5746e30ac633f00f8e`; Homebrew 1.4.1 is published at tap commit `953760f3968200f99658bfb068609532cb9fbf4d`. All three release paths are verified. See [release execution](audits/release-1.4.1.md) and [NEXT.md](NEXT.md) for current evidence. Accessibility remains deferred this session; no fresh automated or manual acceptance is claimed.
+The exporter and completion work shipped in core 1.4.1 at `296deed2f91cd4c8eeecad82b83f137dd029ea26`, with verified GitHub/PyPI artifacts and final hosted guide acceptance. Verify Action 0.2.2 and stable `v0` are published at `9f18d70017f395ef4d15ac5746e30ac633f00f8e`; Homebrew 1.4.1 is published at tap commit `953760f3968200f99658bfb068609532cb9fbf4d`. All three release paths are verified. See [release execution](audits/release-1.4.1.md) and [NEXT.md](NEXT.md) for current evidence. The accessibility repair and audit tranche shipped through [PR #25](https://github.com/snapsynapse/harnessie/pull/25); exact-merge provider checks and byte-identical production readback passed. Human accessibility acceptance remains pending, and no full-conformance claim is made.
