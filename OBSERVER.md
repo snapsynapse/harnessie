@@ -74,8 +74,8 @@ An explicit event phase wins. Otherwise, interpretation attaches only when exact
 
 Findings are sorted by first cited sequence, phase and ID. Structured labels can still contain sensitive metadata, so output stays local. Markdown escapes dynamic values; citation presence is not an injection defense or proof of reviewer independence.
 
-## Verification and deferred work
+## Verification and upcoming work
 
 Pytest covers deterministic replay across processes, source immutability, stale-output diagnostics, path boundaries, no runner/model construction, malformed metadata, incomplete/halted runs, parallel ambiguity and payload omission. The active `evals/observer.yaml` suite exercises eight deterministic scenarios; an unknown expectation fails rather than being ignored.
 
-All bid modes, model commentary, role/schema changes for those features, live-provider calibration, automatic runner observation, and follow mode remain deferred. The operating ladder's live Narrate experience is not completed by this offline command.
+Bid modes, model commentary, related role/schema changes, live-provider calibration, automatic runner observation and follow mode are not implemented by this offline command. They are separately gated slices in the active capability program. The operating ladder's live Narrate experience is not completed by `harnessie observe` today.

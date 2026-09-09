@@ -2,7 +2,7 @@
 
 Tests carry per-test strict expected failures grouped by delivery slice.
 Remove a marker only when its approved contract is implemented and verified.
-Deferred selection tests remain expected failures independently of record mode.
+Selection tests remain expected failures independently of record mode.
 
 The contracts asserted here are the spec. Where the design draft was vague,
 these tests choose: anchors derive only from declared workflow structure,
@@ -22,7 +22,7 @@ from harness.models.base import AssistantTurn, MockModel, ModelSpec, ToolCall
 
 bid_record_pending = pytest.mark.xfail(strict=True, reason="AIDR-0009: bid record and parsing pending")
 bid_select_pending = pytest.mark.xfail(strict=True, reason="AIDR-0009: select requires separate decision")
-bid_scorecard_pending = pytest.mark.xfail(strict=True, reason="AIDR-0009: scorecard deferred")
+bid_scorecard_pending = pytest.mark.xfail(strict=True, reason="bid calibration scorecard not yet implemented")
 
 
 def _bidding():
