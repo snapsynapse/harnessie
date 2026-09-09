@@ -1,0 +1,48 @@
+{
+  "reviewed_at": "2026-09-09",
+  "served_asset": {
+    "path": "docs/imgs/harnessie-hero.mp4",
+    "sha256": "2f33d0627224b725d3918dc8d82692b949ec2170893afeb54bb4b8a85e75a643",
+    "duration_seconds": 10.0,
+    "video": {
+      "codec": "h264",
+      "profile": "High",
+      "width": 1280,
+      "height": 720,
+      "frames_per_second": 24
+    },
+    "audio_streams": 0,
+    "representative_frames": [
+      "media-frames/served-00s.png",
+      "media-frames/served-05s.png",
+      "media-frames/served-09s.png",
+      "media-frames/served-contact-sheet.png"
+    ],
+    "visual_review": "The animation repeats the Harnessie wordmark, tagline, mascot and loch branding already represented by the static fallback and adjacent page content. Mascot motion, ripples and a tail splash add no instructional, status or functional information.",
+    "disposition": "decorative served animation; captions are not applicable because the published derivative has no audio; the meaningful static image alternative and accessible pause control remain"
+  },
+  "original_asset": {
+    "path": "brand/harnessie_og.mp4",
+    "sha256": "ecf98d49c8a962ded28d9f4ad288284426f83f1aaee36f2ee4c4c8ff24794104",
+    "duration_seconds": 10.005,
+    "audio": {
+      "codec": "aac",
+      "channels": 2,
+      "sample_rate_hz": 48000,
+      "bit_rate": 128256,
+      "non_silent": true,
+      "semantic_content_reviewed": false
+    },
+    "publication_boundary": "This audio-bearing original is not served. If it is ever published, review its audio content and caption or alternative requirements before deployment. No claim about speech or meaningful audio is made here."
+  },
+  "interaction_evidence": {
+    "source": "review-after.json",
+    "pause_resume": "passed",
+    "accessible_labels": "Pause the animation and Play the animation reflected state",
+    "prefers_reduced_motion": "autoplay removed and video paused"
+  },
+  "transcription": {
+    "performed": false,
+    "reason": "The served derivative has no audio. Local faster-whisper and model weights were not installed solely to classify an unserved source asset."
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "scope": "local accessibility handoff reconciliation; no commit, push, deployment or conformance claim",
+  "date": "2026-09-09",
+  "base_revision": "e2b7c80b7572945a7765bb8f7c1bf29e920b9133",
+  "branch": "codex/accessibility-handoff-reconciliation",
+  "runtime_url": "http://127.0.0.1:54101",
+  "expected_url": "https://harnessie.com/",
+  "tools": {
+    "skill_a11y_audit": "3.1.0",
+    "axe_core": "4.12.1",
+    "puppeteer": "25.10.0",
+    "node": "26.7.0"
+  },
+  "source_sha256": {
+    "scripts/build_docs_html.py": "75e6c3a8f3f091bdd5ca6dad0c4eeacb3b45b4dc25d6701d1d953f414dc1e66f",
+    "tests/test_public_machine_resources.py": "b6a0287091f4d995c103d3bb9a2160ac9d9c393423e163ebfa58556da1bed9da",
+    "NEXT.md": "cf793449471eca0f08da751822b7119281af2820c65567d845d5eb445a6e7a7b",
+    "ROADMAP.md": "13c64acc03a50945a9bf6f7d5905f07685a7279aae8a22c8853b4022c948ba2a",
+    "docs/index.html": "2d998daa091e9d150f57b1a2ce4f0dd240e4b03b909a31f921646565036cfbea",
+    "docs/quickstart.html": "51a6a12d0728d3623e5338b77de86cc5472f67d02d696b7cd34c596cf3232180",
+    "docs/getting-started.html": "1f8b9d8c4b70d47b19a7b082dba84f401d1a55b97cc8ff2884a4c3722e47bd04",
+    "docs/ladder.html": "8beaaa4178e9d090952de7bb0668762318f3c26a5d2bca6eab6f904ed34a01c2",
+    "docs/guide.html": "9b7981568e08b502bab1944939ca113a394d407b7a125009ae75ed000be51d13",
+    "docs/compare.html": "c0de40efef5491c500d7f74410d0c7eee09ed493a3407c3fd9b6b954bef40a0f",
+    "docs/agent-file-ownership.html": "ac4e53724e7f498f393331791ff6471822875c48b8d38217eeef5bddaf088a78",
+    "docs/brains.html": "dbb89b3254d6dd8d5578f231247778fed5a14b1061e7ef0d5234667c706e14b1",
+    "docs/threat-model.html": "596a053ae6f3b0b5580e32116de7699d8529aca6fa3c4c6e7444e91102d625d1",
+    "docs/ringer.html": "e88039093aad2269d05812ca8d5f73a1a5b6c9fcace657b34f0333854f5249ed"
+  },
+  "evidence_sha256": {
+    "scan.json": "0bd57da53ad854a28395f0a0e4efd6bdc7ca82062eadb115be7d570006e9bada",
+    "scan-after.json": "7fba3091204718118f293c21cf18111a16a89f16fc374eb57313b96810a5e26b",
+    "review-driver.cjs": "2f06ec1fe57ffe46c4ca4e2546569b94063ef81b6b4efa222e562e47c2aca48d",
+    "review-before.json": "83026f02dbd5430e6a08042dba7fe410e20b448fc55bc9740e495ba5124b5b45",
+    "review-after.json": "fb60bcec0e3064c2613972f23f6feae69559a6691021f603c5069472ce3a8358",
+    "media-evidence.json": "1c2dee55836cbe4c5b634bb2bce3cac460d512b2d879165ea77fe947d6b8d7be",
+    "audit-2026-09-09.md": "9b1ddd2c287dad245d417bbd93402ce1d219c161945058e5ebdd63f2d7a6568c",
+    "audit-2026-09-09.json": "2c80236b7795776e75db6263b25ab1c696c4081cdaf15de292a13e3ee4cefe08",
+    "reconciliation.md": "22f0127a3078d4ddced7f908984f0826ac4e4a3e4fe16d4f6454ee7553559661",
+    "guide-1280-right.png": "f2e1781c5b683f98ab17c3db42f7f26fa73b03b34915c9d233bb6b54b32e8c96",
+    "guide-640-right.png": "5a5a11cdc2d0d40175cdab152c54a5a51005c2826a8ed2ed29708fa5a8e74551",
+    "guide-375-right.png": "4896b02692a2f8335431a2a67654ed04fa2b1eaeb0da83dd85b0721b796c506a",
+    "threat-model-1280-right.png": "037391b3887396eb4d94e94dc9947ffba29dc04ff8fbf3a8481eca25b823172a",
+    "threat-model-640-right.png": "3b212882033d3728adc773eba4c3640352c7d02a8832bd66edfafadf4d426b5f",
+    "threat-model-375-right.png": "fdf649113bc54c84f20eae3cdc5686eeb422deb38925c91d8f776312708a3bdf",
+    "media-frames/served-00s.png": "220175b185f62137cac19507ff353364c74fa62b7279f4185deca7788cf0af34",
+    "media-frames/served-05s.png": "a9b7db3d908eb69ef0bb168698fbb685cc242b1dfe55872e9bf028dc6d1906ef",
+    "media-frames/served-09s.png": "ef7d3071b0ba9fc24d9cee43556e4a54aba356b7477adcee472e9b13b8a58653",
+    "media-frames/served-contact-sheet.png": "bc2587d9f1f1a17ad8cc1c738b82d7ed0303c55ebb450ad4a9e9713e3f9393ff"
+  },
+  "validation": {
+    "pytest": "710 passed, 9 skipped, 28 xfailed",
+    "generated_docs": "9 pages current",
+    "trust_manifest": "21 files verified",
+    "inward_manifest": "16 files verified",
+    "search_contract": "10 sitemap pages, 0 defects, 0 infrastructure failures",
+    "pre_repair_scan": "0 confirmed violations, 63 blocking incomplete candidates, 0 route errors",
+    "post_repair_scan": "0 confirmed violations, 60 blocking incomplete candidates, 0 route errors",
+    "supplemental_review": "60 measured-pass dispositions, 180 measurements, minimum 6.08:1; 8 keyboard cases; link and motion checks passed",
+    "lighthouse": "not run",
+    "human_assistive_technology": "not performed; transferred to NEXT.md"
+  }
+}

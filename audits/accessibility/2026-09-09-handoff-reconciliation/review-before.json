@@ -1,0 +1,5433 @@
+{
+  "reviewedAt": "2026-09-09T14:58:03.448Z",
+  "sourceScan": "audits/accessibility/2026-09-09-handoff-reconciliation/scan.json",
+  "axeVersion": "4.12.1",
+  "browser": "Chrome/152.0.7977.75",
+  "viewports": [
+    1280,
+    640,
+    375
+  ],
+  "viewportNotes": {
+    "375": "narrow layout",
+    "640": "reflow proxy for a 1280 CSS-pixel viewport at 200 percent zoom; not a human browser-zoom test",
+    "1280": "normal desktop width"
+  },
+  "contrast": [
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(1) > td:nth-child(2)",
+      "text": "Run a workflow from a goal. Prints a pre-run cost preview first (LIVE vs MOCK, ceilings, worst case) and refuses a live run with no budget ceiling; ends with a plain-language summary and the run id. Repeat --plugin NAME to admit an installed harnessie.tools.v1 plugin explicitly.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 687.15625,
+        "right": 1119.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(1) > td:nth-child(2) > code:nth-child(1)",
+      "text": "--plugin NAME",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 915.421875,
+        "right": 1013.796875,
+        "width": 98.375
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(2) > td:nth-child(2)",
+      "text": "Resume a run from its journal. Re-runs only phases that did not pass. Repeat the original --plugin NAME set exactly; name, version, entry-point target, or tool drift refuses before model dispatch.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 687.15625,
+        "right": 1119.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(2) > td:nth-child(2) > code",
+      "text": "--plugin NAME",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 893.03125,
+        "right": 991.40625,
+        "width": 98.375
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(3) > td:nth-child(2)",
+      "text": "Plain-language run summary: outcome, per-phase status, and on a halt the one named next action. --raw appends the raw journal, events, and proof listing.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 687.15625,
+        "right": 1119.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(3) > td:nth-child(2) > code",
+      "text": "--raw",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 973.3125,
+        "right": 1011.15625,
+        "width": 37.84375
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(4) > td:nth-child(2)",
+      "text": "In 1.3.0, verify an existing local journal snapshot and write cited JSON/Markdown under its observer directory. No model calls or runner integration. Exit 0 means summary production succeeded, including for halted runs; invalid inputs exit 2. See the observer contract.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 687.15625,
+        "right": 1119.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "tr:nth-child(4) > td:nth-child(2) > a",
+      "text": "the observer contract",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 817.9375,
+        "right": 961.09375,
+        "width": 143.15625
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(5) > td:nth-child(2)",
+      "text": "Added in 1.4.1: write one supported open phase record to an explicitly named, unused AIDR destination. Requires a declared human arbiter; does not author arbitration. Prints JSON: exit 0 exported, exit 2 refused. See Offline AIDR export.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 687.15625,
+        "right": 1119.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "td:nth-child(2) > a[href$=\"#offline-aidr-export\"]",
+      "text": "Offline AIDR export",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 700.75,
+        "right": 1061.796875,
+        "width": 361.046875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(6) > td:nth-child(2)",
+      "text": "Verify the hash chain and render the governance timeline. Exit 0 clean, 1 broken chain, 2 run not found.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 687.15625,
+        "right": 1119.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(7) > td:nth-child(2)",
+      "text": "Run the deterministic eval scorecards (optionally one suite YAML).",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 687.15625,
+        "right": 1119.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(8) > td:nth-child(2)",
+      "text": "Run opt-in live provider scorecards; skipped visibly unless HARNESSIE_LIVE=1 and provider configuration are present.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 687.15625,
+        "right": 1119.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(9) > td:nth-child(2)",
+      "text": "Validate the six v1 authoring contracts without model calls, network, sandbox admission, run-state creation, or workspace writes. Use --kind when validating one document whose filename does not identify its contract. Exit 0 valid, 2 invalid.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 687.15625,
+        "right": 1119.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "tr:nth-child(9) > td:nth-child(2) > code",
+      "text": "--kind",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 853.578125,
+        "right": 898.984375,
+        "width": 45.40625
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(10) > td:nth-child(2)",
+      "text": "Explain the exact ownership-ledger decision for one agent and path relative to workspace/ without claiming or modifying it. JSON output uses schema version 1. Valid allowed and denied decisions exit 0; invalid paths or ownership documents exit 2.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 687.15625,
+        "right": 1119.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "tr:nth-child(10) > td:nth-child(2) > code",
+      "text": "workspace/",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 832.015625,
+        "right": 907.6875,
+        "width": 75.671875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(11) > td:nth-child(2)",
+      "text": "Standalone verification of any workspace, no project scaffold required. Harnessie 1.2.0 accepts --workspace <dir> with either --criteria <claims.md> or --evidence-bundle <bundle.yaml> --evidence-root <dir>, plus optional checks, model routing, and report flags. Deterministic checks run sandboxed (network-denied unless --allow-network; the verifier agent stays denied regardless), then a read-only fresh-context verifier tests claims against artifacts. Exit 0 is verified, 1 is failed, and 2 is could-not-verify. Single pass, no retry ladder. Adopted via decisions/AIDR-0006.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 687.15625,
+        "right": 1119.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "tr:nth-child(11) > td:nth-child(2) > code:nth-child(1)",
+      "text": "--workspace <dir>",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 924.484375,
+        "right": 1053.125,
+        "width": 128.640625
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "tr:nth-child(11) > td:nth-child(2) > code:nth-child(2)",
+      "text": "--criteria <claims.md>",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 742.734375,
+        "right": 909.203125,
+        "width": 166.46875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "td:nth-child(2) > code:nth-child(3)",
+      "text": "--evidence-bundle <bundle.yaml> --evidence-root <dir>",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 700.75,
+        "right": 1101.765625,
+        "width": 401.015625
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "tr:nth-child(12) > td:nth-child(2)",
+      "text": "Verify the trust-bundle manifest. Defaults to docs/MANIFEST.yaml.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 687.15625,
+        "right": 1119.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "tr:nth-child(13) > td:nth-child(2)",
+      "text": "Verify the harness input manifest. Defaults to INWARD_MANIFEST.yaml; exit 2 on malformed content, hash drift, or incomplete coverage.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 687.15625,
+        "right": 1119.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "tr:nth-child(14) > td:nth-child(2)",
+      "text": "Promote one verified maiden-voyage proposal after checking the audit chain, staged hashes, and unchanged target. Exit 2 on any drift.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 687.15625,
+        "right": 1119.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "tr:nth-child(15) > td:nth-child(2)",
+      "text": "Scaffold a minimal project layout, then run the guided readiness check: Python version, sandbox backend detection, API-key guidance, and a zero-dollar mock run that must be green. --no-verify skips the guided check for scripted scaffolding.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 687.15625,
+        "right": 1119.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1140,
+        "scrollLeft": 382,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(1) > td:nth-child(2)",
+      "text": "Run a workflow from a goal. Prints a pre-run cost preview first (LIVE vs MOCK, ceilings, worst case) and refuses a live run with no budget ceiling; ends with a plain-language summary and the run id. Repeat --plugin NAME to admit an installed harnessie.tools.v1 plugin explicitly.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 183.15625,
+        "right": 615.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(1) > td:nth-child(2) > code:nth-child(1)",
+      "text": "--plugin NAME",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 411.421875,
+        "right": 509.796875,
+        "width": 98.375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(2) > td:nth-child(2)",
+      "text": "Resume a run from its journal. Re-runs only phases that did not pass. Repeat the original --plugin NAME set exactly; name, version, entry-point target, or tool drift refuses before model dispatch.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 183.15625,
+        "right": 615.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(2) > td:nth-child(2) > code",
+      "text": "--plugin NAME",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 389.03125,
+        "right": 487.40625,
+        "width": 98.375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(3) > td:nth-child(2)",
+      "text": "Plain-language run summary: outcome, per-phase status, and on a halt the one named next action. --raw appends the raw journal, events, and proof listing.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 183.15625,
+        "right": 615.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(3) > td:nth-child(2) > code",
+      "text": "--raw",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 469.3125,
+        "right": 507.15625,
+        "width": 37.84375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(4) > td:nth-child(2)",
+      "text": "In 1.3.0, verify an existing local journal snapshot and write cited JSON/Markdown under its observer directory. No model calls or runner integration. Exit 0 means summary production succeeded, including for halted runs; invalid inputs exit 2. See the observer contract.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 183.15625,
+        "right": 615.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "tr:nth-child(4) > td:nth-child(2) > a",
+      "text": "the observer contract",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 313.9375,
+        "right": 457.09375,
+        "width": 143.15625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(5) > td:nth-child(2)",
+      "text": "Added in 1.4.1: write one supported open phase record to an explicitly named, unused AIDR destination. Requires a declared human arbiter; does not author arbitration. Prints JSON: exit 0 exported, exit 2 refused. See Offline AIDR export.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 183.15625,
+        "right": 615.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "td:nth-child(2) > a[href$=\"#offline-aidr-export\"]",
+      "text": "Offline AIDR export",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 196.75,
+        "right": 557.796875,
+        "width": 361.046875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(6) > td:nth-child(2)",
+      "text": "Verify the hash chain and render the governance timeline. Exit 0 clean, 1 broken chain, 2 run not found.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 183.15625,
+        "right": 615.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(7) > td:nth-child(2)",
+      "text": "Run the deterministic eval scorecards (optionally one suite YAML).",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 183.15625,
+        "right": 615.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(8) > td:nth-child(2)",
+      "text": "Run opt-in live provider scorecards; skipped visibly unless HARNESSIE_LIVE=1 and provider configuration are present.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 183.15625,
+        "right": 615.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(9) > td:nth-child(2)",
+      "text": "Validate the six v1 authoring contracts without model calls, network, sandbox admission, run-state creation, or workspace writes. Use --kind when validating one document whose filename does not identify its contract. Exit 0 valid, 2 invalid.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 183.15625,
+        "right": 615.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "tr:nth-child(9) > td:nth-child(2) > code",
+      "text": "--kind",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 349.578125,
+        "right": 394.984375,
+        "width": 45.40625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(10) > td:nth-child(2)",
+      "text": "Explain the exact ownership-ledger decision for one agent and path relative to workspace/ without claiming or modifying it. JSON output uses schema version 1. Valid allowed and denied decisions exit 0; invalid paths or ownership documents exit 2.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 183.15625,
+        "right": 615.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "tr:nth-child(10) > td:nth-child(2) > code",
+      "text": "workspace/",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 328.015625,
+        "right": 403.6875,
+        "width": 75.671875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(11) > td:nth-child(2)",
+      "text": "Standalone verification of any workspace, no project scaffold required. Harnessie 1.2.0 accepts --workspace <dir> with either --criteria <claims.md> or --evidence-bundle <bundle.yaml> --evidence-root <dir>, plus optional checks, model routing, and report flags. Deterministic checks run sandboxed (network-denied unless --allow-network; the verifier agent stays denied regardless), then a read-only fresh-context verifier tests claims against artifacts. Exit 0 is verified, 1 is failed, and 2 is could-not-verify. Single pass, no retry ladder. Adopted via decisions/AIDR-0006.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 183.15625,
+        "right": 615.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "tr:nth-child(11) > td:nth-child(2) > code:nth-child(1)",
+      "text": "--workspace <dir>",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 420.484375,
+        "right": 549.125,
+        "width": 128.640625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "tr:nth-child(11) > td:nth-child(2) > code:nth-child(2)",
+      "text": "--criteria <claims.md>",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 238.734375,
+        "right": 405.203125,
+        "width": 166.46875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "td:nth-child(2) > code:nth-child(3)",
+      "text": "--evidence-bundle <bundle.yaml> --evidence-root <dir>",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 196.75,
+        "right": 597.765625,
+        "width": 401.015625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "tr:nth-child(12) > td:nth-child(2)",
+      "text": "Verify the trust-bundle manifest. Defaults to docs/MANIFEST.yaml.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 183.15625,
+        "right": 615.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "tr:nth-child(13) > td:nth-child(2)",
+      "text": "Verify the harness input manifest. Defaults to INWARD_MANIFEST.yaml; exit 2 on malformed content, hash drift, or incomplete coverage.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 183.15625,
+        "right": 615.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "tr:nth-child(14) > td:nth-child(2)",
+      "text": "Promote one verified maiden-voyage proposal after checking the audit chain, staged hashes, and unchanged target. Exit 2 on any drift.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 183.15625,
+        "right": 615.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "tr:nth-child(15) > td:nth-child(2)",
+      "text": "Scaffold a minimal project layout, then run the guided readiness check: Python version, sandbox backend detection, API-key guidance, and a zero-dollar mock run that must be green. --no-verify skips the guided check for scripted scaffolding.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 183.15625,
+        "right": 615.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1140,
+        "scrollLeft": 550,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(1) > td:nth-child(2)",
+      "text": "Run a workflow from a goal. Prints a pre-run cost preview first (LIVE vs MOCK, ceilings, worst case) and refuses a live run with no budget ceiling; ends with a plain-language summary and the run id. Repeat --plugin NAME to admit an installed harnessie.tools.v1 plugin explicitly.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 468.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 697,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7283044782592981,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(1) > td:nth-child(2) > code:nth-child(1)",
+      "text": "--plugin NAME",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 146.421875,
+        "right": 244.796875,
+        "width": 98.375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 815,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(2) > td:nth-child(2)",
+      "text": "Resume a run from its journal. Re-runs only phases that did not pass. Repeat the original --plugin NAME set exactly; name, version, entry-point target, or tool drift refuses before model dispatch.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 468.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 697,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7283044782592981,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(2) > td:nth-child(2) > code",
+      "text": "--plugin NAME",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 124.03125,
+        "right": 222.40625,
+        "width": 98.375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 815,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(3) > td:nth-child(2)",
+      "text": "Plain-language run summary: outcome, per-phase status, and on a halt the one named next action. --raw appends the raw journal, events, and proof listing.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 468.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 697,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7283044782592981,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(3) > td:nth-child(2) > code",
+      "text": "--raw",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 204.3125,
+        "right": 242.15625,
+        "width": 37.84375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 815,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(4) > td:nth-child(2)",
+      "text": "In 1.3.0, verify an existing local journal snapshot and write cited JSON/Markdown under its observer directory. No model calls or runner integration. Exit 0 means summary production succeeded, including for halted runs; invalid inputs exit 2. See the observer contract.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 468.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 697,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7283044782592981,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "tr:nth-child(4) > td:nth-child(2) > a",
+      "text": "the observer contract",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 48.9375,
+        "right": 192.09375,
+        "width": 143.15625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 815,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(5) > td:nth-child(2)",
+      "text": "Added in 1.4.1: write one supported open phase record to an explicitly named, unused AIDR destination. Requires a declared human arbiter; does not author arbitration. Prints JSON: exit 0 exported, exit 2 refused. See Offline AIDR export.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 468.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 697,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7283044782592981,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "td:nth-child(2) > a[href$=\"#offline-aidr-export\"]",
+      "text": "Offline AIDR export",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.75,
+        "right": 396.796875,
+        "width": 361.046875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 711,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8731553208984291,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(6) > td:nth-child(2)",
+      "text": "Verify the hash chain and render the governance timeline. Exit 0 clean, 1 broken chain, 2 run not found.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 468.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 697,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7283044782592981,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(7) > td:nth-child(2)",
+      "text": "Run the deterministic eval scorecards (optionally one suite YAML).",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 468.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 697,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7283044782592981,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(8) > td:nth-child(2)",
+      "text": "Run opt-in live provider scorecards; skipped visibly unless HARNESSIE_LIVE=1 and provider configuration are present.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 468.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 697,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7283044782592981,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(9) > td:nth-child(2)",
+      "text": "Validate the six v1 authoring contracts without model calls, network, sandbox admission, run-state creation, or workspace writes. Use --kind when validating one document whose filename does not identify its contract. Exit 0 valid, 2 invalid.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 468.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 697,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7283044782592981,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "tr:nth-child(9) > td:nth-child(2) > code",
+      "text": "--kind",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 84.578125,
+        "right": 129.984375,
+        "width": 45.40625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 815,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(10) > td:nth-child(2)",
+      "text": "Explain the exact ownership-ledger decision for one agent and path relative to workspace/ without claiming or modifying it. JSON output uses schema version 1. Valid allowed and denied decisions exit 0; invalid paths or ownership documents exit 2.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 468.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 697,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7283044782592981,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "tr:nth-child(10) > td:nth-child(2) > code",
+      "text": "workspace/",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 63.015625,
+        "right": 138.6875,
+        "width": 75.671875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 815,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "div[aria-labelledby=\"the-cli\"] > table > tbody > tr:nth-child(11) > td:nth-child(2)",
+      "text": "Standalone verification of any workspace, no project scaffold required. Harnessie 1.2.0 accepts --workspace <dir> with either --criteria <claims.md> or --evidence-bundle <bundle.yaml> --evidence-root <dir>, plus optional checks, model routing, and report flags. Deterministic checks run sandboxed (network-denied unless --allow-network; the verifier agent stays denied regardless), then a read-only fresh-context verifier tests claims against artifacts. Exit 0 is verified, 1 is failed, and 2 is could-not-verify. Single pass, no retry ladder. Adopted via decisions/AIDR-0006.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 468.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 697,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7283044782592981,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "tr:nth-child(11) > td:nth-child(2) > code:nth-child(1)",
+      "text": "--workspace <dir>",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 155.484375,
+        "right": 284.125,
+        "width": 128.640625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 815,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "tr:nth-child(11) > td:nth-child(2) > code:nth-child(2)",
+      "text": "--criteria <claims.md>",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.734375,
+        "right": 202.203125,
+        "width": 166.46875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 753,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "td:nth-child(2) > code:nth-child(3)",
+      "text": "--evidence-bundle <bundle.yaml> --evidence-root <dir>",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.75,
+        "right": 436.765625,
+        "width": 401.015625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 711,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7861289694135983,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "tr:nth-child(12) > td:nth-child(2)",
+      "text": "Verify the trust-bundle manifest. Defaults to docs/MANIFEST.yaml.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 468.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 697,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7283044782592981,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "tr:nth-child(13) > td:nth-child(2)",
+      "text": "Verify the harness input manifest. Defaults to INWARD_MANIFEST.yaml; exit 2 on malformed content, hash drift, or incomplete coverage.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 468.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 697,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7283044782592981,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "tr:nth-child(14) > td:nth-child(2)",
+      "text": "Promote one verified maiden-voyage proposal after checking the audit chain, staged hashes, and unchanged target. Exit 2 on any drift.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 468.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 697,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7283044782592981,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "tr:nth-child(15) > td:nth-child(2)",
+      "text": "Scaffold a minimal project layout, then run the guided readiness check: Python version, sandbox backend detection, API-key guidance, and a zero-dollar mock run that must be green. --no-verify skips the guided check for scripted scaffolding.",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 468.453125,
+        "width": 432.296875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1140,
+        "scrollLeft": 697,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7283044782592981,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(1) > td:nth-child(5)",
+      "text": "tests/test_sandbox.py::test_worker_python_cannot_write_outside_workspace, ::test_worker_network_denied_by_default, ::test_run_shell_fails_closed_without_backend",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 421.5625,
+        "right": 1118.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(1) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_sandbox.py::test_worker_python_cannot_write_outside_workspace",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 979.9375,
+        "width": 544.78125
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(1) > td:nth-child(5) > code:nth-child(3)",
+      "text": "::test_run_shell_fails_closed_without_backend",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 738.21875,
+        "right": 1078.703125,
+        "width": 340.484375
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(2) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_repo_configs.py::test_role_without_grant_is_denied",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 896.703125,
+        "width": 461.546875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(2) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_orchestrator_has_no_side_effecting_tools",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 790.78125,
+        "width": 355.625
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(3) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_routing_verify.py::test_gate_deterministic_check_failure_blocks_verifier",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 1063.171875,
+        "width": 628.015625
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(3) > td:nth-child(5) > code:nth-child(2)",
+      "text": "tests/test_adversarial.py::test_position_agents_are_read_only",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 896.703125,
+        "width": 461.546875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(4) > td:nth-child(5)",
+      "text": "tests/test_adversarial.py::test_dissent_halts_needs_arbitration, ::test_any_oppose_blocks_convergence, ::test_human_arbitration_resumes_phase_to_passed",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 421.5625,
+        "right": 1118.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(4) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_adversarial.py::test_dissent_halts_needs_arbitration",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 911.84375,
+        "width": 476.6875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(4) > td:nth-child(5) > code:nth-child(3)",
+      "text": "::test_human_arbitration_resumes_phase_to_passed",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 715.515625,
+        "right": 1078.703125,
+        "width": 363.1875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(5) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_quarantine.py::test_read_file_quarantine_at_registry",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 911.84375,
+        "width": 476.6875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(6) > td:nth-child(5)",
+      "text": "tests/test_quarantine.py::test_run_shell_env_is_scrubbed, ::test_run_shell_output_redacts_secrets, ::test_write_file_blocks_credential_shaped_content",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 421.5625,
+        "right": 1118.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(6) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_quarantine.py::test_run_shell_env_is_scrubbed",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 858.875,
+        "width": 423.71875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(6) > td:nth-child(5) > code:nth-child(3)",
+      "text": "::test_write_file_blocks_credential_shaped_content",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 813.484375,
+        "width": 378.328125
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(7) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_routing_verify.py::test_budget_accounting",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 828.609375,
+        "width": 393.453125
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(7) > td:nth-child(5) > code:nth-child(2)",
+      "text": "tests/test_preflight.py::test_live_run_without_ceiling_refuses",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 904.28125,
+        "width": 469.125
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(8) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_repo_configs.py::test_approval_gated_tool_fails_closed_under_default_handler",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 1093.4375,
+        "width": 658.28125
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(9) > td:nth-child(5)",
+      "text": "tests/test_ownership.py::test_cross_agent_write_denied_at_dispatch, ::test_run_shell_receives_agent_specific_readonly_roots, tests/test_sandbox.py::test_worker_interpreter_cannot_modify_operator_lane, ::test_readonly_lane_backend_failure_blocks_child",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 421.5625,
+        "right": 1118.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(9) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_ownership.py::test_cross_agent_write_denied_at_dispatch",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 934.546875,
+        "width": 499.390625
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(9) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_run_shell_receives_agent_specific_readonly_roots",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 851.3125,
+        "width": 416.15625
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(9) > td:nth-child(5) > code:nth-child(3)",
+      "text": "tests/test_sandbox.py::test_worker_interpreter_cannot_modify_operator_lane",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 995.078125,
+        "width": 559.921875
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(9) > td:nth-child(5) > code:nth-child(4)",
+      "text": "::test_readonly_lane_backend_failure_blocks_child",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 805.90625,
+        "width": 370.75
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(10) > td:nth-child(5)",
+      "text": "tests/test_plugins.py::test_only_explicitly_selected_entry_point_loads, ::test_malformed_declaration_fails_closed, ::test_resume_requires_exact_recorded_plugin_receipt, ::test_plugin_invocation_audits_loader_supplied_provenance",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 421.5625,
+        "right": 1118.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(10) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_plugins.py::test_only_explicitly_selected_entry_point_loads",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 964.8125,
+        "width": 529.65625
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(10) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_malformed_declaration_fails_closed",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 745.390625,
+        "width": 310.234375
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(10) > td:nth-child(5) > code:nth-child(3)",
+      "text": "::test_resume_requires_exact_recorded_plugin_receipt",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 828.609375,
+        "width": 393.453125
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(10) > td:nth-child(5) > code:nth-child(4)",
+      "text": "::test_plugin_invocation_audits_loader_supplied_provenance",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 874.015625,
+        "width": 438.859375
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(11) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_consent.py::test_side_effects_locked_until_accept",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 889.140625,
+        "width": 453.984375
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(11) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_read_tools_available_before_accept",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 745.390625,
+        "width": 310.234375
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(12) > td:nth-child(5)",
+      "text": "tests/test_maiden_voyage.py::test_new_phase_type_stages_verified_output_without_applying, ::test_workspace_drift_refuses_promotion_without_partial_apply, ::test_tampered_staged_output_refuses_promotion",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 421.5625,
+        "right": 1118.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(12) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_maiden_voyage.py::test_new_phase_type_stages_verified_output_without_applying",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 1101,
+        "width": 665.84375
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(12) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_workspace_drift_refuses_promotion_without_partial_apply",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 904.28125,
+        "width": 469.125
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(12) > td:nth-child(5) > code:nth-child(3)",
+      "text": "::test_tampered_staged_output_refuses_promotion",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 790.78125,
+        "width": 355.625
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(13) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_audit.py::test_edited_line_breaks_chain",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 435.15625,
+        "right": 813.484375,
+        "width": 378.328125
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "selector": "tr:nth-child(13) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_deleted_line_breaks_chain",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 821.453125,
+        "right": 1063.578125,
+        "width": 242.125
+      },
+      "wrapper": {
+        "left": 360,
+        "right": 1120,
+        "width": 760,
+        "clientWidth": 758,
+        "scrollWidth": 1303,
+        "scrollLeft": 545,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(1) > td:nth-child(5)",
+      "text": "tests/test_sandbox.py::test_worker_python_cannot_write_outside_workspace, ::test_worker_network_denied_by_default, ::test_run_shell_fails_closed_without_backend",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.5625,
+        "right": 732.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 595,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8326161018468711,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(1) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_sandbox.py::test_worker_python_cannot_write_outside_workspace",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 580.9375,
+        "width": 544.78125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(1) > td:nth-child(5) > code:nth-child(3)",
+      "text": "::test_run_shell_fails_closed_without_backend",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 234.21875,
+        "right": 574.703125,
+        "width": 340.484375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 713,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(2) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_repo_configs.py::test_role_without_grant_is_denied",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 497.703125,
+        "width": 461.546875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(2) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_orchestrator_has_no_side_effecting_tools",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 391.78125,
+        "width": 355.625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(3) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_routing_verify.py::test_gate_deterministic_check_failure_blocks_verifier",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 664.171875,
+        "width": 628.015625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.923295101137014,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(3) > td:nth-child(5) > code:nth-child(2)",
+      "text": "tests/test_adversarial.py::test_position_agents_are_read_only",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 497.703125,
+        "width": 461.546875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(4) > td:nth-child(5)",
+      "text": "tests/test_adversarial.py::test_dissent_halts_needs_arbitration, ::test_any_oppose_blocks_convergence, ::test_human_arbitration_resumes_phase_to_passed",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.5625,
+        "right": 732.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 595,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8326161018468711,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(4) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_adversarial.py::test_dissent_halts_needs_arbitration",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 512.84375,
+        "width": 476.6875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(4) > td:nth-child(5) > code:nth-child(3)",
+      "text": "::test_human_arbitration_resumes_phase_to_passed",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 211.515625,
+        "right": 574.703125,
+        "width": 363.1875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 713,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(5) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_quarantine.py::test_read_file_quarantine_at_registry",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 512.84375,
+        "width": 476.6875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(6) > td:nth-child(5)",
+      "text": "tests/test_quarantine.py::test_run_shell_env_is_scrubbed, ::test_run_shell_output_redacts_secrets, ::test_write_file_blocks_credential_shaped_content",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.5625,
+        "right": 732.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 595,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8326161018468711,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(6) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_quarantine.py::test_run_shell_env_is_scrubbed",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 459.875,
+        "width": 423.71875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(6) > td:nth-child(5) > code:nth-child(3)",
+      "text": "::test_write_file_blocks_credential_shaped_content",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 414.484375,
+        "width": 378.328125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(7) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_routing_verify.py::test_budget_accounting",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 429.609375,
+        "width": 393.453125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(7) > td:nth-child(5) > code:nth-child(2)",
+      "text": "tests/test_preflight.py::test_live_run_without_ceiling_refuses",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 505.28125,
+        "width": 469.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(8) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_repo_configs.py::test_approval_gated_tool_fails_closed_under_default_handler",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 694.4375,
+        "width": 658.28125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8808450035604083,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(9) > td:nth-child(5)",
+      "text": "tests/test_ownership.py::test_cross_agent_write_denied_at_dispatch, ::test_run_shell_receives_agent_specific_readonly_roots, tests/test_sandbox.py::test_worker_interpreter_cannot_modify_operator_lane, ::test_readonly_lane_backend_failure_blocks_child",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.5625,
+        "right": 732.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 595,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8326161018468711,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(9) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_ownership.py::test_cross_agent_write_denied_at_dispatch",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 535.546875,
+        "width": 499.390625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(9) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_run_shell_receives_agent_specific_readonly_roots",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 452.3125,
+        "width": 416.15625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(9) > td:nth-child(5) > code:nth-child(3)",
+      "text": "tests/test_sandbox.py::test_worker_interpreter_cannot_modify_operator_lane",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 596.078125,
+        "width": 559.921875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(9) > td:nth-child(5) > code:nth-child(4)",
+      "text": "::test_readonly_lane_backend_failure_blocks_child",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 406.90625,
+        "width": 370.75
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(10) > td:nth-child(5)",
+      "text": "tests/test_plugins.py::test_only_explicitly_selected_entry_point_loads, ::test_malformed_declaration_fails_closed, ::test_resume_requires_exact_recorded_plugin_receipt, ::test_plugin_invocation_audits_loader_supplied_provenance",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.5625,
+        "right": 732.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 595,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8326161018468711,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(10) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_plugins.py::test_only_explicitly_selected_entry_point_loads",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 565.8125,
+        "width": 529.65625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(10) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_malformed_declaration_fails_closed",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 346.390625,
+        "width": 310.234375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(10) > td:nth-child(5) > code:nth-child(3)",
+      "text": "::test_resume_requires_exact_recorded_plugin_receipt",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 429.609375,
+        "width": 393.453125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(10) > td:nth-child(5) > code:nth-child(4)",
+      "text": "::test_plugin_invocation_audits_loader_supplied_provenance",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 475.015625,
+        "width": 438.859375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(11) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_consent.py::test_side_effects_locked_until_accept",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 490.140625,
+        "width": 453.984375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(11) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_read_tools_available_before_accept",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 346.390625,
+        "width": 310.234375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(12) > td:nth-child(5)",
+      "text": "tests/test_maiden_voyage.py::test_new_phase_type_stages_verified_output_without_applying, ::test_workspace_drift_refuses_promotion_without_partial_apply, ::test_tampered_staged_output_refuses_promotion",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.5625,
+        "right": 732.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 595,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8326161018468711,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(12) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_maiden_voyage.py::test_new_phase_type_stages_verified_output_without_applying",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 702,
+        "width": 665.84375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.870840568827146,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(12) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_workspace_drift_refuses_promotion_without_partial_apply",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 505.28125,
+        "width": 469.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(12) > td:nth-child(5) > code:nth-child(3)",
+      "text": "::test_tampered_staged_output_refuses_promotion",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 391.78125,
+        "width": 355.625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(13) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_audit.py::test_edited_line_breaks_chain",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 414.484375,
+        "width": 378.328125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 640,
+      "selector": "tr:nth-child(13) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_deleted_line_breaks_chain",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 317.453125,
+        "right": 559.578125,
+        "width": 242.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 616,
+        "width": 592,
+        "clientWidth": 590,
+        "scrollWidth": 1303,
+        "scrollLeft": 713,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(1) > td:nth-child(5)",
+      "text": "tests/test_sandbox.py::test_worker_python_cannot_write_outside_workspace, ::test_worker_network_denied_by_default, ::test_run_shell_fails_closed_without_backend",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.5625,
+        "right": 732.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 595,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.4524834140218756,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(1) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_sandbox.py::test_worker_python_cannot_write_outside_workspace",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 580.9375,
+        "width": 544.78125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.5779269202087994,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(1) > td:nth-child(5) > code:nth-child(3)",
+      "text": "::test_run_shell_fails_closed_without_backend",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.21875,
+        "right": 376.703125,
+        "width": 340.484375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 911,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.9245101188564087,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(2) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_repo_configs.py::test_role_without_grant_is_denied",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 497.703125,
+        "width": 461.546875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.6821490233250956,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(2) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_orchestrator_has_no_side_effecting_tools",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 391.78125,
+        "width": 355.625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8853251318101933,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(3) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_routing_verify.py::test_gate_deterministic_check_failure_blocks_verifier",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 664.171875,
+        "width": 628.015625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.5013310775508173,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(3) > td:nth-child(5) > code:nth-child(2)",
+      "text": "tests/test_adversarial.py::test_position_agents_are_read_only",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 497.703125,
+        "width": 461.546875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.6821490233250956,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(4) > td:nth-child(5)",
+      "text": "tests/test_adversarial.py::test_dissent_halts_needs_arbitration, ::test_any_oppose_blocks_convergence, ::test_human_arbitration_resumes_phase_to_passed",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.5625,
+        "right": 732.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 595,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.4524834140218756,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(4) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_adversarial.py::test_dissent_halts_needs_arbitration",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 512.84375,
+        "width": 476.6875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.6604824963943884,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(4) > td:nth-child(5) > code:nth-child(3)",
+      "text": "::test_human_arbitration_resumes_phase_to_passed",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.515625,
+        "right": 398.703125,
+        "width": 363.1875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 889,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8686542763723972,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(5) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_quarantine.py::test_read_file_quarantine_at_registry",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 512.84375,
+        "width": 476.6875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.6604824963943884,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(6) > td:nth-child(5)",
+      "text": "tests/test_quarantine.py::test_run_shell_env_is_scrubbed, ::test_run_shell_output_redacts_secrets, ::test_write_file_blocks_credential_shaped_content",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.5625,
+        "right": 732.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 595,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.4524834140218756,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(6) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_quarantine.py::test_run_shell_env_is_scrubbed",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 459.875,
+        "width": 423.71875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7430488974113135,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(6) > td:nth-child(5) > code:nth-child(3)",
+      "text": "::test_write_file_blocks_credential_shaped_content",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 414.484375,
+        "width": 378.328125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8321975798124974,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(7) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_routing_verify.py::test_budget_accounting",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 429.609375,
+        "width": 393.453125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8002065049044915,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(7) > td:nth-child(5) > code:nth-child(2)",
+      "text": "tests/test_preflight.py::test_live_run_without_ceiling_refuses",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 505.28125,
+        "width": 469.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.6711297628563816,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(8) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_repo_configs.py::test_approval_gated_tool_fails_closed_under_default_handler",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 694.4375,
+        "width": 658.28125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.4782815096131023,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(9) > td:nth-child(5)",
+      "text": "tests/test_ownership.py::test_cross_agent_write_denied_at_dispatch, ::test_run_shell_receives_agent_specific_readonly_roots, tests/test_sandbox.py::test_worker_interpreter_cannot_modify_operator_lane, ::test_readonly_lane_backend_failure_blocks_child",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.5625,
+        "right": 732.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 595,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.4524834140218756,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(9) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_ownership.py::test_cross_agent_write_denied_at_dispatch",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 535.546875,
+        "width": 499.390625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.6304558680892337,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(9) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_run_shell_receives_agent_specific_readonly_roots",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 452.3125,
+        "width": 416.15625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7565517759255087,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(9) > td:nth-child(5) > code:nth-child(3)",
+      "text": "tests/test_sandbox.py::test_worker_interpreter_cannot_modify_operator_lane",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 596.078125,
+        "width": 559.921875
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.5622994279335845,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(9) > td:nth-child(5) > code:nth-child(4)",
+      "text": "::test_readonly_lane_backend_failure_blocks_child",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 406.90625,
+        "width": 370.75
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8492076871207013,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(10) > td:nth-child(5)",
+      "text": "tests/test_plugins.py::test_only_explicitly_selected_entry_point_loads, ::test_malformed_declaration_fails_closed, ::test_resume_requires_exact_recorded_plugin_receipt, ::test_plugin_invocation_audits_loader_supplied_provenance",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.5625,
+        "right": 732.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 595,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.4524834140218756,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(10) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_plugins.py::test_only_explicitly_selected_entry_point_loads",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 565.8125,
+        "width": 529.65625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.5944303498731489,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(10) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_malformed_declaration_fails_closed",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 346.390625,
+        "width": 310.234375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(10) > td:nth-child(5) > code:nth-child(3)",
+      "text": "::test_resume_requires_exact_recorded_plugin_receipt",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 429.609375,
+        "width": 393.453125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8002065049044915,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(10) > td:nth-child(5) > code:nth-child(4)",
+      "text": "::test_plugin_invocation_audits_loader_supplied_provenance",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 475.015625,
+        "width": 438.859375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.7174137501335137,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(11) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_consent.py::test_side_effects_locked_until_accept",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 490.140625,
+        "width": 453.984375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.6935123042505593,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(11) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_read_tools_available_before_accept",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 346.390625,
+        "width": 310.234375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(12) > td:nth-child(5)",
+      "text": "tests/test_maiden_voyage.py::test_new_phase_type_stages_verified_output_without_applying, ::test_workspace_drift_refuses_promotion_without_partial_apply, ::test_tampered_staged_output_refuses_promotion",
+      "color": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "14.4px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 35.5625,
+        "right": 732.6875,
+        "width": 697.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 595,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.4524834140218756,
+      "ratio": 14.604740700519077,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(12) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_maiden_voyage.py::test_new_phase_type_stages_verified_output_without_applying",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 702,
+        "width": 665.84375
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.47284929835265405,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(12) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_workspace_drift_refuses_promotion_without_partial_apply",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 505.28125,
+        "width": 469.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.6711297628563816,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(12) > td:nth-child(5) > code:nth-child(3)",
+      "text": "::test_tampered_staged_output_refuses_promotion",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 391.78125,
+        "width": 355.625
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8853251318101933,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(13) > td:nth-child(5) > code:nth-child(1)",
+      "text": "tests/test_audit.py::test_edited_line_breaks_chain",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 36.15625,
+        "right": 414.484375,
+        "width": 378.328125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 608,
+        "tabindex": 0
+      },
+      "visibleFraction": 0.8321975798124974,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "selector": "tr:nth-child(13) > td:nth-child(5) > code:nth-child(2)",
+      "text": "::test_deleted_line_breaks_chain",
+      "color": "rgb(47, 107, 40)",
+      "background": "rgb(247, 248, 252)",
+      "fontSize": "12.24px",
+      "fontWeight": "400",
+      "textDecorationLine": "none",
+      "bounds": {
+        "left": 52.453125,
+        "right": 294.578125,
+        "width": 242.125
+      },
+      "wrapper": {
+        "left": 24,
+        "right": 351,
+        "width": 327,
+        "clientWidth": 325,
+        "scrollWidth": 1303,
+        "scrollLeft": 978,
+        "tabindex": 0
+      },
+      "visibleFraction": 1,
+      "ratio": 6.079866471521191,
+      "minimum": 4.5,
+      "passes": true
+    }
+  ],
+  "links": [
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "tr:nth-child(4) > td:nth-child(2) > a",
+      "text": "the observer contract",
+      "color": "rgb(47, 107, 40)",
+      "surrounding": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "colorDifferenceRatio": 2.402148265743894,
+      "persistentUnderline": false,
+      "passesNonColorCue": false
+    },
+    {
+      "route": "guide.html",
+      "width": 1280,
+      "selector": "td:nth-child(2) > a[href$=\"#offline-aidr-export\"]",
+      "text": "Offline AIDR export",
+      "color": "rgb(47, 107, 40)",
+      "surrounding": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "colorDifferenceRatio": 2.402148265743894,
+      "persistentUnderline": false,
+      "passesNonColorCue": false
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "tr:nth-child(4) > td:nth-child(2) > a",
+      "text": "the observer contract",
+      "color": "rgb(47, 107, 40)",
+      "surrounding": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "colorDifferenceRatio": 2.402148265743894,
+      "persistentUnderline": false,
+      "passesNonColorCue": false
+    },
+    {
+      "route": "guide.html",
+      "width": 640,
+      "selector": "td:nth-child(2) > a[href$=\"#offline-aidr-export\"]",
+      "text": "Offline AIDR export",
+      "color": "rgb(47, 107, 40)",
+      "surrounding": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "colorDifferenceRatio": 2.402148265743894,
+      "persistentUnderline": false,
+      "passesNonColorCue": false
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "tr:nth-child(4) > td:nth-child(2) > a",
+      "text": "the observer contract",
+      "color": "rgb(47, 107, 40)",
+      "surrounding": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "colorDifferenceRatio": 2.402148265743894,
+      "persistentUnderline": false,
+      "passesNonColorCue": false
+    },
+    {
+      "route": "guide.html",
+      "width": 375,
+      "selector": "td:nth-child(2) > a[href$=\"#offline-aidr-export\"]",
+      "text": "Offline AIDR export",
+      "color": "rgb(47, 107, 40)",
+      "surrounding": "rgb(23, 40, 26)",
+      "background": "rgb(247, 248, 252)",
+      "colorDifferenceRatio": 2.402148265743894,
+      "persistentUnderline": false,
+      "passesNonColorCue": false
+    }
+  ],
+  "keyboard": [
+    {
+      "route": "quickstart.html",
+      "width": 1280,
+      "target": "pre:nth-child(19)",
+      "tabs": 30,
+      "overflow": 286,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    },
+    {
+      "route": "agent-file-ownership.html",
+      "width": 1280,
+      "target": "pre:nth-child(24)",
+      "tabs": 28,
+      "overflow": 1884,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    },
+    {
+      "route": "ringer.html",
+      "width": 1280,
+      "target": "pre:nth-child(14)",
+      "tabs": 22,
+      "overflow": 67,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 1280,
+      "target": ".table-wrap",
+      "tabs": 17,
+      "overflow": 545,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    },
+    {
+      "route": "quickstart.html",
+      "width": 375,
+      "target": "pre:nth-child(19)",
+      "tabs": 30,
+      "overflow": 719,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    },
+    {
+      "route": "agent-file-ownership.html",
+      "width": 375,
+      "target": "pre:nth-child(24)",
+      "tabs": 28,
+      "overflow": 2317,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    },
+    {
+      "route": "ringer.html",
+      "width": 375,
+      "target": "pre:nth-child(14)",
+      "tabs": 22,
+      "overflow": 500,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    },
+    {
+      "route": "threat-model.html",
+      "width": 375,
+      "target": ".table-wrap",
+      "tabs": 17,
+      "overflow": 978,
+      "scrollBefore": 0,
+      "scrollAfter": 40,
+      "visibleFocus": true,
+      "tabExited": true,
+      "reverseExited": true,
+      "textPreserved": true
+    }
+  ],
+  "motion": {
+    "initial": {
+      "paused": false,
+      "muted": true
+    },
+    "initialLabel": "Pause the animation",
+    "paused": true,
+    "pausedLabel": "Play the animation",
+    "resumed": true,
+    "resumedLabel": "Pause the animation",
+    "reduced": {
+      "paused": true,
+      "autoplay": false
+    }
+  }
+}

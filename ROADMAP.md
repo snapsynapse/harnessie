@@ -178,11 +178,13 @@ The conservative offline observer, approved maintenance packets 1-3, accessibili
 
 Sam applied the final Namecheap DNS value after deployment. The 1.3.1 guide earned [hosted Level 4 under profile 2.0.0](audits/release-1.3.1/guidecheck-prepublication.json) on 2026-09-08 UTC with zero blocking findings before the GitHub Release. Served guide, sidecar, repository and DNS agreed on those release bytes; the signed immutable tag identity was checked from a clean clone. This receipt is historical for the earlier guide.
 
-### Accessibility review completion - DEFERRED FOLLOW-UP
+### Accessibility review completion - MEASURED FOLLOW-UP, HUMAN ACCEPTANCE PENDING
 
-The [ten-route baseline audit](audits/accessibility/2026-09-07/audit-2026-09-07.md) found four confirmed serious keyboard-access issues and 58 incomplete review candidates. The [approved mitigation packet](audits/accessibility/2026-09-07/mitigation-plan.md) is shipped: a [fresh ten-route scan](audits/accessibility/2026-09-07-mitigation/audit-2026-09-07.md) has zero confirmed violations and resolves 22 homepage candidates. The gate remains inconclusive. Review the remaining 35 threat-model table contrast candidates and one homepage video-caption candidate, plus any new findings after further changes. Complete the targeted keyboard, zoom/reflow and screen-reader checks with dated evidence for the final changed routes. `NEXT.md` locates the temporary review queue.
+The [ten-route baseline audit](audits/accessibility/2026-09-07/audit-2026-09-07.md) found four confirmed serious keyboard-access issues and 58 incomplete review candidates. The [approved mitigation packet](audits/accessibility/2026-09-07/mitigation-plan.md) is shipped: a [fresh ten-route scan](audits/accessibility/2026-09-07-mitigation/audit-2026-09-07.md) has zero confirmed violations and resolves 22 homepage candidates.
 
-Acceptance: per-candidate dispositions backed by measurements or applicability evidence, accurate fresh automated results, and completed manual release checks. Sam deferred this review for 1.3.1 and retained that deferral when authorizing the 1.4.1 release sequence. Track it as post-release follow-up; the automated gate remains inconclusive and no fresh automated or manual pass is claimed. GuideCheck acceptance is separate from accessibility acceptance.
+The [2026-09-09 handoff reconciliation](audits/accessibility/2026-09-09-handoff-reconciliation/reconciliation.md) refreshes that evidence after later documentation changes. Its pre-repair scan found 63 incomplete candidates: the original 36 plus 25 guide-table contrast candidates and two guide-table link-cue candidates. The local candidate resolves the video applicability and link-cue findings, leaving 60 clipped-table contrast candidates in the raw scan. The automated gate remains inconclusive, but a separate 180-measurement review dispositions all 60 at desktop, a documented reflow proxy and narrow width; every target passes with a minimum ratio of 6.08:1. Eight targeted keyboard cases and the animation controls/reduced-motion behavior also pass.
+
+Remaining acceptance: complete human all-route keyboard and focus order, actual 200% browser zoom/reflow, screen-reader testing, independent axe comparison and the broader targeted manual checks with dated environment evidence. The historical handoff is removed after migrating this queue to `NEXT.md` and the audit directory. Source repair delivery, deployment and any conformance claim remain separate gates. GuideCheck acceptance remains separate from accessibility acceptance.
 
 ## Controlled review and offline observation
 
@@ -194,7 +196,7 @@ The [controlled-review assessment](audits/review-interoperability-2026-09-07.md)
 
 Core 1.4.1 is published and verified on GitHub and PyPI. It includes strict open-record export, `unsupported_platform` refusals before project I/O, the installed mock-runner/export/reference-lint example, and documentation/discovery parity. [Release execution](audits/release-1.4.1.md) records final evidence; [pre-release completion](audits/aidr-pre-release-completion-2026-09-08.md) remains a dated implementation snapshot. The final guide earned [hosted Level 4 under profile 2.0.0](audits/release-1.4.1/guidecheck-prepublication.json) with zero blocking findings.
 
-Verify Action 0.2.2 and stable `v0` are published at `9f18d70017f395ef4d15ac5746e30ac633f00f8e`, pinning core 1.4.1. Homebrew 1.4.1 is published at tap commit `953760f3968200f99658bfb068609532cb9fbf4d`, with the real upgrade, formula tests, and installed version verified. Engine wrappers remain independently released at 0.1.0. Accessibility remains deferred with no new pass claim.
+Verify Action 0.2.2 and stable `v0` are published at `9f18d70017f395ef4d15ac5746e30ac633f00f8e`, pinning core 1.4.1. Homebrew 1.4.1 is published at tap commit `953760f3968200f99658bfb068609532cb9fbf4d`, with the real upgrade, formula tests, and installed version verified. Engine wrappers remain independently released at 0.1.0. Accessibility has current measured candidate dispositions, but human acceptance remains pending and no full pass is claimed.
 
 ## Platform support
 
