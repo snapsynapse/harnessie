@@ -277,7 +277,7 @@ STYLES = """
     .doc-content h3 { font-size: 1.15rem; font-weight: 600; margin: 1.7rem 0 0.5rem; scroll-margin-top: 84px; }
     .doc-content h4 { font-size: 1rem; font-weight: 600; margin: 1.3rem 0 0.4rem; scroll-margin-top: 84px; }
     .doc-content p { margin: 0 0 1rem; color: var(--text-mid); }
-    .doc-content p a, .doc-content li a, footer p a { text-decoration: underline; text-underline-offset: 0.14em; }
+    .doc-content p a, .doc-content li a, .doc-content td a, footer p a { text-decoration: underline; text-underline-offset: 0.14em; }
     .doc-content ul, .doc-content ol { margin: 0 0 1.1rem 1.3rem; color: var(--text-mid); }
     .doc-content li { margin-bottom: 0.4rem; }
     .doc-content strong { color: var(--text); }
