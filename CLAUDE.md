@@ -40,7 +40,7 @@ harness structure carries the quality floor, the model carries the ceiling.
 - `config/` — `models.yaml` (tiers + routing + budgets: the ONLY file to edit to swap
   brains), `cascade.yaml`, `boundary.yaml`.
 - `OWNERSHIP.yaml` — ownership lanes + first-writer auto-claims; operator-owned.
-- `decisions/` — the repo's own AIDR records (AIDR-0001..0009; AIDR-0009 approves offline observation only, with bidding and commentary deferred).
+- `decisions/` — the repo's own AIDR records (AIDR-0001..0009; AIDR-0009 historically approves the offline observer first, while current program direction lives in INTENT, NEXT and ROADMAP).
 - `memory/` — project memory: `MEMORY.md` index + stamped facts with `verify_by` expiry.
 - `evals/` — deterministic scorecards over mock-brain golden/risky/recovery scenarios.
 - `examples/policy-compliance/` — worked end-to-end example with sample data.
@@ -91,7 +91,7 @@ Live provider scorecards are opt-in and never part of the default suite; without
 `HARNESSIE_LIVE=1` plus provider config they report `SKIP` and exit clean. Pages/DNS/
 PyPI promotion and live-provider calls are deliberate operator acts, never headless.
 
-## Current state (2026-09-08)
+## Current state (2026-09-09)
 
 - Core 1.4.1 is published and verified on GitHub and PyPI, with original-build
   provenance and package attestations. It includes strict open-record AIDR export,
@@ -108,14 +108,14 @@ PyPI promotion and live-provider calls are deliberate operator acts, never headl
   see `audits/release-1.4.1/guidecheck-prepublication.json`. Preserve its frozen
   bytes during release closeout. Any later guide change requires a new sidecar,
   trust pins, independent anchor, and hosted receipt.
-- Sam retained the accessibility deferral for this release sequence.
-  Zero confirmed automated violations with 36 incomplete candidates is inconclusive,
-  not an accessibility pass. No fresh automated or manual pass is claimed.
-  Keep the temporary review queue until processed.
+- The accessibility handoff is processed, its repairs are deployed, and current-source
+  automated evidence is recorded. Human browser and assistive-technology acceptance is
+  a nonblocking roadmap item. No full-conformance claim is made.
 - `audits/release-1.4.1.md` records current release and provider evidence;
   `audits/release-1.3.1.md` remains historical. `NEXT.md` names remaining work.
   Test counts are dated observations, not contracts.
 - The lead adoption surface remains `harnessie verify` for agent-produced changes.
-  Ringer composes through its existing process-exit contract. Bidding, commentary,
-  follow mode, automatic runner integration and model selection remain deferred
-  under Sam's AIDR-0009 arbitration.
+  Ringer composes through its existing process-exit contract. The controlled-review
+  live pilot is the next active tranche. Bidding, commentary, follow mode, automatic
+  runner observation and bid-driven model selection are an evidence-gated capability
+  sequence; AIDR-0009 remains historical authority for its observer-only first slice.

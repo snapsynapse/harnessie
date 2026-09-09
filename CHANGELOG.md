@@ -4,7 +4,7 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
-No changes recorded.
+- Record the controlled-review live pilot as the next active tranche, move human accessibility acceptance to the nonblocking roadmap, and record a current evidence-gated capability sequence alongside the historical AIDR-0009 observer-only decision. Runtime behavior is unchanged.
 
 ## 1.4.1 (2026-09-08)
 
