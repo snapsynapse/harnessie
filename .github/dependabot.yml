@@ -4,6 +4,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Generated, integrity-manifested locks are refreshed by the controlled
+    # dependency-lock-refresh workflow. Dependabot continues to watch pyproject.toml.
+    exclude-paths:
+      - "requirements/**"
   - package-ecosystem: github-actions
     directory: /
     schedule:
