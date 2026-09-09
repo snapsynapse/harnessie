@@ -1,4 +1,4 @@
-# Deferred until the separately approved commentary slice is implemented.
+# Pending the separately gated commentary threat and context-exclusion contract.
 suite: observer-commentary
 scenarios:
   - id: observer_commentary_labeled_and_cited

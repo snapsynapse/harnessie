@@ -94,7 +94,7 @@ Dogfooding this repo under Claude Code uses a local `.claude/` (subagent defs, a
 
 ## Offline run observation
 
-Harnessie 1.3.1 adds `harnessie observe RUN_ID` for an existing local run. It verifies a journal snapshot and writes cited JSON and Markdown summaries without calling models, changing the source journal, or resuming the runner. Exit 0 means observation succeeded, not that the run passed. See [OBSERVER.md](OBSERVER.md) for input limits, refusal behavior, output paths, and deferred features.
+Harnessie 1.3.1 adds `harnessie observe RUN_ID` for an existing local run. It verifies a journal snapshot and writes cited JSON and Markdown summaries without calling models, changing the source journal, or resuming the runner. Exit 0 means observation succeeded, not that the run passed. See [OBSERVER.md](OBSERVER.md) for input limits, refusal behavior, output paths, and upcoming separately gated capabilities.
 
 ## Offline AIDR export
 

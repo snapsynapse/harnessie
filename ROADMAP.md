@@ -178,19 +178,29 @@ The conservative offline observer, approved maintenance packets 1-3, accessibili
 
 Sam applied the final Namecheap DNS value after deployment. The 1.3.1 guide earned [hosted Level 4 under profile 2.0.0](audits/release-1.3.1/guidecheck-prepublication.json) on 2026-09-08 UTC with zero blocking findings before the GitHub Release. Served guide, sidecar, repository and DNS agreed on those release bytes; the signed immutable tag identity was checked from a clean clone. This receipt is historical for the earlier guide.
 
-### Accessibility review completion - MEASURED FOLLOW-UP, HUMAN ACCEPTANCE PENDING
+### Accessibility review completion - DEFERRED NONBLOCKING HUMAN ACCEPTANCE
 
 The [ten-route baseline audit](audits/accessibility/2026-09-07/audit-2026-09-07.md) found four confirmed serious keyboard-access issues and 58 incomplete review candidates. The [approved mitigation packet](audits/accessibility/2026-09-07/mitigation-plan.md) is shipped: a [fresh ten-route scan](audits/accessibility/2026-09-07-mitigation/audit-2026-09-07.md) has zero confirmed violations and resolves 22 homepage candidates.
 
 The [2026-09-09 handoff reconciliation](audits/accessibility/2026-09-09-handoff-reconciliation/reconciliation.md) refreshes that evidence after later documentation changes. Its pre-repair scan found 63 incomplete candidates: the original 36 plus 25 guide-table contrast candidates and two guide-table link-cue candidates. [PR #25](https://github.com/snapsynapse/harnessie/pull/25) delivered the video applicability and link-cue repairs, leaving 60 clipped-table contrast candidates in the raw scan. The automated gate remains inconclusive, but a separate 180-measurement review dispositions all 60 at desktop, a documented reflow proxy and narrow width; every target passes with a minimum ratio of 6.08:1. Eight targeted keyboard cases and the animation controls/reduced-motion behavior also pass. Exact-merge provider checks and byte-identical production readback are recorded in the [delivery receipt](audits/accessibility/2026-09-09-delivery.md).
 
-Remaining acceptance: complete human all-route keyboard and focus order, actual 200% browser zoom/reflow, screen-reader testing, independent axe comparison and the broader targeted manual checks with dated environment evidence. The historical handoff is removed after migrating this queue to `NEXT.md` and the audit directory. Source repair delivery and deployment are complete; human acceptance and any conformance claim remain separate gates. GuideCheck acceptance remains separate from accessibility acceptance.
+Roadmap-only acceptance: complete human all-route keyboard and focus order, actual 200% browser zoom/reflow, screen-reader testing, independent axe comparison and the broader targeted manual checks with dated environment evidence. Sam deferred this nonblocking human work on 2026-09-09 and removed it from the active queue. Source repair delivery and deployment are complete; human acceptance and any conformance claim remain separate gates. GuideCheck acceptance remains separate from accessibility acceptance.
 
 ## Controlled review and offline observation
 
-The offline observer is approved in [AIDR-0009](decisions/AIDR-0009-bid-rounds-and-run-observer.md), with a bounded [acceptance packet](audits/aidr-0009-preparation-2026-09-04.md). Its implementation shipped in 1.3.1 and is documented in [OBSERVER.md](OBSERVER.md). Bidding, commentary, runner integration and model selection are not part of that first slice.
+The offline observer was approved as the first slice in [AIDR-0009](decisions/AIDR-0009-bid-rounds-and-run-observer.md), with a bounded [acceptance packet](audits/aidr-0009-preparation-2026-09-04.md). Its implementation shipped in 1.3.1 and is documented in [OBSERVER.md](OBSERVER.md). That record remains the historical authority for the observer-only slice; it does not describe the current product program as abandoned.
 
-The [controlled-review assessment](audits/review-interoperability-2026-09-07.md) mapped enforcement and gaps for portable AIDR output. Sam accepted a separate offline open-record exporter packet on 2026-09-08, shipped in 1.4.1. The [export command](AIDR_EXPORT.md) preserves recorded dissent and source bytes, maps participant instances, binds consumed evidence and refuses arbitration or unsafe destinations. [Implementation evidence](audits/aidr-export-implementation-2026-09-08.md) records acceptance and provenance limits. A live pilot still needs fixed evidence, named participants, provider opt-in and explicit human arbitration; arbitration import and broader source formats remain deferred.
+The [controlled-review assessment](audits/review-interoperability-2026-09-07.md) mapped enforcement and gaps for portable AIDR output. Sam accepted a separate offline open-record exporter packet on 2026-09-08, shipped in 1.4.1. The [export command](AIDR_EXPORT.md) preserves recorded dissent and source bytes, maps participant instances, binds consumed evidence and refuses arbitration or unsafe destinations. [Implementation evidence](audits/aidr-export-implementation-2026-09-08.md) records acceptance and provenance limits. Sam approved the [live controlled-review pilot](audits/controlled-review-pilot-2026-09-09.md) as the next active tranche on 2026-09-09. Before launch it requires frozen evidence, named participant instances, and explicit provider egress and budget approval; human arbitration is a required post-panel acceptance gate. Arbitration import and broader source formats remain outside the exporter contract.
+
+Active capability sequence, with detailed current readiness in the [capability assessment](audits/capability-program-readiness-2026-09-09.md):
+
+1. Run the controlled-review pilot and retain its evidence.
+2. Implement opt-in automatic deterministic runner observation.
+3. Settle the bid-record exposure and budget rules, then implement record mode without changing dispatch.
+4. Run the live bid scorecard and add propose-only reporting.
+5. Settle the commentary threat and context-exclusion contract, then implement manual opt-in commentary.
+6. Specify and implement deterministic follow mode.
+7. Consider bid-driven selection only after calibrated outcomes and a separate human-arbitrated AIDR.
 
 ### 1.4.1: Offline open-record AIDR export - SHIPPED
 

@@ -25,8 +25,8 @@ from harness import sandbox
 from harness.events import EventLog
 from harness.models.base import AssistantTurn, MockModel, ModelSpec, ToolCall
 
-observer_commentary_pending = pytest.mark.xfail(strict=True, reason="AIDR-0009: commentary deferred")
-observer_runner_pending = pytest.mark.xfail(strict=True, reason="AIDR-0009: runner integration deferred")
+observer_commentary_pending = pytest.mark.xfail(strict=True, reason="commentary threat and context contract pending")
+observer_runner_pending = pytest.mark.xfail(strict=True, reason="automatic runner observation not yet implemented")
 
 
 def _observer():
