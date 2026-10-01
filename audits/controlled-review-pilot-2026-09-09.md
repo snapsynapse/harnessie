@@ -1,12 +1,12 @@
 # Controlled-review live pilot packet
 
-Status: approved by Sam on 2026-09-09 as the next active Harnessie tranche. Operational readiness is AMBER pending frozen inputs, exact participant identities, provider reachability, egress permission and a spend ceiling. No live model call is authorized by this packet alone.
+Status: approved by Sam on 2026-09-09 as the next active Harnessie tranche. Local preparation and synthetic transport checks are complete. The [2026-10-01 full-workload sizing](pilot-workload-sizing-2026-10-01.md) proves the declared evidence fits the byte envelope. The approved [Claude Haiku context policy](pilot-haiku-context-policy-2026-10-01.md) now encodes and rehearses the exact full-evidence per-call and run ceilings offline. The [Claude authentication-contract repair](pilot-claude-auth-contract-2026-10-01.md) recognizes the current first-party OAuth status without treating it as Max billing proof; fresh included-allowance and credits-off evidence remain mandatory. Live readiness remains AMBER pending fresh billing evidence, final disclosure review and one sealed execution approval. No live model call is authorized by this packet alone.
 
 ## Purpose
 
 Exercise the shipped contested-review, mandatory-human halt and open-record AIDR export path against one real decision. Preserve disagreement and exposure evidence without treating configured provider names as authenticated identity or allowing models to arbitrate.
 
-Proposed pilot question:
+Confirmed pilot question:
 
 > Should Harnessie proceed with a bounded bid-record contract after its named exposure and budget gates, while leaving dispatch selection unchanged?
 
@@ -48,11 +48,11 @@ Record the same hashes after the panel. Any unexplained drift invalidates the pi
 
 Export must occur before arbitration because the 1.4.1 exporter refuses an arbitrated source record. Arbitration in the exported AIDR does not flow back into the original run. The source run remains halted unless Sam separately arbitrates its source decision record; that limitation is pilot evidence for later runner and AIDR integration work.
 
-## Inputs still required
+## Inputs and authority still required
 
-- Confirmation of the exact pilot question.
-- Two exact model/provider instances and reachable configuration.
-- Explicit external-egress scope and maximum spend.
-- A disposable project root containing the reviewed frozen evidence packet.
+- Completed offline: `claude-max-haiku-context/v2` encodes 96,000 Haiku cache-inclusive input tokens and 256 output tokens per invocation, 256,000 Haiku input and 2,048 output tokens per run, 800,000 all-model reported tokens per run, eight Claude calls and zero retries. The full-evidence rehearsal admitted all 16 requests and made zero live calls. The execution proposal still carries zero live allowance.
+- Actual participant serving-identity and usage evidence. Intended instances are Claude `claude-fable-5-1` through the unmodified Claude Code Max CLI and local Ollama `qwen3.8:latest`; configuration and account metadata are not inference proof.
+- Explicit final external-egress scope, per-participant/stage invocation and retry ceilings, timeouts and output limits. Subscription dollar cost remains unknown, not zero.
+- Human acceptance of the exact final disposable packet and its externally retained seal. The prepared rehearsal has zero live allowance and is not final live authorization.
 
-The current canonical configuration names Anthropic `claude-fable-5` and local OpenAI-compatible `qwen3.6:35b-mlx`, but this assessment did not establish Anthropic credentials or local endpoint/model reachability. Do not substitute a provider silently.
+The canonical configuration still names Anthropic `claude-fable-5` and local OpenAI-compatible `qwen3.6:35b-mlx`. The preparation deliberately uses separate pilot configuration; it does not change global defaults, the public provider registry or stable schemas. September 17 read-only checks found the existing Max login and local Qwen metadata available. Silent model or billing-route substitution remains forbidden.

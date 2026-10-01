@@ -1,3 +1,6 @@
 include AIDR_EXPORT.md
 recursive-include tests/fixtures/aidr-0.1.0 *.md *.mjs *.json LICENSE
 recursive-include examples/aidr-export *.py *.md
+# Experimental local pilot code and its source-only tests are not distributed.
+exclude scripts/pilot_*.py
+exclude tests/test_pilot_*.py
