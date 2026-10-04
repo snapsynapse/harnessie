@@ -24,4 +24,42 @@ The agentic-harness skill informed the explicit timing, provenance, single-use a
 - Review worker: 197 focused tests passed, including 41 new review tests.
 - Independent pre-dispatch PASS: 197 review/probe/handoff/capture tests and a separate 121-test legacy transport regression passed; exact full-source parity and private operator scope verified.
 - Parent frozen-tree full pilot plus trust/inward manifest suites: 493 passed in 23.28 seconds.
-- No live calls occurred during implementation or verification. The single approved call is pending.
+- No live calls occurred during implementation or pre-dispatch verification.
+
+## Consumed result
+
+Implementation was committed locally as `e2a3a6b` before dispatch. Proposal `9aaaeeac2e1cbf449e8fe52ae9c0e90cb54c13e4420b9e1d521d3b675ffa9890` was executed once under Sam's explicit 20-minute scope approval. The private root is `runs/qwen-evidence-review-20m-candidate-2026-10-03/`; previous consumed attempts and full-evidence preparation remain unchanged. The operator bound the human scope approval to the finalized seal without claiming human inspection of the hash.
+
+| Observation | Result |
+|---|---|
+| Start / stop | October 3, 23:38:56 / 23:58:56 America/Denver |
+| Outcome | `process_timeout` |
+| Overall / transport elapsed | 1,200.155 / 1,200.006 seconds |
+| Both configured timeout controls | 1,200 seconds |
+| Returned response bytes | Zero; capture incomplete |
+| Client HTTP status / final usage | Unknown / unknown |
+| Physical identity | Matching fresh before/after observations |
+| Bound implementation files | 68 |
+| Local cleanup | HTTP child exited after supervisor cleanup |
+| Retry / Claude calls / tools executed | Zero / zero / zero |
+| Review / stance / human arbitration | Not received / unknown / none |
+
+The additional `malformed_response` diagnostic comes from parsing the empty retained capture, not an observed malformed model answer. The primary failure is the per-call timeout. Approval remained valid; the new fresh-at-start policy did not reject the result merely because more than 15 minutes had elapsed.
+
+Independent post-run integrity PASS, reviewed October 4: exact request/all 17 bodies, all 68 implementation hashes, matching physical identity, private permissions and one consumed guard/capture verified. Initial identity age was 20.743 seconds; authority runway was 1,799.991 seconds, with 599.836 seconds remaining after execution. Integrity passed, but the substantive review failed to complete.
+
+## Correlated server evidence
+
+The bounded log slice recorded in `server-observations.md` shows task 0 with a 49,808-token prompt and 262,144-token context. Prompt progress reached 49,804 tokens (rounded to 100%) at 779.27 seconds, followed by generation. The last retained generation progress counter is 3,124 tokens, averaging 7.85 tokens/second at that point.
+
+At 23:58:56 the server logged HTTP 500 on the chat/completions route, cancellation of task 0, slot release with context token count 52,950 and no truncation, then an idle slot. These observations strongly correlate by time, route, prompt size and task sequence; there is no cryptographic/shared request-ID binding. They support cessation of the correlated task, not a global hardware-level cessation claim. The immutable client diagnostic keeps its own unconfirmed server-cancellation field.
+
+This attempt passed the earlier input-processing bottleneck and spent roughly the remaining seven minutes generating. The logs do not distinguish reasoning from answer text. None of those token counters is final provider usage, and subtracting context counters is not a substitute for an accounting receipt. The non-streaming request returned no bytes before timeout, so no stance or review can be recovered or accepted from these observations.
+
+## Next boundary
+
+This approval is consumed. Do not retry, extend the running call, resume the old panel or assert an evidence-backed Qwen position.
+
+Recommended next preparation, not yet implemented or approved: bounded private streaming capture so a later timeout retains emitted deltas instead of losing the entire non-streaming response. Preserve final usage only if actually received, distinguish reasoning from answer fields without publishing private reasoning, and refuse incomplete JSON as a completed review. Streaming is not a claim of faster generation or a substitute for a sufficient time budget. It changes the wire contract and needs offline fixture coverage plus an explicitly scoped live approval before another call. Reassess the next timeout from this observed input/generation split; do not automatically raise it.
+
+The full panel still lacks its completed sequence, objections, open export and Sam's arbitration.
