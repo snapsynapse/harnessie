@@ -3,7 +3,7 @@
 Date: 2026-10-03 (America/Denver)
 Base: 38ac73782e6f7f266fb7d75b4aafa304ce53e7db
 Scope: approved offline pilot repair, Qwen smoke preparation and coordinated CodeQL maintenance
-Delivery: local changes only; no commit, push, release or inference dispatch
+Original delivery: local changes only. Subsequent authorized local commits are 4dd08f6 (CodeQL) and da050e1 (pilot). The separately approved [Qwen smoke](pilot-qwen-smoke-result-2026-10-03.md) subsequently completed. No push or release occurred.
 
 ## Implemented and reviewed
 
@@ -18,7 +18,7 @@ The independent admission reviewer reproduced the four original failures against
 
 ## Integrated verification
 
-The core and pilot suites were partitioned to avoid running the same tests twice. All test and evaluation commands disabled live provider opt-in. No inference was dispatched by this session.
+The core and pilot suites were partitioned to avoid running the same tests twice. All test and evaluation commands disabled live provider opt-in. No inference was dispatched during this offline tranche; the subsequent live smoke has its own linked approval and result.
 
 | Check | Observed result |
 |---|---|
@@ -52,6 +52,6 @@ The admission reviewer verified the v6 fourth capture against its recorded SHA-2
 
 After code stabilized, the parent performed separate read-only local Ollama metadata and blob checks, then generated the private Qwen smoke candidate recorded in its audit. Readback confirmed the canonical proposal digest, exact request bytes/hash, all 63 implementation hashes, self-consistent identity and zero live allowance. Only request.json and proposal.json exist; there is no approval or attempt. Metadata checks are not inference evidence.
 
-Next is Sam's separate approval of the exact local smoke proposal while identity evidence is fresh. If the 15-minute identity window expires, refresh metadata and seal a new candidate for approval. A new full panel subsequently needs fresh Claude account/allowance/credits-off evidence, verified browser/CLI account correspondence, Qwen identity and separate approval. V6 cannot be retried. Human arbitration follows a completed panel and open-record export. Broader runtime capabilities remain in the existing roadmap sequence.
+At the offline checkpoint, the next gate was Sam's separate approval of the exact local smoke proposal while identity evidence was fresh. That gate and one successful smoke are now recorded in the linked result audit. A new full panel still needs fresh Claude account/allowance/credits-off evidence, verified browser/CLI account correspondence, Qwen identity and separate approval. V6 cannot be retried. Human arbitration follows a completed panel and open-record export. Broader runtime capabilities remain in the existing roadmap sequence.
 
-All implementation and documentation changes remain uncommitted on main. main and origin/main still identify the base above. The CodeQL candidate needs hosted checks after separately authorized delivery; there is no new package or downstream release. The temporary pilot handoff remains because live work is still pending.
+The implementation and initial documentation were subsequently committed locally as 4dd08f6 and da050e1 under Sam's "Commit locally then proceed" instruction. The smoke outcome and current pickup state are recorded separately. origin/main remains at the base above. The CodeQL candidate needs hosted checks after separately authorized delivery; there is no new package or downstream release. The temporary pilot handoff remains because full-panel work is still pending.

@@ -2,7 +2,7 @@
 
 Date: 2026-10-03 (America/Denver)
 Scope: offline invocation driver, exact request proposal and injected regressions
-Status: driver verified; separate metadata-only candidate prepared; zero inference calls
+Preparation status: driver verified; metadata-only candidate prepared with zero inference calls. The subsequent separately approved [smoke result](pilot-qwen-smoke-result-2026-10-03.md) records one completed attempt and consumed approval.
 
 ## Prepared behavior
 
@@ -44,8 +44,8 @@ Coverage includes exact request parity with `QwenPilot`, zero-authority preparat
 
 After implementation and independent review, the parent session read the local client version and used the strict local metadata/blob preflight. At 2026-10-03 20:19:08 America/Denver (2026-10-04 02:19:08 UTC), client and server reported 0.35.1; qwen3.8:latest matched digest 22130167c4c20e20c7b71454612966ca8e8171e9b3cc8ab6ce8aa6cbfec79643. Local FROM blob checks passed. These were metadata and filesystem checks with no generation request.
 
-The resulting private proposal is runs/qwen-smoke-candidate-2026-10-03-output-cap/proposal.json. Its canonical SHA-256 is b6e3684e1a7179c10ff1c404df751caf0b1da6719b1e6d02a5d2fe0ff4089306. Exact request length is 1,074 bytes and its SHA-256 is 44b59509ed87531a9ad7dcf769f606f9b8b27455906991d0fb5ca210ce6b60c7. The proposal binds the reviewed implementation and observed identity, with live_allowance zero. No approval or attempt exists. The 15-minute identity admission window ends at 20:34:08 America/Denver; elapsed time grants no authority.
+The resulting private proposal is runs/qwen-smoke-candidate-2026-10-03-output-cap/proposal.json. Its canonical SHA-256 is b6e3684e1a7179c10ff1c404df751caf0b1da6719b1e6d02a5d2fe0ff4089306. Exact request length is 1,074 bytes and its SHA-256 is 44b59509ed87531a9ad7dcf769f606f9b8b27455906991d0fb5ca210ce6b60c7. The proposal binds the reviewed implementation and observed identity, with live_allowance zero. At preparation no approval or attempt existed. The 15-minute identity admission window ended at 20:34:08 America/Denver; the separately approved attempt was reserved within that window at 20:33:06.
 
-## Next approval boundary
+## Subsequent approval and consumption
 
-Present the exact candidate and its bounds above to Sam for the separate live-call approval retained in the handoff. Only his approval of that exact candidate permits an operator to create the corresponding expiring approval record and invoke the execution API once. If identity freshness expires or implementation changes, prepare and review a new candidate with fresh metadata and obtain approval of its new digest. Do not reuse the consumed September driver or any panel approval. Metadata availability does not establish current inference readiness.
+Sam approved this exact candidate with "Commit locally then proceed". Local commits preceded the single dispatch, and the [result audit](pilot-qwen-smoke-result-2026-10-03.md) retains its outcome. This candidate and approval are consumed. Any additional inference needs a new proposal and authority; the smoke approval does not authorize a full panel. Do not reuse the consumed September driver or any panel approval. The preparation metadata alone was not inference evidence.
