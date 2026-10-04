@@ -19,7 +19,7 @@ from harness.runner import WorkflowRunner
 from scripts.pilot_claude_code import ClaudeCodePilot
 from scripts.pilot_contract import CLAUDE_MODEL, QWEN_MODEL, QUESTION, CallAllowance, PilotLimits, PilotRefusal
 from scripts.pilot_execution import (STAGES, TOOLS, require, proposal, validate_proposal, validate_authority,
-                                     load_json, write_proposal, digest_json)
+                                     validate_start_authority, load_json, write_proposal, digest_json)
 from scripts.pilot_ledger import RunLedger, read_ledger_summary
 from scripts.pilot_policy import CLAUDE_MAX_HAIKU_CONTEXT
 from scripts.pilot_prepare import verify_packet
@@ -35,11 +35,12 @@ def forbidden(*args, **kwargs):
 class GuardedModel(ModelInterface):
     """One shared ledger wraps every transport, including ordinary loop retries."""
     def __init__(self, delegate, participant, ledger, stage, verify,
-                 request_metrics: RequestMetricsStore | None = None):
+                 request_metrics: RequestMetricsStore | None = None, start_check=None):
         super().__init__(delegate.spec)
         self.delegate, self.participant, self.ledger = delegate, participant, ledger
         self.stage, self.verify = stage, verify
         self.request_metrics = request_metrics
+        self.start_check = start_check
 
     def complete(self, messages, tools=None, effort='medium'):
         offered_tools = tools or []
@@ -85,6 +86,11 @@ class GuardedModel(ModelInterface):
                     max_evidence_bytes=limits.max_evidence_bytes)
             else:
                 prepared = None
+            # Preparation can consume time; validate again immediately before
+            # reserving the irreversible dispatch, with full runway on call one.
+            self.verify()
+            if self.start_check is not None and not sum(self.ledger.summary()['calls'].values()):
+                self.start_check()
             attempt = self.ledger.reserve(stage, self.participant)
             self.ledger.dispatched(attempt)
         except PilotRefusal as exc:
@@ -105,8 +111,11 @@ class GuardedModel(ModelInterface):
             still_bound = True
             try:
                 self.verify()
-            except PilotRefusal:
+            except PilotRefusal as exc:
                 still_bound = False
+                # Keep transport status and usage intact, but retain the exact
+                # acceptance refusal in the hash-chained operator receipt.
+                receipt = dict(receipt, authority_failure=exc.code)
             accepted = (receipt.get('status') == 'completed' and turn.stop_reason in {'end_turn', 'tool_use'}
                         and all(t.name in TOOLS for t in turn.tool_calls) and still_bound)
             self.ledger.finish(attempt, receipt, accepted)
@@ -177,7 +186,8 @@ def _export(root, run_id, execution):
     return str(path.relative_to(root))
 
 
-def _run_panel(root: Path, execution: dict, factories: dict, *, offline: bool, authority_check=None) -> dict:
+def _run_panel(root: Path, execution: dict, factories: dict, *, offline: bool, authority_check=None,
+               start_check=None) -> dict:
     """Internal injected seam. Host Python/factories are operator-trusted code."""
     seal = validate_proposal(execution, root)
     require(offline or callable(authority_check), 'live_authority_required')
@@ -217,7 +227,7 @@ def _run_panel(root: Path, execution: dict, factories: dict, *, offline: bool, a
                 runner._models[delegate.spec.name] = GuardedModel(delegate, participant, ledger,
                     lambda: runner.active_stage,
                     lambda: (validate_proposal(execution, root) if offline else authority_check()),
-                    request_metrics)
+                    request_metrics, start_check)
             # The legacy runner's USD fixture remains non-authoritative; receipts
             # and the operator ledger own usage, cache counts and unknown dollars.
             runner.budget.max_tokens = execution['limits']['total_tokens']
@@ -291,7 +301,7 @@ def rehearse_panel(root: Path, execution: dict, *, agree=False) -> dict:
 
 def execute_panel(root: Path, execution: dict, approval: dict | None = None,
                   confirmation: str | None = None) -> dict:
-    validate_authority(execution, root, approval, confirmation)
+    validate_start_authority(execution, root, approval, confirmation)
     from scripts.pilot_preflight import claude_metadata, local_qwen_identity
     c, q = execution['identities']['claude'], execution['identities']['qwen']
     current = claude_metadata(Path(c['executable']))
@@ -311,7 +321,8 @@ def execute_panel(root: Path, execution: dict, approval: dict | None = None,
                                                    execution['process_limits']['max_output_bytes'])),
             'qwen': lambda: QwenPilot(ModelSpec('local','openai-compat',QWEN_MODEL,base_url='http://127.0.0.1:11434/v1'),
                 q, lambda: local_qwen_identity(q['harness_identity'], q['client_version']), allowance('qwen')),
-        }, offline=False, authority_check=lambda: validate_authority(execution, root, approval, confirmation))
+        }, offline=False, authority_check=lambda: validate_authority(execution, root, approval, confirmation),
+            start_check=lambda: validate_start_authority(execution, root, approval, confirmation))
 
 
 def main():

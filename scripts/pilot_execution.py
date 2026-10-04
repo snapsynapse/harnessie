@@ -24,6 +24,13 @@ REPO = Path(__file__).resolve().parents[1]
 STAGES = ('claude:position', 'qwen:position', 'claude:objection', 'qwen:objection')
 TOOLS = ['read_file', 'list_files', 'task_complete']
 SCHEMA = 'harnessie-live-pilot/2'
+EXTENDED_TIMING_POLICY = {
+    'schema': 'harnessie-pilot-timing/1',
+    'observation_max_age_s': 3600,
+    'initial_observation_max_age_s': 900,
+    'approval_max_duration_s': 3600,
+    'start_margin_s': 300,
+}
 RESPONSE_CAPTURE = {
     'provider': 'claude', 'format': 'exact_stdout_bytes',
     'required_before_parse': True, 'private_local_only': True,
@@ -60,12 +67,13 @@ def implementation_hashes(repo: Path = REPO) -> dict[str, str]:
 
 
 def proposal(packet_root: Path, packet_seal: str, run_id: str, *,
-             identities: dict | None = None, billing: dict | None = None) -> dict:
+             identities: dict | None = None, billing: dict | None = None,
+             timing_policy: dict | None = None) -> dict:
     packet = verify_packet(packet_root, packet_seal)
     require(isinstance(run_id, str) and re.fullmatch(r'pilot-[a-z0-9][a-z0-9-]{0,60}', run_id) is not None,
             'invalid_run_id')
     now = utc_now()
-    return {
+    result = {
         'schema': SCHEMA, 'status': 'proposal_not_authorization',
         'question': QUESTION, 'run_id': run_id, 'packet_root': str(packet_root.resolve()),
         'packet_sha256': packet_seal, 'created_at': now.isoformat(),
@@ -95,6 +103,22 @@ def proposal(packet_root: Path, packet_seal: str, run_id: str, *,
                     'request_metrics': f'runs/{run_id}/operator/request-metrics.jsonl',
                     'export': f'runs/{run_id}/open-export/decisions/AIDR-9998-pilot.md'},
     }
+    if timing_policy is not None:
+        result['timing_policy'] = timing_policy
+        _timing_policy(result)
+        result['timing_policy'] = dict(timing_policy)
+    return result
+
+
+def _timing_policy(data: dict) -> dict | None:
+    """The longer window is an explicit, exact, sealed opt-in, never a default."""
+    if 'timing_policy' not in data:
+        return None
+    policy = data['timing_policy']
+    require(type(policy) is dict and set(policy) == set(EXTENDED_TIMING_POLICY)
+            and all(type(policy[k]) is type(v) and policy[k] == v
+                    for k, v in EXTENDED_TIMING_POLICY.items()), 'invalid_timing_policy')
+    return policy
 
 
 def validate_proposal(data: dict, packet_root: Path, *, now: datetime | None = None) -> str:
@@ -107,6 +131,7 @@ def validate_proposal(data: dict, packet_root: Path, *, now: datetime | None = N
         require(data['policy'] == CLAUDE_MAX_HAIKU_CONTEXT.as_dict(), 'policy_drift')
         require(data['live_allowance'] == {'claude': 0, 'qwen': 0}, 'proposal_grants_calls')
         require(data['response_capture'] == RESPONSE_CAPTURE, 'response_capture_contract_mismatch')
+        _timing_policy(data)
         run_id = data['run_id']
         require(type(run_id) is str and re.fullmatch(r'pilot-[a-z0-9][a-z0-9-]{0,60}', run_id) is not None,
                 'invalid_run_id')
@@ -168,17 +193,22 @@ def validate_authority(data: dict, packet_root: Path, approval: dict | None,
         now = utc_now()
         start, end = timestamp(approval['approved_at']), timestamp(approval['expires_at'])
         require(start <= now < end and end <= timestamp(data['expires_at']), 'live_authority_expired')
+        timing = _timing_policy(data)
+        if timing is not None:
+            require(end - start <= timedelta(seconds=timing['approval_max_duration_s']),
+                    'invalid_approval_duration')
+        max_age = timedelta(seconds=timing['observation_max_age_s'] if timing else 900)
         billing = data['billing']
         require(billing['requirement'] == 'included_allowance_only' and billing['verified'] is True
                 and billing['included_fable_allowance'] is True and billing['usage_credits_enabled'] is False
                 and type(billing['evidence']) is str and bool(billing['evidence'].strip()), 'included_allowance_unverified')
-        require(timedelta(0) <= now - timestamp(billing['checked_at']) <= timedelta(minutes=15), 'billing_evidence_stale')
+        require(timedelta(0) <= now - timestamp(billing['checked_at']) <= max_age, 'billing_evidence_stale')
         identities = data['identities']
         c = identities['claude']
         require(c['model_id'] == CLAUDE_MODEL and c['auth_contract'] == AUTH_CONTRACT_ID
                 and c['auth_class'] in ELIGIBLE_AUTH_CLASSES
                 and type(c['cli_version']) is str and bool(c['cli_version']), 'claude_identity_unverified')
-        require(timedelta(0) <= now - timestamp(c['checked_at']) <= timedelta(minutes=15), 'claude_identity_stale')
+        require(timedelta(0) <= now - timestamp(c['checked_at']) <= max_age, 'claude_identity_stale')
         require(Path(c['executable']).is_absolute() and Path(c['executable']).is_file()
                 and hashlib.sha256(Path(c['executable']).read_bytes()).hexdigest() == c['sha256'], 'claude_executable_drift')
         q = identities['qwen']
@@ -191,6 +221,29 @@ def validate_authority(data: dict, packet_root: Path, approval: dict | None,
         if isinstance(exc, PilotRefusal):
             raise
         raise PilotRefusal('invalid_live_authority') from exc
+
+
+def validate_start_authority(data: dict, packet_root: Path, approval: dict | None,
+                             confirmation: str | None) -> str:
+    """Require fresh observations and worst-case call runway before starting.
+
+    Legacy proposals retain their original semantics. The sealed extended policy
+    budgets every permitted call at its timeout plus a fixed operational margin.
+    """
+    seal = validate_authority(data, packet_root, approval, confirmation)
+    timing = _timing_policy(data)
+    if timing is None:
+        return seal
+    now = utc_now()
+    observed = [timestamp(data['billing']['checked_at']),
+                timestamp(data['identities']['claude']['checked_at'])]
+    require(all(timedelta(0) <= now - checked <= timedelta(seconds=timing['initial_observation_max_age_s'])
+                for checked in observed), 'initial_observation_stale')
+    deadline = min(timestamp(approval['expires_at']), timestamp(data['expires_at']),
+                   *(checked + timedelta(seconds=timing['observation_max_age_s']) for checked in observed))
+    required_s = sum(data['limits']['calls'].values()) * data['process_limits']['timeout_s'] + timing['start_margin_s']
+    require(deadline - now >= timedelta(seconds=required_s), 'insufficient_start_runway')
+    return seal
 
 
 def load_json(path: Path) -> dict:

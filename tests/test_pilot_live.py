@@ -13,8 +13,8 @@ from harness.models.base import AssistantTurn
 from scripts.pilot_claude_code import AUTH_CONTRACT_ID
 from scripts.pilot_contract import PilotRefusal
 from scripts.pilot_execution import (proposal, validate_proposal, validate_authority, digest_json,
-                                     utc_now, load_json)
-from scripts.pilot_live import rehearse_panel, execute_panel, _run_panel, ScriptedParticipant
+                                     utc_now, load_json, EXTENDED_TIMING_POLICY, validate_start_authority)
+from scripts.pilot_live import rehearse_panel, execute_panel, _run_panel, ScriptedParticipant, GuardedModel
 from scripts.pilot_prepare import prepare_packet
 from scripts.pilot_identity import capture_identity
 from scripts.pilot_policy import (CLAUDE_MAX_HAIKU_CONTEXT, CONTEXT_HAIKU_INPUT_PER_RUN,
@@ -248,3 +248,158 @@ def test_receipt_write_failure_halts_without_retry(tmp_path, monkeypatch):
     assert result['ledger']['calls'] == {'claude': 1, 'qwen': 0}
     assert result['ledger']['active_attempt']['state'] == 'dispatched'
     assert result['ledger']['accounting_complete'] is False
+
+
+def extended_ready(tmp_path):
+    root, data = prepared(tmp_path)
+    identity_ready(root, data)
+    data['timing_policy'] = dict(EXTENDED_TIMING_POLICY)
+    now = utc_now()
+    auth = approval(data)
+    auth['approved_at'] = now.isoformat()
+    auth['expires_at'] = (now + timedelta(hours=1)).isoformat()
+    return root, data, auth, now
+
+
+def test_extended_policy_constructor_opt_in_is_sealed_and_legacy_unchanged(tmp_path):
+    root, legacy = prepared(tmp_path)
+    assert 'timing_policy' not in legacy
+    extended = proposal(root, legacy['packet_sha256'], legacy['run_id'],
+                        timing_policy=EXTENDED_TIMING_POLICY)
+    assert extended['timing_policy'] == EXTENDED_TIMING_POLICY
+    assert validate_proposal(extended, root) == digest_json(extended)
+    assert extended['process_limits'] == legacy['process_limits']
+    assert extended['limits'] == legacy['limits']
+    assert extended['live_allowance'] == {'claude': 0, 'qwen': 0}
+
+
+@pytest.mark.parametrize('policy', [None, {}, [],
+    {**EXTENDED_TIMING_POLICY, 'observation_max_age_s': True},
+    {**EXTENDED_TIMING_POLICY, 'observation_max_age_s': 3600.0},
+    {**EXTENDED_TIMING_POLICY, 'initial_observation_max_age_s': '900'},
+    {**EXTENDED_TIMING_POLICY, 'approval_max_duration_s': 3601},
+    {**EXTENDED_TIMING_POLICY, 'start_margin_s': 0},
+    {**EXTENDED_TIMING_POLICY, 'schema': 'harnessie-pilot-timing/2'},
+    {**EXTENDED_TIMING_POLICY, 'extra': 1},
+])
+def test_malformed_extended_timing_policy_refuses(tmp_path, policy):
+    root, data = prepared(tmp_path)
+    data['timing_policy'] = policy
+    with pytest.raises(PilotRefusal, match='invalid_timing_policy'):
+        validate_proposal(data, root)
+
+
+@pytest.mark.parametrize('field', ['billing', 'claude'])
+@pytest.mark.parametrize(('age_minutes', 'expected'), [(16, None), (61, 'stale'), (-1, 'stale')])
+def test_extended_runtime_observation_window(tmp_path, monkeypatch, field, age_minutes, expected):
+    root, data, auth, now = extended_ready(tmp_path)
+    target = data['billing'] if field == 'billing' else data['identities']['claude']
+    target['checked_at'] = (now - timedelta(minutes=age_minutes)).isoformat()
+    auth['manifest_sha256'] = digest_json(data)
+    monkeypatch.setattr('scripts.pilot_execution.utc_now', lambda: now)
+    if expected:
+        with pytest.raises(PilotRefusal, match=expected):
+            validate_authority(data, root, auth, digest_json(data))
+    else:
+        assert validate_authority(data, root, auth, digest_json(data)) == digest_json(data)
+        with pytest.raises(PilotRefusal, match='initial_observation_stale'):
+            validate_start_authority(data, root, auth, digest_json(data))
+
+
+@pytest.mark.parametrize('field', ['billing', 'claude'])
+def test_legacy_observation_at_16_minutes_still_refuses(tmp_path, monkeypatch, field):
+    root, data = prepared(tmp_path)
+    identity_ready(root, data)
+    now = utc_now()
+    target = data['billing'] if field == 'billing' else data['identities']['claude']
+    target['checked_at'] = (now - timedelta(minutes=16)).isoformat()
+    auth = approval(data)
+    auth['approved_at'] = now.isoformat()
+    monkeypatch.setattr('scripts.pilot_execution.utc_now', lambda: now)
+    with pytest.raises(PilotRefusal, match='stale'):
+        validate_authority(data, root, auth, digest_json(data))
+
+
+def test_extended_approval_cannot_exceed_one_hour(tmp_path):
+    root, data, auth, now = extended_ready(tmp_path)
+    auth['expires_at'] = (now + timedelta(hours=1, seconds=1)).isoformat()
+    with pytest.raises(PilotRefusal, match='invalid_approval_duration'):
+        validate_authority(data, root, auth, digest_json(data))
+
+
+@pytest.mark.parametrize('deadline', ['approval', 'proposal', 'observation'])
+def test_insufficient_start_runway_blocks_before_metadata_or_provider(tmp_path, monkeypatch, deadline):
+    root, data, auth, now = extended_ready(tmp_path)
+    if deadline == 'approval':
+        auth['expires_at'] = (now + timedelta(seconds=2219)).isoformat()
+    elif deadline == 'proposal':
+        data['expires_at'] = (now + timedelta(seconds=2219)).isoformat()
+        auth['expires_at'] = data['expires_at']
+    else:
+        # Observation expiry wins over an otherwise fresh one-hour approval;
+        # start freshness is checked first and refuses without metadata.
+        data['billing']['checked_at'] = (now - timedelta(seconds=1381)).isoformat()
+    auth['manifest_sha256'] = digest_json(data)
+    monkeypatch.setattr('scripts.pilot_execution.utc_now', lambda: now)
+    with patch('scripts.pilot_preflight.claude_metadata', side_effect=AssertionError('no metadata')), \
+         patch('scripts.pilot_preflight.local_qwen_identity', side_effect=AssertionError('no metadata')), \
+         patch('scripts.pilot_live._run_panel', side_effect=AssertionError('no provider')):
+        with pytest.raises(PilotRefusal, match='initial_observation_stale' if deadline == 'observation'
+                           else 'insufficient_start_runway'):
+            execute_panel(root, data, auth, digest_json(data))
+    assert not (root / 'runs').exists()
+
+
+def test_exact_worst_case_runway_is_accepted(tmp_path, monkeypatch):
+    root, data, auth, now = extended_ready(tmp_path)
+    auth['expires_at'] = (now + timedelta(seconds=16 * 120 + 300)).isoformat()
+    monkeypatch.setattr('scripts.pilot_execution.utc_now', lambda: now)
+    assert validate_start_authority(data, root, auth, digest_json(data)) == digest_json(data)
+
+
+def test_runway_rechecked_after_metadata_before_first_dispatch(tmp_path, monkeypatch):
+    from scripts.pilot_ledger import RunLedger
+    root, data, auth, now = extended_ready(tmp_path)
+    auth['expires_at'] = (now + timedelta(seconds=2220)).isoformat()
+    clock = [now]
+    monkeypatch.setattr('scripts.pilot_execution.utc_now', lambda: clock[0])
+    validate_start_authority(data, root, auth, digest_json(data))
+    clock[0] += timedelta(seconds=1)  # metadata / runner setup took time
+    participant = ScriptedParticipant('claude')
+    with RunLedger(tmp_path / 'operator', digest_json(data), data['limits']) as ledger:
+        guarded = GuardedModel(participant, 'claude', ledger, lambda: 'claude:position',
+            lambda: validate_authority(data, root, auth, digest_json(data)),
+            start_check=lambda: validate_start_authority(data, root, auth, digest_json(data)))
+        result = guarded.complete([])
+        assert result.content == 'pilot_refusal: insufficient_start_runway'
+        assert participant.calls == 0
+        assert ledger.summary()['calls'] == {'claude': 0, 'qwen': 0}
+
+
+def test_post_response_expiry_retains_exact_refusal_usage_and_prevents_retry(tmp_path, monkeypatch):
+    from scripts.pilot_ledger import RunLedger, read_ledger_summary
+    root, data, auth, now = extended_ready(tmp_path)
+    clock = [now]
+    monkeypatch.setattr('scripts.pilot_execution.utc_now', lambda: clock[0])
+    class ExpiresOnResponse(ScriptedParticipant):
+        def complete(self, *args, **kwargs):
+            turn = super().complete(*args, **kwargs)
+            clock[0] += timedelta(hours=1)
+            return turn
+    participant = ExpiresOnResponse('claude')
+    directory = tmp_path / 'operator'
+    with RunLedger(directory, digest_json(data), data['limits']) as ledger:
+        guarded = GuardedModel(participant, 'claude', ledger, lambda: 'claude:position',
+            lambda: validate_authority(data, root, auth, digest_json(data)))
+        assert guarded.complete([]).stop_reason == 'error'
+        clock[0] = now  # Even if authority were valid again, no retry.
+        assert guarded.complete([]).stop_reason == 'error'
+        assert participant.calls == 1
+        assert ledger.summary()['known_usage']['input_tokens'] == 10
+        assert ledger.summary()['known_usage']['output_tokens'] == 5
+    entries = [json.loads(line) for line in (directory / 'ledger.jsonl').read_text().splitlines()]
+    receipt = next(entry['data'] for entry in entries if entry['kind'] == 'receipt')
+    assert receipt['accepted'] is False
+    assert receipt['receipt']['status'] == 'completed'
+    assert receipt['receipt']['authority_failure'] == 'live_authority_expired'
+    assert read_ledger_summary(directory)['integrity'] == 'valid'
