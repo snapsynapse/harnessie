@@ -33,4 +33,40 @@ No live result is claimed by this preparation section.
 
 ## Outcome
 
-Pending execution and verification. The existing panel remains incomplete; this probe cannot complete positions, objections, export or human arbitration.
+Implementation was committed locally as `7acbd83` before dispatch. The separately sealed proposal `214a64b89decdba2cb5106285ea23b573bc88b163cd9512f46a89d0fc9629d35` was executed once under Sam's explicit approval of the stated scope. The operator bound that approval to the finalized seal; no claim is made that Sam manually inspected the hash.
+
+Private root: `runs/qwen-evidence-timing-candidate-2026-10-03/`. Original handoff, v8 and earlier consumed probe artifacts remain unchanged. The root retains proposal, exact request, approval provenance, fresh identity observations, consume-once guard, response-capture receipt, outcome and bounded content-free server observations.
+
+| Observation | Result |
+|---|---|
+| Start | 2026-10-03 23:21:22 America/Denver |
+| Client outcome | `process_timeout` |
+| Overall elapsed | 300.180 seconds |
+| Transport elapsed / ceiling | 300.006 / 300 seconds |
+| Response bytes | Zero; capture incomplete |
+| Client-observed HTTP status | Unknown |
+| Final input/output usage | Unknown, not zero |
+| Model and implementation | Pre/post identity matched; 67 implementation files bound |
+| Local cleanup | HTTP child exited after supervisor cleanup |
+| Retry / executed tools / Claude calls | Zero / zero / zero |
+| Accepted review / arbitration | False / false |
+
+The additional `malformed_response` diagnostic reflects parsing an empty retained capture, not a malformed answer received from Qwen. The primary outcome is the timeout. No response reasoning or answer was available.
+
+Independent post-run integrity verification passed: exact request and all source bodies, 67 implementation hashes, matching pre/post identity, private permissions, one guard/capture and 599.991 seconds of authority runway at reservation. The result stayed within approval validity. This is an integrity PASS for a timed-out measurement, not inference success.
+
+## Correlated input-processing evidence
+
+The read-only log interval beginning at the byte offset in `operator-start.json` shows a newly loaded local context of 262,144 tokens and task 2 with 49,808 prompt tokens. Initial cached tokens were zero. Progress remained in prompt processing: 8,704 tokens at 108.56 seconds; 12,800 at 165.37 seconds; 19,456 at 275.77 seconds, averaging 70.55 tokens/second at that point.
+
+At 23:26:22 the server logged HTTP 500 on the chat/completions route, cancellation of task 2, release at 19,968 processed tokens and an idle slot. Roughly 40% of the prompt had been processed. Timing, route and task sequence strongly correlate this task with the probe, but there is no shared request identifier binding. These counters are not final usage and do not repair missing accounting. Server task-release/idle logs support cancellation beyond client cleanup; they are not an independent hardware-level cessation measurement. The immutable client diagnostic correctly retains its own `server_cancellation_confirmed:false`.
+
+This result supports input-processing latency as the immediate bottleneck, not a context-size rejection or a failure to request evidence tools. Full input ingestion, output generation, direct-review schema compatibility and substantive judgment remain untested. The 256-token output allowance was not reached in the observed task.
+
+## Next proposed boundary
+
+Do not retry this consumed measurement or call it a completed review. A same-evidence review needs more than five minutes for cold input processing on the observed configuration. A simple projection at the last observed average rate gives approximately 12 minutes for input alone, but the rate was decreasing and this is not a completion-time guarantee. Output generation at this context size is unmeasured.
+
+Recommended next scope, not executed or authorized here: one local substantive review with the same complete frozen evidence, the original 4,096-token output ceiling and an explicitly sealed 30-minute per-call ceiling, zero retries and no Claude call. Keep model and service configuration unchanged. The transport and approval runway must both support that exact bound; do not merely extend an approval timestamp. Retain abstention and privately captured usage/response. The 30-minute proposal is an explicit time-budget change with uncertain sufficiency, not an automatic continuation or permission to run additional timing probes.
+
+The existing panel remains incomplete; a later independent position still does not complete objections, export or human arbitration.
