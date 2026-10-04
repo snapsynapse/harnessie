@@ -202,11 +202,39 @@ Active capability sequence, with detailed current readiness in the [capability a
 6. Specify and implement deterministic follow mode.
 7. Consider bid-driven selection only after calibrated outcomes and a separate human-arbitrated AIDR.
 
+Pilot-derived architecture candidate: [separate answer attribution, all-model accounting and versioned acceptance policy](audits/pilot-additional-model-policy-2026-09-17.md). Unexpected Haiku usage in Claude Code exposed the weakness of treating one CLI invocation as one model identity. The pilot correction preserves refusal accounting and makes the specific additional-model exception explicit. A future portable provider-receipt contract should prove the same invariants across multiple transports before any public interface or schema changes. This is a design candidate informed by the active pilot, not a new release commitment.
+
 ### 1.4.1: Offline open-record AIDR export - SHIPPED
 
 Core 1.4.1 is published and verified on GitHub and PyPI. It includes strict open-record export, `unsupported_platform` refusals before project I/O, the installed mock-runner/export/reference-lint example, and documentation/discovery parity. [Release execution](audits/release-1.4.1.md) records final evidence; [pre-release completion](audits/aidr-pre-release-completion-2026-09-08.md) remains a dated implementation snapshot. The final guide earned [hosted Level 4 under profile 2.0.0](audits/release-1.4.1/guidecheck-prepublication.json) with zero blocking findings.
 
 Verify Action 0.2.2 and stable `v0` are published at `9f18d70017f395ef4d15ac5746e30ac633f00f8e`, pinning core 1.4.1. Homebrew 1.4.1 is published at tap commit `953760f3968200f99658bfb068609532cb9fbf4d`, with the real upgrade, formula tests, and installed version verified. Engine wrappers remain independently released at 0.1.0. Accessibility has current measured candidate dispositions, but human acceptance remains pending and no full pass is claimed.
+
+## Acceptance and verification design candidates
+
+The [September 17 design assessment](audits/acceptance-and-verification-design-2026-09-17.md) evaluates the spec/test/build/review flow described publicly against current source. These are proposed scopes, not adopted runtime behavior, scheduled releases or implementation approvals. The existing controlled-review pilot and capability sequence remain the active program.
+
+Four bounded preparation packets:
+
+- Acceptance contract and protected tests: define an opt-in example with stable criterion IDs, reviewed acceptance artifacts, separate test/implementation ownership, contract amendment and stale-result refusal. Reuse ownership lanes and evidence-bundle semantics. Acceptance must reject a known defect and test tampering while accepting a valid alternative.
+- Verifier independence and evidence requirements: define context exposure, author provenance, configured versus observed identity, and required versus preferred diversity. Resolve empty-gate behavior and unavailable required verifiers explicitly. Default-policy changes need compatibility review and human arbitration; different adapter names are not proof of different model families.
+- Shared calibration and operator review cost: define human-labeled trials, held-out comparisons, false-pass and false-refusal rates, incomplete outcomes, all-attempt cost and measured review time. Mock fixtures prove mechanisms; they do not establish a model's quality or the usefulness of bidding.
+- First useful review in an existing workflow: design a direct path from an existing artifact and brief to human-confirmed criteria and a concise evidence report. Prefer the standalone verifier in the operator's current tools; measure setup effort, repeat use without help and total review burden. Separate post-hoc verification from control over the original agent, and evaluate safety through effects, exposure and evidence rather than approval count.
+
+Later candidates and their promotion conditions:
+
+| Candidate | Evidence or decision required |
+|---|---|
+| Portable pre-execution acceptance contract across standalone verification and governed runs | A worked example demonstrates a missing seam that existing contracts cannot safely express; adopt the smallest compatible extension. |
+| Mandatory family diversity or additional original-author review | Identity and context boundaries are explicit, fallback cannot weaken containment, and measured incremental benefit justifies cost; adopt any new default through human arbitration. |
+| Review depth chosen from declared task risk | Operator-defined requirements and calibrated outcomes; neither worker confidence nor budget exhaustion can reduce required verification. |
+| Automatic bid-driven selection | Existing record, calibration and propose-only stages; held-out comparison with configured routing and a history-based baseline; separate selection AIDR. |
+| Continuous model commentary | Proven deterministic observation/follow boundaries plus evidence of better operator decisions; commentary remains outside execution authority. |
+| Dynamic nested delegation | A real workload exceeds declared parallel-phase composition; children cannot expand ownership, permissions or budget, and cancellation and verification remain enforced. |
+
+No mandatory three-model pipeline, same-author-only judge, or model-written authoritative audit log is proposed. Additional models must earn their place through evidence.
+
+Interoperability constraint: the [September 17 Ringer/Ringside comparison](audits/ringer-ringside-interoperability-2026-09-17.md) finds existing upstream display, identity, baseline and evaluation capabilities that these packets should reuse. Prepare a pinned process-check recipe that preserves cannot-verify outcomes, separates verifier and producer retries, retains evidence beyond worktree cleanup and accounts for the fixed upstream check timeout. Keep the projects independently usable and do not infer runtime guarantees from upstream template prose or open PRs.
 
 ## Platform support
 

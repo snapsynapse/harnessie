@@ -1,0 +1,25 @@
+{
+  "observed_date": "2026-09-17",
+  "upstream_sha": "0be58d3bef0a1d3eb133fddbfa51fc7ab55c8591",
+  "python": "3.14.7",
+  "kind": "synthetic check-exit mapping, not live Harnessie integration",
+  "check_timeout_s": 60,
+  "model_calls": 0,
+  "rows": [
+    {
+      "check_exit": 0,
+      "ringer_verdict": "PASS",
+      "output": "VERIFIED"
+    },
+    {
+      "check_exit": 1,
+      "ringer_verdict": "FAIL",
+      "output": "FAILED"
+    },
+    {
+      "check_exit": 2,
+      "ringer_verdict": "FAIL",
+      "output": "CANNOT VERIFY"
+    }
+  ]
+}
