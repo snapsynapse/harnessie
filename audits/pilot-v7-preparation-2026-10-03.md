@@ -2,7 +2,7 @@
 
 Date: 2026-10-03 (America/Denver)
 Prepared from: bd52a30
-Status: zero-authority candidate prepared; exact live approval pending
+Status: subsequently approved and consumed; see [v7 live result](pilot-v7-results-2026-10-03.md). The preparation observations below are historical.
 
 ## Candidate and separate rehearsal
 
@@ -13,7 +13,7 @@ The new candidate uses the committed aggregate output cap and reviewer budget gu
 - Initial unapproved proposal SHA-256: f8b2a992032b3dad287c6b28b328f38699d5d5d3f2a5e36b40413a0ade75e3b3; replaced for presentation by the final freshness-only reseal.
 - Sealed files: 26, including the 17 source files; total sealed bytes: 202,354.
 - Runtime and pilot implementation hashes bound by the proposal: 63.
-- Live allowance remains zero for both participants. No approval record or candidate runtime output exists.
+- At preparation, live allowance was zero for both participants and no approval or candidate runtime output existed. A separate bound approval subsequently authorized the single execution recorded in the result audit; the proposal itself remains unchanged.
 
 The separate full-workload rehearsal is retained at runs/pilot-output-budget-rehearsal-v7-2026-10-03/. It has the identical packet SHA-256, uses both real request encoders with injected responses and blocked sockets, and retains all 16 admitted requests. Each stage makes four synthetic requests and receives all 17 sources before synthesis. Maximum encoded request is 221,346 bytes, leaving 34,654 bytes below the 256,000-byte input ceiling. Maximum evidence size is 196,632 bytes.
 
