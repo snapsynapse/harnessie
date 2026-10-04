@@ -53,3 +53,5 @@ The reconstruction and proof are retained under the separate preparation root as
 ## Next boundary
 
 Do not repeat this consumed probe or resume the incomplete panel. Recommended next scope is an offline, one-variable protocol correction that explicitly distinguishes emitting neutral tool requests from executing tools and reinforces the first evidence-read step. Preserve unknown evidence and abstention, but require the expected tool protocol for a completed stage. Verify the correction with fixtures before proposing one separately approved local-only comparison. No prompt change, additional inference, full-panel retry, model substitution or service change is authorized by this result.
+
+Subsequent decision: Sam approved [deterministic full-evidence handoff](pilot-evidence-handoff-2026-10-03.md) as the next lane instead of requiring retrieval through model-emitted tools. This leaves the result above unchanged and separates tool-use testing from evidence-review quality. The new offline payload is complete; no additional inference has occurred.
