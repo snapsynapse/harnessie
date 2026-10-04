@@ -1,6 +1,8 @@
 # Controlled-review live pilot packet
 
-Status: approved by Sam on 2026-09-09 as the next active Harnessie tranche. Local preparation and synthetic transport checks are complete. The [2026-10-01 full-workload sizing](pilot-workload-sizing-2026-10-01.md) proves the declared evidence fits the byte envelope. The approved [Claude Haiku context policy](pilot-haiku-context-policy-2026-10-01.md) now encodes and rehearses the exact full-evidence per-call and run ceilings offline. The [Claude authentication-contract repair](pilot-claude-auth-contract-2026-10-01.md) recognizes the current first-party OAuth status without treating it as Max billing proof; fresh included-allowance and credits-off evidence remain mandatory. Live readiness remains AMBER pending fresh billing evidence, final disclosure review and one sealed execution approval. No live model call is authorized by this packet alone.
+Packet status: approved by Sam on 2026-09-09 as the next active Harnessie tranche and retained as the historical authority baseline. Local preparation and synthetic transport checks are complete. The [2026-10-01 full-workload sizing](pilot-workload-sizing-2026-10-01.md) proves the declared evidence fits the byte envelope. The approved [Claude Haiku context policy](pilot-haiku-context-policy-2026-10-01.md) encodes and rehearses the exact full-evidence per-call and run ceilings offline. The [Claude authentication-contract repair](pilot-claude-auth-contract-2026-10-01.md) recognized first-party OAuth status without treating it as Max billing proof. Its pre-v6 live readiness was AMBER pending fresh billing evidence, final disclosure review and one sealed execution approval. This packet alone never authorized a live model call.
+
+Current execution state is maintained in [NEXT](../NEXT.md). The approved [v6 attempt](pilot-v6-results-2026-10-03.md) is consumed and incomplete; its [offline diagnosis](pilot-v6-offline-diagnosis-2026-10-03.md) defines the current repair questions. No retry, parser repair, replacement route or further live attempt is authorized by the historical packet or consumed approval.
 
 ## Purpose
 
@@ -37,6 +39,8 @@ Record the same hashes after the panel. Any unexplained drift invalidates the pi
 
 ## Acceptance evidence
 
+The retained [October 2 installed mock/export receipt](controlled-review-offline-rehearsal-2026-10-02.md) and its [byte-preserved JSON](controlled-review-offline-rehearsal-output-2026-10-02.json) establish the shipped local mock, mandatory-human halt, open export, pinned lint and format-refusal path at commit `4be8438268a4b97dc8a0dbb4ddfd2435e3c9343c`. That receipt is separate from the October 1 full-evidence transport rehearsal and is not provider proof.
+
 1. Preflight cost preview and explicit provider, egress and budget approval.
 2. Frozen-packet manifest with matching pre-run and post-run SHA-256 values.
 3. Exact participant model, provider, endpoint class and effort metadata.
@@ -56,3 +60,5 @@ Export must occur before arbitration because the 1.4.1 exporter refuses an arbit
 - Human acceptance of the exact final disposable packet and its externally retained seal. The prepared rehearsal has zero live allowance and is not final live authorization.
 
 The canonical configuration still names Anthropic `claude-fable-5` and local OpenAI-compatible `qwen3.6:35b-mlx`. The preparation deliberately uses separate pilot configuration; it does not change global defaults, the public provider registry or stable schemas. September 17 read-only checks found the existing Max login and local Qwen metadata available. Silent model or billing-route substitution remains forbidden.
+
+The public `harnessie run` command prints a cost preview and then dispatches when its preflight permits execution; it has no preview-only or dry-run mode. Subscription entitlement, reported usage, provider billing and dollar cost remain separate claims. Unknown cost is never zero. A Harnessie allowance or budget ceiling is a dispatch and acceptance control, not a provider-billing guarantee. Preserve queued, attempted and completed provider positions as different states. Human arbitration remains required after any complete panel, and no automatic retry or route substitution is permitted.

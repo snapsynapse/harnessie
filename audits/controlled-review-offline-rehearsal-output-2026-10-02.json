@@ -1,0 +1,32 @@
+{
+  "actors": "scripted MockModel only",
+  "cli": "/tmp/harnessie-offline-rehearsal/source/.venv/bin/harnessie",
+  "export": {
+    "evidence_sha256": "004aa4e9b9ea9827eca009e47b8bd2ed999dfbcb668d52bf92d819be688f3d00",
+    "output": "decisions/AIDR-9999-synthetic-mock-review.md",
+    "output_sha256": "f036b489f2f872c107ffb68bc0aebff5c2a362d123a63266bdf9a08c6cf66dd0",
+    "source_sha256": "88831e47466f44da7b2185d8a43d4bd3445edb2cb64c5df7a40f8b88f1b90fac",
+    "status": "exported",
+    "target_spec": "0.1.0"
+  },
+  "export_preserved_inputs": true,
+  "format_refusal": {
+    "code": "invalid_record",
+    "status": "refused"
+  },
+  "format_refusal_preserved_inputs": true,
+  "harness_module": "/tmp/harnessie-offline-rehearsal/source/.venv/lib/python3.12/site-packages/harness/__init__.py",
+  "initial_status": "needs_arbitration",
+  "live_model_calls": 0,
+  "mock_model_calls": 8,
+  "participant_labels": [
+    "implementer",
+    "implementer-2"
+  ],
+  "reference_revision": "a67c41d339d3e70bc3baaf07e652f9cf9d13a5bb",
+  "reference_spec": "0.1.0",
+  "resume_model_calls": 0,
+  "resume_status": "needs_arbitration",
+  "status": "passed",
+  "temporary_root": "/tmp/harnessie-aidr-mock-2i1ma4ps"
+}
