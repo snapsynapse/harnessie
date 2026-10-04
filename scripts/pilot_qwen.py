@@ -160,6 +160,11 @@ class QwenPilot(ModelInterface):
                 # Transport implementations must not disclose arbitrary provider text.
                 failure = "transport_failed"
 
+        # An opt-in private capture failure must stop acceptance, but a complete
+        # response is still parsed above so available provider usage survives.
+        if request_started and getattr(self.transport, "capture_failure", None):
+            failure = "response_capture_failed"
+
         # A request may be malformed or refused, but it still needs a post-call
         # identity capture before we retain its receipt.
         if request_started:
