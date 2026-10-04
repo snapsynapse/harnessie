@@ -3,6 +3,7 @@
 Date: 2026-10-03 (America/Denver)
 Scope: experimental pilot only; no released provider or dispatch-selection changes
 Authority: Sam requested, "okay, let's repeat with a bigger time window"
+Outcome: the single repeat is consumed; see [v8 results](pilot-v8-results-2026-10-03.md).
 
 ## Bounded change
 
