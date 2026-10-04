@@ -204,6 +204,59 @@ def test_evidence_admission_refuses_before_second_transport_and_before_qwen(tmp_
     assert rows[1]["evidence_bytes"] > rows[1]["max_evidence_bytes"]
 
 
+def test_encoded_notice_uses_each_delegate_actual_lower_output_limit(tmp_path):
+    root = tmp_path / "bounded-output"
+    execution, identity = _prepared(root)
+    assert execution['process_limits']['max_output_tokens'] == 4096
+    executable = tmp_path / "fake-claude"
+    executable.write_text("offline")
+    executable.chmod(0o700)
+    notices = []
+
+    def inspect(participant, request):
+        neutral = json.loads(request)
+        if participant == 'qwen':
+            assert neutral['max_tokens'] == 48
+            neutral = json.loads(neutral['messages'][-1]['content'])
+        notice = json.loads(neutral['messages'][-1]['content'])
+        budget = notice['pilot_stage_budget']
+        assert budget['max_output_tokens_per_call'] == (32 if participant == 'claude' else 48)
+        assert budget['output_budget_scope'] == 'aggregate_reported_output_all_models'
+        assert 'reasoning, formatter and helper-model output' in notice['output_instruction']
+        assert 'stance or objection fields' in notice['output_instruction']
+        assert 'evidence-path citations' in notice['output_instruction']
+        assert 'uncertainty' in notice['output_instruction']
+        notices.append((budget['stage'], budget['call_number']))
+
+    class BudgetClaude(_InjectedClaude):
+        def _run(self, argv, stdin):
+            if argv[1:] != ['auth', 'status', '--json']:
+                inspect('claude', stdin)
+            return super()._run(argv, stdin)
+
+    claude = BudgetClaude(executable, root, process_limits={'max_output_tokens': 32})
+    qwen = _factories(root, identity, executable,
+                      process_limits={'max_output_tokens': 48})['qwen']()
+    qwen_transport = qwen.transport
+
+    def inspect_qwen(request, limits):
+        inspect('qwen', request)
+        return qwen_transport(request, limits)
+
+    qwen.transport = inspect_qwen
+    with patch('socket.socket.connect', _forbidden), patch('socket.create_connection', _forbidden), \
+            patch('scripts.pilot_live.forbidden', _forbidden), \
+            patch('scripts.pilot_live._export', lambda *_args: 'offline-export.md'):
+        result = _run_panel(root, execution,
+                            {'claude': lambda: claude, 'qwen': lambda: qwen}, offline=True)
+    assert result['status'] == 'needs_arbitration', result
+    assert result['human_arbitrated'] is False
+    assert notices == [(stage, call) for stage in (
+        'claude:position', 'qwen:position', 'claude:objection', 'qwen:objection')
+        for call in (1, 2)]
+    assert result['request_metrics']['admitted'] == 8
+
+
 @pytest.mark.parametrize("failure", ["qwen_after_identity_drift"])
 def test_refused_adapter_receipt_stops_later_stage_and_preserves_usage(tmp_path, failure):
     assert failure == "qwen_after_identity_drift"

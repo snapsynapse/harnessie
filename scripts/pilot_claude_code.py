@@ -11,9 +11,11 @@ offered, and Harnessie performs all operational tool dispatch.
 
 ``PilotLimits.max_output_tokens`` is supplied as
 ``CLAUDE_CODE_MAX_OUTPUT_TOKENS`` because the tested Claude Code CLI does not
-provide a stable command-line output-token flag.  This is a request limit, not
-a proof that a CLI release will enforce it, so the independent byte limit is
-always enforced while draining stdout.
+provide a stable command-line output-token flag. The adapter also refuses a
+completed response whose aggregate reported output across all models exceeds
+that limit, retaining its capture and usage first. This cannot prevent already
+generated provider usage. The independent byte limit is always enforced while
+draining stdout.
 """
 from __future__ import annotations
 
@@ -286,6 +288,10 @@ class ClaudeCodePilot(ModelInterface):
             # A subscription has no dollar receipt, so primary token counts
             # are the minimum evidence needed for a successful pilot turn.
             return self._refuse("usage_unknown", attempt, reported_model, auth_class, usage, True, model_usage, reported_model_usages, observed_candidate_model, decision)
+        if usage["output_tokens"] > self.allowance.limits.max_output_tokens:
+            return self._refuse("output_token_limit_exceeded", attempt, reported_model, auth_class,
+                                usage, True, model_usage, reported_model_usages,
+                                observed_candidate_model, decision)
 
         receipt = PilotReceipt(
             requested_model=self.spec.model_id,

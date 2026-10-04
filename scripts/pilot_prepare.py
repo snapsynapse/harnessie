@@ -66,6 +66,11 @@ there is no fifth call to consume results. Report missing evidence as unknown.
 The supplied pilot_stage_budget gives the actual stage limit and current call.
 If the limit is lower, combine reading batches earlier and reserve the final
 call for task_complete. Completion is not automatic and exhaustion fails closed.
+The same notice supplies max_output_tokens_per_call for the entire response,
+including any reported reasoning, formatter and helper-model output. Keep the
+final report concise, preserving required stance or objection fields,
+evidence-path citations and uncertainty. Leave room for output overhead;
+do not repeat the source evidence or omit required evidence reads.
 """
 
 

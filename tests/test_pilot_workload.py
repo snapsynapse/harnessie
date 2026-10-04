@@ -51,8 +51,14 @@ def test_each_stage_sees_budget_and_all_evidence_before_synthesis(tmp_path, monk
             call = budget['pilot_stage_budget']['call_number']
             assert budget['pilot_stage_budget']['calls_remaining_after_this'] == 4 - call
             assert budget['pilot_stage_budget']['final_call_reserved_for'] == 'task_complete'
+            assert budget['pilot_stage_budget']['max_output_tokens_per_call'] == self.allowance.limits.max_output_tokens
+            assert budget['pilot_stage_budget']['output_budget_scope'] == 'aggregate_reported_output_all_models'
+            assert 'reasoning, formatter and helper-model output' in budget['output_instruction']
+            assert 'evidence-path citations' in budget['output_instruction']
+            assert 'uncertainty' in budget['output_instruction']
             role = messages[0].content
             assert 'Call 1:' in role and 'Call 4:' in role
+            assert 'max_output_tokens_per_call' in role
             if call == 4:
                 requests = {tc.id: tc.arguments['path'] for message in messages
                             for tc in message.tool_calls if tc.name == 'read_file'}

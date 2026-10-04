@@ -1,8 +1,9 @@
 """Offline v6 shape diagnosis, not approval of a wider stream contract.
 
 All content and identifiers below are synthetic. No captured private content is
-retained. Assertions characterize current refusal and accounting behavior;
-they do not specify or authorize a broader acceptance contract.
+retained. Identity assertions preserve the original refusal boundary. The output
+cap regression now records the approved post-diagnosis repair; historical v6
+captures and receipts remain unchanged.
 """
 from __future__ import annotations
 
@@ -123,15 +124,14 @@ class InjectedOutput(ClaudeCodePilot):
         return _RunResult(self.response, 0, None)
 
 
-def test_characterize_output_request_is_not_post_response_token_cap(tmp_path):
-    # Current behavior, not an assertion that over-limit acceptance is desirable.
+def test_post_diagnosis_output_cap_refuses_formerly_admitted_overage(tmp_path):
     adapter = InjectedOutput(tmp_path, encode(single_identity_events()))
     assert adapter._sanitized_env()['CLAUDE_CODE_MAX_OUTPUT_TOKENS'] == '4096'
     tools = [{'name': 'task_complete', 'parameters': {'type': 'object',
               'properties': {'report': {'type': 'string'}}, 'required': ['report']}}]
     turn = adapter.complete([Message(role='user', content='SYNTHETIC ONLY')], tools)
-    assert turn.stop_reason == 'tool_use'
-    assert turn.output_tokens == 6740
-    assert adapter.receipts[-1].status == 'completed'
+    assert turn.stop_reason == 'error'
+    assert adapter.receipts[-1].status == 'refused'
+    assert adapter.receipts[-1].failure == 'output_token_limit_exceeded'
     assert adapter.receipts[-1].usage['output_tokens'] == 6740
     assert adapter.inferences == 1

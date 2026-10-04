@@ -51,6 +51,8 @@ class GuardedModel(ModelInterface):
             stage = self.stage()
             limit = self.ledger.limits['calls_per_stage']
             call_number = self.ledger.summary()['calls_per_stage'].get(stage, 0) + 1
+            allowance = getattr(self.delegate, 'allowance', None)
+            output_limit = allowance.limits.max_output_tokens if allowance is not None else None
             # Add fresh guidance without accumulating notices in the transcript.
             messages = [*messages, Message(role='user', content=json.dumps({
                 'pilot_stage_budget': {
@@ -58,7 +60,14 @@ class GuardedModel(ModelInterface):
                     'call_number': call_number,
                     'calls_remaining_after_this': max(0, limit - call_number),
                     'final_call_reserved_for': 'task_complete',
+                    'max_output_tokens_per_call': output_limit,
+                    'output_budget_scope': 'aggregate_reported_output_all_models',
                 },
+                'output_instruction': (
+                    'Use the configured output ceiling for the entire response, including any reported '
+                    'reasoning, formatter and helper-model output. Keep the report concise, retaining '
+                    'required stance or objection fields, evidence-path citations and uncertainty. '
+                    'Do not spend the full ceiling on report text or repeat the source evidence.'),
                 'instruction': ('Final call: synthesize available evidence and submit only task_complete. '
                                 'Identify missing evidence as unknown.' if call_number >= limit else
                                 'Batch evidence reads; finish reading before the final synthesis call.'),

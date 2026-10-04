@@ -4,6 +4,9 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+- Enforce the experimental Claude pilot's configured output-token threshold against aggregate reported output across all models, preserving capture and usage on refusal and latching further attempts. Retain single-identity stream admission after the v6 continuation review. These source-only pilot controls are excluded from distributions and do not cap already-generated provider usage.
+- Expose each pilot delegate's actual aggregate output budget in reviewer notices and add concise-report guidance while preserving the full evidence set and required report fields. Add a separately approved, consume-once local Qwen smoke driver with a preparation-only CLI, implementation and request seals, strict local residency checks and retained accounting.
+- Align all four CodeQL Action subactions to the immutable 4.38.2 commit and group their Dependabot version updates to avoid mixed-version analysis failures.
 - Record the controlled-review live pilot as the next active tranche, move human accessibility acceptance to the nonblocking roadmap, and record a current evidence-gated capability sequence alongside the historical AIDR-0009 observer-only decision. Runtime behavior is unchanged.
 
 ## 1.4.1 (2026-09-08)
