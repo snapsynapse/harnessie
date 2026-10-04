@@ -4,6 +4,7 @@ Date: 2026-10-03 (America/Denver)
 Reviewed implementation: b0b4841, including timing repair 8c7c39d
 Scope: saved evidence, existing local logs, code inspection and synthetic tests only
 Status: diagnosis complete within retained-evidence limits; no implementation or inference performed
+Later evidence: the separately approved [capture probe](pilot-qwen-capture-probe-2026-10-03.md) recovered the first assistant text through a hash-matched reconstruction of v8's second request. The limitations below describe the evidence available during this earlier diagnosis.
 
 ## Findings
 

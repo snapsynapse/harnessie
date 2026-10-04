@@ -2,6 +2,8 @@
 
 Date: 2026-10-03 (America/Denver)
 Authority: Sam explicitly approved private response capture and one local-only diagnostic call with a five-minute timeout, unchanged token/byte limits, no Claude and no retry.
+Implementation commit: 84e8a21
+Status: single probe completed and consumed; panel remains incomplete
 
 ## Scoped implementation
 
@@ -31,3 +33,23 @@ Limits: one call, 300 seconds, 256,000 input/evidence bytes, 128,000 response by
 ## Offline verification
 
 The worker capture/adapter suite passed 46 tests; the final combined probe/capture/adapter suite passed 81. Independent review passed 89 focused driver/capture/adapter/storage tests after the runway correction. The final full pilot suite passed 337 tests in 21.21 seconds. Tests cover exact bytes, private capture, malformed/partial/empty/error responses, unknown usage, capture failure with known usage, timeout propagation, strict config/authority/seal checks, identity drift, expiry and consume-once refusal. Trust and inward manifests passed with 21 and 16 files respectively. The verifier checked the exact candidate seal, all 65 implementation hashes, private permissions and zero-authority preparation. No rehearsal proves live tool behavior.
+
+## Actual result
+
+The single approved local request completed in 90.7447 seconds including operator overhead, with HTTP 200. Transport time was 90.5904 seconds and first body bytes arrived at 90.5632 seconds. No timeout, cleanup or retry occurred. Raw response capture is complete: 2,196 bytes, SHA-256 e2fa4c44f49b17a8aec7bd62d546dd768b8c5eea8127d8936a27ba4f4a5534e5. Response bytes, parsed turn, identities, approval, guard and outcome remain private under the candidate's attempt directory. The known usage is 1,184 input plus 350 output tokens, 1,534 total; actual dollar cost remains unknown.
+
+The diagnostic succeeded, but Qwen did not perform the review workflow. It returned a 1,036-byte plain-text report with end_turn and no tool calls. The report explicitly says no evidence files were read, treats the index and all 17 sources as unknown, and concludes abstain because it cannot verify the named gates. It did not request read_file or task_complete. No model-requested tool was executed, no Claude call occurred and no panel position, objection round, export or human arbitration was completed by this probe.
+
+The response does not establish why the model chose that behavior. In particular, a causal claim that the outer no-execution instruction prevents neutral tool requests remains a hypothesis. The captured text demonstrates premature reporting without evidence acquisition, not a valid grounded abstention or a completed task.
+
+Independent read-only post-run verification passed for the single diagnostic: one consumed attempt, exact private capture hash and permissions, response parsing, complete reported usage, unchanged before/after identities and all 65 implementation hashes. Effective runway at reservation was 740.469 seconds, with approximately 649.724 seconds remaining at completion. The verifier confirmed zero retries and zero executed tools, and independently reproduced the historical request reconstruction below. It made no model or service calls.
+
+## Binding the newly retained text to v8
+
+Offline reconstruction combined the new 1,036-byte assistant content with the unchanged initial conversation, the core loop's 148-byte tool-use reminder and the call-two budget notice. It reproduced the historical v8 request-0006 byte-for-byte: 7,987 bytes, SHA-256 1417e8381bbfca23bbe114c849d2b2c321bfbd9cd5d1a8e350452bdb2b3b67fb. This matches the immutable v8 request-metrics record and binds the newly captured text to the content incorporated into v8's second request. Matching response length and token counts alone would not establish that link.
+
+The reconstruction and proof are retained under the separate preparation root as recover_second_request.py, recovered-v8-request-0006.json and content-binding.json. The consumed v8 root was not modified. This recovers the assistant content used in the next request, not v8's original raw response, reasoning, provider identifiers or missing second-call usage. The reconstruction made zero model calls and executed no tools.
+
+## Next boundary
+
+Do not repeat this consumed probe or resume the incomplete panel. Recommended next scope is an offline, one-variable protocol correction that explicitly distinguishes emitting neutral tool requests from executing tools and reinforces the first evidence-read step. Preserve unknown evidence and abstention, but require the expected tool protocol for a completed stage. Verify the correction with fixtures before proposing one separately approved local-only comparison. No prompt change, additional inference, full-panel retry, model substitution or service change is authorized by this result.
