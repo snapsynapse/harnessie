@@ -219,3 +219,42 @@ def test_refused_adapter_receipt_stops_later_stage_and_preserves_usage(tmp_path,
     assert result["ledger"]["calls"] == {"claude": 2, "qwen": 1}
     assert result["ledger"]["known_usage"]["input_tokens"] == 8
     assert result["ledger"]["halted"] and result["ledger"]["accounting_complete"]
+
+
+@pytest.mark.parametrize('stage_limit', [3, 4])
+def test_noncompliant_reader_exhausts_visible_budget_without_advancing(tmp_path, stage_limit):
+    root = tmp_path / 'exhaustion'
+    execution, identity = _prepared(root)
+    execution['limits']['calls_per_stage'] = stage_limit
+    executable = tmp_path / 'fake-claude'
+    executable.write_text('offline')
+    executable.chmod(0o700)
+    notices = []
+
+    class ReadingClaude(_InjectedClaude):
+        def _run(self, argv, stdin):
+            if argv[1:] == ['auth', 'status', '--json']:
+                return super()._run(argv, stdin)
+            messages = json.loads(stdin)['messages']
+            notices.append(json.loads(messages[-1]['content'])['pilot_stage_budget'])
+            self.calls += 1
+            envelope = {'content': '', 'tool_calls': [{
+                'id': f'read-{self.calls}', 'name': 'read_file',
+                'arguments': {'path': 'evidence-index.json'}}], 'stop_reason': 'tool_use'}
+            return _RunResult(_claude_stream(envelope), 0, None)
+
+    factories = _factories(root, identity, executable)
+    claude = ReadingClaude(executable, root)
+    factories['claude'] = lambda: claude
+    with patch('socket.socket.connect', _forbidden), patch('socket.create_connection', _forbidden), \
+            patch('scripts.pilot_live._export', _forbidden):
+        result = _run_panel(root, execution, factories, offline=True)
+    assert result['status'] == 'incomplete'
+    assert result['failure'] == 'stage_failed'
+    assert result['ledger']['calls'] == {'claude': stage_limit, 'qwen': 0}
+    assert result['ledger']['halted'] is True
+    assert 'export_path' not in result and result['human_arbitrated'] is False
+    assert [n['call_number'] for n in notices] == list(range(1, stage_limit + 1))
+    assert all(n['calls_per_stage'] == stage_limit for n in notices)
+    assert notices[-1]['calls_remaining_after_this'] == 0
+    assert notices[-1]['final_call_reserved_for'] == 'task_complete'

@@ -49,6 +49,20 @@ class GuardedModel(ModelInterface):
             self.verify()
             require(all(t.get('name') in TOOLS for t in offered_tools), 'tool_scope_mismatch')
             stage = self.stage()
+            limit = self.ledger.limits['calls_per_stage']
+            call_number = self.ledger.summary()['calls_per_stage'].get(stage, 0) + 1
+            # Add fresh guidance without accumulating notices in the transcript.
+            messages = [*messages, Message(role='user', content=json.dumps({
+                'pilot_stage_budget': {
+                    'stage': stage, 'calls_per_stage': limit,
+                    'call_number': call_number,
+                    'calls_remaining_after_this': max(0, limit - call_number),
+                    'final_call_reserved_for': 'task_complete',
+                },
+                'instruction': ('Final call: synthesize available evidence and submit only task_complete. '
+                                'Identify missing evidence as unknown.' if call_number >= limit else
+                                'Batch evidence reads; finish reading before the final synthesis call.'),
+            }))]
             if self.request_metrics is not None:
                 require(callable(getattr(self.delegate, 'prepare_request', None))
                         and callable(getattr(self.delegate, 'complete_prepared', None)),

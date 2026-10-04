@@ -34,3 +34,40 @@ def test_full_declared_evidence_fits_byte_envelope_without_live_calls(tmp_path):
     assert report["report_canonical_json_sha256"] == digest_json(
         json.loads(report_path.read_text()))
     assert "report_sha256" not in report
+
+
+def test_each_stage_sees_budget_and_all_evidence_before_synthesis(tmp_path, monkeypatch):
+    from scripts.pilot_claude_code import ClaudeCodePilot
+    from scripts.pilot_qwen import QwenPilot
+    from scripts.pilot_prepare import SOURCE_FILES
+
+    observed = []
+    for adapter in (ClaudeCodePilot, QwenPilot):
+        original = adapter.prepare_request
+
+        def inspect(self, messages, tools=None, effort='medium', original=original):
+            budget = json.loads(messages[-1].content)
+            assert budget['pilot_stage_budget']['calls_per_stage'] == 4
+            call = budget['pilot_stage_budget']['call_number']
+            assert budget['pilot_stage_budget']['calls_remaining_after_this'] == 4 - call
+            assert budget['pilot_stage_budget']['final_call_reserved_for'] == 'task_complete'
+            role = messages[0].content
+            assert 'Call 1:' in role and 'Call 4:' in role
+            if call == 4:
+                requests = {tc.id: tc.arguments['path'] for message in messages
+                            for tc in message.tool_calls if tc.name == 'read_file'}
+                results = {requests[m.tool_call_id]: m.content for m in messages
+                           if m.role == 'tool' and m.tool_call_id in requests}
+                assert set(results) == {'evidence-index.json'} | {f'evidence/{p}' for p in SOURCE_FILES}
+                assert all(results.values())
+                assert all((REPO / p).read_text() in results[f'evidence/{p}'] for p in SOURCE_FILES)
+            observed.append((budget['pilot_stage_budget']['stage'], call))
+            return (original(messages, tools, effort) if getattr(original, '__self__', None)
+                    else original(self, messages, tools, effort))
+
+        monkeypatch.setattr(adapter, 'prepare_request', inspect)
+    report = measure_full_workload(REPO, tmp_path / 'scheduled')
+    assert report['status'] == 'needs_arbitration', report
+    assert len(observed) == 16
+    assert [call for _, call in observed] == [1, 2, 3, 4] * 4
+    assert report['next_live_allowance'] == {'claude': 0, 'qwen': 0}
