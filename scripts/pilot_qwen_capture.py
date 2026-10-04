@@ -34,6 +34,17 @@ def _validate_config(config: dict) -> dict:
     return config
 
 
+def _validate_evidence_review_config(config: dict) -> dict:
+    """Only the separately approved, fixed twenty-minute review profile."""
+    if (type(config) is not dict or set(config) != {"timeout_s", "max_output_bytes"}
+            or type(config["timeout_s"]) not in {int, float}
+            or config["timeout_s"] != 1200
+            or type(config["max_output_bytes"]) is not int
+            or not 0 < config["max_output_bytes"] <= 128000):
+        raise PilotRefusal("invalid_qwen_capture_config")
+    return config
+
+
 class CapturedQwenTransport:
     """A reserved response slot, consumed on first transport invocation.
 
@@ -42,12 +53,15 @@ class CapturedQwenTransport:
     Raw bytes never appear in diagnostics or exceptions.
     """
 
+    _config_validator = staticmethod(_validate_config)
+    _child_marker = "--captured-request-child"
+
     def __init__(self, reservation: ResponseCaptureReservation, *,
                  timeout_ceiling_s: float = 300) -> None:
         if type(reservation) is not ResponseCaptureReservation:
             raise PilotRefusal("invalid_qwen_capture_config")
-        _validate_config({"timeout_s": timeout_ceiling_s,
-                          "max_output_bytes": reservation._max_bytes})
+        self._config_validator({"timeout_s": timeout_ceiling_s,
+                                "max_output_bytes": reservation._max_bytes})
         self.reservation = reservation
         self.timeout_ceiling_s = timeout_ceiling_s
         self.response_capture: dict | None = None
@@ -55,14 +69,18 @@ class CapturedQwenTransport:
         self.capture_failure: str | None = None
         self._used = False
 
+    def _transport_config(self, limits: PilotLimits) -> dict:
+        return self._config_validator({
+            "timeout_s": min(limits.timeout_s, self.timeout_ceiling_s),
+            "max_output_bytes": limits.max_output_bytes})
+
     def __call__(self, payload: bytes, limits: PilotLimits) -> bytes:
         if self._used:
             raise PilotRefusal("transport_latched")
         self._used = True
         if not isinstance(payload, bytes) or len(payload) > limits.max_input_bytes:
             raise PilotRefusal("input_limit_exceeded")
-        config = _validate_config({"timeout_s": min(limits.timeout_s, self.timeout_ceiling_s),
-                                   "max_output_bytes": limits.max_output_bytes})
+        config = self._transport_config(limits)
         if limits.max_output_bytes != self.reservation._max_bytes:
             raise PilotRefusal("invalid_qwen_capture_config")
         started = time.monotonic()
@@ -84,7 +102,7 @@ class CapturedQwenTransport:
             input_file.seek(0)
             root = Path(__file__).resolve().parents[1]
             process = subprocess.Popen(
-                [sys.executable, __file__, "--captured-request-child", json.dumps(config)],
+                [sys.executable, __file__, self._child_marker, json.dumps(config)],
                 stdin=input_file, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 start_new_session=True, env={"PYTHONPATH": str(root)}, cwd=root,
             )
@@ -176,9 +194,38 @@ class CapturedQwenTransport:
         return bytes(raw)
 
 
+class EvidenceReviewQwenTransport(CapturedQwenTransport):
+    """Explicit fixed twenty-minute transport for the approved evidence review.
+
+    This does not alter the legacy diagnostic profile or accept caller-chosen
+    timeout ceilings. The caller's limits must match the review profile.
+    """
+
+    _config_validator = staticmethod(_validate_evidence_review_config)
+    _child_marker = "--evidence-review-request-child"
+
+    def __init__(self, reservation: ResponseCaptureReservation) -> None:
+        super().__init__(reservation, timeout_ceiling_s=1200)
+
+    def _transport_config(self, limits: PilotLimits) -> dict:
+        return self._config_validator({"timeout_s": limits.timeout_s,
+                                       "max_output_bytes": limits.max_output_bytes})
+
+
 def _request_child(config: dict) -> int:
-    """Flush each bounded response prefix before another HTTP read can fail."""
+    """Legacy diagnostic child, still limited to at most 300 seconds."""
     _validate_config(config)
+    return _request_child_io(config)
+
+
+def _evidence_review_request_child(config: dict) -> int:
+    """Explicit review child, accepting only the fixed 1200-second profile."""
+    _validate_evidence_review_config(config)
+    return _request_child_io(config)
+
+
+def _request_child_io(config: dict) -> int:
+    """Flush each bounded response prefix before another HTTP read can fail."""
     failure = None
     http_status = None
     try:
@@ -220,11 +267,18 @@ def _request_child(config: dict) -> int:
     return 0 if failure is None else 2
 
 
-if __name__ == "__main__":
-    if len(sys.argv) != 3 or sys.argv[1] != "--captured-request-child":
-        raise SystemExit(2)
+def _child_main(argv: list[str]) -> int:
+    handlers = {
+        "--captured-request-child": _request_child,
+        "--evidence-review-request-child": _evidence_review_request_child,
+    }
+    if len(argv) != 3 or argv[1] not in handlers:
+        return 2
     try:
-        child_config = _validate_config(_strict_json(sys.argv[2]))
+        return handlers[argv[1]](_strict_json(argv[2]))
     except (PilotRefusal, ValueError, TypeError):
-        raise SystemExit(2)
-    raise SystemExit(_request_child(child_config))
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(_child_main(sys.argv))
