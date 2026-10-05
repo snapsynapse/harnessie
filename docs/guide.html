@@ -227,7 +227,7 @@ phases:
     supports_effort: true
   local:
     provider: openai-compat
-    model_id: qwen3.6:35b-mlx
+    model_id: qwen3.8:latest
     base_url: http://localhost:11434/v1
     api_key_env: &quot;&quot;          # local endpoints usually need no key</code></pre>
 <p>Routing maps each task class to a tier and effort. Workflow phases declare a <code>task_class</code>; the router resolves it here. This keeps model choice a policy decision, not something a model asserts about itself.</p>

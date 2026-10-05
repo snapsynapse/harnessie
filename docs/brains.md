@@ -33,7 +33,7 @@ Declared in [config/models.yaml](https://github.com/snapsynapse/harnessie/blob/m
 | frontier | `claude-fable-5` | Anthropic |
 | mid | `claude-sonnet-5` | Anthropic |
 | cheap | `claude-haiku-4-5-20251001` | Anthropic |
-| local | `qwen3.6:35b-mlx` (also runs `gemma4:31b-mlx`, `gemma4:latest`, `gpt-oss:20b`) | any OpenAI-compatible endpoint |
+| local | `qwen3.8:latest` (also runs `gpt-oss:20b`) | any OpenAI-compatible endpoint |
 
 Any OpenAI-compatible endpoint works with no code change: vLLM, Ollama, llama.cpp, Together, OpenRouter, Fireworks, DeepSeek, Mistral, xAI, and others. Swapping a provider is a `model_id` and `base_url` edit.
 

@@ -208,7 +208,7 @@ tiers:
     supports_effort: true
   local:
     provider: openai-compat
-    model_id: qwen3.6:35b-mlx
+    model_id: qwen3.8:latest
     base_url: http://localhost:11434/v1
     api_key_env: ""          # local endpoints usually need no key
 ```
