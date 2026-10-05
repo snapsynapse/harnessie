@@ -6,6 +6,13 @@ updates:
       interval: weekly
     # Generated, integrity-manifested locks are refreshed by the controlled
     # dependency-lock-refresh workflow. Dependabot continues to watch pyproject.toml.
+    # exclude-paths governs version updates only. Dependabot security updates act
+    # on any manifest with an alert and ignore this list; stopping their pull
+    # requests is a repository setting (Code security, "Dependabot security
+    # updates"), not something this file can express. Keep Dependabot alerts on.
+    # An alert on a lock is resolved by reviewing and applying the
+    # dependency-lock-refresh proposal, never by a Dependabot-authored edit to
+    # requirements/*.txt, which fails lock validation.
     exclude-paths:
       - "requirements/**"
   - package-ecosystem: github-actions
