@@ -37,6 +37,18 @@ Declared in [config/models.yaml](https://github.com/snapsynapse/harnessie/blob/m
 
 Any OpenAI-compatible endpoint works with no code change: vLLM, Ollama, llama.cpp, Together, OpenRouter, Fireworks, DeepSeek, Mistral, xAI, and others. Swapping a provider is a `model_id` and `base_url` edit.
 
+## Tool-contract breaks
+
+A brain trained inside another harness often calls that harness's tool by name (`bash`, `read`, `edit`) or sends arguments the schema does not accept, and Harnessie refuses the call at the registry before any tool runs. The live scorecard's `tool_contract` row counts those refusals (`action_unsupported`, `malformed_arguments`, `bad_arguments`) over one short tool-using task, so the cost of Harnessie's own tool vocabulary to a given brain is a number rather than an impression. Policy refusals (consent, role, approval) are not counted; they are the harness working as intended.
+
+Every result also names the harness it came from: `harnessie verify` reports and `harnessie report` print the installed version, the inward-manifest digest and a digest of the tool surface the brain was offered, beside the brain's own identity. A score measured in one harness describes the model in that harness.
+
+No brain has been measured yet. Rows are added as each is run under `HARNESSIE_LIVE=1`, with the bundle identity that pins the result.
+
+| Model | Provider | Breaks | Task completed | Bundle |
+|---|---|---|---|---|
+| (none measured yet) | | | | |
+
 ## Built with
 
 Development provenance, distinct from the runtime table above: these models built, reviewed, and fact-checked Harnessie during construction rather than running under it, so they are not each backed by a single decision record. The trail is in the git history, [source-verification.json](https://github.com/snapsynapse/harnessie/blob/main/source-verification.json), and the session handoffs.

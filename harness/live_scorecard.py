@@ -22,6 +22,7 @@ from .models.base import Message, ModelSpec
 from .runner import load_models_config
 from .tools.builtin import register_builtin
 from .tools.registry import ToolRegistry
+from .trace_eval import analyze_trace, load_events
 from .verify import PARSER_VERSION, parse_verdict
 
 
@@ -288,6 +289,7 @@ def _run_target_scorecard(target: LiveTarget) -> list[LiveCaseResult]:
         _loop_smoke(target, consent=True),
         _consent_lock_smoke(target),
         _placeholder_impact_smoke(target),
+        _tool_contract_smoke(target),
     ]
     if target.provider == "openai-responses":
         cases.append(_openai_responses_protocol_smoke(target))
@@ -477,6 +479,48 @@ def _loop_smoke(target: LiveTarget, consent: bool) -> LiveCaseResult:
         expected="complete" if not consent else "accept_task then complete",
         observed=f"{result.stop}: {result.report[:120]}",
         notes=f"steps={result.steps}",
+    )
+
+
+def _tool_contract_smoke(target: LiveTarget) -> LiveCaseResult:
+    """Measure, not judge: how often this brain speaks a tool vocabulary the
+    harness does not have. The row passes when the loop completes, so the
+    count is a valid measurement; the count itself is the published number."""
+    with tempfile.TemporaryDirectory(prefix="harnessie-live-") as d:
+        root = Path(d)
+        reg = ToolRegistry()
+        workspace = root / "workspace"
+        workspace.mkdir()
+        (workspace / "NOTES.md").write_text("live smoke notes\n", encoding="utf-8")
+        run_dir = root / "run"
+        register_builtin(reg, workspace=workspace)
+        loop = AgentLoop(
+            role="worker",
+            model=build_model(target.spec),  # type: ignore[arg-type]
+            registry=reg,
+            events=EventLog(run_dir, echo=False),
+            max_steps=6,
+            agent_name="implementer",
+        )
+        result = loop.run(
+            "You are a Harnessie live-smoke worker.",
+            "List the workspace, read NOTES.md, then call task_complete with a "
+            "one-line report of what the file says. Do not write files.",
+            effort="low",
+        )
+        metrics = analyze_trace(load_events(run_dir / "events.jsonl"))
+    passed = result.stop == "complete"
+    return LiveCaseResult(
+        id="tool_contract",
+        provider=target.provider,
+        status="passed" if passed else "failed",
+        passed=passed,
+        expected="complete; tool_contract_breaks is the measurement",
+        observed=(f"{result.stop}; tool_contract_breaks="
+                  f"{metrics['tool_contract_breaks']}; "
+                  f"by_error={metrics['refusals_by_error']}"),
+        notes=(f"steps={result.steps} tool_results={metrics['tool_results']} "
+               f"per_completed_task={metrics['tool_calls_per_completed_task']}"),
     )
 
 

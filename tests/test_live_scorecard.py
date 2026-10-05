@@ -3,11 +3,42 @@ from pathlib import Path
 
 from harness.live_scorecard import (
     LiveCaseResult,
+    LiveTarget,
+    _tool_contract_smoke,
     bundle_identity,
     discover_live_targets,
     format_live_scorecard,
 )
-from harness.models.base import ModelSpec
+from harness.models.base import AssistantTurn, MockModel, ModelSpec, ToolCall
+
+
+def _call(idx, name, **args):
+    return AssistantTurn(content="", stop_reason="tool_use",
+                         tool_calls=[ToolCall(id=f"c{idx}", name=name,
+                                              arguments=args)])
+
+
+def test_tool_contract_smoke_measures_breaks_without_judging_them(monkeypatch):
+    script = [
+        _call(1, "bash", command="ls"),
+        _call(2, "list_files"),
+        _call(3, "read_file", path="NOTES.md"),
+        _call(4, "task_complete", report="notes say: live smoke notes"),
+    ]
+    model = MockModel(ModelSpec(name="local", provider="mock", model_id="mock"),
+                      script=script)
+    monkeypatch.setattr("harness.live_scorecard.build_model", lambda spec: model)
+    target = LiveTarget(id="local", provider="openai-compat", status="ready",
+                        spec=ModelSpec(name="local", provider="openai-compat",
+                                       model_id="mock", base_url="http://x"))
+
+    result = _tool_contract_smoke(target)
+
+    assert result.id == "tool_contract"
+    assert result.passed is True
+    assert "tool_contract_breaks=1" in result.observed
+    assert "'action_unsupported': 1" in result.observed
+    assert "per_completed_task=3.0" in result.notes
 
 
 ROOT = Path(__file__).resolve().parents[1]

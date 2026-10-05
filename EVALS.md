@@ -22,11 +22,12 @@ Every scenario has:
 - `evals/redteam.yaml`: published break-it targets for the exfiltration claims (SECURITY.md "Break it"). Canary credentials enter as attacker input; passing proves they reach no workspace artifact and never appear anywhere in the events log.
 - `evals/gate-integrity.yaml`: meta-gates that prove a claimed harness check actually ran and earned the result, including synthetic Ringer-style change intake and duplicate-denial recovery behavior.
 - `evals/canary-leak.yaml`: evaluation-integrity canaries that distinguish the intended gate signal from a coincidental green result.
+- `evals/tool-contract.yaml`: what happens when a brain speaks another harness's tool vocabulary. A foreign tool name or malformed arguments are refused at the registry before any tool runs and counted as `tool_contract_breaks`; one such call is recoverable, a repeated one ends `stuck`; a policy refusal (consent, role, approval) is not a contract break.
 - `evals/pending/`: scorecards written before their scenario kind exists. Not globbed by the default runner. Each moves up one directory in the change that ships its kind; a suite left there after its kind ships is unprocessed work. See CONTRIBUTING.md rule 6.
 
 The current default baseline includes the eight offline observer scenarios. Treat the command result as the contract rather than hard-coding that count into stable release guides.
 
-Standalone verification also emits `proofs/trace-metrics.json`. `harness/trace_eval.py` derives step, token, denial, duplicate-tool-call, and claim-coverage metrics without treating a missing or malformed counter as success. Focused Ringer fixtures live in the test suite and do not depend on a private or ignored contribution queue.
+Standalone verification also emits `proofs/trace-metrics.json`. `harness/trace_eval.py` derives step, token, denial, duplicate-tool-call, and claim-coverage metrics without treating a missing or malformed counter as success. It also splits refusals by error code (`refusals_by_error`), sums the vocabulary refusals `action_unsupported`, `malformed_arguments` and `bad_arguments` into `tool_contract_breaks`, and reports `tool_calls_per_completed_task` (tool results over loops that finished `complete`; `null` when nothing completed, never zero). Focused Ringer fixtures live in the test suite and do not depend on a private or ignored contribution queue.
 - `evals/observer.yaml`: deterministic offline observation, including crashed/halted input, chain refusal, citations, declared-write drift and payload omission.
 
 ## Scenario kinds
@@ -54,7 +55,7 @@ Exercises verifier verdict parsing only.
 ### loop
 Exercises the inner `AgentLoop`.
 - Input: `role`, `task`, `max_steps`, `script`, optional `consent` (bool), optional `agent`
-- Expected: `expect_stop`, optional `expect_file` (`{path, contains}`), optional `expect_file_absent`, optional `expect_refusal` (`{tool, error, boundary, content_fields}`), optional `expect_events_absent` (list of exact strings that must not appear anywhere in the raw events log — the canary-exfiltration assertion; failure messages name canaries by prefix only). `content_fields` is asserted against the `refusal` event, which carries the full `{error, boundary, detail, why}` grammar; `tool_result` content is truncated at 300 chars and is never parsed by the checker.
+- Expected: `expect_stop`, optional `expect_file` (`{path, contains}`), optional `expect_file_absent`, optional `expect_refusal` (`{tool, error, boundary, content_fields}`), optional `expect_events_absent` (list of exact strings that must not appear anywhere in the raw events log — the canary-exfiltration assertion; failure messages name canaries by prefix only), optional `expect_trace` (a mapping of `harness/trace_eval.py` metric names to the exact value the recorded trace must reduce to; an unknown metric name fails the case). `content_fields` is asserted against the `refusal` event, which carries the full `{error, boundary, detail, why}` grammar; `tool_result` content is truncated at 300 chars and is never parsed by the checker.
 - Use for stop conditions such as `no_action`, `refusal`, `model_error`, `budget`, `stuck`, and `declined`, and for consent-lock behavior (side effect before accept_task must leave no artifact).
 ### workflow
 Exercises plan, gated implement, and integrate over a scaffolded temporary project.
@@ -133,5 +134,5 @@ Prefer narrow scenarios. A scenario should explain one harness guarantee. If it 
 The mock-brain baseline proves harness mechanics. The 0.4 live scorecard in `harness/live_scorecard.py` reuses the same categories against configured real endpoints, including governance probes for consent and the locked-side-effect boundary:
 - Anthropic target: configured from `config/models.yaml` by default; requires `HARNESSIE_LIVE=1` and `ANTHROPIC_API_KEY`.
 - Local OpenAI-compatible target: requires `HARNESSIE_LIVE=1` and either `HARNESSIE_OPENAI_COMPAT_BASE_URL` or `HARNESSIE_LIVE_OPENAI_COMPAT=1` to use the checked-in local tier.
-- Scorecard rows: direct completion, verifier JSON, tool-loop completion, consent-loop completion, and consent-lock risky behavior.
+- Scorecard rows: direct completion, verifier JSON, structured verdict, tool-loop completion, consent-loop completion, consent-lock risky behavior, placeholder impact, and tool-contract measurement (`tool_contract`: a short tool-using task whose `tool_contract_breaks` count is the published number; the row passes when the loop completes, so the count is a valid measurement rather than a judgment).
 Do not make live evals part of the default no-network suite. Gate them behind the explicit environment flag; absent credentials or endpoints produce visible `SKIP` rows, not silent omissions.
