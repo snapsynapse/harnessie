@@ -20,7 +20,7 @@ files:
 - path: config/cascade.yaml
   sha256: 7573d03747c2bbc050174d3db2afe73110c903529d899b4c9bcf1e66d568928a
 - path: config/models.yaml
-  sha256: 7035c2c3c410270984aa8d29494a31aa42873ae7104905330e05d37c2738a2ba
+  sha256: e6d84ce8270873ff8e37a1c47483a509499a3dbdd5534ec721315cfc9c60f073
 - path: harness/schemas/v1/approval-policy.schema.json
   sha256: 3caaa9fa6ca60710908d778d3db394f508f79f9235b21986b6009a6680f238c9
 - path: harness/schemas/v1/boundary.schema.json

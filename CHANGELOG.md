@@ -4,6 +4,7 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+- Point the default `local` tier at `qwen3.8:latest`, the model actually installed and already pinned by the pilot; the previous `qwen3.6:35b-mlx` default was no longer installed, so a stock local run failed before any call. Refresh the installed-model comment to the 2026-10-05 `ollama list`, re-pin the inward manifest, and update the `local` tier examples in the user guide, the brains page and the landing page to match.
 - Enforce the experimental Claude pilot's configured output-token threshold against aggregate reported output across all models, preserving capture and usage on refusal and latching further attempts. Retain single-identity stream admission after the v6 continuation review. These source-only pilot controls are excluded from distributions and do not cap already-generated provider usage.
 - Expose each pilot delegate's actual aggregate output budget in reviewer notices and add concise-report guidance while preserving the full evidence set and required report fields. Add a separately approved, consume-once local Qwen smoke driver with a preparation-only CLI, implementation and request seals, strict local residency checks and retained accounting.
 - Align all four CodeQL Action subactions to the immutable 4.38.2 commit and group their Dependabot version updates to avoid mixed-version analysis failures.
