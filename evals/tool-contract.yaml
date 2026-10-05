@@ -1,0 +1,84 @@
+# Tool-contract scenarios: a brain that speaks another harness's tool
+# vocabulary is refused at the registry before any tool runs. The refusal
+# mechanism predates this suite; what it proves is the trace metric that
+# turns those refusals into a published per-brain number
+# (`tool_contract_breaks` in harness/trace_eval.py), and that a single
+# foreign call is recoverable while a repeated one is not.
+scenarios:
+  - id: golden_foreign_tool_name_is_refused_then_recovers
+    kind: loop
+    role: worker
+    max_steps: 4
+    task: "list the workspace and finish"
+    script:
+      - tool: bash
+        args: { command: "ls" }
+      - tool: list_files
+        args: {}
+      - tool: task_complete
+        args: { report: "listed the workspace after one refused call" }
+    expect_stop: complete
+    expect_refusal: { tool: bash, error: action_unsupported, boundary: allowlist }
+    expect_trace:
+      tool_contract_breaks: 1
+      refusals: 1
+      refusals_by_error: { action_unsupported: 1 }
+      completed_tasks: 1
+      # task_complete ends the loop and is not a tool_result, so the refused
+      # bash call and the list_files call are the two tool results here.
+      tool_calls_per_completed_task: 2.0
+
+  - id: risky_malformed_arguments_count_as_a_contract_break
+    kind: loop
+    role: worker
+    max_steps: 4
+    task: "list the workspace and finish"
+    script:
+      - tool: list_files
+        args: { _malformed: "{not json" }
+      - tool: list_files
+        args: {}
+      - tool: task_complete
+        args: { report: "recovered from one malformed call" }
+    expect_stop: complete
+    expect_refusal: { tool: list_files, error: malformed_arguments, boundary: phase }
+    expect_trace:
+      tool_contract_breaks: 1
+      completed_tasks: 1
+
+  - id: risky_repeated_foreign_tool_name_is_stuck_not_completed
+    kind: loop
+    role: worker
+    max_steps: 6
+    task: "list the workspace and finish"
+    script:
+      - tool: bash
+        args: { command: "ls" }
+      - tool: bash
+        args: { command: "ls" }
+      - tool: bash
+        args: { command: "ls" }
+    expect_stop: stuck
+    expect_trace:
+      tool_contract_breaks: 3
+      completed_tasks: 0
+      tool_calls_per_completed_task: null
+
+  - id: golden_policy_refusal_is_not_a_contract_break
+    kind: loop
+    role: worker
+    consent: true
+    max_steps: 4
+    task: "write a file without accepting the task"
+    script:
+      - tool: write_file
+        args: { path: "blocked.txt", content: "x" }
+      - tool: task_complete
+        args: { report: "write was refused under the consent lock" }
+    expect_stop: complete
+    expect_refusal: { tool: write_file, error: consent_required, boundary: consent }
+    expect_file_absent: "blocked.txt"
+    expect_trace:
+      refusals: 1
+      tool_contract_breaks: 0
+      refusals_by_error: { consent_required: 1 }

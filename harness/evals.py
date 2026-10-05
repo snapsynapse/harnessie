@@ -271,6 +271,7 @@ def _run_loop_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
         _check_file_expectations(scenario, workspace, problems)
         _check_refusal_expectations(scenario, run_dir, problems)
         _check_events_absent(scenario, run_dir, problems)
+        _check_trace_expectations(scenario, run_dir, problems)
     return EvalCaseResult(
         id=scenario["id"],
         passed=not problems,
@@ -309,6 +310,28 @@ def _check_refusal_expectations(scenario: dict[str, Any], run_dir: Path,
     for field in fields:
         if not any(e.get(field) for e in targets):
             problems.append(f"refusal event lacks field {field!r}")
+
+
+def _check_trace_expectations(scenario: dict[str, Any], run_dir: Path,
+                              problems: list[str]) -> None:
+    """Assert exact values of `harness/trace_eval.py` metrics.
+
+    `expect_trace` maps metric names to the value the recorded trace must
+    reduce to. An unknown metric name is a scenario authoring error and fails
+    the case rather than passing vacuously.
+    """
+    expected = scenario.get("expect_trace")
+    if not expected:
+        return
+    from .trace_eval import analyze_trace, load_events
+
+    events_path = run_dir / "events.jsonl"
+    metrics = analyze_trace(load_events(events_path) if events_path.exists() else [])
+    for name, value in expected.items():
+        if name not in metrics:
+            problems.append(f"expect_trace names unknown metric {name!r}")
+        elif metrics[name] != value:
+            problems.append(f"trace {name}={metrics[name]!r}, expected {value!r}")
 
 
 def _check_events_absent(scenario: dict[str, Any], run_dir: Path,
