@@ -149,9 +149,14 @@ def test_sealed_missing_source_also_refuses(packet, tmp_path):
     assert not (tmp_path / "handoff").exists()
 
 
+# Explicit ids keep the oversized payloads out of the test node id. pytest
+# exports that id as PYTEST_CURRENT_TEST, and Linux refuses to exec a child
+# (here, prepare_packet's `git rev-parse`) when any single environment
+# string exceeds 128 KiB; macOS has no such per-string limit.
 @pytest.mark.parametrize("data,reason", [(b"x" * 256001, "evidence_limit"),
                                          (b"\\" * 80000, "input_limit"),
-                                         (b"\xff", "non_text_input")])
+                                         (b"\xff", "non_text_input")],
+                         ids=["evidence_limit", "input_limit", "non_text_input"])
 def test_limits_and_utf8_fail_before_writes(packet, tmp_path, data, reason):
     root, _ = packet
     seal = change_source(root, "INTENT.md", data)

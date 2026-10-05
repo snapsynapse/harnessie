@@ -26,9 +26,15 @@ from test_pilot_qwen import complete, pilot, response
 def transport(tmp_path, monkeypatch, body=b"not-json", code=None):
     actual = subprocess.Popen
     seen = []
+    # The fake child reads its body from a file rather than carrying it in
+    # the `-c` source: Linux refuses to exec when one argv string exceeds
+    # 128 KiB, and the overflow test needs a 150,000-byte body.
+    body_path = tmp_path / "fake-child-body.bin"
+    body_path.write_bytes(body)
     def fixture(argv, **kwargs):
         seen.append(argv)
-        script = code or f"import sys; sys.stdout.buffer.write({body!r})"
+        script = code or (f"import sys; sys.stdout.buffer.write("
+                          f"open({str(body_path)!r}, 'rb').read())")
         return actual([sys.executable, "-c", script], **kwargs)
     monkeypatch.setattr(capture.subprocess, "Popen", fixture)
     store = ResponseCaptureStore(tmp_path / "responses", 128000)
