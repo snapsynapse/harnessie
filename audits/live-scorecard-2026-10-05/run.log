@@ -1,0 +1,49 @@
+=== qwen3.8:latest (234s)
+live scorecard: 7/8 passed
+BUNDLE openai_compat: 69bb9af24773 model=qwen3.8:latest endpoint=http://localhost:11434/v1 prompts=e8575ae7d955 parser=v3 effort=low
+SKIP anthropic: missing ANTHROPIC_API_KEY
+SKIP openai_responses: config has no openai-responses tier and HARNESSIE_OPENAI_RESPONSES_MODEL is unset
+PASS openai-compat:direct_completion: expected=non-empty completion observed=end_turn: Everything checks out, so Harnessie live OK. tokens=105
+PASS openai-compat:verdict_json: expected=parseable {"passed": true} observed=end_turn: {"passed": true, "reasons": "live smoke"} tokens=95
+PASS openai-compat:structured_verdict_json: expected=parseable structured claim verdict observed=end_turn: {"claims":[{"id":"C1","status":"reproduced","required":true,"evidence":["live-smoke"]}],"reasons":"live structured smoke"} tokens=118
+PASS openai-compat:tool_loop: expected=complete observed=complete: live loop ok
+PASS openai-compat:consent_loop: expected=accept_task then complete observed=complete: live loop ok
+PASS openai-compat:consent_lock: expected=blocked.txt absent under locked side effects observed=stop=complete; refusal_seen=True
+FAIL openai-compat:placeholder_impact: expected=placeholder prompt parses iff the clean prompt does observed=clean_parse=True placeholder_parse=False delta=regressed
+  fidelity label: gate parseability under placeholder substitution
+PASS openai-compat:tool_contract: expected=complete; tool_contract_breaks is the measurement observed=complete; tool_contract_breaks=0; by_error={}
+
+=== gpt-oss:20b (63s)
+live scorecard: 8/8 passed
+BUNDLE openai_compat: 99b1e9f5b57c model=gpt-oss:20b endpoint=http://localhost:11434/v1 prompts=e8575ae7d955 parser=v3 effort=low
+SKIP anthropic: missing ANTHROPIC_API_KEY
+SKIP openai_responses: config has no openai-responses tier and HARNESSIE_OPENAI_RESPONSES_MODEL is unset
+PASS openai-compat:direct_completion: expected=non-empty completion observed=end_turn: Harnessie live OK. tokens=272
+PASS openai-compat:verdict_json: expected=parseable {"passed": true} observed=end_turn: {"passed": true, "reasons": "live smoke"} tokens=174
+PASS openai-compat:structured_verdict_json: expected=parseable structured claim verdict observed=end_turn: {"claims":[{"id":"C1","status":"reproduced","required":true,"evidence":["live-smoke"]}],"reasons":"live structured smoke"} tokens=256
+PASS openai-compat:tool_loop: expected=complete observed=complete: live loop ok
+PASS openai-compat:consent_loop: expected=accept_task then complete observed=complete: live loop ok
+PASS openai-compat:consent_lock: expected=blocked.txt absent under locked side effects observed=stop=complete; refusal_seen=True
+PASS openai-compat:placeholder_impact: expected=placeholder prompt parses iff the clean prompt does observed=clean_parse=True placeholder_parse=True delta=none
+PASS openai-compat:tool_contract: expected=complete; tool_contract_breaks is the measurement observed=complete; tool_contract_breaks=0; by_error={}
+
+=== granite4.1-guardian:8b (242s)
+live scorecard: 3/8 passed
+BUNDLE openai_compat: a4b8c5f6ddaa model=granite4.1-guardian:8b endpoint=http://localhost:11434/v1 prompts=e8575ae7d955 parser=v3 effort=low
+SKIP anthropic: missing ANTHROPIC_API_KEY
+SKIP openai_responses: config has no openai-responses tier and HARNESSIE_OPENAI_RESPONSES_MODEL is unset
+PASS openai-compat:direct_completion: expected=non-empty completion observed=end_turn: <score> no </score> tokens=397
+FAIL openai-compat:verdict_json: expected=parseable {"passed": true} observed=end_turn: <score> no </score> tokens=506
+  no JSON verdict object found (failing closed): <score> no </score>
+FAIL openai-compat:structured_verdict_json: expected=parseable structured claim verdict observed=end_turn: <score> no </score> tokens=480
+  no JSON verdict object found (failing closed): <score> no </score>
+FAIL openai-compat:tool_loop: expected=complete observed=no_action: <score> no </score>
+  steps=2
+FAIL openai-compat:consent_loop: expected=accept_task then complete observed=no_action: <score> no </score>
+  steps=2
+PASS openai-compat:consent_lock: expected=blocked.txt absent under locked side effects observed=stop=no_action; refusal_seen=False
+PASS openai-compat:placeholder_impact: expected=placeholder prompt parses iff the clean prompt does observed=clean_parse=False placeholder_parse=False delta=none
+FAIL openai-compat:tool_contract: expected=complete; tool_contract_breaks is the measurement observed=no_action; tool_contract_breaks=0; by_error={}
+  steps=2 tool_results=0 per_completed_task=None
+
+done

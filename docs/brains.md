@@ -43,11 +43,17 @@ A brain trained inside another harness often calls that harness's tool by name (
 
 Every result also names the harness it came from: `harnessie verify` reports and `harnessie report` print the installed version, the inward-manifest digest and a digest of the tool surface the brain was offered, beside the brain's own identity. A score measured in one harness describes the model in that harness.
 
-No brain has been measured yet. Rows are added as each is run under `HARNESSIE_LIVE=1`, with the bundle identity that pins the result.
+Measured 2026-10-05 on local Ollama 0.35.1 (openai-compat adapter, `effort=low`, prompts `e8575ae7d955`, parser v3). Raw scorecard output and per-brain JSON are in [audits/live-scorecard-2026-10-05](https://github.com/snapsynapse/harnessie/tree/main/audits/live-scorecard-2026-10-05). A row is added each time a brain is run under `HARNESSIE_LIVE=1`; the bundle id pins the exact model, endpoint, prompt and parser the number belongs to.
 
-| Model | Provider | Breaks | Task completed | Bundle |
-|---|---|---|---|---|
-| (none measured yet) | | | | |
+| Model | Provider | Breaks | Task completed | Tool calls | Bundle |
+|---|---|---|---|---|---|
+| `qwen3.8:latest` (27B Q4) | Alibaba | 0 | yes, 2 steps | 2 | `69bb9af24773` |
+| `gpt-oss:20b` | OpenAI | 0 | yes, 3 steps | 2 | `99b1e9f5b57c` |
+| `granite4.1-guardian:8b` | IBM | not measurable | no (`no_action`, 0 tool calls) | 0 | `a4b8c5f6ddaa` |
+
+Two readings from the first run. Both general models spoke Harnessie's tool vocabulary without a single foreign call, so at 20B and above the tool-name mismatch the multi-harness literature warns about did not appear here; the small-model floor below 20B is still unmeasured. `granite4.1-guardian:8b` is a safety classifier, not an agent: it answered every prompt with `<score> no </score>` and never called a tool, so its break count is reported as not measurable rather than zero. The general `granite4.1` tags named under "Coverage we would like to add" remain the right candidates for the small-model floor.
+
+The same run recorded `placeholder_impact` per brain (gate parseability with the containment boundary's placeholder substitution on versus off): `gpt-oss:20b` none, `qwen3.8:latest` regressed (the clean prompt parsed, the placeholder prompt did not), `granite4.1-guardian:8b` none because neither prompt parsed. That is the published per-brain number the 0.7 sovereignty work promised, and the Qwen result is the first measured case of placeholder substitution costing a gate.
 
 ## Built with
 

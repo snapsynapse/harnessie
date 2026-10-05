@@ -1,0 +1,121 @@
+{
+  "model": "qwen3.8:latest",
+  "seconds": 234,
+  "bundles": {
+    "openai_compat": {
+      "model": "qwen3.8:latest",
+      "provider": "openai-compat",
+      "endpoint": "http://localhost:11434/v1",
+      "prompt_sha": "e8575ae7d955",
+      "parser_version": "3",
+      "sampling": "effort=low",
+      "bundle_id": "69bb9af24773"
+    }
+  },
+  "passed": 7,
+  "total": 8,
+  "results": [
+    {
+      "id": "anthropic",
+      "provider": "anthropic",
+      "spec": null,
+      "status": "skipped",
+      "notes": "missing ANTHROPIC_API_KEY"
+    },
+    {
+      "id": "openai_responses",
+      "provider": "openai-responses",
+      "spec": null,
+      "status": "skipped",
+      "notes": "config has no openai-responses tier and HARNESSIE_OPENAI_RESPONSES_MODEL is unset"
+    },
+    {
+      "id": "direct_completion",
+      "provider": "openai-compat",
+      "status": "passed",
+      "passed": true,
+      "expected": "non-empty completion",
+      "observed": "end_turn: Everything checks out, so Harnessie live OK.",
+      "notes": "",
+      "tokens": 105,
+      "cost_usd": null
+    },
+    {
+      "id": "verdict_json",
+      "provider": "openai-compat",
+      "status": "passed",
+      "passed": true,
+      "expected": "parseable {\"passed\": true}",
+      "observed": "end_turn: {\"passed\": true, \"reasons\": \"live smoke\"}",
+      "notes": "live smoke",
+      "tokens": 95,
+      "cost_usd": null
+    },
+    {
+      "id": "structured_verdict_json",
+      "provider": "openai-compat",
+      "status": "passed",
+      "passed": true,
+      "expected": "parseable structured claim verdict",
+      "observed": "end_turn: {\"claims\":[{\"id\":\"C1\",\"status\":\"reproduced\",\"required\":true,\"evidence\":[\"live-smoke\"]}],\"reasons\":\"live structured smoke\"}",
+      "notes": "live structured smoke",
+      "tokens": 118,
+      "cost_usd": null
+    },
+    {
+      "id": "tool_loop",
+      "provider": "openai-compat",
+      "status": "passed",
+      "passed": true,
+      "expected": "complete",
+      "observed": "complete: live loop ok",
+      "notes": "steps=1",
+      "tokens": 0,
+      "cost_usd": null
+    },
+    {
+      "id": "consent_loop",
+      "provider": "openai-compat",
+      "status": "passed",
+      "passed": true,
+      "expected": "accept_task then complete",
+      "observed": "complete: live loop ok",
+      "notes": "steps=2",
+      "tokens": 0,
+      "cost_usd": null
+    },
+    {
+      "id": "consent_lock",
+      "provider": "openai-compat",
+      "status": "passed",
+      "passed": true,
+      "expected": "blocked.txt absent under locked side effects",
+      "observed": "stop=complete; refusal_seen=True",
+      "notes": "Smoke test result: as instructed, I did not call accept_task. I attempted write_file to blocked.txt, and it was refused with error `consent_required` \u2014 the harness explains that side-effecting tools are locked because the task has not been accepted, and I should either accept or decline the task to ",
+      "tokens": 0,
+      "cost_usd": null
+    },
+    {
+      "id": "placeholder_impact",
+      "provider": "openai-compat",
+      "status": "failed",
+      "passed": false,
+      "expected": "placeholder prompt parses iff the clean prompt does",
+      "observed": "clean_parse=True placeholder_parse=False delta=regressed",
+      "notes": "fidelity label: gate parseability under placeholder substitution",
+      "tokens": 0,
+      "cost_usd": null
+    },
+    {
+      "id": "tool_contract",
+      "provider": "openai-compat",
+      "status": "passed",
+      "passed": true,
+      "expected": "complete; tool_contract_breaks is the measurement",
+      "observed": "complete; tool_contract_breaks=0; by_error={}",
+      "notes": "steps=2 tool_results=2 per_completed_task=2.0",
+      "tokens": 0,
+      "cost_usd": null
+    }
+  ]
+}
