@@ -15,9 +15,9 @@
   },
   "input_sha256": "dab1b391931c52ddbb3691c14930d3fbcd8924216a4366d355e79b5726144fd8",
   "locks": {
-    "dev": "e874fd7d68137693e884fbb8207fbdd6c315a1428ff363dc2afb45d543957935",
-    "release": "8e72f1e345bddba820d73eb089b198c01c3adeeda05e2d7a6c32769955cb6a4a",
-    "runtime": "21d04923d4089f6ef3b1ed536fcd9a5975f8d8e858c261edc80f1cb337f70b1a"
+    "dev": "f7b166fa252eac5af507e1200d58e9a7bbe969f6ed3100fd6cbf73bdf1a596fe",
+    "release": "ee9287b0cbe48987cff4dc359112db62c2f1848c5eb1bcfc6498374c62814798",
+    "runtime": "39d1f9f8bca819156f8da95b79cc35a3d237e32000aaaabf4b703bcb639c6997"
   },
   "schema_version": 1
 }
