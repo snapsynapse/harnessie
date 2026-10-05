@@ -33,6 +33,7 @@ from .boundary import Boundary, RehydrationGrants, SecretEgressHalt, StripMap
 from .cascade import (CascadePolicy, SIDEWAYS_REASONS, load_cascade_config,
                       validate_against_tiers)
 from .events import EventLog
+from .identity import harness_identity
 from .inward_manifest import verify_inward_manifest
 from .loop import AgentLoop, LoopResult
 from .maiden import (
@@ -309,6 +310,11 @@ class WorkflowRunner:
         self.events.emit("workflow_start", name=wf.get("name"), run_id=self.run_id,
                          goal=goal, workflow=workflow_ref,
                          workflow_sha256=self._workflow_sha256)
+        # Every result names the harness it came from, beside the brain the
+        # routing trace names: version, pinned inputs, and the tool surface
+        # (plugins included) that this run's agents were offered.
+        self.events.emit("harness_identity",
+                         **harness_identity(self.root, self.registry))
         outcomes: list[PhaseOutcome] = []
         reports: dict[str, str] = {"goal": goal}
 

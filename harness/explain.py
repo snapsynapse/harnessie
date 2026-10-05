@@ -143,6 +143,12 @@ def format_report(run_dir: Path) -> str:
     lines = [f"Run {run_id}  —  workflow: {name}"]
     if goal:
         lines.append(f"Goal: {goal}")
+    identity = next((e for e in events if e.get("kind") == "harness_identity"), None)
+    if identity is not None:
+        lines.append(
+            f"Harness: harnessie {identity.get('harness_version', '?')}; "
+            f"inward manifest {identity.get('inward_manifest_sha256', '?')}; "
+            f"tool set {identity.get('tool_set_sha256', '?')}")
     lines.append("")
 
     if not phase_statuses:

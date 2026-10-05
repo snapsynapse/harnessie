@@ -139,6 +139,27 @@ def test_verifier_pass_verdict_exits_zero(tmp_path, monkeypatch):
     assert "Verdict: PASS" in report
 
 
+def test_report_names_the_harness_beside_the_brain(tmp_path, monkeypatch):
+    (tmp_path / "ws").mkdir()
+    patch_model(monkeypatch, [verdict_turn(True)])
+    models = write_models_yaml(tmp_path)
+    req = make_request(tmp_path, models_path=models)
+    out = run_standalone_verify(req)
+    report = out.report_path.read_text(encoding="utf-8")
+    from harness import __version__
+    assert f"- harness: harnessie {__version__}" in report
+    # The models file sits directly under tmp_path, so the project root is
+    # tmp_path's parent, which carries no inward manifest: say so.
+    assert "- inward manifest sha256: absent" in report
+    tool_line = next(line for line in report.splitlines()
+                     if line.startswith("- tool set sha256: "))
+    assert len(tool_line.split(": ", 1)[1]) == 64
+    events = [json.loads(line) for line in
+              (tmp_path / "report" / "events.jsonl").read_text().splitlines()]
+    identity = next(e for e in events if e["kind"] == "harness_identity")
+    assert identity["tool_set_sha256"] == tool_line.split(": ", 1)[1]
+
+
 def test_verifier_fail_verdict_exits_one(tmp_path, monkeypatch):
     patch_model(monkeypatch, [verdict_turn(False, "claim refuted")])
     req = make_request(tmp_path, models_path=write_models_yaml(tmp_path))

@@ -42,6 +42,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .events import EventLog
+from .identity import format_identity_lines, harness_identity
 from .loop import AgentLoop
 from .memory import ProofStore
 from .models import build_model
@@ -179,8 +180,17 @@ def _bundle_criteria(bundle: EvidenceBundle) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _project_root(req: VerifyRequest) -> Path:
+    """The project whose harness inputs govern this verification: the one
+    holding the models config, or the working directory when none was named."""
+    if req.models_path is not None:
+        return req.models_path.resolve().parent.parent
+    return Path.cwd()
+
+
 def _render_report(*, workspace: Path, criteria_path: Path,
                    fingerprint: dict[str, str], model_line: str,
+                   identity: dict[str, str],
                    check_results: list[CheckResult], verifier_section: str,
                    exit_code: int, generated: str,
                    allow_network: bool = False) -> str:
@@ -194,8 +204,9 @@ def _render_report(*, workspace: Path, criteria_path: Path,
         f"- criteria: {criteria_path}",
     ]
     lines += [f"- {k}: {v}" for k, v in fingerprint.items()]
-    lines += [f"- verifier model: {model_line}",
-              "- checks network: "
+    lines += [f"- verifier model: {model_line}"]
+    lines += format_identity_lines(identity)
+    lines += ["- checks network: "
               + ("allowed (--allow-network)" if allow_network else "denied"),
               f"- exit code: {exit_code} "
               "(0 verified / 1 failed / 2 cannot verify, fail closed)",
@@ -265,6 +276,12 @@ def run_standalone_verify(req: VerifyRequest) -> VerifyOutcome:
     report_dir.mkdir(parents=True, exist_ok=True)
     events = EventLog(report_dir, echo=False)
     proofs = ProofStore(report_dir)
+    # The registry is built before any check so the report can name the tool
+    # surface the verifier was offered, whether or not the agent layer runs.
+    registry = ToolRegistry()
+    register_builtin(registry, workspace=workspace, events=events)
+    if evidence_bundle is not None and evidence_bundle.files:
+        register_evidence_reader(registry, evidence_bundle)
 
     # -- model resolution (before any check runs: refuse early, bill nothing)
     model = None
@@ -305,10 +322,13 @@ def run_standalone_verify(req: VerifyRequest) -> VerifyOutcome:
         if evidence_bundle is not None:
             fingerprint["evidence_bundle_sha256"] = hashlib.sha256(
                 evidence_bundle.source.read_bytes()).hexdigest()
+        identity = harness_identity(_project_root(req), registry)
+        events.emit("harness_identity", **identity)
         report = _render_report(
             workspace=workspace, criteria_path=criteria_path,
             fingerprint=fingerprint,
-            model_line=model_line, check_results=check_results,
+            model_line=model_line, identity=identity,
+            check_results=check_results,
             verifier_section=verifier_section, exit_code=exit_code,
             generated=generated, allow_network=req.allow_network)
         path = report_dir / "report.md"
@@ -346,10 +366,6 @@ def run_standalone_verify(req: VerifyRequest) -> VerifyOutcome:
     prompt = (req.verifier_prompt_path.read_text(encoding="utf-8")
               if req.verifier_prompt_path else DEFAULT_VERIFIER_PROMPT)
     role = RoleDef(name="verifier", kind="verifier", prompt=prompt)
-    registry = ToolRegistry()
-    register_builtin(registry, workspace=workspace, events=events)
-    if evidence_bundle is not None and evidence_bundle.files:
-        register_evidence_reader(registry, evidence_bundle)
     loop = AgentLoop(role="verifier", model=model, registry=registry,
                      events=events, budget=budget, max_steps=req.max_steps,
                      agent_name="verifier")

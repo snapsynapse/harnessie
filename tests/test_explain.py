@@ -66,6 +66,25 @@ def _write_events(run_dir, events):
         "\n".join(json.dumps(e) for e in events) + "\n", encoding="utf-8")
 
 
+def test_format_report_names_the_harness_when_recorded(tmp_path):
+    run_dir = tmp_path / "R9"
+    run_dir.mkdir()
+    events = [
+        {"kind": "workflow_start", "name": "bv", "run_id": "R9",
+         "workflow": "workflows/bv.yaml"},
+        {"kind": "harness_identity", "harness_version": "9.9.9",
+         "inward_manifest_sha256": "a" * 64, "tool_set_sha256": "b" * 64},
+        {"kind": "phase_done", "phase": "build", "status": "passed",
+         "spent_usd": 0.0},
+        {"kind": "workflow_done", "spent_usd": 0.0},
+    ]
+    (run_dir / "events.jsonl").write_text(
+        "\n".join(json.dumps(e) for e in events) + "\n", encoding="utf-8")
+    text = format_report(run_dir)
+    assert "Harness: harnessie 9.9.9; inward manifest " + "a" * 64 in text
+    assert "tool set " + "b" * 64 in text
+
+
 def test_format_report_missing_run(tmp_path):
     out = format_report(tmp_path / "runs" / "nope")
     assert "No run found" in out
