@@ -8,7 +8,7 @@ Harbor (https://harborframework.com/) runs an agent against a containerised task
 | 1 | failed: a check failed | `reward.txt` = `0` |
 | 2 | cannot verify: no sandbox, no checks, verifier crashed | no reward file; `harnessie-verify.json` records why |
 
-Writing `0` for exit 2 would teach a policy that an unverifiable result is a failure to avoid, which is not what the task meant to teach. Harbor treats a missing reward as a verifier that never scored, and OpenEnv's training path carries that through as `reward=None` rather than a wrong answer.
+Writing `0` for exit 2 would teach a policy that an unverifiable result is a failure to avoid, which is not what the task meant to teach. Harbor carries "no number" in two different ways, and the first real trials (see `audits/harbor-verifier-acceptance-2026-10-05.md`) showed both: a custom verifier returning `rewards=None` gives a completed trial with no score and no exception, while a `tests/test.sh` that writes no reward file makes Harbor's default verifier raise `RewardFileNotFoundError` and record an errored trial. Neither is a zero. OpenEnv's training path carries a verifier that never scored through as `reward=None`.
 
 Only deterministic checks map to reward. The verifier model (`harnessie verify` without `--no-verifier`) is a judgment and is never used as a training signal here.
 
@@ -49,7 +49,9 @@ Literal
 harbor run -p examples/harbor-verifier/tasks -a oracle -e docker
 ```
 
-Caveat, stated up front: `harnessie verify` runs every `--check` inside an OS sandbox and fails closed without one. The image ships bubblewrap, but whether bubblewrap can create namespaces inside a container depends on the runtime's seccomp and capability defaults. Where it cannot, every trial reports exit 2 and stays unscorable; that is the correct outcome, not a bug, and the diagnostic file names it. Form A avoids the question.
+Caveat, stated up front and now observed: `harnessie verify` runs every `--check` inside an OS sandbox and fails closed without one. The image ships bubblewrap, but under Harbor's Docker backend with default confinement bubblewrap cannot create the namespaces it needs, and Harnessie reports "no OS sandbox backend on Linux; child-process execution is blocked (fail-closed policy)", exit 2, no reward file. Harbor then records the trial as errored (`RewardFileNotFoundError`). That is the harness working as specified, the diagnostic file names it, and it is why Form A exists.
+
+If you run Harbor's Docker backend through Colima, put the jobs directory (`-o`) under your home directory. Colima shares only `$HOME` into its VM, and a jobs directory elsewhere leaves the container's `/logs/verifier` mount unreachable from the host, which presents as an empty verifier directory with no diagnostic at all.
 
 ## Testing without Harbor
 
@@ -64,4 +66,4 @@ HARBOR_VERIFIER_DIR=/tmp/hv HARNESSIE_VERIFY_CMD="sh -c 'exit 2'" bash examples/
 
 ## What this does and does not establish
 
-It establishes that Harnessie's verdict contract maps cleanly onto Harbor's reward contract, including the cannot-verify case, and that a Harbor job can use Harnessie as its verifier without changes to either project. A run against a real environment backend is recorded separately when one is available; until then the example is proven at the file level.
+It establishes that Harnessie's verdict contract maps cleanly onto Harbor's reward contract, including the cannot-verify case, and that a Harbor job can use Harnessie as its verifier without changes to either project. Four trials on Harbor's Docker backend are recorded in `audits/harbor-verifier-acceptance-2026-10-05.md`: the host-side form scored 1 with the oracle agent, 0 with the no-op agent, and stayed unscored with an empty check list; the in-sandbox form failed closed as described above. One task and one backend; nothing here is evidence about any brain.

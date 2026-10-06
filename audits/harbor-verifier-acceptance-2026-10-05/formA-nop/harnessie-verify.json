@@ -1,0 +1,7 @@
+{
+  "verifier": "harnessie",
+  "exit_code": 1,
+  "outcome": "failed",
+  "scored": true,
+  "report": "<repo>/runs/harbor-jobs-2026-10-05/formA-nop/2026-10-05__21-22-35/calc-add-mean__ocrqAKe/verifier/harnessie/report.md"
+}

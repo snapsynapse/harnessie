@@ -1,0 +1,26 @@
+{
+  "trial_name": "calc-add-mean__ocrqAKe",
+  "agent": "nop",
+  "verifier_result": {
+    "rewards": {
+      "reward": 0.0
+    }
+  },
+  "exception_type": null,
+  "job_stats": {
+    "n_completed_trials": 1,
+    "n_errored_trials": 0
+  },
+  "eval": {
+    "n_trials": 1,
+    "n_errors": 0,
+    "reward_stats": {
+      "reward": {
+        "0.0": [
+          "calc-add-mean__ocrqAKe"
+        ]
+      }
+    },
+    "exception_stats": {}
+  }
+}

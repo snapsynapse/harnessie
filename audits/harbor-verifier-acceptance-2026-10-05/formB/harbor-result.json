@@ -1,0 +1,20 @@
+{
+  "trial_name": "calc-add-mean__W7Xo72p",
+  "agent": "oracle",
+  "verifier_result": null,
+  "exception_type": "RewardFileNotFoundError",
+  "job_stats": {
+    "n_completed_trials": 1,
+    "n_errored_trials": 1
+  },
+  "eval": {
+    "n_trials": 0,
+    "n_errors": 1,
+    "reward_stats": {},
+    "exception_stats": {
+      "RewardFileNotFoundError": [
+        "calc-add-mean__W7Xo72p"
+      ]
+    }
+  }
+}

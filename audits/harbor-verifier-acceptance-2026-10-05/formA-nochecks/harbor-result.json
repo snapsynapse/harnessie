@@ -1,0 +1,18 @@
+{
+  "trial_name": "calc-add-mean__5xmieze",
+  "agent": "oracle",
+  "verifier_result": {
+    "rewards": null
+  },
+  "exception_type": null,
+  "job_stats": {
+    "n_completed_trials": 1,
+    "n_errored_trials": 0
+  },
+  "eval": {
+    "n_trials": 0,
+    "n_errors": 0,
+    "reward_stats": {},
+    "exception_stats": {}
+  }
+}
