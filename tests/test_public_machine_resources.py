@@ -191,7 +191,7 @@ def test_cli_manifest_is_complete_and_explicitly_not_hosted():
     assert set(data["paths"]) == {
         "run", "resume", "report", "audit", "eval", "verify-manifest",
         "verify-inward-manifest", "approve-maiden", "verify", "init", "validate",
-        "ownership", "observe", "export-aidr",
+        "ownership", "observe", "atif", "export-aidr",
     }
     for command, contract in data["paths"].items():
         assert contract["synopsis"].startswith(f"harnessie {command}")
@@ -339,7 +339,9 @@ def test_export_discovery_distinguishes_source_availability_and_write_boundary()
     command = _json(CLI_MANIFEST)["paths"]["export-aidr"]
     assert export["command"] == command["synopsis"]
     assert export["status"] == command["status"] == "live"
-    assert data["release_context"]["publication_status"] == "published"
+    # A release candidate is "pending" between its tag and its PyPI publication;
+    # the closeout commit flips it to "published". Both are truthful states.
+    assert data["release_context"]["publication_status"] in {"pending", "published"}
     assert export["network_default"] == "not used"
     assert export["exit_codes"] == {"0": "exported", "2": "refused"}
     assert "Writes one" in export["side_effects"]

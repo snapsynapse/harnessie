@@ -36,7 +36,7 @@ Our task's `[agent] timeout_sec` was 300 s. The local 27B model needed longer th
 - Two tasks, one backend, one local model. This is a contract and plumbing result, not evidence about any brain.
 - Eval-level capture only; `n_trainable_tokens` is 0 on every rollout.
 - The agent's confinement for tool effects is the Harbor environment. Harnessie's own OS sandbox is not engaged because nothing executes on the host; the host process still runs with the operator's authority, as any Harbor external agent does.
-- `openenv harbor rollout` integration would need an upstream seam entry (or a working `module:Class` path); recorded as the next external step, not attempted here.
+- `openenv harbor rollout` cannot currently load this agent by import path; the recorded trials used `harbor run` with the proxy started standalone.
 
 ## Reproduce
 

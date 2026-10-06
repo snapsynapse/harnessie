@@ -2,25 +2,30 @@
 
 ## Release boundary
 
-Harnessie 1.4.1 is the stable core release on GitHub and PyPI. Its signed tag resolves to `296deed2f91cd4c8eeecad82b83f137dd029ea26`; release workflow [34276711096](https://github.com/snapsynapse/harnessie/actions/runs/34276711096) passed. Wheel, source distribution, CycloneDX SBOM and checksums have verified original-build provenance. Both PyPI distributions match the GitHub assets and pass cryptographic publisher verification. A fresh Python 3.13 public-index installation exercised the installed exporter and its actual mock-workflow example.
+Harnessie 1.4.1 remains the stable core release on GitHub and PyPI until the 1.5.0 GitHub Release and PyPI publication complete. Harnessie 1.5.0 is prepared for publication from the signed tag `v1.5.0`. Package and source carry 1.5.0, and the assistant guide, its sidecar and the trust-bundle pins are synchronized to the 1.5.0 bytes. The GitHub Release, the PyPI distributions, independent package verification and downstream propagation have not occurred at this point in the record; [release execution](audits/release-1.5.0.md) and its [machine-readable state](audits/release-1.5.0-state.json) append each stage with its evidence as it completes. Until the PyPI publication is recorded there, 1.4.1 remains the stable published core on GitHub and PyPI, with its evidence in [1.4.1 release execution](audits/release-1.4.1.md).
 
-Homebrew and Verify Action are separately versioned downstreams. Action 0.2.2/stable `v0` and Homebrew 1.4.1 are published and verified; their exact identities and acceptance are recorded in [release execution](audits/release-1.4.1.md). Engine wrappers remain independently released at 0.1.0 because this release consumes no new wrapper seam.
+Homebrew and Verify Action are separately versioned downstreams. Action 0.2.2/stable `v0` and Homebrew 1.4.1 are published and pin core 1.4.1; their 1.5.0 bumps are prepared and are pushed after PyPI publication, so both serve 1.4.1 until then. Engine wrappers remain independently released at 0.1.0 because this release consumes no new wrapper seam.
 
 ## Verified evidence
 
-The final 1.4.1 guide earned hosted GuideCheck Level 4 under profile 2.0.0 on 2026-09-08 UTC with zero blocking findings. Sam applied the final Namecheap DNS value. The served guide, sidecar, DNS, repository and signed tag agree on SHA-256 `7ab4c0a952109ea10257b1a9859533778261291605ce386708bccb305bbf09dc`. Conformance is not runtime safety or Level 5 enforcement.
+The 1.5.0 feature evidence is four dated acceptance records: [ATIF export](audits/atif-export-acceptance-2026-10-05.md) (a Harbor-valid trajectory whose call count matched OpenEnv's capture proxy), [Harbor verifier](audits/harbor-verifier-acceptance-2026-10-05.md) (four Docker-backend trials: reward 1, reward 0, unscored, and the in-sandbox form failing closed), [Harbor agent](audits/harbor-agent-acceptance-2026-10-05.md) (three Docker-backend trials with local Qwen through the capture proxy, one with Harnessie on both sides) and the [live scorecard](audits/live-scorecard-2026-10-05/README.md) (first `tool_contract` and per-brain `placeholder_impact` numbers, local Ollama only). Each names the Harbor, OpenEnv, backend, model and Harnessie versions it ran under; a different version of any of them requires a new run. Call-count agreement with the proxy is established; token-level agreement is not and needs a token-returning engine.
 
-The local release gate passed with 718 tests, one live-provider opt-in skip, 28 strict expected failures for not-yet-implemented slices and 66/66 deterministic evaluations. Exact release-commit CI, CodeQL, Scorecard and Pages passed. The dated live Siteline result is 97/100, grade A; production search checked ten pages with zero defects. [Release execution](audits/release-1.4.1.md) and its [machine-readable state](audits/release-1.4.1-state.json) retain exact receipts and limits. Prior [1.3.1 evidence](audits/release-1.3.1.md) remains historical; its guide receipt does not cover current bytes.
+The 1.5.0 guide's served copy, sidecar and `docs/MANIFEST.yaml` pins agree. Its hosted GuideCheck result is pending the DNS TXT rotation Sam performs; the local reference verifier reports the expected `anchor.independent.missing` until then, and no level is claimed for the 1.5.0 bytes. The [1.4.1 receipt](audits/release-1.4.1/guidecheck-prepublication.json) covers only the 1.4.1 bytes. Conformance is not runtime safety or Level 5 enforcement.
+
+The local release gate counts for the exact release commit, exact-commit CI, CodeQL, Scorecard and Pages results are recorded in [release execution](audits/release-1.5.0.md) when they run; this document does not restate them. Prior [1.4.1 evidence](audits/release-1.4.1.md) remains historical.
 
 ## Delivered scope
 
-- The [open-record AIDR exporter](AIDR_EXPORT.md) carries recorded positions and objections into one explicitly named new record, preserves original-role attribution, binds consumed source/evidence hashes, and refuses arbitration or ambiguous input. It is an operator-issued file write outside runner ownership and consent mediation. It makes no model calls, authors no human arbitration and cannot resume the original run.
-- The [installed mock example](examples/aidr-export/README.md) exercises actual runner output, repeated roles and dissent, installed CLI export, pinned AIDR 0.1.0 lint, unchanged inputs, a preserved human halt and unsupported-format refusal. Native Windows export remains unsupported.
-- The [offline observer](OBSERVER.md) remains the conservative shipped outcome of [AIDR-0009](decisions/AIDR-0009-bid-rounds-and-run-observer.md). Its authoritative human arbitration is unchanged. Exit 0 means observation succeeded, not that the observed run passed.
+- Harness identity on every result: `harnessie verify` reports and `harnessie report` print the installed version, inward-manifest digest and tool-surface digest beside the brain, and both the standalone verifier and the workflow runner emit a `harness_identity` event (`harness/identity.py`). These are reported identities, not authorship proof.
+- Tool-contract metrics: `trace_eval` adds `refusals_by_error`, `tool_contract_breaks`, `completed_tasks` and `tool_calls_per_completed_task`; the live scorecard's `tool_contract` row and the table in [docs/brains.md](docs/brains.md) publish the count per brain; `evals/tool-contract.yaml` proves the counting. Counts are per bundle and local-only so far.
+- `harnessie atif RUN_ID_OR_DIR [--out PATH] [--force]` exports a hash-chained event log as an ATIF-v1.7 trajectory with no model calls, refusing a broken chain, an unfinished loop, a step gap or an existing output without `--force`, and reporting absent fields rather than inventing them. `model_turn` events carry `input_tokens`, `output_tokens`, `tool_call_ids`, `model`, `provider` and `effort`; `tool_result` events carry `call_id`.
+- [Harbor verifier](examples/harbor-verifier/README.md) and [Harbor agent](examples/harbor-agent/README.md) examples: exit 0 maps to reward 1, exit 1 to reward 0, exit 2 to no reward file, so cannot-verify stays unscorable; the agent runs Harnessie's loop host side with the builtin worker policy unchanged and Harbor's timeout recorded as a `model_error` stop. Plumbing results on one backend, not brain evidence.
+- Maintenance: the 2026-10-05 dependency lock refresh (urllib3 2.8.0 resolving the three open Dependabot alerts, plus patch updates), the Dependabot `exclude-paths` note, CodeQL subactions aligned to 4.38.2, the default `local` tier pointed at the installed `qwen3.8:latest`, and Linux portability for two pilot tests.
+- Retained unchanged from earlier releases: the [open-record AIDR exporter](AIDR_EXPORT.md) with its [installed mock example](examples/aidr-export/README.md), and the [offline observer](OBSERVER.md) as the conservative shipped outcome of [AIDR-0009](decisions/AIDR-0009-bid-rounds-and-run-observer.md). Exit 0 from the observer means observation succeeded, not that the observed run passed.
 
 ## Remaining release order
 
-Core and downstream external closeout gates are complete. This documentation closeout records their completed state; its exact-commit CI and deployed-byte checks complete the sequence. Release-state evidence distinguishes each stage; branch push or fixture success alone does not establish customer acceptance or a live model verdict.
+Core and downstream external closeout gates remain open. Local release gate on the candidate commit, exact-commit CI, served-byte comparison after Pages deploys, the signed tag, DNS rotation and hosted GuideCheck acceptance, the GitHub Release, PyPI publication through the protected environment, independent package verification, then the prepared Verify Action and Homebrew pushes. [Release execution](audits/release-1.5.0.md) distinguishes each stage; a branch push, a local gate pass or fixture success alone does not establish publication, customer acceptance or a live model verdict.
 
 ## Remaining work
 
@@ -52,7 +57,7 @@ The [controlled-review pilot](audits/controlled-review-pilot-2026-09-09.md) rema
 
 ## Adoption direction
 
-The lead adoption surface is `harnessie verify` as a fail-closed intake gate for agent-produced changes. Ringer composes through its process-exit contract; the full harness supplies consent, ownership, containment, human arbitration and tamper-evident audit. Component authority and release ordering live in [ECOSYSTEM.md](ECOSYSTEM.md).
+The lead adoption surface is `harnessie verify` as a fail-closed intake gate for agent-produced changes. Ringer composes through its process-exit contract, and the [Harbor verifier example](examples/harbor-verifier/README.md) composes the same contract with Harbor's reward interface while keeping cannot-verify unscorable. The [Harbor agent example](examples/harbor-agent/README.md) shows the governed loop running as an external agent with its policy unchanged and its ATIF trajectory reconcilable against an independent capture. The full harness supplies consent, ownership, containment, human arbitration and tamper-evident audit. Component authority and release ordering live in [ECOSYSTEM.md](ECOSYSTEM.md).
 
 ## External and optional checks
 
@@ -68,6 +73,7 @@ python3 -m pytest -q
 python3 -m harness.cli eval
 python3 -m harness.cli verify-manifest
 python3 -m harness.cli verify-inward-manifest
+python3 -m harness.cli validate
 python3 scripts/build_docs_html.py --check
 git diff --check
 ```

@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "repository": "snapsynapse/harnessie",
+  "profile": "core-release",
+  "authority": "Sam authorized the 1.5.0 release through the signed tag and GitHub Release on 2026-10-06, with Verify Action and Homebrew bumps prepared alongside and pushed after PyPI publication.",
+  "start_head": "5913591fd9434a0c3cb7f03a0a4fa37a6e9a23b0",
+  "candidate_head": null,
+  "candidate_version": "1.5.0",
+  "updated_at": "2026-10-06T00:00:00Z",
+  "guide": {
+    "sha256": "f6f1ce225d2dcafe7e2b9da5e1b8539099e6a602a8d827dd02ed02f0159bc631",
+    "bytes": 8054,
+    "profile_version": "2.0.0",
+    "dns_value_pending": "v=1; sha256=f6f1ce225d2dcafe7e2b9da5e1b8539099e6a602a8d827dd02ed02f0159bc631; url=https://harnessie.com/.well-known/assistant-guide.txt"
+  },
+  "steps": [
+    {"id": "candidate", "status": "in_progress", "evidence": "Version 1.5.0 in pyproject and package; guide, sidecar and trust pins synchronized; release documentation tranche in preparation.", "head": null},
+    {"id": "local_gate", "status": "pending", "evidence": null},
+    {"id": "exact_commit_ci", "status": "pending", "evidence": null},
+    {"id": "served_bytes", "status": "pending", "evidence": null},
+    {"id": "signed_tag", "status": "pending", "evidence": null},
+    {"id": "dns_rotation", "status": "pending", "evidence": "Awaiting Sam's Namecheap change to the recorded value."},
+    {"id": "hosted_guidecheck", "status": "pending", "evidence": null},
+    {"id": "github_release", "status": "pending", "evidence": null},
+    {"id": "pypi_publication", "status": "pending", "evidence": null},
+    {"id": "package_verification", "status": "pending", "evidence": null},
+    {"id": "verify_action", "status": "pending", "evidence": "Branch prepared locally; push after PyPI."},
+    {"id": "homebrew", "status": "pending", "evidence": "Branch prepared locally; sdist URL and digest after PyPI."},
+    {"id": "closeout", "status": "pending", "evidence": null}
+  ]
+}

@@ -16,7 +16,7 @@ harnessie init my-project      # scaffold + guided readiness check + zero-dollar
 cd my-project
 ```
 
-This documentation covers Harnessie 1.4.1, published and verified on GitHub and PyPI. Check the installed version before using new commands; release propagation is recorded in NEXT.md. Homebrew 1.4.1 is also published and its installed exporter example is verified.
+This documentation covers Harnessie 1.5.0, prepared for publication from the signed tag; 1.4.1 remains the published release on GitHub, PyPI and Homebrew until NEXT.md records the 1.5.0 publication. Check the installed version before using new commands (`atif` needs 1.5.0 or newer); release propagation is recorded in NEXT.md.
 
 Working on Harnessie itself (or wanting the test suite)? Install from source instead:
 

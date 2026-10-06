@@ -1,0 +1,56 @@
+{
+  "evaluated_commit": "5913591fd9434c36a864caa1ad349e60eefc4f33",
+  "scorecard_date": "2026-10-06T05:42:04Z",
+  "score": 7,
+  "note": "Pre-release review against the last pushed commit before the 1.5.0 release commit; the release commit's own result is appended at closeout.",
+  "findings": [
+    {
+      "rule": "Code-Review",
+      "score": 0,
+      "reason": "Found 0/30 approved changesets -- score normalized to 0",
+      "disposition": "Sole maintainer; reviews are exact-commit CI plus recorded independent checks. Unchanged from 1.4.1."
+    },
+    {
+      "rule": "CI-Tests",
+      "score": -1,
+      "reason": "no pull request found",
+      "disposition": "Scorecard reports -1 (inconclusive) because recent commits land without pull requests; CI runs on every push to main and passed on the release candidate."
+    },
+    {
+      "rule": "CII-Best-Practices",
+      "score": 0,
+      "reason": "no effort to earn an OpenSSF best practices badge detected",
+      "disposition": "Enrollment remains optional per ROADMAP; no badge claimed."
+    },
+    {
+      "rule": "Pinned-Dependencies",
+      "score": 8,
+      "reason": "dependency not pinned by hash detected -- score normalized to 8",
+      "disposition": "Actions and pip installs are commit- and hash-pinned; the remaining deduction is the documented public-constraint consumer job that deliberately resolves ranges."
+    },
+    {
+      "rule": "Signed-Releases",
+      "score": 0,
+      "reason": "Project has not signed or included provenance with any releases.",
+      "disposition": "Release assets are attested by the release workflow (actions/attest) and verified by scripts/verify_release_provenance.py; Scorecard's check looks for signature files, which this project does not publish. Unchanged from 1.4.1."
+    },
+    {
+      "rule": "Fuzzing",
+      "score": 0,
+      "reason": "project is not fuzzed",
+      "disposition": "Bounded property tests exist (tests/test_parser_properties.py); no OSS-Fuzz integration. Unchanged from 1.4.1."
+    },
+    {
+      "rule": "Branch-Protection",
+      "score": 3,
+      "reason": "branch protection is not maximal on development and all release branches",
+      "disposition": "Existing sole-maintainer governance limitation remains explicit (RELEASE_CHECKLIST, ROADMAP post-1.2 candidates); this release used exact-commit CI gates on main. No provider-policy mutation authorized by the release."
+    },
+    {
+      "rule": "Contributors",
+      "score": 3,
+      "reason": "project has 1 contributing companies or organizations -- score normalized to 3",
+      "disposition": "Single organization; expected for a sole-maintainer project."
+    }
+  ]
+}

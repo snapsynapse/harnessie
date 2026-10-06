@@ -54,7 +54,7 @@ Python 3.11 or newer. PyYAML and jsonschema install with Harnessie. Install from
 pip install harnessie   # or: pipx install harnessie / uv tool install harnessie
 ```
 
-This documentation covers Harnessie 1.4.1, published and verified on GitHub and PyPI. `export-aidr` requires version 1.4.1 or newer. The separately maintained Homebrew formula and Harnessie Verify Action have their own release pins; `NEXT.md` records verified propagation.
+This documentation covers Harnessie 1.5.0, prepared for publication from the signed tag `v1.5.0`; 1.4.1 remains the published release on GitHub and PyPI until `NEXT.md` records the 1.5.0 publication. `atif` requires version 1.5.0 or newer; `export-aidr` requires 1.4.1 or newer. The separately maintained Homebrew formula and Harnessie Verify Action have their own release pins; `NEXT.md` records verified propagation.
 
 Developing on the harness itself (or wanting the test suite), install from source:
 
@@ -74,10 +74,11 @@ All commands are subcommands of `python3 -m harness.cli` (or `harnessie` once in
 |---|---|
 | `run <workflow> --goal "..."` | Run a workflow from a goal. Prints a pre-run cost preview first (LIVE vs MOCK, ceilings, worst case) and refuses a live run with no budget ceiling; ends with a plain-language summary and the run id. Repeat `--plugin NAME` to admit an installed `harnessie.tools.v1` plugin explicitly. |
 | `resume <run_id> <workflow> --goal "..."` | Resume a run from its journal. Re-runs only phases that did not pass. Repeat the original `--plugin NAME` set exactly; name, version, entry-point target, or tool drift refuses before model dispatch. |
-| `report <run_id>` | Plain-language run summary: outcome, per-phase status, and on a halt the one named next action. `--raw` appends the raw journal, events, and proof listing. |
+| `report <run_id>` | Plain-language run summary: outcome, per-phase status, and on a halt the one named next action. Since 1.5.0 it names the harness that produced the run (installed version, inward-manifest digest, tool-surface digest) beside the brain. `--raw` appends the raw journal, events, and proof listing. |
 | `observe <run_id>` | In 1.3.0, verify an existing local journal snapshot and write cited JSON/Markdown under its observer directory. No model calls or runner integration. Exit 0 means summary production succeeded, including for halted runs; invalid inputs exit 2. See [the observer contract](https://github.com/snapsynapse/harnessie/blob/main/OBSERVER.md). |
 | `export-aidr RUN_ID PHASE --output decisions/AIDR-NNNN-short-slug.md --arbiter HUMAN_HANDLE` | Added in 1.4.1: write one supported open phase record to an explicitly named, unused AIDR destination. Requires a declared human arbiter; does not author arbitration. Prints JSON: exit 0 exported, exit 2 refused. See [Offline AIDR export](#offline-aidr-export). |
 | `audit <run_id>` | Verify the hash chain and render the governance timeline. Exit 0 clean, 1 broken chain, 2 run not found. |
+| `atif RUN_ID_OR_DIR [--out PATH] [--force]` | Added in 1.5.0: export a run's or verify report's hash-chained event log as an ATIF-v1.7 `trajectory.json`, Harbor's trajectory format, so an independent capture can be reconciled against the harness's own record. No model calls. Refuses a broken chain, a loop without `loop_finished`, a step gap, or an existing output without `--force`; exit 0 written, exit 2 refused. Fields the log does not hold are reported as absent, never invented. See the Export paragraph under [Core concepts](#core-concepts). |
 | `eval [suite]` | Run the deterministic eval scorecards (optionally one suite YAML). |
 | `eval --live` | Run opt-in live provider scorecards; skipped visibly unless `HARNESSIE_LIVE=1` and provider configuration are present. |
 | `validate [paths...]` | Validate the six v1 authoring contracts without model calls, network, sandbox admission, run-state creation, or workspace writes. Use `--kind` when validating one document whose filename does not identify its contract. Exit 0 valid, 2 invalid. |
