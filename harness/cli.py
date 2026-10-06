@@ -92,6 +92,16 @@ def main(argv: list[str] | None = None) -> int:
         "observe", help="derive an offline, cited narrative from a run's event log")
     p_observe.add_argument("run_id")
 
+    p_atif = sub.add_parser(
+        "atif", help="export a run's event log as an ATIF trajectory.json "
+                     "(no model calls; refuses a broken chain)")
+    p_atif.add_argument("target",
+                        help="run id under runs/, or a directory holding "
+                             "events.jsonl such as a verify report dir")
+    p_atif.add_argument("--out", help="output path (default: <dir>/trajectory.json)")
+    p_atif.add_argument("--force", action="store_true",
+                        help="replace an existing output file")
+
     p_export = sub.add_parser(
         "export-aidr", help="export an existing open phase decision to AIDR without running models")
     p_export.add_argument("run_id", metavar="RUN_ID")
@@ -217,6 +227,28 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         print(f"observed {args.run_id}: {result['outcome']} "
               f"(runs/{args.run_id}/observer/narrative.md)")
+        return 0
+
+    if args.cmd == "atif":
+        from .atif import AtifExportError, write_trajectory
+        from .observer import valid_run_id
+
+        run_dir = root / "runs" / args.target
+        if valid_run_id(args.target) and (run_dir / "events.jsonl").is_file():
+            source = run_dir
+        elif Path(args.target).is_dir() and (Path(args.target) / "events.jsonl").is_file():
+            source = Path(args.target)
+        else:
+            print(f"no events log for {args.target!r}: give a run id under runs/ "
+                  "or a directory containing events.jsonl", file=sys.stderr)
+            return 2
+        try:
+            written = write_trajectory(
+                source, Path(args.out) if args.out else None, force=args.force)
+        except AtifExportError as exc:
+            print(f"atif export refused: {exc}", file=sys.stderr)
+            return 2
+        print(f"wrote {written}")
         return 0
 
     if args.cmd == "ownership":

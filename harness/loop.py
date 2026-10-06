@@ -121,10 +121,20 @@ class AgentLoop:
             turn = self.model.complete(messages, tools=tools, effort=effort)
             if self.budget:
                 self.budget.charge(self.model.spec, turn.input_tokens, turn.output_tokens)
+            # Input and output tokens ride separately beside the total, and
+            # call ids beside names, so the log can be exported as a
+            # trajectory and reconciled call for call against an external
+            # capture. The total stays for existing consumers.
             self.events.emit("model_turn", role=self.role, step=step,
                              stop_reason=turn.stop_reason,
                              tool_calls=[tc.name for tc in turn.tool_calls],
-                             tokens=turn.input_tokens + turn.output_tokens)
+                             tool_call_ids=[tc.id for tc in turn.tool_calls],
+                             tokens=turn.input_tokens + turn.output_tokens,
+                             input_tokens=turn.input_tokens,
+                             output_tokens=turn.output_tokens,
+                             model=self.model.spec.model_id,
+                             provider=self.model.spec.provider,
+                             effort=effort)
 
             if turn.stop_reason == "refusal":
                 return self._finish("refusal",
@@ -184,6 +194,7 @@ class AgentLoop:
                 ok, content, flags = res.ok, res.content, res.flags
                 self.events.emit(
                     "tool_result", role=self.role, tool=tc.name,
+                    call_id=tc.id,
                     provenance=self.registry.provenance_for(tc.name),
                     ok=ok, content=content[:300])
                 if res.refusal is not None:

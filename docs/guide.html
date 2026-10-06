@@ -142,6 +142,7 @@
 <p>Routing and budget. Task classes map to model tiers and effort levels in config. The orchestrator does not pick its own model; routing is config, not model self-assessment. A run has a token and dollar budget; hitting it stops the run cleanly.</p>
 <p>Memory. Project memory is a set of dated, provenance-stamped facts under <code>memory/</code>, maintained under approval gates. Nothing is deleted; expired facts move to an archive.</p>
 <p>Audit. Every run writes a hash-chained event log. <code>harnessie audit</code> re-verifies the chain and renders one composite timeline of agent and operator actions.</p>
+<p>Export. <code>harnessie atif &lt;run_id&gt;</code> (or a directory holding <code>events.jsonl</code>, such as a verify report) writes that same log as an ATIF-v1.7 <code>trajectory.json</code>, Harbor&#x27;s trajectory interchange format, so an independent capture of the run can be reconciled against the harness&#x27;s own record call for call. It makes no model calls, refuses a broken chain, an unfinished loop or a step gap, and reports what the log does not hold rather than inventing it: messages and tool arguments are absent by design, and tool results are the 300-character excerpts the log keeps.</p>
 <h2 id="installation-and-requirements">Installation and requirements</h2>
 <p>Python 3.11 or newer. PyYAML and jsonschema install with Harnessie. Install from PyPI:</p>
 <pre tabindex="0"><code>pip install harnessie   # or: pipx install harnessie / uv tool install harnessie</code></pre>

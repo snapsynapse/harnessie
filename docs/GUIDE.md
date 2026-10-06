@@ -44,6 +44,8 @@ Memory. Project memory is a set of dated, provenance-stamped facts under `memory
 
 Audit. Every run writes a hash-chained event log. `harnessie audit` re-verifies the chain and renders one composite timeline of agent and operator actions.
 
+Export. `harnessie atif <run_id>` (or a directory holding `events.jsonl`, such as a verify report) writes that same log as an ATIF-v1.7 `trajectory.json`, Harbor's trajectory interchange format, so an independent capture of the run can be reconciled against the harness's own record call for call. It makes no model calls, refuses a broken chain, an unfinished loop or a step gap, and reports what the log does not hold rather than inventing it: messages and tool arguments are absent by design, and tool results are the 300-character excerpts the log keeps.
+
 ## Installation and requirements
 
 Python 3.11 or newer. PyYAML and jsonschema install with Harnessie. Install from PyPI:
