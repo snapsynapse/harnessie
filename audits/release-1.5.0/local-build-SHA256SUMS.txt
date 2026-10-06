@@ -1,0 +1,3 @@
+58cceb921aee68124514894fad072ff76fa1ff066eb99c7ccbb3996e944b06c5  dist/harnessie-1.5.0-py3-none-any.whl
+fdab8e5a7ccb6d291925eb3f72a60c26b46cf35feda446762de439ba1cb21ad5  dist/harnessie-1.5.0.tar.gz
+99691b51dc1f42d492a347fa3bbf4e851a26007803bda2222c8f47fc9712029f  release/harnessie-1.5.0.cdx.json

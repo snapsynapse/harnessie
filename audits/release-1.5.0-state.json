@@ -4,9 +4,9 @@
   "profile": "core-release",
   "authority": "Sam authorized the 1.5.0 release through the signed tag and GitHub Release on 2026-10-06, with Verify Action and Homebrew bumps prepared alongside and pushed after PyPI publication.",
   "start_head": "5913591fd9434a0c3cb7f03a0a4fa37a6e9a23b0",
-  "candidate_head": null,
+  "candidate_head": "4ccf3f304bca0c88c8997c0a0cf33a909145d3ef",
   "candidate_version": "1.5.0",
-  "updated_at": "2026-10-06T00:00:00Z",
+  "updated_at": "2026-10-06T06:32:11Z",
   "guide": {
     "sha256": "f6f1ce225d2dcafe7e2b9da5e1b8539099e6a602a8d827dd02ed02f0159bc631",
     "bytes": 8054,
@@ -14,18 +14,85 @@
     "dns_value_pending": "v=1; sha256=f6f1ce225d2dcafe7e2b9da5e1b8539099e6a602a8d827dd02ed02f0159bc631; url=https://harnessie.com/.well-known/assistant-guide.txt"
   },
   "steps": [
-    {"id": "candidate", "status": "in_progress", "evidence": "Version 1.5.0 in pyproject and package; guide, sidecar and trust pins synchronized; release documentation tranche in preparation.", "head": null},
-    {"id": "local_gate", "status": "pending", "evidence": null},
-    {"id": "exact_commit_ci", "status": "pending", "evidence": null},
-    {"id": "served_bytes", "status": "pending", "evidence": null},
-    {"id": "signed_tag", "status": "pending", "evidence": null},
-    {"id": "dns_rotation", "status": "pending", "evidence": "Awaiting Sam's Namecheap change to the recorded value."},
-    {"id": "hosted_guidecheck", "status": "pending", "evidence": null},
-    {"id": "github_release", "status": "pending", "evidence": null},
-    {"id": "pypi_publication", "status": "pending", "evidence": null},
-    {"id": "package_verification", "status": "pending", "evidence": null},
-    {"id": "verify_action", "status": "pending", "evidence": "Branch prepared locally; push after PyPI."},
-    {"id": "homebrew", "status": "pending", "evidence": "Branch prepared locally; sdist URL and digest after PyPI."},
-    {"id": "closeout", "status": "pending", "evidence": null}
-  ]
+    {
+      "id": "candidate",
+      "status": "completed",
+      "evidence": "Release commit 4ccf3f304bca0c88c8997c0a0cf33a909145d3ef on main: version, changelog, release notes, public surfaces, final guide, trust pins, audit skeleton.",
+      "head": "4ccf3f304bca0c88c8997c0a0cf33a909145d3ef"
+    },
+    {
+      "id": "local_gate",
+      "status": "completed",
+      "evidence": "release_gate.py --locked-build OK on 4ccf3f3: 1240 passed, 4 skipped, 28 xfailed; 70/70 evals; trust and inward manifests OK; validate OK; dependency locks OK; ecosystem manifest OK; check-search 10 pages 0 defects; wheel and sdist Twine PASSED; artifact checks and fresh-install smoke OK; sdist sweep clean; LICENSE and NOTICE present; SBOM reproducible."
+    },
+    {
+      "id": "exact_commit_ci",
+      "status": "completed",
+      "evidence": "ci 37423763122, CodeQL 37423763128, Scorecard 37423763227, pages 37423762389 all success on 4ccf3f3.",
+      "head": "4ccf3f304bca0c88c8997c0a0cf33a909145d3ef"
+    },
+    {
+      "id": "served_bytes",
+      "status": "completed",
+      "evidence": "release-1.5.0/live-bytes.json: 11 resources match the commit byte for byte; production search 10 pages, 0 defects."
+    },
+    {
+      "id": "signed_tag",
+      "status": "completed",
+      "evidence": "v1.5.0 tag object bbf51b69cfd942af616ace2d752d26b33c337eac -> 4ccf3f3, SSH signature verified locally and from a clean clone, GitHub verified; https://github.com/snapsynapse/harnessie/tree/v1.5.0 returns 200.",
+      "head": "4ccf3f304bca0c88c8997c0a0cf33a909145d3ef"
+    },
+    {
+      "id": "dns_rotation",
+      "status": "pending",
+      "evidence": "Awaiting Sam's Namecheap change to the recorded value."
+    },
+    {
+      "id": "hosted_guidecheck",
+      "status": "in_progress",
+      "evidence": "Pre-DNS checkpoint release-1.5.0/guidecheck-before-dns.json: Level 3, one blocker anchor.independent.mismatch (DNS still carries the 1.4.1 hash), four warnings (repository-file independence, nosniff and HSTS headers, package-registry 404 for the unpublished version). Final receipt pending DNS rotation."
+    },
+    {
+      "id": "github_release",
+      "status": "pending",
+      "evidence": null
+    },
+    {
+      "id": "pypi_publication",
+      "status": "pending",
+      "evidence": null
+    },
+    {
+      "id": "package_verification",
+      "status": "pending",
+      "evidence": null
+    },
+    {
+      "id": "verify_action",
+      "status": "pending",
+      "evidence": "Branch prepared locally; push after PyPI."
+    },
+    {
+      "id": "homebrew",
+      "status": "pending",
+      "evidence": "Branch prepared locally; sdist URL and digest after PyPI."
+    },
+    {
+      "id": "closeout",
+      "status": "pending",
+      "evidence": null
+    }
+  ],
+  "tag": {
+    "name": "v1.5.0",
+    "object": "bbf51b69cfd942af616ace2d752d26b33c337eac",
+    "commit": "4ccf3f304bca0c88c8997c0a0cf33a909145d3ef",
+    "signature": "SSH, Good git signature for 57973674+snapsynapse@users.noreply.github.com from the local checkout and a clean clone; GitHub API verification.verified true"
+  },
+  "local_build": {
+    "wheel_sha256": "58cceb921aee68124514894fad072ff76fa1ff066eb99c7ccbb3996e944b06c5",
+    "sdist_sha256": "fdab8e5a7ccb6d291925eb3f72a60c26b46cf35feda446762de439ba1cb21ad5",
+    "sbom_sha256": "99691b51dc1f42d492a347fa3bbf4e851a26007803bda2222c8f47fc9712029f",
+    "note": "Local build from the exact release commit for pre-publication checks; the GitHub release assets are built once by the workflow from the tag and are the published artifacts."
+  }
 }

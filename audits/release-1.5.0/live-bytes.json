@@ -1,0 +1,71 @@
+{
+  "checked_at_commit": "4ccf3f3",
+  "resources": {
+    "https://harnessie.com/.well-known/assistant-guide.txt": {
+      "match": true,
+      "live": "f6f1ce225d2dcafe7e2b9da5e1b8539099e6a602a8d827dd02ed02f0159bc631",
+      "local": "f6f1ce225d2dcafe7e2b9da5e1b8539099e6a602a8d827dd02ed02f0159bc631",
+      "bytes": 8054
+    },
+    "https://harnessie.com/.well-known/assistant-guide-manifest.txt": {
+      "match": true,
+      "live": "c05b5978625dbdc65691a58e33544e4738db579f5acfe4a6df8508ad74520310",
+      "local": "c05b5978625dbdc65691a58e33544e4738db579f5acfe4a6df8508ad74520310",
+      "bytes": 304
+    },
+    "https://harnessie.com/agents.json": {
+      "match": true,
+      "live": "759de28611f65b19203e828527d980b830b77f5996b8914b1a02b4f41df3d749",
+      "local": "759de28611f65b19203e828527d980b830b77f5996b8914b1a02b4f41df3d749",
+      "bytes": 8305
+    },
+    "https://harnessie.com/changelog.json": {
+      "match": true,
+      "live": "43d5129389f194b9aa295fdb1f9d8e40f95d5c1113fe3d6386eede55e35d387e",
+      "local": "43d5129389f194b9aa295fdb1f9d8e40f95d5c1113fe3d6386eede55e35d387e",
+      "bytes": 4115
+    },
+    "https://harnessie.com/llms.txt": {
+      "match": true,
+      "live": "fe136388f02b0595afb837c2ae83b08000ad4a4bbfd30d7a3cf5eeb8ca4f13fa",
+      "local": "fe136388f02b0595afb837c2ae83b08000ad4a4bbfd30d7a3cf5eeb8ca4f13fa",
+      "bytes": 9029
+    },
+    "https://harnessie.com/llm.txt": {
+      "match": true,
+      "live": "fe136388f02b0595afb837c2ae83b08000ad4a4bbfd30d7a3cf5eeb8ca4f13fa",
+      "local": "fe136388f02b0595afb837c2ae83b08000ad4a4bbfd30d7a3cf5eeb8ca4f13fa",
+      "bytes": 9029
+    },
+    "https://harnessie.com/api/v1/index.json": {
+      "match": true,
+      "live": "2d1740a2fe80b52689aff72f8f9cab6255046013263428c0a52b65557dd296ef",
+      "local": "2d1740a2fe80b52689aff72f8f9cab6255046013263428c0a52b65557dd296ef",
+      "bytes": 7431
+    },
+    "https://harnessie.com/index.html": {
+      "match": true,
+      "live": "f711dd29190ddd2788e67a6b856c57893280b8f0c2f2867720da400231b3972a",
+      "local": "f711dd29190ddd2788e67a6b856c57893280b8f0c2f2867720da400231b3972a",
+      "bytes": 53765
+    },
+    "https://harnessie.com/guide.html": {
+      "match": true,
+      "live": "3a7649ca713b43fc6151707f6fe50d4edcbada279c9d07f46f00fdde72095fe2",
+      "local": "3a7649ca713b43fc6151707f6fe50d4edcbada279c9d07f46f00fdde72095fe2",
+      "bytes": 63422
+    },
+    "https://harnessie.com/brains.html": {
+      "match": true,
+      "live": "5ca25aa3949eb1fb683cd6af3b4af6ff60e6f86b76218e64182a03611d4d2625",
+      "local": "5ca25aa3949eb1fb683cd6af3b4af6ff60e6f86b76218e64182a03611d4d2625",
+      "bytes": 29457
+    },
+    "https://harnessie.com/MANIFEST.yaml": {
+      "match": true,
+      "live": "393db3e73cade6b859757604d4c658abeaaaa5755be62f49fd73539abec10524",
+      "local": "393db3e73cade6b859757604d4c658abeaaaa5755be62f49fd73539abec10524",
+      "bytes": 2448
+    }
+  }
+}

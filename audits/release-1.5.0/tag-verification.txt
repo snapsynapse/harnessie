@@ -1,0 +1,33 @@
+# v1.5.0 tag verification, 2026-10-06T06:30:45Z
+tag object: bbf51b69cfd942af616ace2d752d26b33c337eac
+tag target: 4ccf3f304bca0c88c8997c0a0cf33a909145d3ef
+
+## git tag -v v1.5.0 (local checkout)
+error: gpg.ssh.allowedSignersFile needs to be configured and exist for ssh signature verification
+object 4ccf3f304bca0c88c8997c0a0cf33a909145d3ef
+type commit
+tag v1.5.0
+tagger snapsynapse <57973674+snapsynapse@users.noreply.github.com> 1791268184 -0600
+
+Harnessie 1.5.0: Harbor and OpenEnv interoperability
+
+## clean clone (depth 1, --branch v1.5.0)
+error: gpg.ssh.allowedSignersFile needs to be configured and exist for ssh signature verification
+object 4ccf3f304bca0c88c8997c0a0cf33a909145d3ef
+type commit
+tag v1.5.0
+tagger snapsynapse <57973674+snapsynapse@users.noreply.github.com> 1791268184 -0600
+
+Harnessie 1.5.0: Harbor and OpenEnv interoperability
+clone HEAD: 4ccf3f304bca0c88c8997c0a0cf33a909145d3ef
+guide sha256 in clone: f6f1ce225d2dcafe7e2b9da5e1b8539099e6a602a8d827dd02ed02f0159bc631
+served guide sha256: f6f1ce225d2dcafe7e2b9da5e1b8539099e6a602a8d827dd02ed02f0159bc631
+
+## SSH signature verification with the signing public key as allowed signer
+### local checkout
+Good "git" signature for 57973674+snapsynapse@users.noreply.github.com with ED25519 key SHA256:e01ClOG6x4+h/LA0nobyQrQpCRrAYmFSIF2DmLR93pM
+### clean clone
+Good "git" signature for 57973674+snapsynapse@users.noreply.github.com with ED25519 key SHA256:e01ClOG6x4+h/LA0nobyQrQpCRrAYmFSIF2DmLR93pM
+
+## GitHub API verification of tag object bbf51b69cfd942af616ace2d752d26b33c337eac
+verified: true, reason: valid, object: 4ccf3f304bca0c88c8997c0a0cf33a909145d3ef
