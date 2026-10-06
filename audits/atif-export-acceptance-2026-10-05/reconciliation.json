@@ -1,0 +1,46 @@
+{
+  "atif_agent_steps": 3,
+  "proxy_turns": 3,
+  "per_step": [
+    {
+      "atif_tool_calls": 2,
+      "atif_prompt_tokens": 1060,
+      "atif_completion_tokens": 60,
+      "proxy_n_tools": 4,
+      "proxy_n_prompt": 0,
+      "proxy_n_sampled": 0,
+      "proxy_finish": "tool_calls"
+    },
+    {
+      "atif_tool_calls": 2,
+      "atif_prompt_tokens": 1183,
+      "atif_completion_tokens": 131,
+      "proxy_n_tools": 4,
+      "proxy_n_prompt": 0,
+      "proxy_n_sampled": 0,
+      "proxy_finish": "tool_calls"
+    },
+    {
+      "atif_tool_calls": 1,
+      "atif_prompt_tokens": 1315,
+      "atif_completion_tokens": 696,
+      "proxy_n_tools": 4,
+      "proxy_n_prompt": 0,
+      "proxy_n_sampled": 0,
+      "proxy_finish": "tool_calls"
+    }
+  ],
+  "proxy_stats": {
+    "n_turns": 3,
+    "n_roots": 1,
+    "n_leaves": 1,
+    "n_forks": 0,
+    "n_discarded": 0,
+    "n_sequences": 1,
+    "n_trainable_sequences": 0,
+    "n_trainable_tokens": 0
+  },
+  "proxy_capture_level": "logprobs",
+  "proxy_rollout_type": "eval",
+  "session_id": "sf2b68555094a467d95b9c308"
+}

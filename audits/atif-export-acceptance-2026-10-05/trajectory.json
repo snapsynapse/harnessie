@@ -1,0 +1,220 @@
+{
+  "schema_version": "ATIF-v1.7",
+  "session_id": "report-atif",
+  "trajectory_id": "report-atif:events",
+  "agent": {
+    "name": "harnessie",
+    "version": "1.4.1",
+    "extra": {
+      "roles": [
+        "verifier"
+      ],
+      "harness_identity": {
+        "harness_version": "1.4.1",
+        "inward_manifest_sha256": "absent",
+        "tool_set_sha256": "ff7a60ebaa0db482f4154ea9b2b52d3e8fbfa5139708f6908f76494528778e77"
+      }
+    },
+    "model_name": "qwen3.8:latest"
+  },
+  "steps": [
+    {
+      "step_id": 1,
+      "source": "agent",
+      "message": "",
+      "llm_call_count": 1,
+      "extra": {
+        "event_seq": 2,
+        "role": "verifier",
+        "loop": 1,
+        "loop_step": 1,
+        "stop_reason": "tool_use",
+        "message_recorded": false
+      },
+      "timestamp": "2026-10-06T01:36:53Z",
+      "model_name": "qwen3.8:latest",
+      "reasoning_effort": "medium",
+      "tool_calls": [
+        {
+          "tool_call_id": "call_1ifganbn",
+          "function_name": "list_files",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        },
+        {
+          "tool_call_id": "call_dttjqlez",
+          "function_name": "read_file",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        }
+      ],
+      "metrics": {
+        "prompt_tokens": 1060,
+        "completion_tokens": 60
+      },
+      "observation": {
+        "results": [
+          {
+            "content": "__pycache__/\ncalc.py",
+            "extra": {
+              "tool": "list_files",
+              "ok": true,
+              "provenance": "builtin",
+              "content_excerpt_chars": 300,
+              "event_seq": 3
+            },
+            "source_call_id": "call_1ifganbn"
+          },
+          {
+            "content": "def add(a, b):\n    return a + b\n\n\ndef mean(xs):\n    if not xs:\n        raise ValueError(\"mean of empty list\")\n    return sum(xs) / len(xs)\n",
+            "extra": {
+              "tool": "read_file",
+              "ok": true,
+              "provenance": "builtin",
+              "content_excerpt_chars": 300,
+              "event_seq": 4
+            },
+            "source_call_id": "call_dttjqlez"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 2,
+      "source": "agent",
+      "message": "",
+      "llm_call_count": 1,
+      "extra": {
+        "event_seq": 5,
+        "role": "verifier",
+        "loop": 1,
+        "loop_step": 2,
+        "stop_reason": "tool_use",
+        "message_recorded": false
+      },
+      "timestamp": "2026-10-06T01:37:15Z",
+      "model_name": "qwen3.8:latest",
+      "reasoning_effort": "medium",
+      "tool_calls": [
+        {
+          "tool_call_id": "call_e1sq3uj8",
+          "function_name": "run_shell",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        },
+        {
+          "tool_call_id": "call_vsk2a5oz",
+          "function_name": "run_shell",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        }
+      ],
+      "metrics": {
+        "prompt_tokens": 1183,
+        "completion_tokens": 131
+      },
+      "observation": {
+        "results": [
+          {
+            "content": "exit=0\n__pycache__\ncalc.py\n",
+            "extra": {
+              "tool": "run_shell",
+              "ok": true,
+              "provenance": "builtin",
+              "content_excerpt_chars": 300,
+              "event_seq": 6
+            },
+            "source_call_id": "call_e1sq3uj8"
+          },
+          {
+            "content": "exit=0\n1:def add(a, b):\n5:def mean(xs):\n7:        raise ValueError(\"mean of empty list\")\n",
+            "extra": {
+              "tool": "run_shell",
+              "ok": true,
+              "provenance": "builtin",
+              "content_excerpt_chars": 300,
+              "event_seq": 7
+            },
+            "source_call_id": "call_vsk2a5oz"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 3,
+      "source": "agent",
+      "message": "",
+      "llm_call_count": 1,
+      "extra": {
+        "event_seq": 8,
+        "role": "verifier",
+        "loop": 1,
+        "loop_step": 3,
+        "stop_reason": "tool_use",
+        "message_recorded": false
+      },
+      "timestamp": "2026-10-06T01:38:52Z",
+      "model_name": "qwen3.8:latest",
+      "reasoning_effort": "medium",
+      "tool_calls": [
+        {
+          "tool_call_id": "call_hfxh9qbu",
+          "function_name": "task_complete",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        }
+      ],
+      "metrics": {
+        "prompt_tokens": 1315,
+        "completion_tokens": 696
+      },
+      "observation": {
+        "results": [
+          {
+            "content": "loop ended: task_complete",
+            "extra": {
+              "tool": "task_complete",
+              "event_seq": 9
+            },
+            "source_call_id": "call_hfxh9qbu"
+          }
+        ]
+      }
+    }
+  ],
+  "notes": "Exported from Harnessie's hash-chained events.jsonl after the chain verified. Model messages, system prompts and tool arguments are not recorded in that log, so agent `message` fields are empty and tool-call `arguments` are `{}` with `arguments_recorded: false`. Observation content is the 300-character excerpt the log keeps. A run with several agent loops is flattened into one step sequence; each agent step's `extra.role` and `extra.loop` say which loop it belongs to, and `final_metrics.extra.loops` lists how each ended.",
+  "final_metrics": {
+    "total_steps": 3,
+    "extra": {
+      "total_tokens": 4445,
+      "loops": [
+        {
+          "loop": 1,
+          "role": "verifier",
+          "stop": "complete",
+          "steps": 3,
+          "event_seq": 10
+        }
+      ],
+      "agent_steps": 3
+    },
+    "total_prompt_tokens": 3558,
+    "total_completion_tokens": 887
+  },
+  "extra": {
+    "source": "events.jsonl",
+    "chain_verified": true,
+    "spec": "https://github.com/harbor-framework/harbor/blob/main/rfcs/0001-trajectory-format.md",
+    "chain_length": 14
+  }
+}
