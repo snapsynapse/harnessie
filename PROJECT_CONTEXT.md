@@ -14,7 +14,7 @@ means the operator does not need to be a developer (declared token/dollar ceilin
 named halt conditions each with one plain operator action, disagreement surfaced as a
 human decision rather than a silent merge).
 
-Shipped as the `harnessie` Python package (Apache-2.0, stable 1.4.1). The verifier also
+Shipped as the `harnessie` Python package (Apache-2.0, stable 1.5.0). The verifier also
 ships standalone as a separately versioned GitHub Action (Harnessie Verify) for gating
 PRs. Core 1.2.0 includes evidence-bound intake and structured required-claim verdicts.
 
@@ -50,18 +50,20 @@ PRs. Core 1.2.0 includes evidence-bound intake and structured required-claim ver
 Copyright Snap Synapse LLC (author Sam Rogers, subscriptions@snapsynapse.com), with
 trademark and PAICE.work PBC spec/code carveouts recorded in NOTICE.
 
-## Current status (2026-09-09)
+## Current status (2026-10-06)
 
-Core 1.4.1 is published and verified on PyPI and GitHub. It adds strict offline
-open-record AIDR export, preserving recorded dissent and source evidence while
-leaving human Arbitration empty. Verify Action 0.2.2 and stable `v0` pin core
-1.4.1. Homebrew 1.4.1 is published, with the real upgrade, formula tests,
-and installed version verified. Engine wrappers remain independently released at 0.1.0.
-NEXT.md records the current propagation evidence. The docs site is
-live, and the dated 2026-09-08 Siteline scan scored it A, 97/100. Public-facing doc pages under `docs/` are generated
-from markdown via `scripts/build_docs_html.py` (edit markdown, rebuild, commit both).
-AIDR-0008 is arbitrated and executed in the independent engine-wrappers release train.
-See NEXT.md for current source and release state and CHANGELOG.md for shipped history.
+Core 1.5.0 is published and verified on PyPI and GitHub from signed tag `v1.5.0` at
+`4ccf3f304bca0c88c8997c0a0cf33a909145d3ef`, with provenance-verified original assets and
+publisher attestations. It adds harness identity on every result, tool-contract break
+metrics with the first measured brains, `harnessie atif` export to ATIF-v1.7, and
+Harnessie as a Harbor verifier and as a Harbor external agent (`examples/harbor-verifier`,
+`examples/harbor-agent`), each with a dated acceptance audit. Verify Action 0.2.2 and
+stable `v0` still pin core 1.4.1 and Homebrew still serves 1.4.1; their 1.5.0 bumps are
+open and tested as pull requests awaiting merge. Engine wrappers remain independently
+released at 0.1.0. [Release execution](audits/release-1.5.0.md) records the evidence.
+The docs site is live; the dated 2026-09-08 Siteline scan scored it A, 97/100 (not
+refreshed for 1.5.0). Public-facing doc pages under `docs/` are generated from markdown
+via `scripts/build_docs_html.py` (edit markdown, rebuild, commit both).
 
 The current adoption wedge is verification of agent-produced changes. Ringer is the
 first named composition surface because its task checks already consume process exit
@@ -81,13 +83,13 @@ write only what you own. The read-only `harnessie ownership` command explains th
 ledger decision, and the zero-model collision example proves a second agent cannot
 overwrite the first agent's artifact through the built-in write path.
 
-The final 1.4.1 assistant guide earned [hosted GuideCheck Level 4 under profile 2.0.0](audits/release-1.4.1/guidecheck-prepublication.json) on 2026-09-08 UTC with zero blocking findings and a qualifying DNS anchor. Its frozen bytes remain the release artifact. The [1.3.1 receipt](audits/release-1.3.1/guidecheck-prepublication.json) is historical evidence for the earlier guide.
+The final 1.5.0 assistant guide earned [hosted GuideCheck Level 4 under profile 2.0.0](audits/release-1.5.0/guidecheck-prepublication.json) on 2026-10-06 UTC with zero blocking findings and a qualifying DNS anchor. Its frozen bytes remain the release artifact. The [1.4.1 receipt](audits/release-1.4.1/guidecheck-prepublication.json) and [1.3.1 receipt](audits/release-1.3.1/guidecheck-prepublication.json) are historical evidence for earlier guides.
 
 ## Historical 1.3.1 release completion
 
 Sam authorized full publishing and deferred the remaining accessibility review as nonblocking. Core 1.3.1, Verify Action 0.2.1/stable v0 and Homebrew 1.3.1 are published and verified. The original signed 1.3.0 tag remains intact after its build stopped before package upload. [Release execution](audits/release-1.3.1.md) records exact identities, tests and residual follow-up.
 
-## 1.4.1 release completion
+## Historical 1.4.1 release completion
 
 The exporter and completion work shipped in core 1.4.1 at `296deed2f91cd4c8eeecad82b83f137dd029ea26`, with verified GitHub/PyPI artifacts and final hosted guide acceptance. Verify Action 0.2.2 and stable `v0` are published at `9f18d70017f395ef4d15ac5746e30ac633f00f8e`; Homebrew 1.4.1 is published at tap commit `953760f3968200f99658bfb068609532cb9fbf4d`. All three release paths are verified. See [release execution](audits/release-1.4.1.md) and [NEXT.md](NEXT.md) for current evidence. The accessibility repair and audit tranche shipped through [PR #25](https://github.com/snapsynapse/harnessie/pull/25); exact-merge provider checks and byte-identical production readback passed. Human accessibility acceptance is a deferred nonblocking roadmap item, and no full-conformance claim is made.
 
