@@ -1,0 +1,191 @@
+{
+  "schema_version": "ATIF-v1.7",
+  "session_id": "hello-world__hPX6LvV__agent",
+  "trajectory_id": "hello-world__hPX6LvV__agent:events",
+  "agent": {
+    "name": "harnessie",
+    "version": "1.4.1",
+    "extra": {
+      "roles": [
+        "worker"
+      ],
+      "harness_identity": {
+        "harness_version": "1.4.1",
+        "inward_manifest_sha256": "91acd9976c66f40549db394ee25a0ea395fdfebdce24aa3bd3de03b59f2905d8",
+        "tool_set_sha256": "e707465f92fbef4d6c45b1eeed4ee2f2841e34ee6f084bf0409172cb0d50bead"
+      }
+    },
+    "model_name": "qwen3.8:latest"
+  },
+  "steps": [
+    {
+      "step_id": 1,
+      "source": "user",
+      "message": "Create a file called hello.txt with \"Hello, world!\" as the content.\n",
+      "extra": {
+        "event_seq": 1
+      },
+      "timestamp": "2026-10-06T05:25:37Z"
+    },
+    {
+      "step_id": 2,
+      "source": "agent",
+      "message": "",
+      "llm_call_count": 1,
+      "extra": {
+        "event_seq": 3,
+        "role": "worker",
+        "loop": 1,
+        "loop_step": 1,
+        "stop_reason": "tool_use",
+        "message_recorded": false
+      },
+      "timestamp": "2026-10-06T05:25:55Z",
+      "model_name": "qwen3.8:latest",
+      "reasoning_effort": "medium",
+      "tool_calls": [
+        {
+          "tool_call_id": "call_p4lc0xfq",
+          "function_name": "write_file",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        }
+      ],
+      "metrics": {
+        "prompt_tokens": 1296,
+        "completion_tokens": 65
+      },
+      "observation": {
+        "results": [
+          {
+            "content": "wrote /app/hello.txt (13 bytes)",
+            "extra": {
+              "tool": "write_file",
+              "ok": true,
+              "provenance": "builtin",
+              "content_excerpt_chars": 300,
+              "event_seq": 4
+            },
+            "source_call_id": "call_p4lc0xfq"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 3,
+      "source": "agent",
+      "message": "",
+      "llm_call_count": 1,
+      "extra": {
+        "event_seq": 5,
+        "role": "worker",
+        "loop": 1,
+        "loop_step": 2,
+        "stop_reason": "tool_use",
+        "message_recorded": false
+      },
+      "timestamp": "2026-10-06T05:26:00Z",
+      "model_name": "qwen3.8:latest",
+      "reasoning_effort": "medium",
+      "tool_calls": [
+        {
+          "tool_call_id": "call_rdyvmy9h",
+          "function_name": "read_file",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        }
+      ],
+      "metrics": {
+        "prompt_tokens": 1367,
+        "completion_tokens": 36
+      },
+      "observation": {
+        "results": [
+          {
+            "content": "exit=0\nHello, world!",
+            "extra": {
+              "tool": "read_file",
+              "ok": true,
+              "provenance": "builtin",
+              "content_excerpt_chars": 300,
+              "event_seq": 6
+            },
+            "source_call_id": "call_rdyvmy9h"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 4,
+      "source": "agent",
+      "message": "",
+      "llm_call_count": 1,
+      "extra": {
+        "event_seq": 7,
+        "role": "worker",
+        "loop": 1,
+        "loop_step": 3,
+        "stop_reason": "tool_use",
+        "message_recorded": false
+      },
+      "timestamp": "2026-10-06T05:26:09Z",
+      "model_name": "qwen3.8:latest",
+      "reasoning_effort": "medium",
+      "tool_calls": [
+        {
+          "tool_call_id": "call_57ip9ovy",
+          "function_name": "task_complete",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        }
+      ],
+      "metrics": {
+        "prompt_tokens": 1418,
+        "completion_tokens": 76
+      },
+      "observation": {
+        "results": [
+          {
+            "content": "loop ended: task_complete",
+            "extra": {
+              "tool": "task_complete",
+              "event_seq": 8
+            },
+            "source_call_id": "call_57ip9ovy"
+          }
+        ]
+      }
+    }
+  ],
+  "notes": "Exported from Harnessie's hash-chained events.jsonl after the chain verified. Model messages, system prompts and tool arguments are not recorded in that log, so agent `message` fields are empty and tool-call `arguments` are `{}` with `arguments_recorded: false`. Observation content is the 300-character excerpt the log keeps. A run with several agent loops is flattened into one step sequence; each agent step's `extra.role` and `extra.loop` say which loop it belongs to, and `final_metrics.extra.loops` lists how each ended.",
+  "final_metrics": {
+    "total_steps": 4,
+    "extra": {
+      "total_tokens": 4258,
+      "loops": [
+        {
+          "loop": 1,
+          "role": "worker",
+          "stop": "complete",
+          "steps": 3,
+          "event_seq": 9
+        }
+      ],
+      "agent_steps": 3
+    },
+    "total_prompt_tokens": 4081,
+    "total_completion_tokens": 177
+  },
+  "extra": {
+    "source": "events.jsonl",
+    "chain_verified": true,
+    "spec": "https://github.com/harbor-framework/harbor/blob/main/rfcs/0001-trajectory-format.md",
+    "chain_length": 9
+  }
+}

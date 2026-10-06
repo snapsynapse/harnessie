@@ -1,0 +1,471 @@
+{
+  "schema_version": "ATIF-v1.7",
+  "session_id": "calc-add-mean__EU7ftdY__agent",
+  "trajectory_id": "calc-add-mean__EU7ftdY__agent:events",
+  "agent": {
+    "name": "harnessie",
+    "version": "1.4.1",
+    "extra": {
+      "roles": [
+        "worker"
+      ],
+      "harness_identity": {
+        "harness_version": "1.4.1",
+        "inward_manifest_sha256": "91acd9976c66f40549db394ee25a0ea395fdfebdce24aa3bd3de03b59f2905d8",
+        "tool_set_sha256": "e707465f92fbef4d6c45b1eeed4ee2f2841e34ee6f084bf0409172cb0d50bead"
+      }
+    },
+    "model_name": "qwen3.8:latest"
+  },
+  "steps": [
+    {
+      "step_id": 1,
+      "source": "user",
+      "message": "In `/app`, create a Python module `calc.py` that defines two functions:\n\n- `add(a, b)` returns the sum of its two arguments.\n- `mean(xs)` returns the arithmetic mean of a non-empty list of numbers and raises `ValueError` when the list is empty.\n\nDo not add any other files.\n",
+      "extra": {
+        "event_seq": 1
+      },
+      "timestamp": "2026-10-06T05:35:20Z"
+    },
+    {
+      "step_id": 2,
+      "source": "agent",
+      "message": "",
+      "llm_call_count": 1,
+      "extra": {
+        "event_seq": 3,
+        "role": "worker",
+        "loop": 1,
+        "loop_step": 1,
+        "stop_reason": "tool_use",
+        "message_recorded": false
+      },
+      "timestamp": "2026-10-06T05:35:50Z",
+      "model_name": "qwen3.8:latest",
+      "reasoning_effort": "medium",
+      "tool_calls": [
+        {
+          "tool_call_id": "call_j09hwh0i",
+          "function_name": "list_files",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        }
+      ],
+      "metrics": {
+        "prompt_tokens": 1350,
+        "completion_tokens": 38
+      },
+      "observation": {
+        "results": [
+          {
+            "content": "exit=0\n",
+            "extra": {
+              "tool": "list_files",
+              "ok": true,
+              "provenance": "builtin",
+              "content_excerpt_chars": 300,
+              "event_seq": 4
+            },
+            "source_call_id": "call_j09hwh0i"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 3,
+      "source": "agent",
+      "message": "",
+      "llm_call_count": 1,
+      "extra": {
+        "event_seq": 5,
+        "role": "worker",
+        "loop": 1,
+        "loop_step": 2,
+        "stop_reason": "tool_use",
+        "message_recorded": false
+      },
+      "timestamp": "2026-10-06T05:36:03Z",
+      "model_name": "qwen3.8:latest",
+      "reasoning_effort": "medium",
+      "tool_calls": [
+        {
+          "tool_call_id": "call_qwvkmdhj",
+          "function_name": "write_file",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        }
+      ],
+      "metrics": {
+        "prompt_tokens": 1395,
+        "completion_tokens": 145
+      },
+      "observation": {
+        "results": [
+          {
+            "content": "wrote /app/calc.py (329 bytes)",
+            "extra": {
+              "tool": "write_file",
+              "ok": true,
+              "provenance": "builtin",
+              "content_excerpt_chars": 300,
+              "event_seq": 6
+            },
+            "source_call_id": "call_qwvkmdhj"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 4,
+      "source": "agent",
+      "message": "",
+      "llm_call_count": 1,
+      "extra": {
+        "event_seq": 7,
+        "role": "worker",
+        "loop": 1,
+        "loop_step": 3,
+        "stop_reason": "tool_use",
+        "message_recorded": false
+      },
+      "timestamp": "2026-10-06T05:36:20Z",
+      "model_name": "qwen3.8:latest",
+      "reasoning_effort": "medium",
+      "tool_calls": [
+        {
+          "tool_call_id": "call_jlo6qiyq",
+          "function_name": "run_shell",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        }
+      ],
+      "metrics": {
+        "prompt_tokens": 1553,
+        "completion_tokens": 153
+      },
+      "observation": {
+        "results": [
+          {
+            "content": "{\"error\":\"command_not_allowlisted\",\"boundary\":\"allowlist\",\"detail\":\"Command 'cd' is not in the allowlist for role 'worker': ['cat', 'git', 'grep', 'ls', 'pytest', 'python3'].\",\"why\":\"Shell access is allowlist-first so prompts cannot expand execution authority.\"}",
+            "extra": {
+              "tool": "run_shell",
+              "ok": true,
+              "provenance": "builtin",
+              "content_excerpt_chars": 300,
+              "event_seq": 8,
+              "refusal": {
+                "error": "command_not_allowlisted",
+                "boundary": "allowlist"
+              }
+            },
+            "source_call_id": "call_jlo6qiyq"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 5,
+      "source": "agent",
+      "message": "",
+      "llm_call_count": 1,
+      "extra": {
+        "event_seq": 10,
+        "role": "worker",
+        "loop": 1,
+        "loop_step": 4,
+        "stop_reason": "tool_use",
+        "message_recorded": false
+      },
+      "timestamp": "2026-10-06T05:36:40Z",
+      "model_name": "qwen3.8:latest",
+      "reasoning_effort": "medium",
+      "tool_calls": [
+        {
+          "tool_call_id": "call_o0p0hubz",
+          "function_name": "run_shell",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        }
+      ],
+      "metrics": {
+        "prompt_tokens": 1775,
+        "completion_tokens": 169
+      },
+      "observation": {
+        "results": [
+          {
+            "content": "exit=0\n",
+            "extra": {
+              "tool": "run_shell",
+              "ok": true,
+              "provenance": "builtin",
+              "content_excerpt_chars": 300,
+              "event_seq": 11
+            },
+            "source_call_id": "call_o0p0hubz"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 6,
+      "source": "agent",
+      "message": "",
+      "llm_call_count": 1,
+      "extra": {
+        "event_seq": 12,
+        "role": "worker",
+        "loop": 1,
+        "loop_step": 5,
+        "stop_reason": "tool_use",
+        "message_recorded": false
+      },
+      "timestamp": "2026-10-06T05:37:01Z",
+      "model_name": "qwen3.8:latest",
+      "reasoning_effort": "medium",
+      "tool_calls": [
+        {
+          "tool_call_id": "call_zuo9xvce",
+          "function_name": "run_shell",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        }
+      ],
+      "metrics": {
+        "prompt_tokens": 1930,
+        "completion_tokens": 170
+      },
+      "observation": {
+        "results": [
+          {
+            "content": "exit=0\nall checks passed\n",
+            "extra": {
+              "tool": "run_shell",
+              "ok": true,
+              "provenance": "builtin",
+              "content_excerpt_chars": 300,
+              "event_seq": 13
+            },
+            "source_call_id": "call_zuo9xvce"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 7,
+      "source": "agent",
+      "message": "",
+      "llm_call_count": 1,
+      "extra": {
+        "event_seq": 14,
+        "role": "worker",
+        "loop": 1,
+        "loop_step": 6,
+        "stop_reason": "tool_use",
+        "message_recorded": false
+      },
+      "timestamp": "2026-10-06T05:37:19Z",
+      "model_name": "qwen3.8:latest",
+      "reasoning_effort": "medium",
+      "tool_calls": [
+        {
+          "tool_call_id": "call_56aeeife",
+          "function_name": "list_files",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        }
+      ],
+      "metrics": {
+        "prompt_tokens": 2070,
+        "completion_tokens": 104
+      },
+      "observation": {
+        "results": [
+          {
+            "content": "exit=0\n__pycache__/\ncalc.py\n",
+            "extra": {
+              "tool": "list_files",
+              "ok": true,
+              "provenance": "builtin",
+              "content_excerpt_chars": 300,
+              "event_seq": 15
+            },
+            "source_call_id": "call_56aeeife"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 8,
+      "source": "agent",
+      "message": "",
+      "llm_call_count": 1,
+      "extra": {
+        "event_seq": 16,
+        "role": "worker",
+        "loop": 1,
+        "loop_step": 7,
+        "stop_reason": "tool_use",
+        "message_recorded": false
+      },
+      "timestamp": "2026-10-06T05:37:38Z",
+      "model_name": "qwen3.8:latest",
+      "reasoning_effort": "medium",
+      "tool_calls": [
+        {
+          "tool_call_id": "call_sz0kl6gn",
+          "function_name": "run_shell",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        }
+      ],
+      "metrics": {
+        "prompt_tokens": 2123,
+        "completion_tokens": 141
+      },
+      "observation": {
+        "results": [
+          {
+            "content": "exit=0\n",
+            "extra": {
+              "tool": "run_shell",
+              "ok": true,
+              "provenance": "builtin",
+              "content_excerpt_chars": 300,
+              "event_seq": 17
+            },
+            "source_call_id": "call_sz0kl6gn"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 9,
+      "source": "agent",
+      "message": "",
+      "llm_call_count": 1,
+      "extra": {
+        "event_seq": 18,
+        "role": "worker",
+        "loop": 1,
+        "loop_step": 8,
+        "stop_reason": "tool_use",
+        "message_recorded": false
+      },
+      "timestamp": "2026-10-06T05:37:46Z",
+      "model_name": "qwen3.8:latest",
+      "reasoning_effort": "medium",
+      "tool_calls": [
+        {
+          "tool_call_id": "call_fradosws",
+          "function_name": "list_files",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        }
+      ],
+      "metrics": {
+        "prompt_tokens": 2184,
+        "completion_tokens": 57
+      },
+      "observation": {
+        "results": [
+          {
+            "content": "exit=0\ncalc.py\n",
+            "extra": {
+              "tool": "list_files",
+              "ok": true,
+              "provenance": "builtin",
+              "content_excerpt_chars": 300,
+              "event_seq": 19
+            },
+            "source_call_id": "call_fradosws"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 10,
+      "source": "agent",
+      "message": "",
+      "llm_call_count": 1,
+      "extra": {
+        "event_seq": 20,
+        "role": "worker",
+        "loop": 1,
+        "loop_step": 9,
+        "stop_reason": "tool_use",
+        "message_recorded": false
+      },
+      "timestamp": "2026-10-06T05:38:18Z",
+      "model_name": "qwen3.8:latest",
+      "reasoning_effort": "medium",
+      "tool_calls": [
+        {
+          "tool_call_id": "call_bc9nqpcx",
+          "function_name": "task_complete",
+          "arguments": {},
+          "extra": {
+            "arguments_recorded": false
+          }
+        }
+      ],
+      "metrics": {
+        "prompt_tokens": 2232,
+        "completion_tokens": 284
+      },
+      "observation": {
+        "results": [
+          {
+            "content": "loop ended: task_complete",
+            "extra": {
+              "tool": "task_complete",
+              "event_seq": 21
+            },
+            "source_call_id": "call_bc9nqpcx"
+          }
+        ]
+      }
+    }
+  ],
+  "notes": "Exported from Harnessie's hash-chained events.jsonl after the chain verified. Model messages, system prompts and tool arguments are not recorded in that log, so agent `message` fields are empty and tool-call `arguments` are `{}` with `arguments_recorded: false`. Observation content is the 300-character excerpt the log keeps. A run with several agent loops is flattened into one step sequence; each agent step's `extra.role` and `extra.loop` say which loop it belongs to, and `final_metrics.extra.loops` lists how each ended.",
+  "final_metrics": {
+    "total_steps": 10,
+    "extra": {
+      "total_tokens": 17873,
+      "loops": [
+        {
+          "loop": 1,
+          "role": "worker",
+          "stop": "complete",
+          "steps": 9,
+          "event_seq": 22
+        }
+      ],
+      "agent_steps": 9
+    },
+    "total_prompt_tokens": 16612,
+    "total_completion_tokens": 1261
+  },
+  "extra": {
+    "source": "events.jsonl",
+    "chain_verified": true,
+    "spec": "https://github.com/harbor-framework/harbor/blob/main/rfcs/0001-trajectory-format.md",
+    "chain_length": 23
+  }
+}

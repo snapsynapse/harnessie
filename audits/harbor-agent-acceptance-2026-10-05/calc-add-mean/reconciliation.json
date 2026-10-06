@@ -1,0 +1,124 @@
+{
+  "events": {
+    "model_turns": 9,
+    "tool_results": 8,
+    "refusals": [
+      [
+        "run_shell",
+        "command_not_allowlisted"
+      ]
+    ],
+    "loop_finished": [
+      "complete"
+    ]
+  },
+  "harbor": {
+    "verifier_result": {
+      "rewards": {
+        "reward": 1.0
+      }
+    },
+    "exception": null,
+    "agent_result": {
+      "n_input_tokens": 16612,
+      "n_output_tokens": 1261,
+      "metadata": {
+        "harness": "harnessie",
+        "stop": "complete",
+        "steps": 9,
+        "host_cancelled": false,
+        "tool_contract_breaks": 0,
+        "tool_results": 8,
+        "sandbox_calls": 7,
+        "harness_version": "1.4.1",
+        "inward_manifest_sha256": "91acd9976c66f40549db394ee25a0ea395fdfebdce24aa3bd3de03b59f2905d8",
+        "tool_set_sha256": "e707465f92fbef4d6c45b1eeed4ee2f2841e34ee6f084bf0409172cb0d50bead"
+      }
+    }
+  },
+  "proxy": {
+    "turns": 9,
+    "stats": {
+      "n_turns": 9,
+      "n_roots": 1,
+      "n_leaves": 1,
+      "n_forks": 0,
+      "n_discarded": 0,
+      "n_sequences": 1,
+      "n_trainable_sequences": 0,
+      "n_trainable_tokens": 0
+    },
+    "capture_level": "logprobs"
+  },
+  "atif": {
+    "agent_steps": 9,
+    "tool_calls": [
+      [
+        "list_files"
+      ],
+      [
+        "write_file"
+      ],
+      [
+        "run_shell"
+      ],
+      [
+        "run_shell"
+      ],
+      [
+        "run_shell"
+      ],
+      [
+        "list_files"
+      ],
+      [
+        "run_shell"
+      ],
+      [
+        "list_files"
+      ],
+      [
+        "task_complete"
+      ]
+    ],
+    "tokens": [
+      {
+        "prompt_tokens": 1350,
+        "completion_tokens": 38
+      },
+      {
+        "prompt_tokens": 1395,
+        "completion_tokens": 145
+      },
+      {
+        "prompt_tokens": 1553,
+        "completion_tokens": 153
+      },
+      {
+        "prompt_tokens": 1775,
+        "completion_tokens": 169
+      },
+      {
+        "prompt_tokens": 1930,
+        "completion_tokens": 170
+      },
+      {
+        "prompt_tokens": 2070,
+        "completion_tokens": 104
+      },
+      {
+        "prompt_tokens": 2123,
+        "completion_tokens": 141
+      },
+      {
+        "prompt_tokens": 2184,
+        "completion_tokens": 57
+      },
+      {
+        "prompt_tokens": 2232,
+        "completion_tokens": 284
+      }
+    ]
+  },
+  "turn_counts_agree": true
+}

@@ -1,0 +1,40 @@
+{
+  "events": {
+    "model_turns": 3,
+    "tool_results": 3,
+    "refusals": [
+      [
+        "run_shell",
+        "command_not_allowlisted"
+      ]
+    ],
+    "loop_finished": []
+  },
+  "harbor": {
+    "verifier_result": {
+      "rewards": {
+        "reward": 1.0
+      }
+    },
+    "exception": "AgentTimeoutError",
+    "agent_result": {
+      "n_input_tokens": null,
+      "n_output_tokens": null,
+      "metadata": null
+    }
+  },
+  "proxy": {
+    "turns": 3,
+    "stats": {
+      "n_turns": 3,
+      "n_roots": 1,
+      "n_leaves": 1,
+      "n_forks": 0,
+      "n_discarded": 0,
+      "n_sequences": 1,
+      "n_trainable_sequences": 0,
+      "n_trainable_tokens": 0
+    },
+    "capture_level": "logprobs"
+  }
+}

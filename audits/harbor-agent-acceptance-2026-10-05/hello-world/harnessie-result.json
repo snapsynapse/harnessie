@@ -1,0 +1,30 @@
+{
+  "stop": "complete",
+  "steps": 3,
+  "report": "Created hello.txt in the workspace root with the exact content \"Hello, world!\" (13 bytes). Verified via read_file: the workspace file contains \"Hello, world!\" matching the acceptance criterion.",
+  "metrics": {
+    "model_turns": 3,
+    "steps": 3,
+    "tokens": 4258,
+    "tool_results": 2,
+    "refusals": 0,
+    "refusals_by_error": {},
+    "tool_contract_breaks": 0,
+    "denial_rate": 0.0,
+    "completed_tasks": 1,
+    "tool_calls_per_completed_task": 2.0,
+    "duplicate_tool_calls": 0,
+    "turns_with_duplicate_calls": 0,
+    "claim_count": 0,
+    "covered_claims": [],
+    "uncovered_claims": [],
+    "claim_coverage_rate": 1.0
+  },
+  "model": "qwen3.8:latest",
+  "endpoint": "http://127.0.0.1:8100/v1",
+  "identity": {
+    "harness_version": "1.4.1",
+    "inward_manifest_sha256": "91acd9976c66f40549db394ee25a0ea395fdfebdce24aa3bd3de03b59f2905d8",
+    "tool_set_sha256": "e707465f92fbef4d6c45b1eeed4ee2f2841e34ee6f084bf0409172cb0d50bead"
+  }
+}
