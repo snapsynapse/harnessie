@@ -9,16 +9,16 @@
   },
   "current": {
     "version": "1.5.0",
-    "released": null,
-    "status": "pending-publication",
+    "released": "2026-10-06",
+    "status": "published",
     "summary": "Harbor and OpenEnv interoperability: harness identity on every result, measured tool-contract breaks per brain, ATIF-v1.7 trajectory export, and Harnessie as a Harbor verifier and external agent.",
     "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.5.0"
   },
   "history": [
     {
       "version": "1.5.0",
-      "released": null,
-      "status": "pending-publication",
+      "released": "2026-10-06",
+      "status": "published",
       "summary": "Harbor and OpenEnv interoperability: harness identity on every result, measured tool-contract breaks per brain, ATIF-v1.7 trajectory export, and Harnessie as a Harbor verifier and external agent.",
       "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.5.0"
     },

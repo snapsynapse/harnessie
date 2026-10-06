@@ -1,0 +1,2 @@
+status 0 AD False
+TXT: "v=1; sha256=f6f1ce225d2dcafe7e2b9da5e1b8539099e6a602a8d827dd02ed02f0159bc631; url=https://harnessie.com/.well-known/assistant-guide.txt" ttl 1799

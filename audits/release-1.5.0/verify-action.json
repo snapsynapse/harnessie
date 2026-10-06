@@ -1,0 +1,28 @@
+{
+  "component": "harnessie-verify-action",
+  "target_core_pin": "1.5.0",
+  "proposed_action_version": "0.2.3",
+  "checked_at": "2026-10-06T07:37:06Z",
+  "branch": "agent/core-1.5.0",
+  "commit": "0389568d33c7efb4655dd7e388b05c683eaa8a49",
+  "pull_request": "https://github.com/snapsynapse/harnessie-verify-action/pull/4",
+  "merged": false,
+  "released": false,
+  "fixtures": {
+    "cannot-verify-advisory-passes": "pass",
+    "cannot-verify-fails-closed": "pass",
+    "evidence-bundle-fresh-check-still-gates": "pass",
+    "evidence-bundle-reaches-verifier": "pass",
+    "failing-check-fails-job": "pass",
+    "refuses-pull-request-target": "pass",
+    "stale-evidence-bundle-refuses-before-checks": "pass"
+  },
+  "files_changed": [
+    "action.yml (harnessie-version default 1.4.1 -> 1.5.0)",
+    "CHANGELOG.md",
+    "README.md",
+    "CLAUDE.md",
+    "PROJECT_CONTEXT.md"
+  ],
+  "note": "Merge, the v0.2.3 release and the stable v0 advance are separate operator decisions; until then the action's default pin remains 1.4.1."
+}

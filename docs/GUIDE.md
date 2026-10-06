@@ -54,7 +54,7 @@ Python 3.11 or newer. PyYAML and jsonschema install with Harnessie. Install from
 pip install harnessie   # or: pipx install harnessie / uv tool install harnessie
 ```
 
-This documentation covers Harnessie 1.5.0, prepared for publication from the signed tag `v1.5.0`; 1.4.1 remains the published release on GitHub and PyPI until `NEXT.md` records the 1.5.0 publication. `atif` requires version 1.5.0 or newer; `export-aidr` requires 1.4.1 or newer. The separately maintained Homebrew formula and Harnessie Verify Action have their own release pins; `NEXT.md` records verified propagation.
+This documentation covers Harnessie 1.5.0, published and verified on GitHub and PyPI. `atif` requires version 1.5.0 or newer; `export-aidr` requires 1.4.1 or newer. The separately maintained Homebrew formula and Harnessie Verify Action have their own release pins; `NEXT.md` records verified propagation.
 
 Developing on the harness itself (or wanting the test suite), install from source:
 

@@ -1,6 +1,6 @@
 # Harnessie 1.5.0: Harbor and OpenEnv interoperability
 
-Prepared for publication on 2026-10-06 from the signed tag `v1.5.0`. Package version is 1.5.0. The GitHub Release, the PyPI distributions and the downstream pins follow the release sequence in [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md); the exact commit, artifact digests and publication evidence are recorded in [audits/release-1.5.0.md](audits/release-1.5.0.md) as each stage completes. Nothing in this document asserts that a publication stage has completed unless that audit records it.
+Published on GitHub at 2026-10-06T07:21:46Z from signed tag `v1.5.0` (tag object `bbf51b69cfd942af616ace2d752d26b33c337eac`, pointing to `4ccf3f304bca0c88c8997c0a0cf33a909145d3ef`), with original-build assets attached by release workflow run 37429182709. Both PyPI distributions, published at 2026-10-06T07:25:53Z, match those assets byte for byte, carry publisher provenance naming this repository's `release.yml` and `pypi` environment, and install from the public index in a fresh Python 3.13.9 environment. Package and assistant guide both use 1.5.0. The exact receipts are in [audits/release-1.5.0.md](audits/release-1.5.0.md).
 
 Harnessie 1.5.0 makes a Harnessie result identifiable and reconcilable from outside the harness. Every verify report, run report and event log names the harness that produced it. The registry refusals a brain triggers by speaking another harness's tool vocabulary are counted as tool-contract breaks and published per brain. A run's hash-chained event log exports as an ATIF-v1.7 trajectory that an independent capture can be checked against. Two examples put Harnessie on either side of a Harbor trial, as the verifier and as the external agent, without changes to either project.
 
@@ -31,18 +31,27 @@ Cannot-verify is unscorable, never zero. A `harnessie verify` exit 2 produces no
 
 ## Verification status
 
-The local release gates (`pytest`, `harness.cli eval`, `verify-manifest`, `verify-inward-manifest`, `validate`, `build_docs_html.py --check`, `ecosystem_status.py --validate`, `git diff --check` and `scripts/release_gate.py`) are run against the exact release commit and their counts recorded in [audits/release-1.5.0.md](audits/release-1.5.0.md). Test and eval counts are dated observations, not contracts; this document does not restate them.
+The [release execution audit](audits/release-1.5.0.md) records the locked release gate on the exact release commit `4ccf3f3`, the signed tag verification, the GitHub Release and its workflow run, artifact provenance, PyPI publication and the installed-consumer check. All four GitHub assets passed [provenance verification](audits/release-1.5.0/github-provenance.json) against the signed tag and release commit. Both PyPI files match the GitHub asset digests exactly and their publisher provenance records GitHub `snapsynapse/harnessie` `release.yml` in the `pypi` environment. A fresh Python 3.13.9 public-index install resolved 1.5.0 with the matching wheel digest. Test and eval counts are dated observations, not contracts; this document does not restate them.
 
 Four dated acceptance records carry the 1.5.0 feature evidence: [ATIF export acceptance](audits/atif-export-acceptance-2026-10-05.md), [Harbor verifier acceptance](audits/harbor-verifier-acceptance-2026-10-05.md), [Harbor agent acceptance](audits/harbor-agent-acceptance-2026-10-05.md) and the [live scorecard](audits/live-scorecard-2026-10-05/README.md). Each names the Harbor, OpenEnv, backend, model and Harnessie versions it ran under; a different version of any of them requires a new run.
 
-The 1.4.1 guide earned [hosted GuideCheck Level 4 under profile 2.0.0](audits/release-1.4.1/guidecheck-prepublication.json) for its frozen bytes. That receipt covers only those bytes. Any 1.5.0 guide change requires a new sidecar, trust-bundle pins, independent anchor and hosted receipt before a level is claimed. Guide conformance does not establish software safety or accessibility conformance.
+The final 8,054-byte 1.5.0 guide earned [hosted GuideCheck Level 4 under profile 2.0.0](audits/release-1.5.0/guidecheck-prepublication.json) on 2026-10-06 with zero blocking findings and a qualifying DNS TXT anchor. Its frozen SHA-256 is `f6f1ce225d2dcafe7e2b9da5e1b8539099e6a602a8d827dd02ed02f0159bc631`. The receipt carries four warnings: repository-file independence is unestablished (expected), GitHub Pages sets neither `X-Content-Type-Options` nor HSTS, and the package-registry anchor returned 404 at the time of the check because PyPI publication came after it. The [1.4.1 receipt](audits/release-1.4.1/guidecheck-prepublication.json) remains historical evidence for different guide bytes. Guide conformance does not establish software safety or accessibility conformance.
 
 ## Deferred work and downstreams
 
-Verify Action 0.2.2 and stable `v0` pin core 1.4.1 at `9f18d70017f395ef4d15ac5746e30ac633f00f8e`. Homebrew 1.4.1 is published at tap merge `953760f3968200f99658bfb068609532cb9fbf4d`. Both are separately propagated downstreams and are updated after the 1.5.0 PyPI distributions are published and verified; until then they continue to serve 1.4.1. Engine wrappers remain on their independent 0.1.0 release train.
+Verify Action 0.2.2 and stable `v0` pin core 1.4.1 at `9f18d70017f395ef4d15ac5746e30ac633f00f8e`. The 1.5.0 pin, proposing Verify Action 0.2.3, is in progress at https://github.com/snapsynapse/harnessie-verify-action/pull/4 with all seven fixtures green; it is not merged or released. Homebrew 1.4.1 is published at tap merge `953760f3968200f99658bfb068609532cb9fbf4d`; the 1.5.0 Homebrew 1.5.0 formula is in progress at https://github.com/snapsynapse/homebrew-tap/pull/5, where the exact formula passed `brew audit --strict --online`, a real 1.4.1 to 1.5.0 upgrade, `brew test` and `brew linkage --test`; it is not merged. Both are separately propagated downstreams and continue to serve 1.4.1 until their own releases land; pinning follows. Engine wrappers remain on their independent 0.1.0 release train.
 
 Token-level ATIF agreement, the full validated-harness bar OpenEnv applies, needs the capture proxy in front of a token-returning engine such as vLLM or SGLang. Local Ollama yields evaluation-only rollouts, which is enough for call-count agreement and for every other shipped candidate. That remains a GPU-host decision.
 
 The in-sandbox Harbor verifier form could score if the task image ran with the capabilities bubblewrap needs, or if Harnessie gained a backend that confines without namespaces. Neither was attempted. Record-mode tool aliases, the containment note for proxied endpoints and the training-surface scope note remain proposed candidates in [ROADMAP.md](ROADMAP.md); the two marked contested need human-arbitrated decisions.
 
 The controlled-review pilot's local Qwen queue continues as recorded in [NEXT.md](NEXT.md); its consumed attempts and approvals are unchanged by this release. Human accessibility acceptance remains a deferred nonblocking roadmap item; no full-conformance claim is made. Live review panels, bidding, commentary, follow mode, automatic runner observation and bid-driven model selection remain an evidence-gated capability sequence.
+
+## Original release assets
+
+| Asset | SHA-256 |
+|---|---|
+| `harnessie-1.5.0-py3-none-any.whl` | `92c2fd5a5de3a967b6f5e288c64694386ac4f4f4988f6e6919b4941ade1e437a` |
+| `harnessie-1.5.0.tar.gz` | `1ec6d7662bcb7df5c947a7f284f537ffb77ed4e3adb98437ee967a7908c99e20` |
+| `harnessie-1.5.0.SHA256SUMS` | `484e7b5c53473e9f8b0dd0b342b29167583062fd824dcca3a2fd15d0b0081410` |
+| `harnessie-1.5.0.cdx.json` | `99691b51dc1f42d492a347fa3bbf4e851a26007803bda2222c8f47fc9712029f` |

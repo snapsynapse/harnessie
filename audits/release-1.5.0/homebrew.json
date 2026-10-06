@@ -1,0 +1,44 @@
+{
+  "component": "homebrew-tap",
+  "formula": "Formula/harnessie.rb",
+  "target_version": "1.5.0",
+  "checked_at": "2026-10-06T07:37:06Z",
+  "branch": "agent/harnessie-1.5.0",
+  "commit": "8257ab9",
+  "pull_request": "https://github.com/snapsynapse/homebrew-tap/pull/5",
+  "merged": false,
+  "sdist_url": "https://files.pythonhosted.org/packages/9a/4c/c258972b5cf4c20bcc44ff94a46fcbb0f7ae1a9aeac591b0491096a44bb7/harnessie-1.5.0.tar.gz",
+  "sdist_sha256": "1ec6d7662bcb7df5c947a7f284f537ffb77ed4e3adb98437ee967a7908c99e20",
+  "sdist_matches_github_asset_and_pypi": true,
+  "resources_changed": {
+    "rpds-py": "2026.6.3 -> 2026.9.1 (mirrors requirements/runtime.txt)"
+  },
+  "checks": [
+    {
+      "id": "brew_style",
+      "result": "1 file inspected, no offenses detected"
+    },
+    {
+      "id": "brew_audit_strict_online",
+      "result": "run by name with the tap clone checked out at the branch commit; no findings reported"
+    },
+    {
+      "id": "brew_upgrade",
+      "result": "snapsynapse/tap/harnessie 1.4.1 -> 1.5.0 (real upgrade of the installed formula)"
+    },
+    {
+      "id": "brew_test",
+      "result": "formula test block ran (harnessie init demo and the scaffold run) without error"
+    },
+    {
+      "id": "brew_linkage_test",
+      "result": "no output, exit clean"
+    },
+    {
+      "id": "installed_cli",
+      "result": "brew list reports harnessie 1.5.0; /opt/homebrew/Cellar/harnessie/1.5.0/bin/harnessie atif --help parses"
+    }
+  ],
+  "tap_state_after": "tap clone restored to main; local checkout restored to guidecheck-2.0.0; local main fast-forwarded to origin/main 0ab7265 before the branch was rebased",
+  "note": "Merge of the pull request is a separate operator decision; until merged the tap's main still serves 1.4.1 for other machines."
+}

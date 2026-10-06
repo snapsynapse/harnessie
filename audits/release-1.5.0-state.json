@@ -6,7 +6,7 @@
   "start_head": "5913591fd9434a0c3cb7f03a0a4fa37a6e9a23b0",
   "candidate_head": "4ccf3f304bca0c88c8997c0a0cf33a909145d3ef",
   "candidate_version": "1.5.0",
-  "updated_at": "2026-10-06T06:32:11Z",
+  "updated_at": "2026-10-06T07:37:06Z",
   "guide": {
     "sha256": "f6f1ce225d2dcafe7e2b9da5e1b8539099e6a602a8d827dd02ed02f0159bc631",
     "bytes": 8054,
@@ -44,43 +44,43 @@
     },
     {
       "id": "dns_rotation",
-      "status": "pending",
-      "evidence": "Awaiting Sam's Namecheap change to the recorded value."
+      "status": "completed",
+      "evidence": "Sam replaced the Namecheap TXT value; release-1.5.0/dns-after.txt shows the 1.5.0 hash on Cloudflare and Google DoH."
     },
     {
       "id": "hosted_guidecheck",
-      "status": "in_progress",
-      "evidence": "Pre-DNS checkpoint release-1.5.0/guidecheck-before-dns.json: Level 3, one blocker anchor.independent.mismatch (DNS still carries the 1.4.1 hash), four warnings (repository-file independence, nosniff and HSTS headers, package-registry 404 for the unpublished version). Final receipt pending DNS rotation."
+      "status": "completed",
+      "evidence": "release-1.5.0/guidecheck-prepublication.json: guidecheck-hosted 2.0.0, profile 2.0.0, Level 4, zero blocking findings, qualifying dns-txt anchor; four warnings retained (repository-file independence, nosniff, HSTS, package-registry 404 before PyPI publication)."
     },
     {
       "id": "github_release",
-      "status": "pending",
-      "evidence": null
+      "status": "completed",
+      "evidence": "https://github.com/snapsynapse/harnessie/releases/tag/v1.5.0 published 2026-10-06T07:21:46Z from the verified tag; release workflow 37429182709 succeeded (build, attach-release-assets, publish-pypi). Four original assets provenance-verified before the environment approval: release-1.5.0/github-provenance.json."
     },
     {
       "id": "pypi_publication",
-      "status": "pending",
-      "evidence": null
+      "status": "completed",
+      "evidence": "Protected environment pypi approved under the authorized sequence after asset provenance verification; distributions uploaded 2026-10-06T07:25:53Z and 07:25:54Z."
     },
     {
       "id": "package_verification",
-      "status": "pending",
-      "evidence": null
+      "status": "completed",
+      "evidence": "release-1.5.0/pypi-integrity.json: both PyPI digests match the GitHub assets; pypi-attestations 0.0.30 verified both files against snapsynapse/harnessie. release-1.5.0/pypi-consumer.json: fresh Python 3.13.9 public-index install, wheel digest match, installed CLI scaffold, validate, deterministic verify with identity header, and a correct atif refusal."
     },
     {
       "id": "verify_action",
-      "status": "pending",
-      "evidence": "Branch prepared locally; push after PyPI."
+      "status": "in_progress",
+      "evidence": "PR https://github.com/snapsynapse/harnessie-verify-action/pull/4 open with all seven fixtures green (release-1.5.0/verify-action.json); merge and the 0.2.3 release await the operator."
     },
     {
       "id": "homebrew",
-      "status": "pending",
-      "evidence": "Branch prepared locally; sdist URL and digest after PyPI."
+      "status": "in_progress",
+      "evidence": "PR https://github.com/snapsynapse/homebrew-tap/pull/5 open; brew audit, a real 1.4.1 to 1.5.0 upgrade, brew test and linkage passed on the exact formula (release-1.5.0/homebrew.json); merge awaits the operator."
     },
     {
       "id": "closeout",
-      "status": "pending",
-      "evidence": null
+      "status": "in_progress",
+      "evidence": "Documentation flipped to published state; closeout commit pending."
     }
   ],
   "tag": {
@@ -94,5 +94,16 @@
     "sdist_sha256": "fdab8e5a7ccb6d291925eb3f72a60c26b46cf35feda446762de439ba1cb21ad5",
     "sbom_sha256": "99691b51dc1f42d492a347fa3bbf4e851a26007803bda2222c8f47fc9712029f",
     "note": "Local build from the exact release commit for pre-publication checks; the GitHub release assets are built once by the workflow from the tag and are the published artifacts."
+  },
+  "published": {
+    "github_release_at": "2026-10-06T07:21:46Z",
+    "workflow_run": 37429182709,
+    "pypi_uploaded_at": "2026-10-06T07:25:53Z",
+    "assets": {
+      "wheel": "92c2fd5a5de3a967b6f5e288c64694386ac4f4f4988f6e6919b4941ade1e437a",
+      "sdist": "1ec6d7662bcb7df5c947a7f284f537ffb77ed4e3adb98437ee967a7908c99e20",
+      "sbom": "99691b51dc1f42d492a347fa3bbf4e851a26007803bda2222c8f47fc9712029f",
+      "checksums": "484e7b5c53473e9f8b0dd0b342b29167583062fd824dcca3a2fd15d0b0081410"
+    }
   }
 }

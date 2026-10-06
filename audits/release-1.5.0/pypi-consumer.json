@@ -1,0 +1,37 @@
+{
+  "version": "1.5.0",
+  "status": "verified",
+  "verified": true,
+  "index": "https://pypi.org/simple",
+  "python": "3.13.9",
+  "checked_at": "2026-10-06T07:31:43.206819+00:00",
+  "venv": "fresh uv venv with seed pip, no PYTHONPATH, --no-cache-dir",
+  "installed_module": "<venv>/lib/python3.13/site-packages/harness/__init__.py (checked from a neutral working directory)",
+  "installed_wheel_sha256": "92c2fd5a5de3a967b6f5e288c64694386ac4f4f4988f6e6919b4941ade1e437a",
+  "runtime_matches_original_github_wheel": true,
+  "install_attempts": 1,
+  "pip_check": "No broken requirements found.",
+  "checks": [
+    {
+      "id": "version",
+      "result": "harness.__version__ == 1.5.0"
+    },
+    {
+      "id": "cli_surface",
+      "result": "harnessie --help lists atif; harnessie atif --help parses"
+    },
+    {
+      "id": "init_scaffold",
+      "result": "harnessie init demo --no-verify wrote 9 files; harnessie validate: 3 documents valid; verify-inward-manifest: 5 files OK"
+    },
+    {
+      "id": "standalone_verify",
+      "result": "harnessie verify --no-verifier with one sandboxed check: VERIFIED; report header names harnessie 1.5.0, the scaffold's inward manifest digest and the tool set digest"
+    },
+    {
+      "id": "atif_refusal",
+      "result": "harnessie atif on the checks-only report refused with no_model_turns (no model call in the log); fail-closed as designed"
+    }
+  ],
+  "note": "No model or provider was called; no live verdict was earned. The first install attempt succeeded; no index propagation lag was observed."
+}
