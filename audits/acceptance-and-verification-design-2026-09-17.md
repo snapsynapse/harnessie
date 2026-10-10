@@ -134,3 +134,73 @@ The operator can reprioritize implementation. This assessment does not move the 
 | Dynamic nested delegation | A concrete workload defeats declared phase composition, and a child cannot expand permissions, ownership or budget. |
 
 Do not pursue a mandatory three-model pipeline, a same-author-only final gate, self-confidence as routing authority, or an AI-generated log as the authoritative audit record. Those constraints add cost or concentrate failure without established benefit.
+
+## Open design questions (from 2026-09-17 brief)
+
+Migrated from the processed 2026-09-17 handoffs (packets AC, VI, CE). Numbering is preserved. None of these is adopted policy.
+
+### Acceptance contract and protected tests (AC)
+
+Design questions:
+1. What is the smallest acceptance artifact containing stable criterion IDs, requiredness, check definitions, test hashes, allowed write paths and an author/provenance receipt? Reuse existing structures or state why they cannot represent it.
+2. Who checks that the spec expresses the operator's intent before it is frozen? A passing test written from a wrong requirement is not correctness.
+3. Can two ordinary runs, with explicit operator review between authoring and implementation, demonstrate the flow without new runner lifecycle states?
+4. Which files can the author, implementer and verifier change? Acceptance tests, runner and configuration sit in a protected lane; protection must cover test discovery, fixtures and dependencies.
+5. How does a contract amendment invalidate affected evidence and get accepted before work resumes? A decline or counter-proposal must not silently relax frozen criteria.
+6. How is the verified output revision bound to the verdict? Use checks at use time or immutable snapshots; a one-time hash comparison is insufficient under concurrent writers.
+7. How do phase verdicts reuse standalone claim coverage without conflating pre-execution acceptance criteria with post-execution proof artifacts?
+
+Failure scenarios:
+- A known missing behavior fails for the intended assertion; infrastructure, dependency and test-discovery failures are classified separately.
+- A known good implementation and a valid alternative both pass; a tautological test and an intentionally wrong implementation do not establish acceptance.
+- Worker direct and shell writes cannot weaken protected tests, checks, fixtures or expected results; unsupported confinement refuses.
+- Missing, duplicate or unknown required claim IDs and changed requiredness cannot produce a pass.
+- Changed acceptance bytes or check definitions invalidate the result and resume path; unrelated changes have explicitly defined behavior.
+- A malicious artifact or counter-proposal cannot amend the contract through prose or verifier output.
+- A test is inapplicable only through an explicit reviewed contract revision, never a silent skip.
+- Existing workflows and standalone 0/1/2 behavior remain compatible unless a separate change is adopted.
+
+### Verifier independence and verification requirements (VI)
+
+Design questions:
+1. Required evidence: deterministic checks, structured criterion verdicts, verifier availability, nonempty coverage. A strengthened opt-in profile refuses an empty gate, unavailable required verifier or incomplete claims. Legacy generic workflows: deprecate, warn or reject is a separate human decision.
+2. Independence receipt: author and executor roles, context exposure, configured and observed model identity, adapter/transport, endpoint trust class, declared family provenance. Preserve unknowns; never infer family from model strings or equate transport with origin.
+3. Diversity policy: a preference may use an allowed fallback and report the unmet preference; a requirement refuses when identity is unknown or no eligible reviewer exists. Containment and approval constraints filter candidates before egress.
+4. Actual routes: validate policy against the executor that produced each attempt, including retries, escalations and fallbacks.
+5. Context boundary: does the verifier see the worker report? Keep current behavior until an evidence-only first pass is evaluated. Author review, bid rationale and observer commentary need a declared exposure stage.
+6. Original-author contribution: pre-freeze clarification or separately attributed review. An author objection stays visible and cannot flip a failed independent verdict; disagreement needs a human or a bounded rework attempt, no silent majority merge.
+7. Budget failure: a task requiring a verifier reserves bounded verification capacity or refuses before execution (tokens, request/output caps, unknown monetary cost, in-flight reservations).
+8. Operator receipt: evidence required, obtained and missing per verdict, with artifact and contract hashes; distinguish execution completion, check success, model verification and human acceptance.
+
+Failure scenarios:
+- Same adapter with different families, different endpoints with the same family, unknown family, mutable local tags.
+- Required reviewer unavailable; preferred diversity target unavailable; every eligible reviewer contained locally.
+- Worker escalation lands on the initial verifier's model; retry must not inherit a stale diversity result.
+- Worker completes after exhausting unreserved headroom; missing verification stays incomplete, never a passing checks-only result.
+- Empty checks, omitted required verifier, incomplete criterion results, changed requiredness, unparseable output.
+- Observer sentinel and bid pre-mortem never reach a verifier context that excludes them; an author comment appears only at its declared stage.
+- Two reviewers agree on a planted wrong criterion; report agreement and error independently.
+- Existing standalone exits, ordinary workflow behavior and historical AIDR claims keep their documented meaning until a versioned change is adopted.
+
+### Calibration and operator review cost (CE)
+
+Protocol to specify:
+1. Pilot corpus of about 12 tasks across known defects, correct alternatives, ambiguous or unsatisfiable criteria, malicious artifacts and incomplete evidence, including at least one non-code evidence task. A feasibility set, not a production threshold.
+2. How human labels are obtained, which are uncertain, how disagreements are adjudicated; model-generated seeds need independent validation; labels stay out of reviewed inputs.
+3. Separate calibration from held-out evaluation; freeze inputs, contracts, reference outcomes and participant receipts before calls; specify repetitions, paired comparisons, setup noise and order effects.
+4. Start from configured routing plus the fresh-context verifier; change one factor at a time (protected artifacts, same vs different family, worker-report inclusion, optional author review).
+5. Bidding later: configured routing vs history baseline vs bid recommendations; each sampled candidate executes on its own copy; evaluation never mutates production routes.
+6. Commentary later: deterministic summary vs derived explanation, measured by the operator's correct identification of blockers and next action.
+7. Report review and observation resources separately; unknown cost when unavailable; record timeouts, parse failures, tool refusals, retries, incomplete trials; date price data.
+
+Measures: false-pass and false-refusal rates with raw denominators (cannot-verify separate), required-criterion coverage, total model, execution and human cost, cost per independently accepted completion, bid calibration only with matching outcomes, operator time to correct next action. Predeclare tolerances, sample-size rationale and stopping rule; publish inconclusive results.
+
+Failure scenarios:
+- A skipped, timed-out or unparseable trial cannot become a success or leave the denominator.
+- Missing usage cannot become zero cost; mark incomplete accounting.
+- A changed model fingerprint, prompt, parser, contract or task invalidates pooling unless treated as another condition.
+- Missing expected claim IDs or altered requiredness cannot earn coverage.
+- Held-out labels or seeded-defect notes cannot leak to candidate or judge inputs.
+- Bids from an unexecuted candidate remain unscored.
+- Observer or commentary success cannot mark a halted source run complete.
+- Budget exhaustion cannot silently reduce review depth or add unapproved provider exposure.

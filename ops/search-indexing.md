@@ -3,10 +3,10 @@
 title: "Search indexing"
 purpose: "Property-specific index policy, validation commands, deployment gate, and console follow-up."
 status: active
-updated: 2026-08-20
+updated: 2026-10-09
 owner: "Harnessie maintainers"
 open_tasks:
-  - "On the next authorized console-maintenance pass, recheck after the Page indexing report advances beyond 2026-08-06 or one of the four requested pages is recrawled."
+  - "On the next authorized console-maintenance pass, recheck after the Page indexing report advances beyond 2026-09-17 or `/ringer.html` or `/agent-file-ownership.html` is crawled or reclassified."
 ---
 # Search indexing
 
@@ -24,7 +24,7 @@ No Bing property was observed in the 2026-08-09 task. Its existence and state ar
 
 | Surface | Policy | Reason |
 |---|---|---|
-| `/`, `/quickstart.html`, `/getting-started.html`, `/ladder.html`, `/guide.html`, `/compare.html`, `/brains.html`, `/threat-model.html`, `/ringer.html` | Index and include in sitemap | Canonical reader destinations with unique titles, descriptions, and crawl-visible internal discovery |
+| `/`, `/quickstart.html`, `/getting-started.html`, `/ladder.html`, `/guide.html`, `/compare.html`, `/brains.html`, `/threat-model.html`, `/ringer.html`, `/agent-file-ownership.html` | Index and include in sitemap | Canonical reader destinations with unique titles, descriptions, and crawl-visible internal discovery |
 | `/404.html` | `noindex` and omit from sitemap | Error response, not a content destination |
 | `/robots.txt`, `/sitemap.xml`, `/llms.txt`, `/agents.json`, `/api/v1/index.json`, `/changelog.json`, `/.well-known/*`, `/schemas/v1/*` | Crawlable machine surfaces, omit from HTML sitemap | Discovery, trust, or machine consumption rather than canonical HTML search results |
 | Markdown source files under `/docs/` | Omit from sitemap; canonical served HTML remains the index target | GitHub Pages may serve source files, but generated HTML is the reader surface |
@@ -37,7 +37,7 @@ Harnessie currently declares no localized route set. Canonical sitemap targets a
 ## Evidence governance
 
 - This file owns the current property policy, classified state, action ledger, do-not-repeat rules, and next-review conditions.
-- Sanitized dated observations live under `ops/search/<provider>/YYYY-MM-DD/`; the current baseline is [`ops/search/GoogleSearchConsole/2026-08-09/summary.md`](search/GoogleSearchConsole/2026-08-09/summary.md).
+- Sanitized dated observations live under `ops/search/<provider>/YYYY-MM-DD/`; the initial baseline is [`ops/search/GoogleSearchConsole/2026-08-09/summary.md`](search/GoogleSearchConsole/2026-08-09/summary.md) and the latest is [`ops/search/GoogleSearchConsole/2026-09-21/audit.md`](search/GoogleSearchConsole/2026-09-21/audit.md).
 - Historical observations are append-only evidence. Later provider changes receive a new dated record rather than rewriting the old observation.
 - `.playwright-mcp/` and `.search-evidence-private/` are ignored private locations. Never commit account identity, queries, authenticated URLs, exports, screenshots, traces, cookies, profiles, or unreviewed browser artifacts.
 - Missing, stale, insufficient, unknown, and zero are distinct states. No export is inferred when only authenticated UI evidence was observed.
@@ -71,11 +71,12 @@ Exit code `0` is pass, `1` is a site defect, and `2` is configuration or infrast
 
 ## Current baseline
 
-- Repository baseline on 2026-08-09: nine intended canonical HTML pages after adding `/ringer.html`.
-- Production after commit `47f7ec3`: nine sitemap pages, 0 contract defects, canonical HTTPS redirects healthy, real 404 behavior healthy, and all sitemap pages carry valid JSON-LD.
+- Repository baseline on 2026-09-21 (isolated copy): ten intended canonical HTML pages; `node scripts/check-search.mjs` reported 10 sitemap pages, 0 defects, 0 infrastructure failures; `python3 scripts/build_docs_html.py --check` reported 9 generated documentation pages current.
+- Production on 2026-09-21: `node scripts/check-production-search.mjs --json` reported 10 sitemap pages, 0 defects, 0 infrastructure failures. Earlier (2026-08-09, commit `47f7ec3`): nine sitemap pages, 0 contract defects, canonical HTTPS redirects healthy, real 404 behavior healthy, and all sitemap pages carry valid JSON-LD.
 - Google Search Console baseline: `ops/search/GoogleSearchConsole/2026-08-09/summary.md`.
 - GSC sitemap status: `Success`, last read 2026-08-09, 9 discovered pages.
-- Indexing requested for `/guide.html`, `/ladder.html`, `/brains.html`, and `/ringer.html`; all four are pending recrawl.
+- Latest evidence: [`ops/search/GoogleSearchConsole/2026-09-21/audit.md`](search/GoogleSearchConsole/2026-09-21/audit.md).
+- Of the four 2026-08-09 indexing requests, `/guide.html`, `/brains.html`, and `/ladder.html` are indexed (per the report updated 2026-09-17); `/ringer.html` is still discovered but never crawled. `/agent-file-ownership.html` is discovered, never crawled, and has not been requested.
 
 ## Current classified state
 
@@ -96,14 +97,18 @@ Exit code `0` is pass, `1` is a site defect, and `2` is configuration or infrast
 | Provider and property | Action and target | Accepted | Visible confirmation | Classification | Repeat policy | Next review condition |
 |---|---|---|---|---|---|---|
 | GSC `sc-domain:harnessie.com` | Submit `https://harnessie.com/sitemap.xml` | 2026-08-09; exact time not recorded | `Success`, last read 2026-08-09, 9 discovered pages | Accepted discovery action | Do not resubmit while healthy; refresh once only after a verified material sitemap revision whose last-read state is stale | Material sitemap revision or a sitemap error |
-| GSC `sc-domain:harnessie.com` | Request indexing for `/guide.html`, `/ladder.html`, `/brains.html`, and `/ringer.html` | 2026-08-09; exact times not recorded | Each entered Google's priority crawl queue | Pending recrawl | Do not request any of these URLs again while queued | Page indexing advances beyond 2026-08-06, one URL is recrawled, or Google reports a new actionable reason |
+| GSC `sc-domain:harnessie.com` | Request indexing for `/guide.html`, `/brains.html`, `/ladder.html` | 2026-08-09; exact times not recorded | Indexed per 2026-09-21 audit (last crawled 2026-09-15, 2026-09-16, 2026-09-17) | Completed | Do not repeat | None |
+| GSC `sc-domain:harnessie.com` | Request indexing for `/ringer.html` | 2026-08-09; exact time not recorded | Still discovered, never crawled as of the report updated 2026-09-17 | Accepted; pending recrawl | Do not repeat | Page indexing refresh beyond 2026-09-17 or a crawl or classification change |
+| GSC `sc-domain:harnessie.com` | None for `/agent-file-ownership.html` | Not requested | Discovered, currently not indexed; never crawled | Pending recrawl | Do not request without inspecting stored URL Inspection state first and separate console-mutation authorization | Page indexing refresh beyond 2026-09-17 or a crawl or classification change |
 
 Active validation batches: none. The `Page with redirect` group is intentional and validation was deliberately not started.
 
 ## Do not repeat
 
 - Do not resubmit the accepted healthy sitemap merely because its status remains `Success`.
-- Do not repeat indexing requests for `/guide.html`, `/ladder.html`, `/brains.html`, or `/ringer.html` while they remain queued or pending recrawl.
+- Do not repeat indexing requests for `/guide.html`, `/brains.html`, `/ladder.html` (completed) or `/ringer.html` (accepted, pending recrawl).
+- Do not request indexing for `/agent-file-ownership.html` without separate console-mutation authorization.
+- Do not validate `/.well-known/security.txt` as an HTML indexing defect.
 - Do not start validation for the three intentional host and protocol redirects.
 - Do not treat the decorative video exclusion as a page-indexing defect.
 - Do not classify insufficient Core Web Vitals field data as either a pass or a failure.
@@ -111,4 +116,4 @@ Active validation batches: none. The `Page with redirect` group is intentional a
 
 ## Next review
 
-Review the property on the next authorized console-maintenance pass after the Page indexing report advances beyond 2026-08-06, any requested URL receives a crawl, the sitemap reports an error, or production search validation reveals a new defect. Until then, the four indexing requests are pending recrawl and no repository defect is open.
+Review the property on the next authorized console-maintenance pass after the Page indexing report advances beyond 2026-09-17, a crawl or classification change for `/ringer.html` or `/agent-file-ownership.html`, a sitemap error, or a repository or production contract failure. Until then no repository defect is open.

@@ -112,3 +112,32 @@ Acceptance should include: a valid artifact, a refuted claim, missing proof, an 
 ## If Ringer succeeds
 
 Ringer's wider adoption can increase the number of tasks that benefit from Harnessie's acceptance checks. That strengthens Harnessie's position if its contracts remain useful from any runner and its evidence is easy to display. Duplicating dispatch, catalogs and mission-control screens would instead spend effort on the part upstream already owns well. Keep Harnessie independently usable so neither project needs to become a dependency of the other to function.
+
+## Integration contract to settle
+
+Migrated from the processed 2026-09-17 RI handoff. Proposal only; nothing here is implemented.
+
+- One accepted contract: bind the original task, criterion IDs, requiredness and check definitions to the artifact revision. An adapter maps the contract; it does not rewrite the human's intent.
+- Three acceptance outcomes: retain verified, failed and cannot-verify in the durable receipt and operator summary, and preserve Ringer's actual outer status. If current Ringer shows FAIL for exit 2, disclose that mapping rather than claiming native three-state UI support.
+- Separate retries: a verification infrastructure problem cannot silently trigger a producer rewrite. The minimal recipe may use one outer attempt and an explicit rerun. Any automatic producer or verifier retry has one named owner, its own ceiling and causal classification.
+- Real cancellation: the enclosing deadline and cancellation reach the verification process and children; no detached model job continues after Ringer records completion or timeout. A missing or interrupted receipt is incomplete, never an old success reused.
+- Durable evidence: unique run/task/attempt identities; preserve all outcomes beyond cleanup and retries; bind reports to artifact and contract hashes; refuse stale results. Logs or excerpts are not receipts.
+- Truthful display: Ringside's declared `verified` sentence describes the check; acceptance comes from the current receipt. Start with an existing report/artifact surface. Failure evidence stays reachable even where upstream only harvests passing deliverables.
+- Complete accounting: distinguish worker, verifier and check resources, configured vs observed identity, known vs unknown usage, outer vs inner failures. Do not penalize the worker for missing verifier credentials or infrastructure.
+- Explicit boundary: Harnessie confines its own verification execution per the active contract; it does not confine the Ringer worker or authenticate the operator as human. A report is not permission to merge, publish or arbitrate.
+- Post-run path: label Ringer producer completion and Harnessie acceptance separately; the consuming workflow holds downstream use until acceptance. Inline path: keep a nonzero exit whenever required verification is incomplete; never return 0 merely to prevent a retry.
+
+## Deterministic acceptance matrix
+
+| Scenario | Required observation |
+|---|---|
+| Valid artifact and complete required evidence | Verified receipt and matching artifact/contract identity; outer behavior agrees with the documented path. |
+| A required claim is refuted | Failed receipt with evidence; bounded correction may target that defect. |
+| Missing proof or unavailable verifier | Cannot-verify retained; no silent producer rewrite or successful acceptance. |
+| Artifact or criteria change | Prior verdict cannot apply to new bytes; refresh or refuse explicitly. |
+| Check timeout or operator cancellation | Child processes terminate and outcome remains incomplete; no stale pass is displayed. |
+| Explicit producer or verifier retry | New attempt identity and costs; earlier reports survive. |
+| Successful worktree deletion | Verified artifact identity and complete report remain available outside the deleted tree. |
+| Failed task not harvested by Ringside | Its receipt still has a stable, usable path and the operator can find the failure. |
+| Malformed/unsupported receipt or missing resource counter | Refusal or documented unknown; no silent promotion or invented zero. |
+| Synthetic credential-like content in evidence | The proposed output boundary behaves as documented; no claim that unmodified upstream logs are automatically sanitized. |
