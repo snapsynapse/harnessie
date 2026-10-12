@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import stat
+import subprocess
+import sys
 import time
 
 import pytest
@@ -38,7 +40,9 @@ def _fake(tmp_path: Path, auth=AUTH_OK, result=None, results=None, exit_code=0, 
     tmp_path.mkdir(parents=True, exist_ok=True)
     script = tmp_path / "fake-claude"
     script.write_text(
-        "#!/usr/bin/env python3\n"
+        # Use the test interpreter, not whichever Python an inherited PATH
+        # resolves. Interpreter startup is not the transport behavior here.
+        f"#!{sys.executable}\n"
         "import json, os, sys, time\n"
         f"AUTH = {auth!r}\nRESULT = {result!r}\nRESULTS = {results!r}\nEXIT = {exit_code!r}\nNOISY = {noisy!r}\nSLEEP = {sleep!r}\nLOG = {str(log) if log else None!r}\nORPHAN_PID = {str(orphan_pid) if orphan_pid else None!r}\nORPHAN_SURVIVED = {str(orphan_survived) if orphan_survived else None!r}\nCOUNT = {str(tmp_path / 'inference-count')!r}\nFABLE = {CLAUDE_MODEL!r}\n"
         "def emit(data):\n"
@@ -60,6 +64,8 @@ def _fake(tmp_path: Path, auth=AUTH_OK, result=None, results=None, exit_code=0, 
         "if ORPHAN_PID:\n"
         "  import subprocess\n"
         "  child=subprocess.Popen([sys.executable,'-c',\"import os,sys,time;open(sys.argv[1],'w').write(str(os.getpid()));time.sleep(.45);open(sys.argv[2],'w').write('survived');time.sleep(5)\",ORPHAN_PID,ORPHAN_SURVIVED])\n"
+        "  deadline=time.monotonic()+5\n"
+        "  while not os.path.exists(ORPHAN_PID) and time.monotonic()<deadline: time.sleep(.001)\n"
         "if SLEEP: time.sleep(SLEEP)\n"
         "if NOISY: sys.stdout.write('x'*NOISY); sys.stdout.flush()\n"
         "elif RESULTS is not None:\n"
@@ -511,7 +517,7 @@ def test_result_status_and_terminal_stop_cannot_dispatch_tools(tmp_path):
     ]
     for index, (result, expected) in enumerate(cases):
         case_dir = tmp_path / str(index)
-        pilot = _pilot(case_dir, _fake(case_dir, result=result))
+        pilot = _pilot(case_dir, _fake(case_dir, result=result), timeout=5)
         turn = _complete(pilot, [{"name": "read", "parameters": {"type": "object"}}])
         assert turn.content == f"pilot_refusal: {expected}"
 
@@ -532,8 +538,17 @@ def test_tool_schema_and_duplicate_call_ids_are_rejected(tmp_path):
 def test_timeout_kills_child_when_parent_already_exited(tmp_path):
     pid_file = tmp_path / "child-pid"
     survived = tmp_path / "survived"
-    pilot = _pilot(tmp_path, _fake(tmp_path, orphan_pid=pid_file, orphan_survived=survived), timeout=0.3)
-    assert _complete(pilot).content == "pilot_refusal: process_timeout"
-    assert pid_file.exists()
-    time.sleep(0.25)
-    assert not survived.exists(), "inherited-stdout child survived pilot timeout"
+    fake = _fake(tmp_path, orphan_pid=pid_file, orphan_survived=survived)
+    pilot = _pilot(tmp_path, fake, timeout=0.05)
+    # Establish the exited leader and inherited pipe before starting the
+    # drain deadline. Authentication/interpreter startup cannot consume it.
+    process = subprocess.Popen([str(fake)], stdout=subprocess.PIPE, start_new_session=True)
+    try:
+        assert process.wait(timeout=5) == 0
+        assert pid_file.exists()
+        assert pilot._drain(process).failure == "process_timeout"
+        time.sleep(0.5)
+        assert not survived.exists(), "inherited-stdout child survived pilot timeout"
+    finally:
+        pilot._kill_group(process)
+        process.stdout.close()
