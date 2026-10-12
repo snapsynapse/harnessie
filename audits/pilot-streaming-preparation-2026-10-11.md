@@ -40,6 +40,7 @@ The first offline candidate used an ASCII-normalizing encoder; the Unicode round
 - Deterministic evals: 70/70. Trust manifest: 21 files. Inward manifest: 16 files. Authoring validation: nine documents, schema v1.
 - Ecosystem readback: Verify Action and Homebrew both pin core 1.5.0; wrappers remain independently released at 0.1.0.
 - Documentation and release-state checks: 38 passed; generated docs check: nine pages; whitespace clean. A local wheel and sdist passed artifact inspection, and archive inspection confirms all pilot scripts/tests and private run/handoff artifacts are excluded. These disposable builds were not published.
+- Hosted tests passed on `2da14f3`, but its Linux/macOS evals reported 69/70: the documentation rewrite omitted the required separate-downstream-version boundary sentence in NEXT. The sentence was restored without changing the eval contract, and all 70 evals were rerun on the corrected documentation before delivery. Exact repaired-head hosted acceptance is recorded at session closeout.
 
 ## Next boundary
 
