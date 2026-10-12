@@ -1,0 +1,79 @@
+{
+  "schema": "harnessie-downstream-closeout/1",
+  "observed_at": "2026-10-12T00:15:49.997648+00:00",
+  "local_date": "2026-10-11",
+  "authority": "Sam: Proceed as described, Stage, commit, push, and release as appropriate.",
+  "verify_action": {
+    "pr": {
+      "mergeCommit": {
+        "oid": "80f61b4d47231aa08b1274375a982ddae5263d52"
+      },
+      "mergedAt": "2026-10-12T00:07:41Z",
+      "state": "MERGED",
+      "url": "https://github.com/snapsynapse/harnessie-verify-action/pull/4"
+    },
+    "release": {
+      "isDraft": false,
+      "publishedAt": "2026-10-12T00:09:07Z",
+      "tagName": "v0.2.3",
+      "url": "https://github.com/snapsynapse/harnessie-verify-action/releases/tag/v0.2.3"
+    },
+    "tag_object": "5e7a606986dbffe51fb84de8bfa8b70e8196fe0b",
+    "signature_verified": true,
+    "stable_v0": "80f61b4d47231aa08b1274375a982ddae5263d52",
+    "ci": {
+      "head": "80f61b4d47231aa08b1274375a982ddae5263d52",
+      "run": 38186828991,
+      "jobs": [
+        {
+          "name": "refuses-pull-request-target",
+          "conclusion": "success"
+        },
+        {
+          "name": "cannot-verify-advisory-passes",
+          "conclusion": "success"
+        },
+        {
+          "name": "cannot-verify-fails-closed",
+          "conclusion": "success"
+        },
+        {
+          "name": "evidence-bundle-fresh-check-still-gates",
+          "conclusion": "success"
+        },
+        {
+          "name": "evidence-bundle-reaches-verifier",
+          "conclusion": "success"
+        },
+        {
+          "name": "stale-evidence-bundle-refuses-before-checks",
+          "conclusion": "success"
+        },
+        {
+          "name": "failing-check-fails-job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    "public_artifact_sha256": "f8ff00d35441dd6fe18d29c7898c3abf6ce69a47dd72a0c9d4f00c4ff0a108b6",
+    "consumer": "published exact-version Action definition equals the clean release checkout; all seven hosted fixtures used published core 1.5.0"
+  },
+  "homebrew": {
+    "pr": {
+      "mergeCommit": {
+        "oid": "4ae1944da5c603536af75a47761bd8dabea4648a"
+      },
+      "mergedAt": "2026-10-12T00:07:45Z",
+      "state": "MERGED",
+      "url": "https://github.com/snapsynapse/homebrew-tap/pull/5"
+    },
+    "formula_sha256": "6e2d21ade2de0fa584ade02bae7d0f99d728300a4f581cf2950b3c64728570d7",
+    "installed_version": "1.5.0",
+    "audit_strict_online": "passed",
+    "brew_test": "passed",
+    "brew_linkage_test": "passed",
+    "note": "Checks rerun against the merged formula; the real upgrade receipt remains in homebrew.json."
+  },
+  "core_publication": "unchanged v1.5.0; no rebuild or new package release",
+  "live_model_calls": 0
+}

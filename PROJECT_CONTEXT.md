@@ -50,16 +50,17 @@ PRs. Core 1.2.0 includes evidence-bound intake and structured required-claim ver
 Copyright Snap Synapse LLC (author Sam Rogers, subscriptions@snapsynapse.com), with
 trademark and PAICE.work PBC spec/code carveouts recorded in NOTICE.
 
-## Current status (2026-10-06)
+## Current status (2026-10-11)
 
 Core 1.5.0 is published and verified on PyPI and GitHub from signed tag `v1.5.0` at
 `4ccf3f304bca0c88c8997c0a0cf33a909145d3ef`, with provenance-verified original assets and
 publisher attestations. It adds harness identity on every result, tool-contract break
 metrics with the first measured brains, `harnessie atif` export to ATIF-v1.7, and
 Harnessie as a Harbor verifier and as a Harbor external agent (`examples/harbor-verifier`,
-`examples/harbor-agent`), each with a dated acceptance audit. Verify Action 0.2.2 and
-stable `v0` still pin core 1.4.1 and Homebrew still serves 1.4.1; their 1.5.0 bumps are
-open and tested as pull requests awaiting merge. Engine wrappers remain independently
+`examples/harbor-agent`), each with a dated acceptance audit. Verify Action 0.2.3 and
+stable `v0` now pin core 1.5.0; Homebrew 1.5.0 is merged and its installed consumer
+is verified. The October 11 downstream receipt records exact merge, fixture,
+signed-tag, publication and consumer evidence. Engine wrappers remain independently
 released at 0.1.0. [Release execution](audits/release-1.5.0.md) records the evidence.
 The docs site is live; the dated 2026-09-08 Siteline scan scored it A, 97/100 (not
 refreshed for 1.5.0). Public-facing doc pages under `docs/` are generated from markdown

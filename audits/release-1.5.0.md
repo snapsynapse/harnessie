@@ -43,8 +43,8 @@ Sam replaced the Namecheap TXT value after the pre-DNS checkpoint; [DNS after](r
 
 ## Downstream acceptance
 
-Verify Action: [PR #4](https://github.com/snapsynapse/harnessie-verify-action/pull/4) pins core 1.5.0 and proposes 0.2.3; all seven fixtures passed on the branch ([receipt](release-1.5.0/verify-action.json)). Homebrew: [PR #5](https://github.com/snapsynapse/homebrew-tap/pull/5) updates the formula to the published sdist and moves `rpds-py` to the runtime lock's 2026.9.1; on the exact branch formula, `brew audit --strict --online` reported no findings, a real 1.4.1 to 1.5.0 upgrade, `brew test` and `brew linkage --test` passed, and the installed CLI reports 1.5.0 ([receipt](release-1.5.0/homebrew.json)). The tap's local `main` was fast-forwarded to origin before the branch was rebased. Merging both pull requests, releasing Verify Action 0.2.3 with the stable `v0` advance, and the tap merge are operator decisions; until then Verify Action and Homebrew serve 1.4.1.
+Verify Action 0.2.3 and stable `v0` now pin core 1.5.0 at `80f61b4d47231aa08b1274375a982ddae5263d52`; all seven fixtures passed on that exact merge commit, and signed tag `v0.2.3` and the GitHub Release are published. Homebrew 1.5.0 is merged at `4ae1944da5c603536af75a47761bd8dabea4648a`; audit, test, linkage and installed-package version were verified after merge. The [downstream closeout receipt](release-1.5.0/downstream-closeout-2026-10-11.json) records the October 11 acceptance. Engine wrappers remain independently released at 0.1.0. Earlier branch audit and real-upgrade receipts remain historical evidence in `release-1.5.0/verify-action.json` and `release-1.5.0/homebrew.json`.
 
 ## Progress
 
-Core publication and verification are complete. Downstream merges and the Verify Action release remain open as recorded above. [Machine-readable state](release-1.5.0-state.json) mirrors each step.
+Core publication, downstream merges, the signed Verify Action release and stable `v0` advance are complete. [Machine-readable state](release-1.5.0-state.json) mirrors each step.

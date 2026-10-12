@@ -94,7 +94,7 @@ Live provider scorecards are opt-in and never part of the default suite; without
 `HARNESSIE_LIVE=1` plus provider config they report `SKIP` and exit clean. Pages/DNS/
 PyPI promotion and live-provider calls are deliberate operator acts, never headless.
 
-## Current state (2026-10-06)
+## Current state (2026-10-11)
 
 - Core 1.5.0 is published and verified on GitHub and PyPI from signed tag `v1.5.0`
   (commit `4ccf3f304bca0c88c8997c0a0cf33a909145d3ef`), with original-build provenance
@@ -114,11 +114,7 @@ PyPI promotion and live-provider calls are deliberate operator acts, never headl
   `harbor-agent-acceptance-2026-10-05.md`, `live-scorecard-2026-10-05/`). They are
   plumbing results on one backend and one local model, not brain evidence; token-level
   ATIF agreement needs vLLM or SGLang.
-- Downstream bumps are in progress and still pin 1.4.1: Verify Action 0.2.3 is proposed
-  at https://github.com/snapsynapse/harnessie-verify-action/pull/4 (seven fixtures
-  green, unmerged); the Homebrew 1.5.0 formula is in progress at https://github.com/snapsynapse/homebrew-tap/pull/5, where the exact formula passed `brew audit --strict --online`, a real 1.4.1 to 1.5.0 upgrade, `brew test` and `brew linkage --test`; it is not merged.
-  Verify Action 0.2.2/stable `v0` and Homebrew 1.4.1 remain current. Engine wrappers
-  remain independently released at 0.1.0.
+- Verify Action 0.2.3 and stable `v0` pin core 1.5.0 at `80f61b4d47231aa08b1274375a982ddae5263d52`, with seven exact-merge fixtures green and signed tag/release published. Homebrew 1.5.0 is merged at `4ae1944da5c603536af75a47761bd8dabea4648a` and its installed consumer is verified. See `audits/release-1.5.0/downstream-closeout-2026-10-11.json`. Engine wrappers remain independently released at 0.1.0.
 - The final 1.5.0 guide (8,054 bytes) earned hosted Level 4 under profile 2.0.0 on
   2026-10-06 with zero blockers; see `audits/release-1.5.0/guidecheck-prepublication.json`.
   Preserve its frozen bytes. Any later guide change requires a new sidecar, trust

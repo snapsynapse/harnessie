@@ -2,16 +2,16 @@
   "schema_version": "1.0",
   "repository": "snapsynapse/harnessie",
   "profile": "core-release",
-  "authority": "Sam authorized the 1.5.0 release through the signed tag and GitHub Release on 2026-10-06, with Verify Action and Homebrew bumps prepared alongside and pushed after PyPI publication.",
+  "authority": "Sam authorized the 1.5.0 release through the signed tag and GitHub Release on 2026-10-06, with Verify Action and Homebrew bumps prepared alongside and pushed after PyPI publication. On 2026-10-11 Sam authorized proceeding with staging, commits, pushes and appropriate releases, including downstream closeout.",
   "start_head": "5913591fd9434a0c3cb7f03a0a4fa37a6e9a23b0",
   "candidate_head": "4ccf3f304bca0c88c8997c0a0cf33a909145d3ef",
   "candidate_version": "1.5.0",
-  "updated_at": "2026-10-06T07:37:06Z",
+  "updated_at": "2026-10-12T00:15:49.997648+00:00",
   "guide": {
     "sha256": "f6f1ce225d2dcafe7e2b9da5e1b8539099e6a602a8d827dd02ed02f0159bc631",
     "bytes": 8054,
     "profile_version": "2.0.0",
-    "dns_value_pending": "v=1; sha256=f6f1ce225d2dcafe7e2b9da5e1b8539099e6a602a8d827dd02ed02f0159bc631; url=https://harnessie.com/.well-known/assistant-guide.txt"
+    "dns_value": "v=1; sha256=f6f1ce225d2dcafe7e2b9da5e1b8539099e6a602a8d827dd02ed02f0159bc631; url=https://harnessie.com/.well-known/assistant-guide.txt"
   },
   "steps": [
     {
@@ -69,18 +69,20 @@
     },
     {
       "id": "verify_action",
-      "status": "in_progress",
-      "evidence": "PR https://github.com/snapsynapse/harnessie-verify-action/pull/4 open with all seven fixtures green (release-1.5.0/verify-action.json); merge and the 0.2.3 release await the operator."
+      "status": "completed",
+      "evidence": "audits/release-1.5.0/downstream-closeout-2026-10-11.json: PR #4 merged, seven fixtures pass on 80f61b4, signed v0.2.3 and GitHub Release published, stable v0 matches.",
+      "head": "80f61b4d47231aa08b1274375a982ddae5263d52"
     },
     {
       "id": "homebrew",
-      "status": "in_progress",
-      "evidence": "PR https://github.com/snapsynapse/homebrew-tap/pull/5 open; brew audit, a real 1.4.1 to 1.5.0 upgrade, brew test and linkage passed on the exact formula (release-1.5.0/homebrew.json); merge awaits the operator."
+      "status": "completed",
+      "evidence": "audits/release-1.5.0/downstream-closeout-2026-10-11.json: PR #5 merged, exact formula matches published sdist, strict online audit, test, linkage and installed 1.5.0 consumer verified.",
+      "head": "4ae1944da5c603536af75a47761bd8dabea4648a"
     },
     {
       "id": "closeout",
-      "status": "in_progress",
-      "evidence": "Documentation flipped to published state; closeout commit pending."
+      "status": "completed",
+      "evidence": "Core documentation closeout landed at f1892f4 and 66b5b09; October 11 downstream acceptance is verified in audits/release-1.5.0/downstream-closeout-2026-10-11.json."
     }
   ],
   "tag": {
