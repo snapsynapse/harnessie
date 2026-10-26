@@ -6,17 +6,17 @@
       "darwin-x86_64"
     ],
     "generator": "uv",
-    "generator_version": "0.11.15",
+    "generator_version": "0.13.4",
     "python": "3.12",
     "release": [
-      "uv==0.11.15",
+      "uv==0.13.4",
       "cyclonedx-bom==7.3.1"
     ]
   },
-  "input_sha256": "dab1b391931c52ddbb3691c14930d3fbcd8924216a4366d355e79b5726144fd8",
+  "input_sha256": "a7e911029c9a0a9c02b56ab4996e38148188bf7b075a44f9d18eafaa31903990",
   "locks": {
     "dev": "f7b166fa252eac5af507e1200d58e9a7bbe969f6ed3100fd6cbf73bdf1a596fe",
-    "release": "ee9287b0cbe48987cff4dc359112db62c2f1848c5eb1bcfc6498374c62814798",
+    "release": "267ac622c97a6415d524dfd448ee7201e65ad259d0ad830ef769686fde97a802",
     "runtime": "39d1f9f8bca819156f8da95b79cc35a3d237e32000aaaabf4b703bcb639c6997"
   },
   "schema_version": 1
