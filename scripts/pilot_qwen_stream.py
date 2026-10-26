@@ -153,6 +153,8 @@ def inspect_stream(raw: bytes, *, capture_complete: bool) -> dict:
             for field in ("content", "reasoning", "reasoning_content"):
                 value = delta.get(field)
                 require(value is None or type(value) is str, "invalid_stream_delta")
+                if value is not None:
+                    value.encode("utf-8")
             require(not (delta.get("reasoning") is not None and delta.get("reasoning_content") is not None),
                     "ambiguous_reasoning")
             content.append(delta.get("content") or "")

@@ -4,6 +4,7 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+- Prepare a source-only consume-once Qwen streaming execution wrapper with separate approval scope, fresh pre/post identity, unchanged limits and private accounting. Preserve usage through combined transport/storage failures, filter public usage to numeric counters, and refuse malformed Unicode without losing later accounting. Independently verified offline; no inference or package change.
 - Prepare source-only Qwen streaming capture offline: retain bounded private SSE frames, refuse incomplete answers and missing final usage, preserve all reported accounting and exact frozen evidence, and seal a zero-live-allowance candidate. No dispatch command, inference, runtime or package change.
 - Make pilot transport fixtures use the test interpreter; establish the exited leader before the inherited-pipe timeout test, and isolate terminal-status validation from interpreter-startup timing. Production limits are unchanged.
 

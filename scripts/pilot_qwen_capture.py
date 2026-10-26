@@ -67,6 +67,9 @@ class CapturedQwenTransport:
         self.response_capture: dict | None = None
         self.diagnostics: dict = {}
         self.capture_failure: str | None = None
+        # Private bounded fallback for accounting when persistence and transport
+        # both fail. Callers must never print or treat these bytes as accepted.
+        self.captured_stdout: bytes | None = None
         self._used = False
 
     def _transport_config(self, limits: PilotLimits) -> dict:
@@ -183,9 +186,10 @@ class CapturedQwenTransport:
                 "cleanup_child_exited": cleanup_exited,
                 "server_cancellation_confirmed": False,
             }
+            self.captured_stdout = bytes(raw)
             try:
                 self.response_capture = self.reservation.save(
-                    bytes(raw), returncode=returncode, process_failure=failure)
+                    self.captured_stdout, returncode=returncode, process_failure=failure)
             except Exception:
                 self.capture_failure = "response_capture_failed"
                 self.response_capture = {"status": "failed", "phase": "after_inference"}
