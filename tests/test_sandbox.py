@@ -44,6 +44,18 @@ def test_profile_denies_network_by_default(tmp_path):
     assert "(deny network*)" not in open_prof         # opt-in lifts it
 
 
+def test_seatbelt_network_opt_in_keeps_local_unix_sockets_denied(tmp_path):
+    # Only the resolver pathname is exempt from outbound Unix-socket denial.
+    prof = sandbox._seatbelt_profile(tmp_path, allow_network=True)
+    lines = prof.splitlines()
+    deny = "(deny network-outbound (remote unix-socket))"
+    resolver = ('(allow network-outbound (remote unix-socket (path-literal '
+                '"/private/var/run/mDNSResponder")))')
+    assert deny in lines and resolver in lines
+    assert lines.index(deny) < lines.index(resolver)   # last match wins
+    assert lines[-1] == resolver                         # nothing re-opens after
+
+
 def test_seatbelt_profile_restricts_lane_after_workspace_allow(tmp_path):
     protected = tmp_path / "protected"
     protected.mkdir()
@@ -108,6 +120,128 @@ def test_worker_network_denied_by_default(tmp_path):
     assert res.ok
     # sandbox blocks name resolution / connect; either way it is not a success
     assert "exit=0" not in res.content or "error" in res.content.lower()
+
+
+needs_seatbelt = pytest.mark.skipif(
+    sys.platform != "darwin" or sandbox.backend_name() != "seatbelt",
+    reason="Seatbelt-specific Unix-socket policy")
+
+
+@pytest.fixture(params=["stream", "datagram-connect", "datagram-sendto"])
+def unix_endpoint(request):
+    import socket
+    import tempfile
+
+    # AF_UNIX paths are capped near 104 bytes on macOS. The server belongs
+    # to the test, outside the child's workspace; no real control daemon runs.
+    with tempfile.TemporaryDirectory(dir="/tmp") as d:
+        ws = Path(d) / "ws"
+        ws.mkdir()
+        path = Path(d) / "ctl.sock"
+        kind = (socket.SOCK_STREAM if request.param == "stream"
+                else socket.SOCK_DGRAM)
+        with socket.socket(socket.AF_UNIX, kind) as server:
+            server.bind(str(path))
+            server.settimeout(3)
+            if kind == socket.SOCK_STREAM:
+                server.listen(4)
+            yield ws, path, server, request.param
+
+
+def _unix_child(path, mode):
+    kind = "SOCK_STREAM" if mode == "stream" else "SOCK_DGRAM"
+    return ("import socket,sys\n"
+            f"s=socket.socket(socket.AF_UNIX, socket.{kind})\n"
+            "s.settimeout(3)\n"
+            "try:\n"
+            + (f" s.sendto(b'probe', {str(path)!r})\n" if mode == "datagram-sendto"
+               else f" s.connect({str(path)!r})\n s.sendall(b'probe')\n")
+            + "except PermissionError:\n sys.exit(3)\n")
+
+
+def _run_socket_child(child, ws, profile=None):
+    import subprocess
+
+    argv = [sys.executable, "-I", "-c", child]
+    if profile is not None:
+        argv = ["sandbox-exec", "-p", profile, *argv]
+    return subprocess.run(argv, cwd=ws, capture_output=True, timeout=15)
+
+
+def _receive_probe(server, mode):
+    if mode == "stream":
+        conn, _ = server.accept()
+        with conn:
+            assert conn.recv(5) == b"probe"
+    else:
+        assert server.recv(5) == b"probe"
+
+
+@needs_seatbelt
+@pytest.mark.parametrize("allow_network", [False, True])
+@pytest.mark.parametrize("path_style", ["canonical", "tmp-alias", "relative", "symlink"])
+def test_seatbelt_child_cannot_reach_unconfined_unix_socket(
+        unix_endpoint, allow_network, path_style):
+    ws, path, server, mode = unix_endpoint
+    if path_style == "canonical":
+        target = path.resolve()
+    elif path_style == "relative":
+        target = Path("../ctl.sock")
+    elif path_style == "symlink":
+        target = ws / "alias.sock"
+        target.symlink_to(path)
+    else:
+        target = path
+    child = _unix_child(target, mode)
+    # An unsandboxed positive control proves the endpoint and operation work.
+    control = _run_socket_child(child, ws)
+    assert control.returncode == 0, control.stderr.decode(errors="replace")
+    _receive_probe(server, mode)
+    profile = sandbox._seatbelt_profile(ws, allow_network=allow_network)
+    result = _run_socket_child(child, ws, profile)
+    assert result.returncode == 3, result.stderr.decode(errors="replace")
+
+
+@needs_seatbelt
+def test_seatbelt_resolver_exception_is_exact_and_usable(unix_endpoint):
+    import json
+    import socket
+
+    ws, path, server, mode = unix_endpoint
+    profile = sandbox._seatbelt_profile(ws, allow_network=True)
+    # Substitute our controlled endpoint for the one resolver literal. This
+    # tests native exception precedence without contacting a system service.
+    resolver = '"/private/var/run/mDNSResponder"'
+    assert profile.count(resolver) == 1
+    profile = profile.replace(resolver, json.dumps(str(path.resolve())))
+    result = _run_socket_child(_unix_child(path, mode), ws, profile)
+    assert result.returncode == 0, result.stderr.decode(errors="replace")
+    _receive_probe(server, mode)
+    other = path.with_name("other.sock")
+    with socket.socket(server.family, server.type) as neighbor:
+        neighbor.bind(str(other))
+        if mode == "stream":
+            neighbor.listen(1)
+        result = _run_socket_child(_unix_child(other, mode), ws, profile)
+        assert result.returncode == 3, result.stderr.decode(errors="replace")
+
+
+@needs_seatbelt
+@pytest.mark.parametrize("allow_network", [False, True])
+def test_seatbelt_network_opt_in_preserves_tcp(tmp_path, allow_network):
+    import socket
+
+    with socket.socket() as server:
+        server.bind(("127.0.0.1", 0))
+        server.listen(1)
+        child = ("import socket,sys\n"
+                 "try:\n"
+                 f" s=socket.create_connection({server.getsockname()!r}, 3)\n"
+                 "except PermissionError:\n sys.exit(3)\n")
+        profile = sandbox._seatbelt_profile(tmp_path, allow_network=allow_network)
+        result = _run_socket_child(child, tmp_path, profile)
+        assert result.returncode == (0 if allow_network else 3), (
+            result.stderr.decode(errors="replace"))
 
 
 @needs_lane_sandbox

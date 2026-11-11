@@ -4,6 +4,7 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+- On macOS Seatbelt, keep outbound Unix-socket connections denied when `allow_network: true` or `harnessie verify --allow-network` permits TCP/IP. Preserve the exact `/private/var/run/mDNSResponder` exception. Independently review security commit `520cc08`, add native stream/datagram, path-alias, exact-exception and TCP regression coverage, and qualify remaining loopback TCP, Mach IPC and unprobed Linux exposure in `SECURITY.md`. No inference or package publication.
 - Separate experimental streaming capture into a bounded 4 MiB wire envelope and an unchanged 128,000-byte decoded-text allowance. Preserve the 20-minute/4,096-token limits and single-use authority, version the streaming approval scope, and count nullable reasoning aliases correctly. Independently verified offline; no inference or package change.
 - Upgrade the controlled release resolver and hash-locked uv dependency from 0.11.15 to 0.13.4 to remove the compromised emSign root (GHSA-hq85-5cpj-mr62). Regenerate the lock manifest without changing runtime or development dependencies.
 - Prepare a source-only consume-once Qwen streaming execution wrapper with separate approval scope, fresh pre/post identity, unchanged limits and private accounting. Preserve usage through combined transport/storage failures, filter public usage to numeric counters, and refuse malformed Unicode without losing later accounting. Independently verified offline; no inference or package change.

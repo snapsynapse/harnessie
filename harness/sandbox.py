@@ -10,6 +10,8 @@ Policy (operator-chosen, 2026-07-06):
     and gate checks are BLOCKED, never run unsandboxed. Wire a backend to
     enable shell on a new platform.
   - Deny network by default; a workflow phase opts in with allow_network: true.
+    On Seatbelt, the opt-in keeps outbound Unix-socket connections denied
+    except the DNS resolver socket. TCP/IP, including loopback, is allowed.
   - Confine writes to the workspace, then overlay ownership paths denied to
     the active agent as read-only. Temp dirs outside home stay writable so
     interpreters function; that is a deliberate boundary (the protected asset
@@ -110,6 +112,15 @@ def _seatbelt_profile(
         lines.append(f"(deny file-write* (subpath {literal}))")
     if not allow_network:
         lines.append("(deny network*)")
+    else:
+        # A reachable Unix control socket can let a confined child ask an
+        # unconfined process to act for it, bypassing write confinement.
+        # Keep these connections denied, with one exact resolver exception.
+        # This does not restrict loopback TCP or Mach IPC.
+        lines.append("(deny network-outbound (remote unix-socket))")
+        lines.append(
+            '(allow network-outbound (remote unix-socket (path-literal '
+            '"/private/var/run/mDNSResponder")))')
     return "\n".join(lines)
 
 
