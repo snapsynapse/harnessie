@@ -93,8 +93,8 @@ def test_prepare_is_private_offline_deeply_sealed_and_grants_no_call(tmp_path, s
     proposal = json.loads((root / "proposal.json").read_bytes())
     assert (root / "request.json").read_bytes() == stream_wire
     assert proposal["live_allowance"] == 0
-    assert proposal["schema"] == "harnessie-streaming-review/1"
-    assert proposal["approval_action"] == "execute_one_local_qwen_streaming_review"
+    assert proposal["schema"] == "harnessie-streaming-review/2"
+    assert proposal["approval_action"] == "execute_one_local_qwen_streaming_review_v2"
     assert proposal["limits"]["timeout_s"] == 1200 and proposal["limits"]["max_output_tokens"] == 4096
     assert proposal["minimum_runway_s"] == 1320
     assert root.stat().st_mode & 0o777 == 0o700
@@ -239,7 +239,8 @@ def test_bad_stream_cannot_become_review(tmp_path, stream_wire, body, reason):
 @pytest.mark.parametrize("failure", ["process_timeout", "transport_failed", "output_limit_exceeded"])
 def test_failed_stream_keeps_observed_usage_and_refuses_retry(tmp_path, stream_wire, failure):
     root, approval = prepared(tmp_path, stream_wire)
-    body = frames() + (b"x" * 130000 if failure == "output_limit_exceeded" else b"")
+    body = frames() + (b"x" * (review.LIMITS.max_output_bytes + 1)
+                       if failure == "output_limit_exceeded" else b"")
     result = execute(root, approval, factory=wire_factory(body, failure=failure))
     assert result["outcome"] == failure
     assert result["usage"]["output_tokens"] == 20 and not result["review_received"]
@@ -344,7 +345,7 @@ def test_real_capture_transport_is_wired_without_network(tmp_path, stream_wire, 
     body = tmp_path / "synthetic.sse"
     body.write_bytes(frames())
     def fixture(argv, **kwargs):
-        assert argv[2] == "--evidence-review-request-child"
+        assert argv[2] == "--streaming-review-request-child"
         return original([sys.executable, "-c", "import sys;sys.stdout.buffer.write(open(sys.argv[1],'rb').read())", str(body)], **kwargs)
     monkeypatch.setattr(capture.subprocess, "Popen", fixture)
     result = review.execute(root, approval, approval["proposal_sha256"], identity_capture=observed)
@@ -373,7 +374,7 @@ def test_real_transport_timeout_plus_disk_failure_preserves_usage(tmp_path, stre
         return original([sys.executable, "-c", "import sys,time;sys.stdout.buffer.write(open(sys.argv[1],'rb').read());sys.stdout.flush();time.sleep(10)", str(body)], **kwargs)
     monkeypatch.setattr(capture.subprocess, "Popen", fixture)
     monkeypatch.setattr(capture.EvidenceReviewQwenTransport, "_transport_config",
-                        lambda *_: {"timeout_s": .3, "max_output_bytes": 128000})
+                        lambda *_: {"timeout_s": .3, "max_output_bytes": review.LIMITS.max_output_bytes})
     result = review.execute(root, approval, approval["proposal_sha256"], identity_capture=observed)
     assert result["usage"]["output_tokens"] == 20
     assert "response_capture_failed" in result["failures"] and not result["review_received"]

@@ -22,6 +22,8 @@ from scripts.pilot_capture import ResponseCaptureReservation
 from scripts.pilot_contract import PilotLimits, PilotRefusal
 from scripts.pilot_qwen import _CHAT_URL, _NoRedirect, _kill_child_group, _strict_json
 
+STREAMING_MAX_WIRE_BYTES = 4 * 1024 * 1024
+
 
 def _validate_config(config: dict) -> dict:
     if (type(config) is not dict or set(config) != {"timeout_s", "max_output_bytes"}
@@ -41,6 +43,17 @@ def _validate_evidence_review_config(config: dict) -> dict:
             or config["timeout_s"] != 1200
             or type(config["max_output_bytes"]) is not int
             or not 0 < config["max_output_bytes"] <= 128000):
+        raise PilotRefusal("invalid_qwen_capture_config")
+    return config
+
+
+def _validate_streaming_review_config(config: dict) -> dict:
+    """Separate bounded SSE envelope; legacy JSON capture limits stay intact."""
+    if (type(config) is not dict or set(config) != {"timeout_s", "max_output_bytes"}
+            or type(config["timeout_s"]) not in {int, float}
+            or config["timeout_s"] != 1200
+            or type(config["max_output_bytes"]) is not int
+            or config["max_output_bytes"] != STREAMING_MAX_WIRE_BYTES):
         raise PilotRefusal("invalid_qwen_capture_config")
     return config
 
@@ -228,6 +241,11 @@ def _evidence_review_request_child(config: dict) -> int:
     return _request_child_io(config)
 
 
+def _streaming_review_request_child(config: dict) -> int:
+    _validate_streaming_review_config(config)
+    return _request_child_io(config)
+
+
 def _request_child_io(config: dict) -> int:
     """Flush each bounded response prefix before another HTTP read can fail."""
     failure = None
@@ -275,6 +293,7 @@ def _child_main(argv: list[str]) -> int:
     handlers = {
         "--captured-request-child": _request_child,
         "--evidence-review-request-child": _evidence_review_request_child,
+        "--streaming-review-request-child": _streaming_review_request_child,
     }
     if len(argv) != 3 or argv[1] not in handlers:
         return 2

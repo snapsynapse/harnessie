@@ -4,6 +4,7 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 ## Unreleased
 
+- Separate experimental streaming capture into a bounded 4 MiB wire envelope and an unchanged 128,000-byte decoded-text allowance. Preserve the 20-minute/4,096-token limits and single-use authority, version the streaming approval scope, and count nullable reasoning aliases correctly. Independently verified offline; no inference or package change.
 - Upgrade the controlled release resolver and hash-locked uv dependency from 0.11.15 to 0.13.4 to remove the compromised emSign root (GHSA-hq85-5cpj-mr62). Regenerate the lock manifest without changing runtime or development dependencies.
 - Prepare a source-only consume-once Qwen streaming execution wrapper with separate approval scope, fresh pre/post identity, unchanged limits and private accounting. Preserve usage through combined transport/storage failures, filter public usage to numeric counters, and refuse malformed Unicode without losing later accounting. Independently verified offline; no inference or package change.
 - Prepare source-only Qwen streaming capture offline: retain bounded private SSE frames, refuse incomplete answers and missing final usage, preserve all reported accounting and exact frozen evidence, and seal a zero-live-allowance candidate. No dispatch command, inference, runtime or package change.

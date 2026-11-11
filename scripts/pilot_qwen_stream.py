@@ -6,7 +6,7 @@ Consumed non-streaming proposals and their request hashes remain unchanged.
 """
 from __future__ import annotations
 
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from copy import deepcopy
 import hashlib
 from pathlib import Path
@@ -14,14 +14,21 @@ from pathlib import Path
 from scripts.pilot_capture import ResponseCaptureStore
 from scripts.pilot_contract import PilotRefusal, QWEN_MODEL
 from scripts.pilot_evidence_handoff import _encode, validate_review
-from scripts.pilot_evidence_review import LIMITS, REQUEST_SHA256, RUNWAY_S, TIMING_POLICY, _request
+from scripts.pilot_evidence_review import LIMITS as REVIEW_LIMITS, REQUEST_SHA256, RUNWAY_S, TIMING_POLICY, _request
 from scripts.pilot_execution import implementation_hashes, require
 from scripts.pilot_qwen import _strict_json, _unknown_usage, _usage
-from scripts.pilot_qwen_capture import EvidenceReviewQwenTransport
+from scripts.pilot_qwen_capture import (EvidenceReviewQwenTransport, STREAMING_MAX_WIRE_BYTES,
+                                       _validate_streaming_review_config)
 from scripts.pilot_qwen_smoke import _save
 
 
-POLICY = {"schema": "harnessie-qwen-stream-review/1", "framing": "SSE",
+MAX_DECODED_TEXT_BYTES = REVIEW_LIMITS.max_output_bytes
+LIMITS = replace(REVIEW_LIMITS, max_output_bytes=STREAMING_MAX_WIRE_BYTES)
+
+POLICY = {"schema": "harnessie-qwen-stream-review/2", "framing": "SSE",
+          "wire_max_bytes": STREAMING_MAX_WIRE_BYTES,
+          "decoded_text_max_bytes": MAX_DECODED_TEXT_BYTES,
+          "decoded_text_budget": "UTF-8 content plus reasoning; checked after private capture",
           "terminal": "[DONE] after one stop and one final usage receipt",
           "missing_usage": "unknown and refuse", "incomplete_answer": "refuse",
           "reasoning": "private raw capture only", "retries": 0}
@@ -42,7 +49,7 @@ def streaming_request(original: bytes) -> bytes:
 def prepare(root: Path, original: bytes) -> dict:
     """Seal a private offline candidate, with no identity I/O or live authority."""
     raw = streaming_request(original)
-    proposal = {"schema": "harnessie-qwen-stream-preparation/1",
+    proposal = {"schema": "harnessie-qwen-stream-preparation/2",
                 "status": "offline_preparation_not_authorization", "live_allowance": 0,
                 "original_request_sha256": REQUEST_SHA256,
                 "request_sha256": hashlib.sha256(raw).hexdigest(), "request_bytes": len(raw),
@@ -60,9 +67,12 @@ def prepare(root: Path, original: bytes) -> dict:
 class StreamingEvidenceReviewQwenTransport(EvidenceReviewQwenTransport):
     """Reuse bounded private capture with an explicitly different wire request.
 
-    This low-level transport is not an approval gateway. A future live runner
+    This low-level transport is not an approval gateway. The execution wrapper
     must seal and consume fresh authority before using it. There is no CLI.
     """
+
+    _config_validator = staticmethod(_validate_streaming_review_config)
+    _child_marker = "--streaming-review-request-child"
 
     def __call__(self, payload, limits):
         require(type(payload) is bytes and len(payload) <= LIMITS.max_input_bytes, "request_drift")
@@ -87,6 +97,7 @@ def inspect_stream(raw: bytes, *, capture_complete: bool) -> dict:
     reported_usage = []
     usage = _unknown_usage()
     content = []
+    content_bytes = 0
     reasoning_bytes = 0
     finished = False
     done = False
@@ -157,8 +168,15 @@ def inspect_stream(raw: bytes, *, capture_complete: bool) -> dict:
                     value.encode("utf-8")
             require(not (delta.get("reasoning") is not None and delta.get("reasoning_content") is not None),
                     "ambiguous_reasoning")
-            content.append(delta.get("content") or "")
-            reasoning_bytes += len((delta.get("reasoning", delta.get("reasoning_content")) or "").encode())
+            piece = delta.get("content") or ""
+            content_bytes += len(piece.encode())
+            reasoning_bytes += len((delta.get("reasoning") or delta.get("reasoning_content") or "").encode())
+            if content_bytes + reasoning_bytes > MAX_DECODED_TEXT_BYTES:
+                # Keep inspecting later accounting, but never grow the answer
+                # buffer after the independent decoded-text budget is spent.
+                fail("decoded_output_limit_exceeded")
+            else:
+                content.append(piece)
             finish = choice.get("finish_reason")
             if finish is not None:
                 finished = True
@@ -186,9 +204,9 @@ def inspect_stream(raw: bytes, *, capture_complete: bool) -> dict:
         except (PilotRefusal, ValueError, TypeError):
             fail("invalid_review")
             review = None
-    return {"schema": "harnessie-qwen-stream-inspection/1",
+    return {"schema": "harnessie-qwen-stream-inspection/2",
             "outcome": failures[0] if failures else "review_received", "failures": failures,
             "usage": usage, "raw_provider_usage": reported_usage,
-            "response_shape": {"content_bytes": len(answer.encode()), "reasoning_bytes": reasoning_bytes},
+            "response_shape": {"content_bytes": content_bytes, "reasoning_bytes": reasoning_bytes},
             "review_received": not failures, "review": review,
             "semantic_acceptance": False, "human_arbitrated": False, "retries": 0}

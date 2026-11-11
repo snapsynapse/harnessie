@@ -84,7 +84,7 @@ def test_complete_stream_keeps_reasoning_private_and_usage_exact(capsys):
 def test_split_utf8_and_frames_reassemble_under_capture(tmp_path, monkeypatch, wire_request, width):
     body = frames().replace(b"\n", b"\r\n")
     value, request = fake_transport(tmp_path, monkeypatch, wire_request, body, width=width)
-    raw = value(request, legacy.LIMITS)
+    raw = value(request, stream.LIMITS)
     assert Path(value.response_capture["path"]).read_bytes() == body
     assert inspect(raw)["review_received"] is True
 
@@ -165,19 +165,21 @@ def fake_transport(tmp_path, monkeypatch, wire_request, body, *, timeout=False, 
             code += "time.sleep(10)\n"
         return actual([sys.executable, "-c", code, str(body_file)], **kwargs)
     monkeypatch.setattr(capture.subprocess, "Popen", launch)
-    value = stream.StreamingEvidenceReviewQwenTransport(ResponseCaptureStore(tmp_path / "responses", 128000).reserve(1))
+    value = stream.StreamingEvidenceReviewQwenTransport(
+        ResponseCaptureStore(tmp_path / "responses", stream.LIMITS.max_output_bytes).reserve(1))
     if timeout:
-        monkeypatch.setattr(value, "_transport_config", lambda _limits: {"timeout_s": .3, "max_output_bytes": 128000})
+        monkeypatch.setattr(value, "_transport_config", lambda _limits: {
+            "timeout_s": .3, "max_output_bytes": stream.LIMITS.max_output_bytes})
     return value, stream.streaming_request(wire_request)
 
 
 def test_transport_captures_wire_before_parser_and_is_consumed(tmp_path, monkeypatch, wire_request):
     value, request = fake_transport(tmp_path, monkeypatch, wire_request, frames())
-    raw = value(request, legacy.LIMITS)
+    raw = value(request, stream.LIMITS)
     assert Path(value.response_capture["path"]).read_bytes() == frames()
     assert inspect(raw)["review_received"] is True
     with pytest.raises(PilotRefusal, match="transport_latched"):
-        value(request, legacy.LIMITS)
+        value(request, stream.LIMITS)
 
 
 def test_unicode_evidence_roundtrips_the_exact_original_wire(tmp_path, monkeypatch, wire_request):
@@ -191,14 +193,14 @@ def test_unicode_evidence_roundtrips_the_exact_original_wire(tmp_path, monkeypat
     reconstructed["stream"] = False
     del reconstructed["stream_options"]
     assert _encode(reconstructed) == raw
-    assert inspect(value(request, legacy.LIMITS))["review_received"] is True
+    assert inspect(value(request, stream.LIMITS))["review_received"] is True
 
 
 def test_timeout_retains_emitted_prefix_without_inventing_usage(tmp_path, monkeypatch, wire_request):
     raw = frames(usage=False, done=False)
     value, request = fake_transport(tmp_path, monkeypatch, wire_request, raw, timeout=True)
     with pytest.raises(PilotRefusal, match="process_timeout"):
-        value(request, legacy.LIMITS)
+        value(request, stream.LIMITS)
     assert Path(value.response_capture["path"]).read_bytes() == raw
     result = inspect(raw, value.response_capture["capture_complete"])
     assert not result["review_received"]
@@ -211,7 +213,7 @@ def test_storage_failure_refuses_but_in_memory_final_usage_survives(tmp_path, mo
     def fail(*_a, **_k):
         raise OSError("synthetic disk failure")
     monkeypatch.setattr(value.reservation, "save", fail)
-    raw = value(request, legacy.LIMITS)
+    raw = value(request, stream.LIMITS)
     assert value.capture_failure == "response_capture_failed"
     result = inspect(raw, False)
     assert result["usage"]["output_tokens"] == 20
@@ -219,10 +221,11 @@ def test_storage_failure_refuses_but_in_memory_final_usage_survives(tmp_path, mo
 
 
 def test_overflow_is_retained_at_bound_plus_sentinel(tmp_path, monkeypatch, wire_request):
-    value, request = fake_transport(tmp_path, monkeypatch, wire_request, b"x" * 150000)
+    value, request = fake_transport(tmp_path, monkeypatch, wire_request,
+                                    b"x" * (stream.LIMITS.max_output_bytes + 500))
     with pytest.raises(PilotRefusal, match="output_limit_exceeded"):
-        value(request, legacy.LIMITS)
+        value(request, stream.LIMITS)
     raw = Path(value.response_capture["path"]).read_bytes()
-    assert len(raw) == 128001
+    assert len(raw) == stream.LIMITS.max_output_bytes + 1
     with pytest.raises(PilotRefusal, match="output_limit_exceeded"):
         inspect(raw, False)

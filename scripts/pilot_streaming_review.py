@@ -20,19 +20,19 @@ from harness.verify import PARSER_VERSION
 from scripts.pilot_capture import ResponseCaptureStore, _fsync_directory
 from scripts.pilot_contract import PilotRefusal, QWEN_MODEL, digest_json
 from scripts.pilot_evidence_handoff import _encode, validate_review
-from scripts.pilot_evidence_review import ENDPOINT, LIMITS, RUNWAY_S, TIMING_POLICY
+from scripts.pilot_evidence_review import ENDPOINT, RUNWAY_S, TIMING_POLICY
 from scripts.pilot_execution import implementation_hashes, require, timestamp, utc_now
 from scripts.pilot_identity import assert_same_identity
 from scripts.pilot_preflight import local_qwen_identity
 from scripts.pilot_prepare import _read
 from scripts.pilot_qwen import _strict_json, _unknown_usage
 from scripts.pilot_qwen_smoke import _save
-from scripts.pilot_qwen_stream import POLICY, StreamingEvidenceReviewQwenTransport, inspect_stream, streaming_request
+from scripts.pilot_qwen_stream import LIMITS, POLICY, StreamingEvidenceReviewQwenTransport, inspect_stream, streaming_request
 
 REQUEST_SHA256 = "86d9e69ec9d93568b389fdf0f10ab57ebb4f2efdfd06a2dee2bb09d53ce0425e"
 REQUEST_BYTES = 212263
 MODEL_DIGEST = "sha256:22130167c4c20e20c7b71454612966ca8e8171e9b3cc8ab6ce8aa6cbfec79643"
-ACTION = "execute_one_local_qwen_streaming_review"
+ACTION = "execute_one_local_qwen_streaming_review_v2"
 
 
 def harness_identity() -> dict:
@@ -74,7 +74,7 @@ def _reported_usage(receipts: list) -> list[dict]:
 
 
 def _fixed(root: Path) -> dict:
-    return {"schema": "harnessie-streaming-review/1", "status": "proposal_not_authorization",
+    return {"schema": "harnessie-streaming-review/2", "status": "proposal_not_authorization",
             "live_allowance": 0, "root": str(root), "endpoint": ENDPOINT, "model": QWEN_MODEL,
             "model_digest": MODEL_DIGEST, "limits": asdict(LIMITS), "request_sha256": REQUEST_SHA256,
             "request_bytes": REQUEST_BYTES, "execute_tools": False, "retries": 0,
@@ -254,7 +254,7 @@ def execute(root: Path, approval: dict | None = None, confirmation: str | None =
         except (OSError, PilotRefusal):
             fail("evidence_persistence_failed")
     received = not failures and candidate is not None
-    result = {"schema": "harnessie-streaming-review-result/1", "outcome": failures[0] if failures else "review_received",
+    result = {"schema": "harnessie-streaming-review-result/2", "outcome": failures[0] if failures else "review_received",
               "failures": failures, "proposal_sha256": confirmation, "request_sha256": REQUEST_SHA256,
               "elapsed_s": time.monotonic() - started, "transport_dispatched": dispatched,
               "usage": inspection["usage"], "reported_usage_count": len(inspection["raw_provider_usage"]),
