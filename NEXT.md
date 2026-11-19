@@ -43,7 +43,7 @@ The search decoder repair (SEC-20261118-017) and verifier-first README/example a
 
 Harnessie 1.5.1 is the current stable core release on [GitHub](https://github.com/snapsynapse/harnessie/releases/tag/v1.5.1) and [PyPI](https://pypi.org/project/harnessie/1.5.1/). Its signed annotated tag `v1.5.1` (tag object `43956fb1120cc53430dcdfa4c16a1ba944b56788`) resolves to `2bb78f24ad029db7e1c1545fdc6ab3a39f808c92`; [release workflow 44485696953](https://github.com/snapsynapse/harnessie/actions/runs/44485696953) passed its build, attachment and protected PyPI jobs. The wheel, source distribution, CycloneDX SBOM and checksum record have [verified original-build provenance](audits/release-1.5.1/github-provenance.json). Both PyPI distributions match the GitHub assets and pass publisher-attestation verification; a [fresh Python 3.12.16 public-index consumer](audits/release-1.5.1/pypi-consumer.json) installed 1.5.1 with the matching wheel digest. The [release execution](audits/release-1.5.1.md) and [machine-readable state](audits/release-1.5.1-state.json) retain the exact receipts. The [1.5.0 release record](audits/release-1.5.0.md) remains historical.
 
-Homebrew 1.5.1 passed a fresh install and CLI smoke test. Verify Action v0.2.4 defaults to core 1.5.1, and a fresh Ubuntu consumer verified that stable `@v0` installed 1.5.1. Engine wrappers remain independently released at 0.1.0. [Downstream verification receipt](audits/release-1.5.1.md#downstream-acceptance)
+Homebrew and Verify Action are separately versioned downstreams. Homebrew 1.5.1 passed a fresh install and CLI smoke test. Verify Action v0.2.4 defaults to core 1.5.1, and a fresh Ubuntu consumer verified that stable `@v0` installed 1.5.1. Engine wrappers remain independently released at 0.1.0. [Downstream verification receipt](audits/release-1.5.1.md#downstream-acceptance)
 
 ## Verified evidence
 
@@ -62,9 +62,9 @@ The 1.5.0 feature evidence is four dated acceptance records: [ATIF export](audit
 - Maintenance: the 2026-10-05 dependency lock refresh (urllib3 2.8.0 resolving the three open Dependabot alerts, plus patch updates), the Dependabot `exclude-paths` note, CodeQL subactions aligned to 4.38.2, the default `local` tier pointed at the installed `qwen3.8:latest`, and Linux portability for two pilot tests.
 - Retained unchanged from earlier releases: the [open-record AIDR exporter](AIDR_EXPORT.md) with its [installed mock example](examples/aidr-export/README.md), and the [offline observer](OBSERVER.md) as the conservative shipped outcome of [AIDR-0009](decisions/AIDR-0009-bid-rounds-and-run-observer.md). Exit 0 from the observer means observation succeeded, not that the observed run passed.
 
-## 1.5.0 release closeout
+## Remaining release order
 
-Core and downstream external closeout gates are complete. [Release execution](audits/release-1.5.0.md) and the [October 11 downstream receipt](audits/release-1.5.0/downstream-closeout-2026-10-11.json) distinguish core publication, exact-merge Action fixtures, signed Action release, stable alias and merged Homebrew consumer verification. Customer acceptance remains a separate claim.
+Core and downstream external closeout gates are complete for 1.5.1. The merged [release receipt](audits/release-1.5.1.md#downstream-acceptance) records Homebrew and Verify Action acceptance. Customer acceptance remains a separate claim.
 
 ## Remaining work
 
