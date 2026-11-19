@@ -82,7 +82,7 @@ def test_agents_json_describes_released_core_and_downstream_boundaries():
     if guide_status["current_receipt"] is None:
         assert guide_status["current_end_to_end_level"].startswith("Pending")
     else:
-        assert guide_status["current_end_to_end_level"].startswith("Level 4")
+        assert guide_status["current_end_to_end_level"].startswith("Level 3")
     assert capabilities["observe-run"]["command"] == "harnessie observe RUN_ID"
     assert "Writes derived" in capabilities["observe-run"]["side_effects"]
     assert capabilities["inspect-ownership"]["side_effects"] == "read-only"
@@ -105,9 +105,11 @@ def test_current_guidecheck_receipt_earns_the_claimed_level():
     assert receipt["input"]["evaluation_mode"] == "public-web"
     assert receipt["guide"]["bytes"] == len(guide)
     assert receipt["guide"]["sha256"] == hashlib.sha256(guide).hexdigest()
-    assert receipt["guide"]["achieved_level"] == 4
+    assert receipt["guide"]["achieved_level"] == 3
     assert receipt["profile_selection"]["evaluated_policy"] == "2.0.0"
-    assert receipt["qualifying_anchor_count"] >= 1
+    assert receipt["qualifying_anchor_count"] == 0
+    assert any(item["id"] == "anchor.hosted.unverified"
+               for item in receipt["findings"])
     assert receipt["verifier"]["guide_profile_version"] == re.search(
         rb"^profile-version: (.+)$", guide, re.M).group(1).decode()
     sidecar = (DOCS / ".well-known" / "assistant-guide-manifest.txt").read_bytes()

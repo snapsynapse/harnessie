@@ -6,7 +6,7 @@
   "start_head": "ab3333f6e8798b19d069ce103bae23ff47c6506a",
   "candidate_head": "2bb78f24ad029db7e1c1545fdc6ab3a39f808c92",
   "candidate_version": "1.5.1",
-  "updated_at": "2026-11-19T08:23:06.101694Z",
+  "updated_at": "2026-11-19T15:50:40.893489Z",
   "steps": [
     {
       "id": "source_merge",
@@ -40,13 +40,14 @@
     },
     {
       "id": "pypi",
-      "status": "blocked",
-      "evidence": "publish-pypi job in release workflow 44485696953 is waiting for required human review of protected pypi environment. PyPI 1.5.1 returned 404 while waiting. No bypass or local upload attempted."
+      "status": "completed",
+      "evidence": "Sam approved protected pypi environment; release workflow 44485696953 completed successfully at 2026-11-19T15:45:13Z. PyPI wheel 0c586af43e8585ac57abfbef94611c1993587dbf2ca038dba051a4edc3a93255 and sdist b26dcaed78237219e5408229f88327c335688a3659330f397e0eeb9dc7375c6a match GitHub assets. pypi-attestations 0.0.30 verified both direct PyPI URLs against snapsynapse/harnessie; publisher GitHub release.yml environment pypi. Fresh CPython 3.12.16 public-index install from site-packages, pip check, CLI help and checks-only 1/0/2 trial passed. See audits/release-1.5.1/pypi-integrity.json and pypi-consumer.json.",
+      "completed_at": "2026-11-19T15:45:13Z"
     },
     {
       "id": "downstream",
       "status": "not_started",
-      "evidence": "Verify Action and Homebrew remain at core 1.5.0 until separately tested and updated after PyPI 1.5.1 verification; engine wrappers have an independent train."
+      "evidence": "Core 1.5.1 publication is verified. Verify Action 0.2.3/stable v0 and Homebrew still pin core 1.5.0; their separate repository release trains and consumer checks are not part of this core publication closeout. Engine wrappers have an independent train."
     }
   ]
 }

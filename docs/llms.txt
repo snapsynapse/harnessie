@@ -4,7 +4,7 @@ A brain-agnostic multi-agent harness. The harness structure carries the quality 
 
 ## Release state
 
-Harnessie 1.5.1 source includes the security repairs. Check the release status and artifact provenance in RELEASE_CHECKLIST.md and NEXT.md before attributing them to an installed package; Homebrew and Verify Action have separate versioned pins.
+Harnessie 1.5.1 is published on GitHub and PyPI from signed tag v1.5.1. The original-build wheel and source distribution match PyPI, both publisher attestations are verified, and a fresh public-index install passed. See https://github.com/snapsynapse/harnessie/blob/main/audits/release-1.5.1.md for the exact receipts. Homebrew and Verify Action still pin core 1.5.0 and have separate release follow-ups.
 
 The prior Harnessie 1.5.0 core release on GitHub and PyPI came from signed tag v1.5.0 with provenance-verified assets and publisher attestations. Homebrew 1.5.0 and Verify Action 0.2.3/stable v0 were verified against that version. Version 1.3.1 adds offline observation of existing run journals with cited JSON/Markdown and no model calls. It accepts raw verification criteria or v1 evidence bundles and provides structured required-claim verdicts under the fail-closed 0/1/2 verifier exit contract.
 
@@ -12,7 +12,7 @@ Added in 1.5.0: harness identity on every result (installed version, inward-mani
 
 Added in 1.4.1: harnessie export-aidr exports one canonical open record to AIDR 0.1.0 with recorded dissent and export-time hashes. It writes a new operator-selected file, refuses arbitration or ambiguous formatting, and leaves the original run halted. This command is included in the published 1.4.1 package.
 
-Downstream release boundary: Homebrew and Harnessie Verify Action are separately propagated. Check NEXT.md for their verified pins before attributing a core release or the 1.2.0 evidence-bundle contract to those install surfaces.
+Downstream release boundary: Homebrew and Harnessie Verify Action are separately propagated and still pin core 1.5.0. Check NEXT.md for their verified pins before attributing the 1.5.1 security repairs or the 1.2.0 evidence-bundle contract to those install surfaces.
 
 ## What it is
 
@@ -33,7 +33,7 @@ An orchestrator decomposes a goal into task packets with acceptance criteria and
 
 ## Install
 
-pip install harnessie; also available through pipx or uv tool install. Check the installed version against the current GitHub and PyPI release receipts; Homebrew and Verify Action version pins are tracked separately in NEXT.md. The guided mock run makes no provider call and spends no model money, but installation and scaffolding do use the package index and local filesystem. An AI-assisted review path exists at https://harnessie.com/.well-known/assistant-guide.txt; verify its exact hash, sidecar, DNS anchor and current hosted result, report the achieved level, and get explicit human approval before any action. The historical 1.5.0 guide earned hosted Level 4 with zero blockers on 2026-10-06: https://github.com/snapsynapse/harnessie/blob/main/audits/release-1.5.0/guidecheck-prepublication.json. That receipt covers only the earlier bytes. The 1.4.1 receipt (https://github.com/snapsynapse/harnessie/blob/main/audits/release-1.4.1/guidecheck-prepublication.json) and the 1.3.1 receipt (https://github.com/snapsynapse/harnessie/blob/main/audits/release-1.3.1/guidecheck-prepublication.json) are historical evidence for their own bytes.
+pip install harnessie; also available through pipx or uv tool install. PyPI publishes verified core 1.5.1; Homebrew and Verify Action still pin core 1.5.0, with follow-ups in NEXT.md. The guided mock run makes no provider call and spends no model money, but installation and scaffolding use the package index and local filesystem. An AI-assisted review path exists at https://harnessie.com/.well-known/assistant-guide.txt; verify its exact hash and current hosted result, report the achieved level, and get explicit human approval before any action. The 1.5.1 guide earned hosted Level 3 under profile 2.0.0 with zero blockers: https://github.com/snapsynapse/harnessie/blob/main/audits/release-1.5.1/guidecheck-prepublication.json. Separate checks matched its served bytes, sidecar, DNS and signed tag. The hosted verifier reports anchors as unverified and does not award Level 4. The 1.5.0 guide earned Level 4 on 2026-10-06 under the earlier hosted verifier: https://github.com/snapsynapse/harnessie/blob/main/audits/release-1.5.0/guidecheck-prepublication.json; that receipt covers only the earlier bytes.
 
 ## Key files
 
@@ -54,7 +54,7 @@ pip install harnessie; also available through pipx or uv tool install. Check the
 - Stable v1 workflow schema: https://harnessie.com/schemas/v1/workflow.schema.json
 - Schema compatibility contract: https://github.com/snapsynapse/harnessie/blob/main/SCHEMA_COMPATIBILITY.md
 - Plugin contract: https://github.com/snapsynapse/harnessie/blob/main/PLUGIN_CONTRACT.md
-- [Assistant Guide](https://harnessie.com/.well-known/assistant-guide.txt): 1.5.1 guide under profile 2.0.0; check the exact live hash, DNS anchor and current hosted result before claiming an achieved level. The prior 1.5.0 guide earned hosted Level 4 on 2026-10-06.
+- [Assistant Guide](https://harnessie.com/.well-known/assistant-guide.txt): 1.5.1 guide under profile 2.0.0, hosted Level 3 with zero blockers and separately matched DNS and signed-tag hashes; the current hosted verifier does not award Level 4. The prior 1.5.0 Level 4 receipt covers only its own bytes.
 - Harbor verifier example (harnessie verify as a Harbor reward, cannot-verify stays unscorable): https://github.com/snapsynapse/harnessie/tree/main/examples/harbor-verifier
 - Harbor external agent example (Harnessie loop host side, tool effects in the Harbor environment, ATIF trajectory per trial): https://github.com/snapsynapse/harnessie/tree/main/examples/harbor-agent
 - ATIF export acceptance (Harbor-valid trajectory reconciled against OpenEnv's capture proxy, call counts only): https://github.com/snapsynapse/harnessie/blob/main/audits/atif-export-acceptance-2026-10-05.md

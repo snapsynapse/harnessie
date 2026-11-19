@@ -1,11 +1,12 @@
 # Harnessie 1.5.1 release execution
 
-Status: partial publication. The signed tag and GitHub Release with all four original-build assets are verified. PyPI publication is waiting for the protected `pypi` environment approval; no PyPI or downstream 1.5.1 claim is made yet. Release-preparation PR [#48](https://github.com/snapsynapse/harnessie/pull/48) merged at `2bb78f24ad029db7e1c1545fdc6ab3a39f808c92` after exact-head CI, CodeQL, Scorecard and Pages workflows passed.
+Status: core publication verified. The signed tag, GitHub Release, four original-build assets and both PyPI distributions are verified. Verify Action and Homebrew still pin core 1.5.0 and require separate downstream work. Release-preparation PR [#48](https://github.com/snapsynapse/harnessie/pull/48) merged at `2bb78f24ad029db7e1c1545fdc6ab3a39f808c92` after exact-head CI, CodeQL, Scorecard and Pages workflows passed.
 
 ## Source and gates
 
 - Security PR [#46](https://github.com/snapsynapse/harnessie/pull/46) merged at `94d950fa700cad046d6ed78f865f1ff3b39e08f6` after the proxy CONNECT accounting review fix. Its exact-head CI, CodeQL and package checks passed. The [local candidate receipt](release-1.5.1-candidate-2026-11-18.md) records 2,319 passing tests, 76 passing evals, hash-locked build, Twine, artifact inspection and clean-consumer smoke. Those retained local artifacts are test evidence, not release assets.
 - Adoption PR [#47](https://github.com/snapsynapse/harnessie/pull/47) merged at `ab3333f6e8798b19d069ce103bae23ff47c6506a` after resolving its README conflict. Its exact-head checks and the merged-main CI, CodeQL, Scorecard and Pages workflows passed. The verifier-first example produced exits 1, 0 and 2 against the combined source.
+- Release-preparation PR [#48](https://github.com/snapsynapse/harnessie/pull/48) merged at `2bb78f24ad029db7e1c1545fdc6ab3a39f808c92`. Exact-main CI, CodeQL, Scorecard and Pages workflows passed. The current Scorecard SARIF reported one `BranchProtectionID` result (score 3), the previously documented sole-maintainer branch-protection limitation; the [1.5.0 disposition](release-1.5.0/scorecard-review.json) remains applicable. No new release-relevant Scorecard finding was observed.
 - The 1.5.1 guide served at `https://harnessie.com/.well-known/assistant-guide.txt` is 8,054 bytes, SHA-256 `3afdb258f2f3feb1a32ba3bef615652a3d8314c5261fb89738806c68688aa8b4`; the served sidecar declares the same hash and profile 2.0.0. Sam replaced the single `_assistant-guide.harnessie.com` TXT value. [Cloudflare](release-1.5.1/dns-cloudflare.json) and [Google](release-1.5.1/dns-google.json) DNS-over-HTTPS now return `v=1; sha256=3afdb258f2f3feb1a32ba3bef615652a3d8314c5261fb89738806c68688aa8b4; url=https://harnessie.com/.well-known/assistant-guide.txt`.
 
 ## Revised GuideCheck gate
@@ -25,10 +26,14 @@ Signed annotated tag `v1.5.1` is tag object `43956fb1120cc53430dcdfa4c16a1ba944b
 | CycloneDX SBOM | `f192bc2a5f22d22b05ab6adbc697af37bab2ca28e59609ee0c680e65332a983b` |
 | Checksum record | `5864537aa4afaf7984d1c1d7f6923fcef0cdf8e5032c14bb25dd4e55ca22f710` |
 
-The downloaded wheel and sdist passed artifact inspection and Twine; the wheel passed a clean-consumer fresh-install smoke. These are GitHub assets, not yet PyPI files.
+The downloaded wheel and sdist passed artifact inspection and Twine; the wheel passed a clean-consumer fresh-install smoke.
 
-## Remaining publication sequence
+## PyPI publication and independent acceptance
 
-1. Approve and complete the protected `pypi` deployment in release workflow 44485696953.
-2. Independently verify PyPI's immutable files, attestations, and a fresh public-index installation against the four original-build assets.
-3. Update the public release-state surfaces and assess Verify Action and Homebrew pins in their own repositories. Engine wrappers remain an independent train.
+Sam approved the protected `pypi` environment deployment. Release workflow 44485696953 completed successfully, including `publish-pypi` at 2026-11-19T15:45:13Z. [PyPI integrity](release-1.5.1/pypi-integrity.json) verifies both immutable distributions match the GitHub assets: wheel `0c586af43e8585ac57abfbef94611c1993587dbf2ca038dba051a4edc3a93255` and sdist `b26dcaed78237219e5408229f88327c335688a3659330f397e0eeb9dc7375c6a`. `pypi-attestations` 0.0.30 verified each direct PyPI file URL against `snapsynapse/harnessie`; both provenance bundles identify GitHub Trusted Publishing through `release.yml` and environment `pypi`.
+
+A [fresh Python 3.12.16 public-index consumer](release-1.5.1/pypi-consumer.json) installed 1.5.1 outside the checkout on the first attempt. The downloaded public wheel matched the GitHub wheel hash, the imported module came from `site-packages`, `pip check` passed, and the installed CLI reported 1.5.1. The verifier-first example produced exit codes 1, 0 and 2 with matching report identity. These are deterministic checks only; no model verdict was earned.
+
+## Remaining downstream sequence
+
+Verify Action and Homebrew have separate versioned release trains and still pin core 1.5.0. Test each consumer against the published 1.5.1 core before changing its pin; engine wrappers remain independently released at 0.1.0. The current core release is complete without claiming these downstream updates.
