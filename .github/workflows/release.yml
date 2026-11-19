@@ -102,7 +102,7 @@ jobs:
         run: python scripts/verify_release_provenance.py --tag "$RELEASE_TAG" --commit "$GITHUB_SHA"
       - name: Retain distributions for verification and recovery
         if: success() || failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: python-package-distributions
           path: dist/
@@ -110,7 +110,7 @@ jobs:
           retention-days: 7
       - name: Retain integrity evidence for verification and recovery
         if: success() || failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: release-integrity
           path: release/
@@ -191,7 +191,7 @@ jobs:
           gh release download "$RELEASE_TAG" --repo "$GH_REPO" --pattern "harnessie-$version.SHA256SUMS" --dir release
           release_commit="$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")"
           python3 scripts/verify_release_provenance.py --tag "$RELEASE_TAG" --commit "$release_commit"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: recovery-python-package-distributions
           path: dist/
