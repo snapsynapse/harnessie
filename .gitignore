@@ -28,6 +28,8 @@ working/
 # Harnessie run output: per-run journals, proofs, workspaces (never committed)
 runs/
 workspace/
+# Tracked example inputs, not run output
+!examples/verify-first-trial/workspace/
 .maiden/
 
 # Secrets: keys live in env vars, never in the repo
