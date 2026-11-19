@@ -37,7 +37,7 @@ The [pre-candidate receipt](audits/security-repair-local-verification-2026-11-18
 
 ### Other handoff queues
 
-The search decoder repair (SEC-20261118-017) and verifier-first README/example are merged. SPONSORS.md is merged, and the Verify Action 0.2.3 dogfood pin came through Dependabot PR #40. The Qwen pickup remains open: it requires fresh physical metadata, current implementation hashes, independent verification and a new explicit one-call decision after the security release. Do not repeat consumed pilot attempts or reuse old preparations or approvals.
+The search decoder repair (SEC-20261118-017) and verifier-first README/example are merged. SPONSORS.md is merged. The claim-verification workflow pins Verify Action v0.2.4 at `d3fe8ac756cd2d2e968237781d4614cb52c7f55b`, merged through [PR #52](https://github.com/snapsynapse/harnessie/pull/52). The Qwen pickup remains open: it requires fresh physical metadata, current implementation hashes, independent verification and a new explicit one-call decision after the security release. Do not repeat consumed pilot attempts or reuse old preparations or approvals.
 
 ## Release boundary
 
