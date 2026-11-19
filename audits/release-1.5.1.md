@@ -1,6 +1,6 @@
 # Harnessie 1.5.1 release execution
 
-Status: core publication verified. The signed tag, GitHub Release, four original-build assets and both PyPI distributions are verified. Verify Action and Homebrew still pin core 1.5.0 and require separate downstream work. Release-preparation PR [#48](https://github.com/snapsynapse/harnessie/pull/48) merged at `2bb78f24ad029db7e1c1545fdc6ab3a39f808c92` after exact-head CI, CodeQL, Scorecard and Pages workflows passed.
+Status: core publication verified. The signed tag, GitHub Release, four original-build assets and both PyPI distributions are verified. Homebrew and Verify Action v0.2.4 both passed fresh consumer verification with core 1.5.1. Release-preparation PR [#48](https://github.com/snapsynapse/harnessie/pull/48) merged at `2bb78f24ad029db7e1c1545fdc6ab3a39f808c92` after exact-head CI, CodeQL, Scorecard and Pages workflows passed.
 
 ## Source and gates
 
@@ -36,6 +36,9 @@ A [fresh Python 3.12.16 public-index consumer](release-1.5.1/pypi-consumer.json)
 
 A [post-publication hosted GuideCheck recheck](release-1.5.1/guidecheck-postpublication.json) still reports Level 3 and zero blockers for the unchanged guide hash. The package-registry 404 warning has cleared; the registry channel is reported `absent`, so it is not treated as a qualifying anchor. The remaining three warnings concern repository-file independence and the two response headers. The DNS TXT remains `present-matches`, and `anchor.hosted.unverified` remains explicit.
 
-## Remaining downstream sequence
+## Downstream acceptance
 
-Verify Action and Homebrew have separate versioned release trains and still pin core 1.5.0. Test each consumer against the published 1.5.1 core before changing its pin; engine wrappers remain independently released at 0.1.0. The current core release is complete without claiming these downstream updates.
+- **Homebrew** installed core 1.5.1 from the published PyPI source distribution. The formula merged at `46347bcb5ecd6b4809c0dcf369263539d2439877`, and the archive matched the source distribution SHA-256 above. Formula style, strict audit, source install, `brew test`, and installed CLI smoke passed on arm64 macOS 26.7.3 with Python 3.13.18. The fresh keg used an isolated prefix with the host's installed Homebrew dependency versions. [Formula PR #7](https://github.com/snapsynapse/homebrew-tap/pull/7) · [Homebrew verification receipt](https://github.com/snapsynapse/homebrew-tap/blob/792b740e438c3939f35cbcd5b8a94adf6f47a450/ops/harnessie-1.5.1-homebrew-verification.md)
+- **Verify Action v0.2.4** defaults to core 1.5.1. The signed release tag and stable `v0` resolve to `d3fe8ac756cd2d2e968237781d4614cb52c7f55b`, where all nine offline fixtures passed. A fresh GitHub-hosted Ubuntu run resolved `@v0` to that commit, confirmed core 1.5.1 was installed, and observed `FAILED` with exit 1 from a launched deterministic check using the offline mock fixture. [Verify Action v0.2.4 release](https://github.com/snapsynapse/harnessie-verify-action/releases/tag/v0.2.4) · [Merged-commit fixtures](https://github.com/snapsynapse/harnessie-verify-action/actions/runs/44572596117) · [Fresh stable-tag consumer](https://github.com/snapsynapse/harnessie-verify-action/actions/runs/44575395265)
+
+Engine wrappers remain independently released at 0.1.0.
