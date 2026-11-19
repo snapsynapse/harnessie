@@ -356,7 +356,6 @@ def _launch_check(check: Check, argv: list[str], sandboxed: list[str],
                   env: dict, workspace: Path,
                   blast_radius: PhaseBlastRadius | None
                   ) -> tuple[str, str, bool, bool]:
-    from .sandbox import SandboxUnavailable
     truncated = terminal = False
     limit = CHECK_OUTPUT_LIMIT_BYTES
     try:
@@ -384,9 +383,6 @@ def _launch_check(check: Check, argv: list[str], sandboxed: list[str],
                       f"{output.strip()}")
         else:
             outcome = CHECK_PASSED if proc.returncode == 0 else CHECK_FAILED
-    except SandboxUnavailable as e:
-        outcome = CHECK_BLOCKED
-        output = f"sandbox unavailable, check blocked (fail-closed): {e}"
     except BlastRadiusExceeded as e:
         outcome, output = CHECK_RESOURCE, e.detail
         terminal = True

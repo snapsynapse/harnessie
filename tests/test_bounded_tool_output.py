@@ -251,10 +251,15 @@ def test_shell_missing_executable_is_structured_refusal(tmp_path, no_sandbox):
 
 
 ORPHAN_SCRIPT = """\
-import subprocess, sys
+import os, subprocess, sys, time
 subprocess.Popen([sys.executable, "-c",
                   "import os, time; open('orphan.pid', 'w').write(str(os.getpid())); "
                   "time.sleep(20)"])
+deadline = time.monotonic() + 5
+while not (os.path.exists('orphan.pid') and os.path.getsize('orphan.pid')):
+    if time.monotonic() >= deadline:
+        raise RuntimeError('descendant did not record its pid')
+    time.sleep(0.01)
 print("parent done")
 """
 
@@ -264,10 +269,10 @@ def _orphan_command(ws) -> str:
     return "python3 orphan.py"
 
 
-def _orphan_pid(ws) -> int:
+def _pid_from(ws, name) -> int:
     end = time.monotonic() + 5
     while time.monotonic() < end:
-        text = (ws / "orphan.pid").read_text() if (ws / "orphan.pid").exists() else ""
+        text = (ws / name).read_text() if (ws / name).exists() else ""
         if text:
             return int(text)
         time.sleep(0.05)
@@ -294,7 +299,7 @@ def test_shell_descendant_holding_pipes_is_killed_and_reader_returns(tmp_path, n
     assert res.content.startswith("exit=0\n")
     assert "parent done" in res.content
     assert elapsed < 10
-    assert _wait_gone(_orphan_pid(ws))
+    assert _wait_gone(_pid_from(ws, "orphan.pid"))
 
 
 @pytest.mark.skipif(sys.platform != "darwin" or not sandbox.available(),
@@ -306,7 +311,7 @@ def test_shell_descendant_under_native_sandbox_is_killed(tmp_path):
     elapsed = time.monotonic() - started
     assert res.refusal is None, res.content
     assert elapsed < 10
-    assert _wait_gone(_orphan_pid(ws))
+    assert _wait_gone(_pid_from(ws, "orphan.pid"))
 
 
 def test_shell_ordinary_command_output_unchanged(tmp_path, no_sandbox):
@@ -327,16 +332,6 @@ subprocess.Popen([sys.executable, "-c",
                   "time.sleep(20)"], start_new_session=True)
 print("parent done")
 """
-
-
-def _pid_from(ws, name) -> int:
-    end = time.monotonic() + 5
-    while time.monotonic() < end:
-        text = (ws / name).read_text() if (ws / name).exists() else ""
-        if text:
-            return int(text)
-        time.sleep(0.05)
-    raise AssertionError("descendant never recorded its pid")
 
 
 def test_shell_escaped_descendant_is_signalled_without_changing_exit(
@@ -361,4 +356,4 @@ def test_shell_in_group_descendant_is_not_reported_escaped(tmp_path, no_sandbox)
     reg, ws = _registry(tmp_path)
     res = reg.dispatch("worker", "run_shell", {"command": _orphan_command(ws)})
     assert res.ok and ESCAPED_MARKER not in res.content
-    assert _wait_gone(_orphan_pid(ws))
+    assert _wait_gone(_pid_from(ws, "orphan.pid"))

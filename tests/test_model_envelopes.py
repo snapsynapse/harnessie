@@ -104,9 +104,10 @@ def _responses_payload(status, tools, usage, refusal=False, item_status=None):
 
 # (adapter factory, payload, expected terminal stop)
 _BLOCKED = []
+_BLOCKED_TOOL_CALLS = []
 for _tools in (True, False):
     for _usage in (True, False):
-        _BLOCKED += [
+        _cases = [
             ("compat-content_filter", _compat, _compat_payload("content_filter", _tools, _usage),
              "refusal", _usage),
             ("compat-refusal-field", _compat, _compat_payload("stop", _tools, _usage, "no"),
@@ -128,10 +129,15 @@ for _tools in (True, False):
             ("responses-failed-refusal", _responses,
              _responses_payload("failed", _tools, _usage, refusal=True), "error", _usage),
         ]
+        for _case in _cases:
+            _param = pytest.param(*_case,
+                                  id=f"{_case[0]}-tools{_tools}-usage{_usage}")
+            _BLOCKED.append(_param)
+            if _tools and _usage:
+                _BLOCKED_TOOL_CALLS.append(_param)
 
 
-@pytest.mark.parametrize("label,factory,payload,stop,usage", _BLOCKED,
-                         ids=[f"{b[0]}-tools{bool(b[2])}-{i}" for i, b in enumerate(_BLOCKED)])
+@pytest.mark.parametrize("label,factory,payload,stop,usage", _BLOCKED)
 def test_terminal_status_takes_precedence_over_tool_calls(
         monkeypatch, label, factory, payload, stop, usage):
     _serve(monkeypatch, payload)
@@ -292,7 +298,7 @@ def _events(tmp_path):
 
 
 @pytest.mark.parametrize("label,factory,payload,stop,usage",
-                         [b for b in _BLOCKED if b[4]][:10])
+                         _BLOCKED_TOOL_CALLS)
 def test_blocked_envelope_never_reaches_tool_dispatch(
         tmp_path, monkeypatch, label, factory, payload, stop, usage):
     _serve(monkeypatch, payload)

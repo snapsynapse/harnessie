@@ -15,6 +15,7 @@ Requirements: Python 3.11+, released Harnessie installed (`pip install harnessie
 
 Copy the workspace somewhere disposable so the repository stays untouched and the report lands outside the inspected workspace:
 
+Literal
 ```bash
 T="$(mktemp -d)" && cp -R examples/verify-first-trial/. "$T" && cd "$T"
 harnessie verify --workspace "$PWD/workspace" --criteria "$PWD/claims.md" \

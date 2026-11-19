@@ -27,6 +27,7 @@ After the fix, the same criteria and the same check return `VERIFIED` with exit 
 
 Requirements: Python 3.11+, released Harnessie, and a usable sandbox on macOS (Seatbelt) or Linux (bubblewrap, firejail or docker). WSL2 follows Linux support; bare Windows has no supported shell sandbox. Installation reaches PyPI and writes locally. The trial below makes no model calls and denies the check network access by default. No project scaffold, workflow file or model configuration is needed.
 
+Literal
 ```bash
 pipx install harnessie               # or: pip install harnessie / uv tool install harnessie
 ```
@@ -38,6 +39,7 @@ Replace: CLAIMS_PATH -> absolute path to your reviewed Markdown criteria file.
 Replace: CHECK_COMMAND -> the check command, run from WORKSPACE_PATH, for example `python3 -m pytest -q` or `npm test`.
 Replace: REPORT_PATH -> a new directory for this trial's report, outside the inspected workspace.
 
+Customize
 ```bash
 harnessie verify --workspace "WORKSPACE_PATH" --criteria "CLAIMS_PATH" --check "CHECK_COMMAND" --report-dir "REPORT_PATH" --no-verifier
 ```
@@ -85,9 +87,9 @@ pip install harnessie                # or: pipx install / uv tool install
 harnessie init my-project            # scaffold + guided readiness check + zero-dollar mock run
 ```
 
-Harnessie 1.5.0 is published on [GitHub](https://github.com/snapsynapse/harnessie/releases/tag/v1.5.0) from the signed tag `v1.5.0` and includes the harness identity, tool-contract metrics, ATIF export and Harbor examples described below. PyPI distributions, publisher attestations and a fresh public-index installed consumer are verified; see [audits/release-1.5.0.md](audits/release-1.5.0.md). Homebrew serves 1.5.0, and Verify Action 0.2.3 and stable `v0` pin core 1.5.0; see the [downstream closeout receipt](audits/release-1.5.0/downstream-closeout-2026-10-11.json). [NEXT.md](NEXT.md) records remaining work.
+The previous core release, Harnessie 1.5.0, was published on [GitHub](https://github.com/snapsynapse/harnessie/releases/tag/v1.5.0) from the signed tag `v1.5.0` and includes the harness identity, tool-contract metrics, ATIF export and Harbor examples described below. PyPI distributions, publisher attestations and a fresh public-index installed consumer are verified; see [audits/release-1.5.0.md](audits/release-1.5.0.md). At the 1.5.0 closeout, Homebrew served 1.5.0, and Verify Action 0.2.3 and stable `v0` pinned that core version; see the [downstream closeout receipt](audits/release-1.5.0/downstream-closeout-2026-10-11.json). [NEXT.md](NEXT.md) records remaining work.
 
-Source now contains a local 1.5.1 security repair candidate. It has not been published or propagated to Homebrew or Verify Action. See the [candidate notes](RELEASE_NOTES-1.5.1.md) and [local verification receipt](audits/security-repair-local-verification-2026-11-18.md).
+Harnessie 1.5.1 is published on [GitHub](https://github.com/snapsynapse/harnessie/releases/tag/v1.5.1) and PyPI from the signed tag. Its wheel and source distribution match the original-build assets, carry verified publisher attestations, and passed a fresh public-index install; see the [release execution](audits/release-1.5.1.md) and [release notes](RELEASE_NOTES-1.5.1.md). Homebrew and Verify Action still pin core 1.5.0 and have separate release follow-ups in [NEXT.md](NEXT.md).
 
 To gate pull requests on claim-by-claim verification without installing anything locally, the standalone verifier also ships as a GitHub Action: [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify). Harnessie 1.2.0 accepts raw criteria or a v1 evidence bundle that binds stable claim IDs to an exact Git state, content-addressed proofs, and recorded deterministic checks. Its structured verdicts distinguish reproduced, refuted, and not-verifiable claims before the exit code gates the merge. The Action's separately released pin is reported in [NEXT.md](NEXT.md).
 
@@ -118,7 +120,7 @@ Worked examples: [policy compliance](examples/policy-compliance/README.md) exerc
 - [docs/ringer.md](docs/ringer.md): the Ringer adoption path, including the shared exit-code contract and a recipe for verifying agent-produced changes.
 - [PLUGIN_CONTRACT.md](PLUGIN_CONTRACT.md): the versioned, opt-in tool extension contract and its explicit in-process trust boundary.
 - [docs/brains.md](docs/brains.md): the brain-agnostic receipt, the models actually run under the harness with a link to the record that proves each.
-- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run or export. The current source guide is a 1.5.1 candidate with hosted verification pending. The prior 1.5.0 guide earned [hosted Level 4 under profile 2.0.0](audits/release-1.5.0/guidecheck-prepublication.json) on 2026-10-06 with zero blocking findings and a qualifying DNS anchor; that receipt covers only the earlier bytes. The [1.4.1 receipt](audits/release-1.4.1/guidecheck-prepublication.json) and the [1.3.1 receipt](audits/release-1.3.1/guidecheck-prepublication.json) are historical evidence for their own bytes. Conformance does not establish software safety.
+- [assistant-guide.txt](assistant-guide.txt): a bounded, human-verifiable guide for an assistant reviewing a Harnessie checkout before you authorize a run or export. The 1.5.1 guide earned [hosted Level 3 under profile 2.0.0](audits/release-1.5.1/guidecheck-prepublication.json) with zero blockers. Its served bytes, sidecar, DNS and signed tag matched in separate checks; the hosted verifier reports those anchors as unverified and does not award Level 4. The prior 1.5.0 guide earned [hosted Level 4 under profile 2.0.0](audits/release-1.5.0/guidecheck-prepublication.json) on 2026-10-06 with zero blocking findings and a qualifying DNS anchor; that receipt covers only the earlier bytes. The [1.4.1 receipt](audits/release-1.4.1/guidecheck-prepublication.json) and the [1.3.1 receipt](audits/release-1.3.1/guidecheck-prepublication.json) are historical evidence for their own bytes. Conformance does not establish software safety.
 - [docs/agents.json](docs/agents.json), [docs/api/v1/index.json](docs/api/v1/index.json), [docs/changelog.json](docs/changelog.json), and [docs/.well-known/security.txt](docs/.well-known/security.txt): machine-readable capability, local CLI, release-history, and private security-report handoffs. The declarations explicitly do not advertise a hosted API, service, or MCP server.
 
 The engineering references below (ARCHITECTURE, GOVERNANCE, SECURITY, ROADMAP) sit at the repo root; the user-facing guides live under `docs/`.

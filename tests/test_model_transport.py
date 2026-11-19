@@ -12,6 +12,7 @@ import urllib.request
 
 import pytest
 
+from harness.models import _transport
 from harness.models.anthropic import AnthropicModel
 from harness.models.base import ModelSpec
 from harness.models.openai_compat import OpenAICompatModel
@@ -151,19 +152,12 @@ def test_transport_refuses_redirect_for_custom_credential_headers(wire, code, he
                                    origin)
     req = urllib.request.Request(origin, data=b"{}", headers={header: _SYNTHETIC})
 
-    reply = _tx().post(req)
+    reply = _transport.post(req)
 
     assert not reply.ok
     assert reply.failure == "redirect_refused"
     assert reply.code == code
     assert [url for url, _ in seen] == [origin]
-
-
-def _tx():
-    """Imported late so the redirect tests above stay meaningful on code
-    that predates the shared transport module."""
-    import importlib
-    return importlib.import_module("harness.models._transport")
 
 
 class _Trickle:
@@ -210,7 +204,7 @@ class _Clock:
 
 def _post(response, **kwargs):
     req = urllib.request.Request("https://origin.invalid/v1/x", data=b"{}")
-    return _tx().post(req, opener=_FixedOpener(response), **kwargs)
+    return _transport.post(req, opener=_FixedOpener(response), **kwargs)
 
 
 class _FixedOpener:
@@ -290,9 +284,9 @@ def test_fast_body_inside_deadline_is_accepted():
 def test_error_body_read_is_bounded(wire):
     seen, routes = wire
     origin = "https://origin.invalid/v1/x"
-    body = b"e" * (_tx().MAX_ERROR_BYTES * 4)
+    body = b"e" * (_transport.MAX_ERROR_BYTES * 4)
     routes[origin] = _WireResponse(500, body, url=origin)
-    reply = _tx().post(urllib.request.Request(origin, data=b"{}"))
+    reply = _transport.post(urllib.request.Request(origin, data=b"{}"))
     assert reply.failure == "http_error"
     assert reply.code == 500
     assert reply.usage_known is True
@@ -302,8 +296,8 @@ def test_error_body_read_is_bounded(wire):
 @pytest.mark.parametrize("cls", ADAPTERS)
 def test_adapter_oversize_success_body_is_error_with_unknown_usage(monkeypatch, cls):
     big = b" " * 64 + json.dumps(_ok_body(cls)).encode()
-    monkeypatch.setattr(_tx(), "MAX_RESPONSE_BYTES", 32)
-    monkeypatch.setattr(_tx(), "_open",
+    monkeypatch.setattr(_transport, "MAX_RESPONSE_BYTES", 32)
+    monkeypatch.setattr(_transport, "_open",
                         lambda req, timeout=None: _Trickle([big]))
     turn = _model(cls).complete([])
     assert turn.stop_reason == "error"
