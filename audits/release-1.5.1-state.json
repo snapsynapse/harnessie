@@ -6,7 +6,7 @@
   "start_head": "ab3333f6e8798b19d069ce103bae23ff47c6506a",
   "candidate_head": "2bb78f24ad029db7e1c1545fdc6ab3a39f808c92",
   "candidate_version": "1.5.1",
-  "updated_at": "2026-11-19T15:53:15.966210Z",
+  "updated_at": "2026-11-19T18:18:53.922701Z",
   "steps": [
     {
       "id": "source_merge",
@@ -46,8 +46,8 @@
     },
     {
       "id": "downstream",
-      "status": "not_started",
-      "evidence": "Core 1.5.1 publication is verified. Verify Action 0.2.3/stable v0 and Homebrew still pin core 1.5.0; their separate repository release trains and consumer checks are not part of this core publication closeout. Engine wrappers have an independent train."
+      "status": "completed",
+      "evidence": "Homebrew 1.5.1 formula merged at 46347bcb5ecd6b4809c0dcf369263539d2439877. Fresh arm64 macOS source install, archive checksum, style, strict audit, brew test and CLI smoke passed in an isolated prefix using the host's installed dependency versions. Receipt: https://github.com/snapsynapse/homebrew-tap/blob/792b740e438c3939f35cbcd5b8a94adf6f47a450/ops/harnessie-1.5.1-homebrew-verification.md. Verify Action v0.2.4 and stable v0 resolve to d3fe8ac756cd2d2e968237781d4614cb52c7f55b and default to core 1.5.1. All nine merged-commit offline fixtures passed (run 44572596117); fresh Ubuntu stable-v0 consumer run 44575395265 installed 1.5.1 and observed FAILED with exit 1 from the launched offline mock check. Release: https://github.com/snapsynapse/harnessie-verify-action/releases/tag/v0.2.4. Harnessie's claim-verification workflow adopted this immutable pin through PR #52, merged at 75f2d8df2c5c66e3adce6be5e3d1bd5971a837d1. See audits/release-1.5.1.md#downstream-acceptance. Engine wrappers remain independently released at 0.1.0."
     }
   ]
 }
