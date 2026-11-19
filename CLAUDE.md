@@ -16,7 +16,7 @@ harness structure carries the quality floor, the model carries the ceiling.
 
 ## Stack
 
-- Python 3.11+ (packaged as `harnessie`, published stable version 1.5.0, local 1.5.1 security repair candidate, Apache-2.0).
+- Python 3.11+ (packaged as `harnessie`, published stable version 1.5.1, Apache-2.0).
 - Runtime dependencies: PyYAML and jsonschema. Model adapters remain stdlib-only (no vendor SDK).
 - Dev dependency: pytest 8+. Console entry point: `harnessie = harness.cli:main`.
 - OS sandbox: macOS `sandbox-exec` (Seatbelt); Linux bubblewrap / firejail / docker.
@@ -94,19 +94,18 @@ Live provider scorecards are opt-in and never part of the default suite; without
 `HARNESSIE_LIVE=1` plus provider config they report `SKIP` and exit clean. Pages/DNS/
 PyPI promotion and live-provider calls are deliberate operator acts, never headless.
 
-## Current state (2026-10-11)
+## Current state (2026-11-19)
 
-- Core 1.5.0 is published and verified on GitHub and PyPI from signed tag `v1.5.0`
-  (commit `4ccf3f304bca0c88c8997c0a0cf33a909145d3ef`), with original-build provenance
-  and publisher attestations. Theme: Harbor and OpenEnv interoperability. It adds
-  harness identity on every result (`harness/identity.py`, verify report header,
-  `harness_identity` event), tool-contract break metrics with a `tool_contract` live
-  scorecard row and the first measured local brains, `harnessie atif` ATIF-v1.7
-  export (no model calls; refuses a broken chain, an unfinished loop or a step gap;
-  absent fields are reported, never invented), richer `model_turn` and `tool_result`
-  events, `evals/tool-contract.yaml`, the urllib3 2.8.0 lock refresh, a working
-  default `local` tier and Linux-portable pilot tests. AIDR export and the offline
-  observer are retained unchanged.
+- Core 1.5.1 is published on GitHub and PyPI from signed tag `v1.5.1`
+  at `2bb78f24ad029db7e1c1545fdc6ab3a39f808c92`. Original-build assets,
+  publisher attestations and a fresh public-index consumer are verified.
+  The security repair passed 2,319 tests and 76 deterministic evals in the
+  recorded release gate. Read [release execution](audits/release-1.5.1.md)
+  for publication and downstream evidence, and [NEXT.md](NEXT.md) before
+  selecting follow-up work or resuming the pilot.
+- The 1.5.0 interoperability features remain shipped, including harness identity,
+  tool-contract metrics, ATIF-v1.7 export, Harbor examples, AIDR export and the
+  offline observer. Their dated acceptance records cover their tested versions.
 - `examples/harbor-verifier/` and `examples/harbor-agent/` run Harnessie on either side
   of a Harbor trial; exit 0 is reward 1, exit 1 is reward 0, exit 2 is no reward file
   (cannot-verify stays unscorable). Dated acceptance audits are under `audits/`
@@ -114,15 +113,25 @@ PyPI promotion and live-provider calls are deliberate operator acts, never headl
   `harbor-agent-acceptance-2026-10-05.md`, `live-scorecard-2026-10-05/`). They are
   plumbing results on one backend and one local model, not brain evidence; token-level
   ATIF agreement needs vLLM or SGLang.
-- Verify Action 0.2.3 and stable `v0` pin core 1.5.0 at `80f61b4d47231aa08b1274375a982ddae5263d52`, with seven exact-merge fixtures green and signed tag/release published. Homebrew 1.5.0 is merged at `4ae1944da5c603536af75a47761bd8dabea4648a` and its installed consumer is verified. See `audits/release-1.5.0/downstream-closeout-2026-10-11.json`. Engine wrappers remain independently released at 0.1.0.
-- The final 1.5.0 guide (8,054 bytes) earned hosted Level 4 under profile 2.0.0 on
-  2026-10-06 with zero blockers; see `audits/release-1.5.0/guidecheck-prepublication.json`.
-  Preserve its frozen bytes. Any later guide change requires a new sidecar, trust
-  pins, independent anchor, and hosted receipt.
+- Verify Action v0.2.4 and stable `v0` default to core 1.5.1 at
+  `d3fe8ac756cd2d2e968237781d4614cb52c7f55b`. Nine merged-commit offline
+  fixtures and a fresh Ubuntu stable-tag consumer passed. Harnessie's
+  claim-verification workflow pins this commit through merged PR #52.
+  Homebrew 1.5.1 passed a fresh source install and CLI smoke on arm64 macOS
+  in an isolated prefix using the host's installed dependency versions.
+  Engine wrappers remain independently released at 0.1.0.
+  See [downstream acceptance](audits/release-1.5.1.md#downstream-acceptance).
+- The 8,054-byte 1.5.1 guide earned hosted Level 3 under profile 2.0.0 with
+  zero blockers. Independent checks matched the served guide, sidecar, DNS,
+  repository pins and signed tag source. The hosted result retains
+  `anchor.hosted.unverified`. The earlier 1.5.0 Level 4 receipt covers its
+  historical bytes. See [guide acceptance](audits/release-1.5.1.md#revised-guidecheck-gate).
+  A guide change requires a new sidecar, trust pins, independent anchor and
+  hosted receipt.
 - Human browser and assistive-technology accessibility acceptance remains a
   nonblocking roadmap item. No full-conformance claim is made.
-- `audits/release-1.5.0.md` records current release and provider evidence;
-  `audits/release-1.4.1.md` remains historical. `NEXT.md` names remaining work.
+- `audits/release-1.5.1.md` records current release evidence. Earlier release
+  records remain historical. `NEXT.md` names remaining work.
   Test counts are dated observations, not contracts.
 - The lead adoption surface remains `harnessie verify` for agent-produced changes.
   Ringer composes through its existing process-exit contract; the Harbor verifier
