@@ -166,21 +166,48 @@ def demonstrate(cli: Path, reference: Path) -> dict:
         require(resumed == 'needs_arbitration', 'Export incorrectly enabled resume')
         require(original_record.read_bytes() == before[original_record], 'Resume changed the source record')
 
-        # This second source is also produced by the actual runner. Its rendered
-        # task contains an unclosed fence, intentionally outside the export subset.
-        unsupported_status, more_calls = review(root, 'synthetic-unsupported', GOAL + '\n\n```text\nunfinished')
-        require(unsupported_status == 'needs_arbitration', 'Unsupported fixture did not halt')
-        unsupported_before = snapshot(root, 'synthetic-unsupported')
+        # A second runner-produced source whose goal carries an unclosed fence.
+        # The runner quotes fence, heading and rule lines and escapes raw HTML
+        # when it writes a decision record, so this formerly unsupported goal
+        # now yields an in-subset record that exports and lints.
+        fenced_status, more_calls = review(root, 'synthetic-fenced-goal', GOAL + '\n\n```text\nunfinished')
+        require(fenced_status == 'needs_arbitration', 'Fenced-goal fixture did not halt')
+        fenced_before = snapshot(root, 'synthetic-fenced-goal')
+        fenced_output = 'decisions/AIDR-9998-synthetic-fenced-goal.md'
+        fenced = json.loads(command(export_args(cli, root, 'synthetic-fenced-goal', fenced_output), root))
+        require(fenced['status'] == 'exported', 'Fenced-goal record did not export')
+        fenced_text = (root / fenced_output).read_text(encoding='utf-8')
+        require('> ```text\n' in fenced_text, 'Goal fence was not quoted as prose')
+        require(not any(line.startswith(('```', '~~~')) for line in fenced_text.splitlines()),
+                'Exported record contains an unquoted fence')
+        receipt = command([node, str(lint), str(root / fenced_output)], root)
+        require('PASS ' in receipt, 'Reference lint did not pass the fenced-goal output')
+        require(snapshot(root, 'synthetic-fenced-goal') == fenced_before, 'Export changed fenced-goal inputs')
+
+        # The refusal case is an operator-edited copy of that run: a raw HTML
+        # comment added by hand after generation is outside the export subset
+        # (it could hide later sections when rendered). The runner itself no
+        # longer writes such content, so this source is honestly hand-made.
+        shutil.copytree(root / 'runs/synthetic-fenced-goal', root / 'runs/synthetic-hand-edited')
+        edited = root / 'runs/synthetic-hand-edited/decisions/DR-decide.md'
+        edited_text = edited.read_text(encoding='utf-8')
+        require('\n## Question\n' in edited_text, 'Unexpected record layout')
+        edited.write_text(edited_text.replace(
+            '\n## Question\n', '\n<!-- operator note added by hand after generation -->\n\n## Question\n', 1),
+            encoding='utf-8')
+        edited_before = snapshot(root, 'synthetic-hand-edited')
         decisions_before = {p.name: p.read_bytes() for p in (root / 'decisions').iterdir()}
-        refused = json.loads(command(export_args(cli, root, 'synthetic-unsupported',
-                              'decisions/AIDR-9998-synthetic-unsupported.md'), root, expected=2))
-        require(refused == {'status': 'refused', 'code': 'invalid_record'}, 'Formatting was not refused')
-        require(snapshot(root, 'synthetic-unsupported') == unsupported_before, 'Refusal changed run inputs')
+        refused = json.loads(command(export_args(cli, root, 'synthetic-hand-edited',
+                              'decisions/AIDR-9997-synthetic-hand-edited.md'), root, expected=2))
+        require(refused == {'status': 'refused', 'code': 'invalid_record'}, 'Hand-edited HTML was not refused')
+        require(snapshot(root, 'synthetic-hand-edited') == edited_before, 'Refusal changed run inputs')
         require({p.name: p.read_bytes() for p in (root / 'decisions').iterdir()} == decisions_before,
                 'Refusal left output or staging artifacts')
         return {'status': 'passed', 'actors': 'scripted MockModel only', 'live_model_calls': 0,
                 'mock_model_calls': calls + more_calls, 'resume_model_calls': resume_calls,
                 'initial_status': initial, 'resume_status': resumed, 'export_preserved_inputs': True,
+                'fenced_goal_export': fenced['status'], 'fenced_goal_preserved_inputs': True,
+                'format_refusal_source': 'operator-edited copy with raw HTML',
                 'format_refusal': refused, 'format_refusal_preserved_inputs': True,
                 'participant_labels': ['implementer', 'implementer-2'],
                 'reference_spec': '0.1.0', 'reference_revision': REFERENCE_REVISION,

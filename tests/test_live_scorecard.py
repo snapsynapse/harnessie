@@ -4,6 +4,7 @@ from pathlib import Path
 from harness.live_scorecard import (
     LiveCaseResult,
     LiveTarget,
+    _direct_smoke,
     _tool_contract_smoke,
     bundle_identity,
     discover_live_targets,
@@ -39,6 +40,44 @@ def test_tool_contract_smoke_measures_breaks_without_judging_them(monkeypatch):
     assert "tool_contract_breaks=1" in result.observed
     assert "'action_unsupported': 1" in result.observed
     assert "per_completed_task=3.0" in result.notes
+
+
+def _priced_target():
+    return LiveTarget(id="local", provider="openai-compat", status="ready",
+                      spec=ModelSpec(name="local", provider="openai-compat",
+                                     model_id="mock", base_url="http://x",
+                                     cost_per_mtok_in=1.0, cost_per_mtok_out=2.0))
+
+
+def test_unknown_usage_is_not_reported_as_measured_zero(monkeypatch):
+    turn = AssistantTurn(content="Harnessie live OK.", stop_reason="end_turn",
+                         usage_known=False)
+    model = MockModel(ModelSpec(name="local", provider="mock", model_id="mock"),
+                      script=[turn])
+    monkeypatch.setattr("harness.live_scorecard.build_model", lambda spec: model)
+
+    result = _direct_smoke(_priced_target())
+
+    assert result.usage_known is False
+    assert result.cost_usd is None
+    line = format_live_scorecard({"passed": 1, "total": 1, "results": [result]}).splitlines()[-1]
+    assert "usage=unknown" in line
+    assert "cost=" not in line
+
+
+def test_known_usage_is_reported_positive_control(monkeypatch):
+    turn = AssistantTurn(content="Harnessie live OK.", stop_reason="end_turn",
+                         input_tokens=1000, output_tokens=500)
+    model = MockModel(ModelSpec(name="local", provider="mock", model_id="mock"),
+                      script=[turn])
+    monkeypatch.setattr("harness.live_scorecard.build_model", lambda spec: model)
+
+    result = _direct_smoke(_priced_target())
+
+    assert result.usage_known is True
+    assert result.tokens == 1500
+    assert result.cost_usd is not None and result.cost_usd > 0
+    assert "usage=unknown" not in format_live_scorecard({"passed": 1, "total": 1, "results": [result]})
 
 
 ROOT = Path(__file__).resolve().parents[1]

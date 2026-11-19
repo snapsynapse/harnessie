@@ -16,7 +16,7 @@ harnessie init my-project      # scaffold + guided readiness check + zero-dollar
 cd my-project
 ```
 
-This documentation covers Harnessie 1.5.0, published and verified on GitHub and PyPI. Homebrew still serves 1.4.1 while its 1.5.0 bump is in progress. Check the installed version before using new commands (`atif` needs 1.5.0 or newer); release propagation is recorded in NEXT.md.
+This source documentation covers the local Harnessie 1.5.1 security repair candidate. Published GitHub, PyPI and Homebrew installations still serve 1.5.0. Check the installed version before using new commands (`atif` needs 1.5.0 or newer); release propagation is recorded in NEXT.md.
 
 Working on Harnessie itself (or wanting the test suite)? Install from source instead:
 
@@ -82,7 +82,7 @@ python3 -m harness.cli report <run_id>   # phases, results, proofs
 python3 -m harness.cli audit  <run_id>   # verify the hash chain + governance timeline
 ```
 
-`report` shows what each phase did and where its proofs are. `audit` re-verifies the event log end to end (exit 0 clean, exit 1 if the chain was tampered with) and renders one composite timeline of agent and operator actions: consents, ownership claims and denials, structured refusals, gate verdicts, and any decision records.
+`report` shows what each phase did and where its proofs are. `audit` re-verifies the event log link by link (exit 0 clean, exit 1 if a linked earlier event was edited, removed, or reordered; an edited final event or a truncated tail still verifies unless you kept the final digest elsewhere) and renders one composite timeline of agent and operator actions: consents, ownership claims and denials, structured refusals, gate verdicts, and any decision records.
 
 ## 6. When a run stops
 

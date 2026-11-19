@@ -146,7 +146,7 @@
 <h2 id="installation-and-requirements">Installation and requirements</h2>
 <p>Python 3.11 or newer. PyYAML and jsonschema install with Harnessie. Install from PyPI:</p>
 <pre tabindex="0"><code>pip install harnessie   # or: pipx install harnessie / uv tool install harnessie</code></pre>
-<p>This documentation covers Harnessie 1.5.0, published and verified on GitHub and PyPI. <code>atif</code> requires version 1.5.0 or newer; <code>export-aidr</code> requires 1.4.1 or newer. The separately maintained Homebrew formula and Harnessie Verify Action have their own release pins; <code>NEXT.md</code> records verified propagation.</p>
+<p>This source documentation covers the local 1.5.1 security repair candidate. Published Harnessie 1.5.0 remains the GitHub, PyPI, Homebrew and Verify Action core version until a separate release and downstream propagation are verified. <code>atif</code> requires version 1.5.0 or newer; <code>export-aidr</code> requires 1.4.1 or newer. <code>NEXT.md</code> records the release boundary.</p>
 <p>Developing on the harness itself (or wanting the test suite), install from source:</p>
 <pre tabindex="0"><code>git clone https://github.com/snapsynapse/harnessie.git
 cd harnessie
@@ -241,6 +241,14 @@ phases:
 <pre tabindex="0"><code>budget:
   max_usd: 10.0
   max_tokens: 2000000</code></pre>
+<p>Every model turn must carry a usage receipt. If a provider omits token usage, or reports a counter that is not a non-negative integer up to 10^12, the run&#x27;s spend is unknowable, so a metered run stops at that turn instead of retrying, and its journal refuses resume. Both refusals name the remedy. When a tier is genuinely unbilled, typically a local or self-hosted endpoint that omits usage, mark it explicitly:</p>
+<pre tabindex="0"><code>tiers:
+  local:
+    provider: openai-compat
+    model_id: qwen3.8:latest
+    base_url: http://localhost:11434/v1
+    unmetered: true          # default false; cost rates must stay 0</code></pre>
+<p><code>unmetered: true</code> lets a turn with unknown usage continue, and the journal&#x27;s <code>budget_charge</code> record says it was unmetered. Reported tokens still count against <code>max_tokens</code>. The schema refuses <code>unmetered</code> with a nonzero cost rate on the tier or any of its fallbacks, and fallbacks inherit the flag from their tier. A run stopped for unknown usage cannot be resumed; set the flag and start a new run.</p>
 <p>Use <code>openai-responses</code> for OpenAI reasoning models that combine reasoning effort with function tools. Use <code>openai-compat</code> for Chat Completions endpoints such as Ollama and vLLM. To run everything on a local open-source model, point the task classes you use at the <code>local</code> tier and leave the external-provider keys unset. To swap one provider for another, change the tier&#x27;s <code>provider</code>, <code>model_id</code>, and <code>base_url</code>. Nothing else in the harness changes.</p>
 <p>The escalation ladder walks the tier order. When a phase fails its gate, the harness first reformulates the task with the verifier&#x27;s evidence, then raises effort, then raises tier, before halting for a human. That ladder is why a cheap worker can carry bulk execution safely: a capable verifier and an automatic escalation stand behind it.</p>
 <h2 id="cascade-routing-and-the-sovereign-tier">Cascade routing and the sovereign tier</h2>

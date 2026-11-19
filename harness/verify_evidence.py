@@ -8,12 +8,15 @@ inside it.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import hashlib
 from importlib.resources import files
 import json
+import os
 from pathlib import Path, PurePosixPath
-from typing import Any, Iterable
+import stat
+from types import MappingProxyType
+from typing import Any, Iterable, Mapping
 
 import yaml
 from jsonschema import Draft202012Validator
@@ -39,12 +42,58 @@ class EvidenceValidationError(ValueError):
         super().__init__("; ".join(problem.render() for problem in self.problems))
 
 
+MAX_BUNDLE_BYTES = 4 * 1024 * 1024
+MAX_EVIDENCE_FILE_BYTES = 64 * 1024 * 1024
+READ_EVIDENCE_CHARS = 100_000
+# A UTF-8 character is at most four bytes, so this prefix fully determines the
+# first READ_EVIDENCE_CHARS characters a reader can be served.
+_SNAPSHOT_BYTES = 4 * READ_EVIDENCE_CHARS
+
+
 @dataclass(frozen=True)
 class EvidenceBundle:
+    """A preflighted bundle. ``files`` records where each item was admitted
+    from; ``snapshots`` holds the bounded prefix of the exact bytes that were
+    hashed at admission, and is the only content ever served downstream.
+    ``sizes`` and ``digests`` record each admitted file's full byte count and
+    sha256, so a served prefix is always marked as one. ``source_sha256``
+    digests the exact bundle bytes that were parsed."""
+
     source: Path
     evidence_root: Path
     data: dict[str, Any]
     files: dict[str, Path]
+    snapshots: Mapping[str, bytes] = field(
+        default_factory=lambda: MappingProxyType({}))
+    source_sha256: str = ""
+    sizes: Mapping[str, int] = field(
+        default_factory=lambda: MappingProxyType({}))
+    digests: Mapping[str, str] = field(
+        default_factory=lambda: MappingProxyType({}))
+
+
+def _serve(evidence_id: str, snapshot: bytes, total: int | None,
+           sha256: str | None) -> str:
+    """Decode at most READ_EVIDENCE_CHARS characters of the admitted prefix.
+    Whenever less than the whole admitted file is served, append a sentinel
+    naming the served and total byte counts and the full-file sha256, so an
+    unserved suffix is never mistaken for an absent one."""
+    # surrogateescape maps each undecodable byte to one character, so the
+    # served character count converts back to an exact served byte count.
+    text = snapshot.decode("utf-8", errors="surrogateescape")
+    served = len(text[:READ_EVIDENCE_CHARS].encode("utf-8", "surrogateescape"))
+    content = snapshot[:served].decode("utf-8", errors="replace")
+    if total is not None and served >= total:
+        return content
+    # A total that was never recorded cannot prove completeness: mark it.
+    content += (
+        f"\n[harnessie:truncated source=read_evidence evidence_id={evidence_id} "
+        f"served_bytes={served} "
+        f"total_bytes={total if total is not None else 'unknown'} "
+        f"sha256={sha256 or 'unknown'}] Only the first {served} bytes of this "
+        "admitted file were served. The unserved remainder was not inspected; "
+        "do not judge anything in it as absent.")
+    return content
 
 
 def register_evidence_reader(registry: ToolRegistry,
@@ -55,14 +104,21 @@ def register_evidence_reader(registry: ToolRegistry,
         return
 
     def read_evidence(evidence_id: str) -> str:
-        path = bundle.files.get(evidence_id)
-        if path is None:
+        if evidence_id not in bundle.files:
             raise ToolRefusal(
                 "evidence_unknown", "evidence",
                 f"Unknown evidence id {evidence_id!r}; use one of {list(known)}.",
                 "Evidence access is limited to content-addressed files that "
                 "passed bundle preflight.")
-        return path.read_text(encoding="utf-8", errors="replace")[:100_000]
+        snapshot = bundle.snapshots.get(evidence_id)
+        if snapshot is None:
+            raise ToolRefusal(
+                "evidence_unavailable", "evidence",
+                f"Evidence {evidence_id!r} has no admitted snapshot.",
+                "Only bytes hashed at bundle preflight are served; paths are "
+                "never reopened.")
+        return _serve(evidence_id, snapshot, bundle.sizes.get(evidence_id),
+                      bundle.digests.get(evidence_id))
 
     registry.register(ToolSpec(
         name="read_evidence",
@@ -89,12 +145,57 @@ def _json_path(parts: Iterable[Any]) -> str:
     return result
 
 
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for block in iter(lambda: stream.read(1024 * 1024), b""):
+class _SnapshotRefused(Exception):
+    def __init__(self, code: str, message: str):
+        super().__init__(message)
+        self.code = code
+        self.message = message
+
+
+def _snapshot(resolved: Path, root: Path) -> tuple[str, bytes, int]:
+    """Hash one admitted file through a single no-follow descriptor and keep
+    the bounded prefix of exactly the bytes that were hashed, plus the total
+    number of bytes hashed."""
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(
+        os, "O_NONBLOCK", 0) | getattr(os, "O_CLOEXEC", 0)
+    try:
+        fd = os.open(resolved, flags)
+    except OSError as exc:
+        raise _SnapshotRefused(
+            "file.unreadable",
+            f"referenced evidence cannot be opened: {type(exc).__name__}") from None
+    with os.fdopen(fd, "rb", buffering=0) as stream:
+        opened = os.fstat(fd)
+        if not stat.S_ISREG(opened.st_mode):
+            raise _SnapshotRefused("file.not_regular",
+                                   "referenced evidence is not a file")
+        try:
+            current = resolved.resolve(strict=True)
+            named = os.stat(current)
+        except (OSError, RuntimeError):
+            current, named = None, None
+        if (current != resolved or not current.is_relative_to(root)
+                or (named.st_dev, named.st_ino) != (opened.st_dev, opened.st_ino)):
+            raise _SnapshotRefused(
+                "file.changed_during_preflight",
+                "referenced evidence changed while it was being admitted")
+        if opened.st_size > MAX_EVIDENCE_FILE_BYTES:
+            raise _SnapshotRefused(
+                "file.too_large",
+                f"referenced evidence exceeds {MAX_EVIDENCE_FILE_BYTES} bytes")
+        digest = hashlib.sha256()
+        prefix = bytearray()
+        total = 0
+        while block := stream.read(1024 * 1024):
+            total += len(block)
+            if total > MAX_EVIDENCE_FILE_BYTES:
+                raise _SnapshotRefused(
+                    "file.too_large",
+                    f"referenced evidence exceeds {MAX_EVIDENCE_FILE_BYTES} bytes")
             digest.update(block)
-    return digest.hexdigest()
+            if len(prefix) < _SNAPSHOT_BYTES:
+                prefix.extend(block[:_SNAPSHOT_BYTES - len(prefix)])
+    return digest.hexdigest(), bytes(prefix), total
 
 
 def _schema() -> dict[str, Any]:
@@ -105,9 +206,16 @@ def _schema() -> dict[str, Any]:
     return schema
 
 
-def _load_document(path: Path) -> Any:
+def _load_document(path: Path) -> tuple[Any, bytes]:
+    """Read the bundle once, bounded, and parse exactly those bytes."""
     try:
-        return yaml.safe_load(path.read_text(encoding="utf-8"))
+        with path.open("rb") as stream:
+            raw = stream.read(MAX_BUNDLE_BYTES + 1)
+        if len(raw) > MAX_BUNDLE_BYTES:
+            raise EvidenceValidationError([
+                EvidenceProblem("$", "document.too_large",
+                                f"bundle exceeds {MAX_BUNDLE_BYTES} bytes")])
+        return yaml.safe_load(raw.decode("utf-8")), raw
     except FileNotFoundError:
         raise EvidenceValidationError([
             EvidenceProblem("$", "document.missing", "bundle does not exist")
@@ -175,7 +283,7 @@ def load_evidence_bundle(
     state. Harnessie does not invoke Git to discover them.
     """
     source = Path(path)
-    data = _load_document(source)
+    data, raw = _load_document(source)
     problems = [
         EvidenceProblem(_json_path(error.absolute_path),
                         f"schema.{error.validator}", error.message)
@@ -241,6 +349,9 @@ def load_evidence_bundle(
             f"is dirty={current_dirty!r}"))
 
     resolved_files: dict[str, Path] = {}
+    snapshots: dict[str, bytes] = {}
+    sizes: dict[str, int] = {}
+    digests: dict[str, str] = {}
     file_records: list[tuple[str, str, str]] = []
     if "diff" in data:
         file_records.append(("diff", data["diff"]["path"],
@@ -253,7 +364,10 @@ def load_evidence_bundle(
         problems.extend(file_problems)
         if resolved is not None and not file_problems:
             try:
-                actual_hash = _sha256(resolved)
+                actual_hash, snapshot, size = _snapshot(resolved, root)
+            except _SnapshotRefused as exc:
+                problems.append(EvidenceProblem(location, exc.code, exc.message))
+                continue
             except OSError as exc:
                 problems.append(EvidenceProblem(
                     location, "file.unreadable",
@@ -265,8 +379,15 @@ def load_evidence_bundle(
                     f"expected {expected_hash}, got {actual_hash}"))
             else:
                 resolved_files[key] = resolved
+                snapshots[key] = snapshot
+                sizes[key] = size
+                digests[key] = actual_hash
 
     if problems:
         raise EvidenceValidationError(problems)
     return EvidenceBundle(source=source.resolve(), evidence_root=root,
-                          data=data, files=resolved_files)
+                          data=data, files=resolved_files,
+                          snapshots=MappingProxyType(snapshots),
+                          source_sha256=hashlib.sha256(raw).hexdigest(),
+                          sizes=MappingProxyType(sizes),
+                          digests=MappingProxyType(digests))

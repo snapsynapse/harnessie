@@ -55,10 +55,16 @@ class ApprovalPolicy:
             problems=problems,
         )
 
-    def decide(self, phase: str, tool: str, args: dict) -> bool | None:
+    def mandatory_denial(self, phase: str, tool: str) -> bool:
+        """True when this policy forbids the call regardless of any other
+        grant source: the policy is invalid, or an explicit deny matches.
+        Callers must consult this before workflow preapprovals or a TTY."""
         if self.problems:
-            return False
-        if any(rule.matches(phase, tool) for rule in self.deny):
+            return True
+        return any(rule.matches(phase, tool) for rule in self.deny)
+
+    def decide(self, phase: str, tool: str, args: dict) -> bool | None:
+        if self.mandatory_denial(phase, tool):
             return False
         if any(rule.matches(phase, tool) for rule in self.allow):
             return True

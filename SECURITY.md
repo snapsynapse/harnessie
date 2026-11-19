@@ -63,7 +63,7 @@ Run counters are shared under a lock across parallel phases and reconstructed fr
 ### 6. Secret-handling guards (mechanical, harness-enforced)
 
 - Child processes run under a scrubbed environment (`scrubbed_env`, PATH/HOME/LANG/TMPDIR/TERM only). The parent's API keys are not inherited, so an injected `print(os.environ)` finds nothing to steal, and even with network opted in there is nothing to exfiltrate.
-- `run_shell` output is passed through `redact_secrets` before returning: credential-shaped strings (pplx-, sk-ant-, sk-, ghp_, github_pat_, AKIA, xox[bpars]-) become `[REDACTED-SECRET]`, so a command that reads a key cannot surface it into the transcript.
+- `run_shell` output is passed through `redact_secrets` before returning: recognized credential-shaped strings (pplx-, sk-ant-, sk-, ghp_, github_pat_, AKIA, xox[bpars]-) become `[REDACTED-SECRET]`. At the byte ceilings for `read_file` and each shell stream, and at the combined shell character ceiling, the unfinished trailing non-whitespace token is withheld so a cut cannot expose a partial credential. An ordinary long token can be withheld too. This is pattern coverage, not a guarantee for every credential format or a hostile command that uses another channel.
 - `write_file` refuses content containing credential-shaped strings (fail closed): an injected worker cannot copy secrets into the workspace deliverable.
 
 These are defense in depth around the root cause of this project's one real session incident (a key inlined into transcripts by a research prompt): the structural fix is to reference secrets as environment variables and never read them into a command string in the first place; the guards catch what the structural fix misses.
@@ -89,7 +89,16 @@ The gate's verifier agent runs in a fresh context, sees only artifacts and crite
 | 7 verifier | behavior-level corruption of the deliverable | injection that satisfies the criteria maliciously |
 | 8 human | anything reasoning survives the above | reviewer attention |
 
-The honest residual: a well-crafted injection written as ordinary-looking advice, aimed at the deliverable rather than at tool calls, is caught only by layers 7 and 8. That is a deliberate design boundary, not an oversight. The tool-call and exfil paths (layers 1 through 6) are now mechanically confined when the relevant opt-in controls are declared; what remains is corruption expressed through legitimate-looking work, which is a reasoning problem, not a filtering one.
+The honest residual: a well-crafted injection written as ordinary-looking advice, aimed at the deliverable rather than at tool calls, is caught only by layers 7 and 8. That is a deliberate design boundary, not an oversight. The mechanical controls also have the operating limits below; declaring an opt-in control does not erase them.
+
+### Operating limits of the current source repairs
+
+- A descendant that starts a new session and closes inherited output pipes can outlive `run_shell` or a deterministic check without being detected or killed by the current process-group cleanup.
+- Raw `proofs/check-*.txt` retain check output as operator artifacts. Do not run checks that print credentials or sensitive source content into a proof directory that will be shared.
+- Resume binds reused phase outputs and selected contracts, but does not bind `config/models.yaml`, memory contents, ownership, approval, or boundary configuration. Review those inputs before resuming; a changed reused output refuses rather than silently reusing its verdict.
+- A provider call with unknown usage stops metered execution. The affected run cannot resume; start a new run after reconciling provider usage outside Harnessie.
+- The transport deadline does not bound an HTTPS proxy CONNECT handshake. Use a trusted proxy or a direct endpoint when the deadline is part of a hard operating bound.
+- Linux bubblewrap, firejail, and Docker backends have not yet had the same native security regression coverage as the macOS Seatbelt cases in this repair work. The CI Linux bubblewrap gate remains a separate release requirement.
 
 ## Governance controls (v0.2)
 
@@ -97,7 +106,7 @@ Three further code-enforced controls, specified in [GOVERNANCE.md](GOVERNANCE.md
 
 - Consent lock: on consent-gated worker phases, registry dispatch refuses write/execute tools until the agent calls `accept_task`; `decline_task` is a first-class stop the gate routes to a single counter-proposal re-offer or the operator, never to route escalation. A hijacked or confused agent cannot mutate anything while the offer is still open.
 - Ownership lanes: `write_file` checks `OWNERSHIP.yaml` (project root, outside the workspace jail, unwritable by any agent). Agents own the files they create, cross-agent writes are refused with a `request_change` remedy, and operator lanes are locked to all agents. The same decision is compiled into the OS sandbox for interpreters and checks: denied lane roots become read-only, invalid patterns or unsupported profiles refuse child execution, and unowned paths retain first-writer semantics.
-- Hash-chained audit: every event carries `seq` and `prev` (SHA-256 of the previous line); `harnessie audit <run_id>` verifies the chain and renders the consent/ownership/injection/gate/arbitration timeline, exit 1 on any break. Tamper-evident, not tamper-proof: whole-file rewrites are out of scope; anchoring the chain head externally (git commit, transparency log) is the operator's escrow decision.
+- Hash-chained audit: every event carries `seq` and `prev` (SHA-256 of the previous line); `harnessie audit <run_id>` verifies the chain and renders the consent/ownership/injection/gate/arbitration timeline, exit 1 on any break. An edit, deletion, or reorder of a linked interior line is detected. Tamper-evident, not tamper-proof: the chain is unanchored, so an edited final event or a truncated suffix still verifies, and whole-file rewrites are out of scope. Detecting those needs a terminal digest and event count held outside the log's trust boundary (git commit, transparency log); recording one is the operator's escrow decision.
 
 Decision records for contested phases live under `runs/<id>/decisions/` — also outside the workspace jail — and only a human may author their Arbitration sections; the harness lints structure and earned claims but never judgment.
 
@@ -127,7 +136,7 @@ Exported prose may contain sensitive project material and source-reported claims
 
 Use [GitHub private vulnerability reporting](https://github.com/snapsynapse/harnessie/security/advisories/new) so the report stays private until a fix ships. If that path is unavailable, [open an issue](https://github.com/snapsynapse/harnessie/issues/new) that says only "security contact requested" with no details, and a private channel will be arranged. Please do not disclose publicly before a fix is released; there is no bounty program, but reports are credited in the changelog unless you ask otherwise.
 
-In scope: anything that falsifies a claim in this document or in [docs/threat-model.md](docs/threat-model.md) — a sandbox escape, a secret reaching the events log or a workspace artifact, an approval or consent gate bypassed, a hash chain that verifies after tampering. Out of scope: attacks requiring control of the operator's machine or environment variables, and the residual risks the threat model already states plainly.
+In scope: anything that falsifies a claim in this document or in [docs/threat-model.md](docs/threat-model.md) — a sandbox escape, a secret reaching the events log or a workspace artifact, an approval or consent gate bypassed, a hash chain that verifies after an interior edit, deletion, or reorder. Out of scope: attacks requiring control of the operator's machine or environment variables, and the residual risks the threat model already states plainly.
 
 ## Break it: standing red-team targets
 

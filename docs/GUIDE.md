@@ -54,7 +54,7 @@ Python 3.11 or newer. PyYAML and jsonschema install with Harnessie. Install from
 pip install harnessie   # or: pipx install harnessie / uv tool install harnessie
 ```
 
-This documentation covers Harnessie 1.5.0, published and verified on GitHub and PyPI. `atif` requires version 1.5.0 or newer; `export-aidr` requires 1.4.1 or newer. The separately maintained Homebrew formula and Harnessie Verify Action have their own release pins; `NEXT.md` records verified propagation.
+This source documentation covers the local 1.5.1 security repair candidate. Published Harnessie 1.5.0 remains the GitHub, PyPI, Homebrew and Verify Action core version until a separate release and downstream propagation are verified. `atif` requires version 1.5.0 or newer; `export-aidr` requires 1.4.1 or newer. `NEXT.md` records the release boundary.
 
 Developing on the harness itself (or wanting the test suite), install from source:
 
@@ -233,6 +233,19 @@ budget:
   max_usd: 10.0
   max_tokens: 2000000
 ```
+
+Every model turn must carry a usage receipt. If a provider omits token usage, or reports a counter that is not a non-negative integer up to 10^12, the run's spend is unknowable, so a metered run stops at that turn instead of retrying, and its journal refuses resume. Both refusals name the remedy. When a tier is genuinely unbilled, typically a local or self-hosted endpoint that omits usage, mark it explicitly:
+
+```yaml
+tiers:
+  local:
+    provider: openai-compat
+    model_id: qwen3.8:latest
+    base_url: http://localhost:11434/v1
+    unmetered: true          # default false; cost rates must stay 0
+```
+
+`unmetered: true` lets a turn with unknown usage continue, and the journal's `budget_charge` record says it was unmetered. Reported tokens still count against `max_tokens`. The schema refuses `unmetered` with a nonzero cost rate on the tier or any of its fallbacks, and fallbacks inherit the flag from their tier. A run stopped for unknown usage cannot be resumed; set the flag and start a new run.
 
 Use `openai-responses` for OpenAI reasoning models that combine reasoning effort with function tools. Use `openai-compat` for Chat Completions endpoints such as Ollama and vLLM. To run everything on a local open-source model, point the task classes you use at the `local` tier and leave the external-provider keys unset. To swap one provider for another, change the tier's `provider`, `model_id`, and `base_url`. Nothing else in the harness changes.
 

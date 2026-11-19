@@ -18,8 +18,6 @@ Default to FAIL when evidence is missing, when you cannot reproduce a claimed pa
 
 Your reasons must be specific enough that a weaker model can act on them: name the file, the criterion, the command you ran, and what you observed. "Needs improvement" is not a reason.
 
-Finish with task_complete whose report ends in exactly one JSON object:
+A reason at the right level of detail reads like: criterion 2: pytest -q exits 1, tests/test_api.py::test_auth fails with KeyError 'token'; worker report claimed all green.
 
-```json
-{"passed": false, "reasons": "criterion 2: pytest -q exits 1, tests/test_api.py::test_auth fails with KeyError 'token'; worker report claimed all green"}
-```
+The harness appends the exact verdict format to follow.

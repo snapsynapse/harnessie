@@ -6,11 +6,15 @@ to stderr. Nothing in the harness prints ad hoc; observability is a boundary,
 not an afterthought.
 
 Each event carries `seq` and `prev` — the SHA-256 of the previous serialized
-line (`genesis` for the first). Any post-hoc edit, deletion, or reorder breaks
-every subsequent link, which `harnessie audit` detects (harness/audit.py).
-Honest limit: a hash chain is tamper-evident, not tamper-proof; an attacker who
-can rewrite the whole file can rewrite the whole chain. The defended failure is
-silent partial edits. Reopening a log (resume) continues the chain from the
+line (`genesis` for the first). An edit, deletion, or reorder of any line that
+a later line links to breaks the next link, which `harnessie audit` detects
+(harness/audit.py). Honest limits: a hash chain is tamper-evident, not
+tamper-proof, and this one is unanchored. An edit to the final event, or a
+truncated suffix, leaves a shorter chain that still verifies; detecting either
+needs a terminal digest and event count held outside the log's trust boundary
+(an anchor stored beside the log is no anchor). An attacker who can rewrite the
+whole file can rewrite the whole chain. The defended failure is silent edits to
+linked interior history. Reopening a log (resume) continues the chain from the
 last line rather than restarting it.
 """
 

@@ -13,14 +13,18 @@ completed phases. Prior phase reports are available to later phases via
 from __future__ import annotations
 
 import json
+import math
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
+from functools import partial
 from pathlib import Path
 
 import yaml
 
 from .adversarial import (PositionRecord, assemble_record, converged,
-                          lint_record, parse_objection_response, parse_stance)
+                          lint_record, lint_record_file,
+                          parse_objection_response, parse_stance, stood_down,
+                          write_position_sidecar)
 from .approval import ApprovalPolicy, tty_approval
 from .blast_radius import (
     BlastRadiusConfigError,
@@ -40,9 +44,12 @@ from .maiden import (
     MaidenConfigError,
     approved_fingerprints,
     clone_workspace,
+    manifest_changes,
+    path_entry,
     phase_fingerprint,
     proposal_paths,
     text_sha256,
+    workspace_manifest,
     workspace_sha256,
     write_proposal,
 )
@@ -55,10 +62,11 @@ from .plugins import (AdmittedPlugin, plugin_receipts, register_plugins,
 from .write_safety import WriteDeclarationError, parallel_write_conflicts
 from .quarantine import guard_result
 from .roles import RoleLibrary
+from .accounting import replay_accounting
 from .routing import Budget, Route, Router, VALID_TIERS
 from .schema import (ConfigurationError, read_document,
                      workflow_cross_checks)
-from .state import RunState, new_run_id
+from .state import RunState, canonical_sha256, new_run_id
 from .tools.builtin import register_builtin
 from .tools.registry import ToolRegistry
 from .verify import Check, GateResult, VerificationGate
@@ -135,9 +143,20 @@ def _validate_models_config(
         if effort not in EFFORT_LEVELS:
             raise ValueError(
                 f"{path}: routing.{task_class}.effort={effort!r} is invalid")
-    if budget_cfg and (budget_cfg.get("max_usd", 0) <= 0
-                       or budget_cfg.get("max_tokens", 0) <= 0):
-        raise ValueError(f"{path}: budget ceilings must be positive")
+    if budget_cfg and not all(
+            _finite_number(budget_cfg.get(key)) and budget_cfg[key] > 0
+            for key in ("max_usd", "max_tokens")):
+        raise ValueError(f"{path}: budget ceilings must be finite and positive")
+    for spec in tiers.values():
+        if not all(_finite_number(rate) and rate >= 0
+                   for rate in (spec.cost_per_mtok_in, spec.cost_per_mtok_out)):
+            raise ValueError(
+                f"{path}: tiers.{spec.name} rates must be finite and non-negative")
+
+
+def _finite_number(value) -> bool:
+    return (not isinstance(value, bool) and isinstance(value, (int, float))
+            and math.isfinite(value))
 
 
 @dataclass
@@ -149,6 +168,18 @@ class PhaseOutcome:
     spent_tokens: int = 0
 
 HALT_STATUSES = ("needs_human", "needs_arbitration", "needs_approval")
+
+# Version of the acceptance binding journaled with every phase result. A
+# passed result reused on resume must carry this exact version and the
+# manifest of the files that phase produced.
+RESUME_BINDING_VERSION = 2
+RESUME_DRIFT_FIELDS = (
+    ("goal", "goal_changed"),
+    ("workflow", "workflow_changed"),
+    ("phase", "phase_contract_changed"),
+    ("upstream", "upstream_contract_changed"),
+    ("inputs", "inputs_changed"),
+)
 
 
 class WorkflowRunner:
@@ -173,7 +204,19 @@ class WorkflowRunner:
         resuming = (self.run_dir / "events.jsonl").exists()
         if resuming:
             verify_resume_plugins(self.run_dir / "events.jsonl", self.plugins)
+            # Cumulative spend carries across resumes; only the ceilings come
+            # from current config, and the replay records which ones applied.
+            journal = [line for line in (self.run_dir / "events.jsonl").read_text(
+                encoding="utf-8").splitlines() if line.strip()]
+            replayed_usd, replayed_tokens = replay_accounting(journal)
+            self.budget.add_spend(replayed_usd, replayed_tokens)
         self.events = EventLog(self.run_dir, echo=echo)
+        if resuming:
+            self.events.emit("budget_replayed", spent_usd=self.budget.spent_usd,
+                             spent_tokens=self.budget.spent_tokens,
+                             max_usd=self.budget.max_usd,
+                             max_tokens=self.budget.max_tokens)
+        self.budget.recorder = partial(self.events.emit, "budget_charge")
         if not resuming:
             self.events.emit(
                 "plugin_set_admitted",
@@ -205,6 +248,7 @@ class WorkflowRunner:
         register_plugins(self.registry, self.plugins)
         (self.root / "workspace").mkdir(exist_ok=True)
         self._models: dict[str, object] = {}   # tier name -> ModelInterface cache
+        self._manifest_cache: dict[str, tuple[tuple, str]] = {}
 
     # -- model plumbing ------------------------------------------------------
 
@@ -217,7 +261,10 @@ class WorkflowRunner:
         spec = self.router.spec_for(route)
         if spec.name not in self._models:
             self._models[spec.name] = build_model(spec)
-        return AgentLoop(role=role_kind, model=self._models[spec.name],
+        # One adapter per loop: parallel phases on the same tier must never
+        # share conversation replay state (stateless adapters return self).
+        model = self._models[spec.name].for_conversation()
+        return AgentLoop(role=role_kind, model=model,
                          registry=registry or self.registry, events=self.events,
                          budget=budget or self.budget, max_steps=max_steps,
                          deny_tools=deny_tools, allow_network=allow_network,
@@ -307,6 +354,14 @@ class WorkflowRunner:
                 return [PhaseOutcome("(goal)", "needs_human", str(halt))]
             self.strip_map.mapping = result.mapping
             goal = result.stripped
+        self._workflow_doc = wf
+        # Resume reuses a recorded acceptance only under the contract it was
+        # verified against; drift refuses the whole resume before any phase
+        # runs, so no side effect is silently re-executed or built upon.
+        refusal = self._validate_resume(wf.get("phases", []), goal)
+        if refusal is not None:
+            self._persist_strip_map()
+            return [refusal]
         self.events.emit("workflow_start", name=wf.get("name"), run_id=self.run_id,
                          goal=goal, workflow=workflow_ref,
                          workflow_sha256=self._workflow_sha256)
@@ -343,11 +398,26 @@ class WorkflowRunner:
                         break
                     group.append(candidate)
                 handled_parallel.update(p["name"] for p in group)
+                bindings = {
+                    p["name"]: self._phase_binding(phases, idx + offset, goal,
+                                                   reports)
+                    for offset, p in enumerate(group)}
+                before = self._snapshot()
                 group_outcomes = self._run_parallel_group(group, reports)
+                changes = self._changes_since(before)
                 for outcome in group_outcomes:
-                    self.state.record(
-                        f"phase:{outcome.phase}",
-                        {"status": outcome.status, "report": outcome.report})
+                    # A reused acceptance keeps its original journal record.
+                    if outcome.status != "skipped_resume":
+                        # Each sibling writes only its own .phases/<name>/.
+                        prefix = f".phases/{outcome.phase}/"
+                        outputs = (None if changes is None else {
+                            rel: entry for rel, entry in changes.items()
+                            if rel.startswith(prefix)})
+                        self.state.record(
+                            f"phase:{outcome.phase}",
+                            self._phase_record(outcome,
+                                               bindings[outcome.phase],
+                                               outputs))
                     reports[outcome.phase] = outcome.report
                     outcomes.append(outcome)
                 if any(o.status in HALT_STATUSES for o in group_outcomes):
@@ -359,6 +429,7 @@ class WorkflowRunner:
             # blow up format parsing.
             phase_start_usd = self.budget.spent_usd
             phase_start_tokens = self.budget.spent_tokens
+            binding = self._phase_binding(phases, idx, goal, reports)
             self.events.emit("phase_start", phase=name,
                              spent_usd=round(phase_start_usd, 4),
                              spent_tokens=phase_start_tokens)
@@ -382,12 +453,13 @@ class WorkflowRunner:
                 # deterministic snapshot instead of widening any read surface.
                 task = task.rstrip() + "\n\n" + self._memory_status_block()
 
+            before = self._snapshot()
             if phase.get("mode") == "adversarial":
                 outcome = self._run_adversarial_phase(name, phase, task)
                 self._stamp_phase_cost(outcome, phase_start_usd,
                                        phase_start_tokens)
-                self.state.record(f"phase:{name}",
-                                  {"status": outcome.status, "report": outcome.report})
+                self.state.record(f"phase:{name}", self._phase_record(
+                    outcome, binding, self._changes_since(before)))
                 reports[name] = outcome.report
                 outcomes.append(outcome)
                 self.events.emit("phase_done", phase=name, status=outcome.status,
@@ -410,8 +482,8 @@ class WorkflowRunner:
                     blast_radius=self._phase_blast_radius(phase, workspace))
 
             self._stamp_phase_cost(outcome, phase_start_usd, phase_start_tokens)
-            self.state.record(f"phase:{name}",
-                              {"status": outcome.status, "report": outcome.report})
+            self.state.record(f"phase:{name}", self._phase_record(
+                outcome, binding, self._changes_since(before)))
             reports[name] = outcome.report
             outcomes.append(outcome)
             self.events.emit("phase_done", phase=name, status=outcome.status,
@@ -428,6 +500,161 @@ class WorkflowRunner:
                          spent_usd=round(self.budget.spent_usd, 4),
                          proofs=self.proofs.listing())
         return outcomes
+
+    # -- resume binding --------------------------------------------------------
+
+    def _phase_binding(self, phases: list[dict], idx: int, goal: str,
+                       reports: dict[str, str]) -> dict:
+        """What a phase's acceptance is bound to: the goal, the workflow
+        header, this phase's normalized contract plus its role prompts, the
+        ordered contracts before it, and the upstream reports its task
+        template consumes. Siblings in its parallel group are excluded from
+        upstream and inputs because a group runs on one shared snapshot."""
+        phase = phases[idx]
+        template = str(phase.get("task", ""))
+        siblings = self._parallel_siblings(phases, idx)
+        roles = {}
+        for role_name in [phase.get("agent", "orchestrator"),
+                          (phase.get("verify") or {}).get("verifier"),
+                          *[p.get("agent", "implementer")
+                            for p in phase.get("positions", []) or []]]:
+            if role_name and role_name in self.roles.roles:
+                roles[role_name] = text_sha256(self.roles.get(role_name).prompt)
+        return {
+            "version": RESUME_BINDING_VERSION,
+            "goal": text_sha256(goal),
+            "workflow": canonical_sha256(
+                {k: v for k, v in self._workflow_doc.items() if k != "phases"}),
+            "phase": canonical_sha256({"contract": phase, "roles": roles}),
+            "upstream": canonical_sha256(
+                [canonical_sha256(p) for p in phases[:idx]
+                 if p.get("name") not in siblings]),
+            "inputs": {
+                key: text_sha256(str(value))
+                for key, value in sorted(reports.items())
+                if key != "goal" and key not in siblings
+                and "{" + key + "}" in template},
+        }
+
+    @staticmethod
+    def _parallel_siblings(phases: list[dict], idx: int) -> set[str]:
+        label = phases[idx].get("parallel")
+        if not label:
+            return set()
+        start = idx
+        while start > 0 and phases[start - 1].get("parallel") == label:
+            start -= 1
+        end = idx
+        while end + 1 < len(phases) and phases[end + 1].get("parallel") == label:
+            end += 1
+        return {p["name"] for p in phases[start:end + 1]} - {phases[idx]["name"]}
+
+    def _snapshot(self) -> dict[str, str] | None:
+        try:
+            return workspace_manifest(self.root / "workspace",
+                                      self._manifest_cache)
+        except OSError:
+            return None
+
+    def _changes_since(self, before: dict[str, str] | None
+                       ) -> dict[str, str] | None:
+        """The files a phase produced, changed or removed: the difference
+        between snapshots around it. Unknown (None) when either failed."""
+        after = self._snapshot()
+        if before is None or after is None:
+            return None
+        return manifest_changes(before, after)
+
+    def _phase_record(self, outcome: PhaseOutcome, binding: dict,
+                      outputs: dict[str, str] | None) -> dict:
+        return {"status": outcome.status, "report": outcome.report,
+                "binding": binding, "outputs": outputs}
+
+    def _validate_resume(self, phases: list[dict],
+                         goal: str) -> PhaseOutcome | None:
+        """Check every reused acceptance before anything runs. Contract
+        drift refuses first; then each journaled output must still hold the
+        bytes its last toucher left (see _expected_outputs). Files no
+        journaled phase touched are not bound, so operator fixes, OS noise
+        and a crashed phase's new files resume."""
+        reports: dict[str, str] = {"goal": goal}
+        for idx, phase in enumerate(phases):
+            name = phase["name"]
+            prior = self.state.completed.get(f"phase:{name}")
+            if not isinstance(prior, dict) or prior.get("status") != "passed":
+                continue
+            recorded = prior.get("binding")
+            if (not isinstance(recorded, dict)
+                    or recorded.get("version") != RESUME_BINDING_VERSION):
+                return self._refuse_resume(name, "unbound_legacy")
+            current = self._phase_binding(phases, idx, goal, reports)
+            for field_name, reason in RESUME_DRIFT_FIELDS:
+                if recorded.get(field_name) != current[field_name]:
+                    return self._refuse_resume(name, reason)
+            outputs = prior.get("outputs")
+            if not isinstance(outputs, dict):
+                return self._refuse_resume(name, "outputs_unrecorded")
+            reports[name] = prior.get("report", "")
+        workspace = self.root / "workspace"
+        for rel, (_idx, name, entry) in sorted(
+                self._expected_outputs(phases).items(),
+                key=lambda item: (item[1][0], item[0])):
+            if path_entry(workspace, rel) != entry:
+                return self._refuse_resume(name, "reused_output_changed",
+                                           path=rel)
+        return None
+
+    def _expected_outputs(self, phases: list[dict]
+                          ) -> dict[str, tuple[int, str, str]]:
+        """Path -> (phase index, phase, entry) every reused path must hold.
+
+        The expected entry for a path is the one recorded by the LAST
+        journaled phase record that touched it, in journal order, whether
+        that record passed or halted and even when a later record of the
+        same phase superseded it: a halted phase's edits stay in the
+        workspace after the phase later passes without touching them again.
+        The path is released (not bound) only when that last toucher is a
+        phase rerunning now, i.e. one whose latest record is not a pass;
+        the rerun may legitimately change what it wrote. Everything else,
+        including a path a superseded halted record left, is bound to that
+        record's post-state entry, so it cannot be swapped before resume.
+        A record without a known outputs map (snapshot failed, crash)
+        touches nothing, so an earlier toucher's entry still applies and
+        any change refuses: fail closed."""
+        index = {phase["name"]: idx for idx, phase in enumerate(phases)}
+        rerunning = set()
+        for name in index:
+            latest = self.state.completed.get(f"phase:{name}")
+            if not isinstance(latest, dict) or latest.get("status") != "passed":
+                rerunning.add(name)
+        last: dict[str, tuple[str, str]] = {}
+        for step_key, record in self.state.history:
+            name = step_key[len("phase:"):]
+            if (not step_key.startswith("phase:") or name not in index
+                    or not isinstance(record, dict)):
+                continue
+            outputs = record.get("outputs")
+            for rel, entry in (outputs if isinstance(outputs, dict)
+                               else {}).items():
+                last[rel] = (name, entry)
+        return {rel: (index[name], name, entry)
+                for rel, (name, entry) in last.items()
+                if name not in rerunning}
+
+    def _refuse_resume(self, phase: str, reason: str,
+                       path: str | None = None) -> PhaseOutcome:
+        detail = {"path": path} if path is not None else {}
+        self.events.emit("resume_refused", run_id=self.run_id, phase=phase,
+                         reason=reason, remedy="new_run", **detail)
+        changed = f" changed {path!r}" if path is not None else ""
+        return PhaseOutcome(
+            phase, "needs_human",
+            f"resume refused at phase {phase!r} ({reason}){changed}: a "
+            "recorded acceptance is reused only under the exact goal, "
+            "workflow, phase contract and inputs it was verified against, "
+            "and only while the files it produced are unchanged; it is never "
+            "silently re-executed. Start a new run with this workflow and "
+            f"goal instead of resuming run {self.run_id}.")
 
     def _configure_maiden_voyages(self, workflow: dict) -> None:
         self._maiden_fingerprints: dict[str, str] = {}
@@ -1002,22 +1229,29 @@ class WorkflowRunner:
     def _approval_handler_for(self, phase_name: str,
                               approve_tools: frozenset[str]):
         """Per-phase approval handler. Operator actions enter the SAME audit
-        stream as agent actions: every grant and every denial is an event."""
+        stream as agent actions: every grant and every denial is an event.
+        Precedence: an invalid policy or explicit policy deny is decided
+        first; only then a workflow preapproval, a policy allow, the TTY."""
         def handler(tool: str, args: dict) -> bool:
+            policy = self.approval_policy
+            if policy is not None and policy.mandatory_denial(phase_name, tool):
+                self.events.emit("approval_denied", tool=tool, phase=phase_name,
+                                 source="policy-file")
+                if policy.problems:
+                    self.events.emit("approval_policy_invalid",
+                                     phase=phase_name,
+                                     problems=policy.problems)
+                return False
             if tool in approve_tools:
                 self.events.emit("approval_granted", tool=tool,
                                  phase=phase_name, source="workflow-config")
                 return True
-            if self.approval_policy is not None:
-                decision = self.approval_policy.decide(phase_name, tool, args)
+            if policy is not None:
+                decision = policy.decide(phase_name, tool, args)
                 if decision is not None:
                     kind = "approval_granted" if decision else "approval_denied"
                     self.events.emit(kind, tool=tool, phase=phase_name,
                                      source="policy-file")
-                    if self.approval_policy.problems:
-                        self.events.emit("approval_policy_invalid",
-                                         phase=phase_name,
-                                         problems=self.approval_policy.problems)
                     return decision
             if self.interactive_approvals:
                 decision = tty_approval(phase_name, tool, args)
@@ -1098,7 +1332,7 @@ class WorkflowRunner:
         record_path = decisions_dir / f"DR-{name}.md"
 
         if record_path.exists():
-            lint = lint_record(record_path.read_text(encoding="utf-8"))
+            lint = lint_record_file(record_path)
             if "human-arbitrated" in lint["claims"]:
                 # The operator's arbitration is itself an audited action in
                 # the composite timeline, same stream as agent actions.
@@ -1200,6 +1434,12 @@ class WorkflowRunner:
                     for objection in parsed["objections"]:
                         new_in_round.append({"by": pos.label, "to": "the record",
                                              "text": objection})
+                    if not parsed["objections"] and not stood_down(parsed):
+                        new_in_round.append({
+                            "by": pos.label, "to": "the record",
+                            "text": "(no explicit stand-down: empty objection "
+                                    "list without literal no_new_objection "
+                                    "true; treated as dissent, fail closed)"})
             for o in new_in_round:
                 self.events.emit("objection_recorded", phase=name, by=o["by"],
                                  text=o["text"][:200])
@@ -1220,7 +1460,8 @@ class WorkflowRunner:
                       "log evidencing isolated position generation"])
         decisions_dir.mkdir(parents=True, exist_ok=True)
         record_path.write_text(record_text, encoding="utf-8")
-        lint = lint_record(record_text)
+        write_position_sidecar(record_path, positions)
+        lint = lint_record(record_text, positions=positions)
         self.events.emit("decision_assembled", phase=name,
                          record=str(record_path), claims=lint["claims"],
                          errors=lint["errors"])

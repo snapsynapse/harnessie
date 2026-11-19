@@ -1,0 +1,183 @@
+{
+  "containment.py": {
+    "exit_code": 0,
+    "observations": [
+      {
+        "mock_model_calls": 1,
+        "probe": "credential_event_leak",
+        "raw_value_in_events": true,
+        "stop": "secret_egress"
+      },
+      {
+        "mock_model_calls": 2,
+        "probe": "pii_event_leak",
+        "raw_value_in_events": true,
+        "stop": "complete"
+      },
+      {
+        "dispatches_ok": true,
+        "operator_lane_changed": true,
+        "outside_workspace_changed": true,
+        "probe": "preexisting_hardlink_alias"
+      },
+      {
+        "guard_returned_without_halt": true,
+        "mapping_entries": 1,
+        "probe": "secret_pii_overlap",
+        "recognized_before_strip": true,
+        "rehydration_reconstructs_secret": true
+      }
+    ]
+  },
+  "governance.py": {
+    "exit_code": 0,
+    "observations": [
+      {
+        "probe": "resume_changed_contract",
+        "statuses": [
+          "skipped_resume"
+        ],
+        "model_calls": 0,
+        "reused_report": "old task accepted"
+      },
+      {
+        "probe": "resume_budget",
+        "prior_logged_usd": 5.0,
+        "prior_logged_tokens": 100000,
+        "resumed_spent_usd": 0.0,
+        "resumed_spent_tokens": 0
+      },
+      {
+        "probe": "policy_deny_overridden",
+        "fact_archived": true
+      },
+      {
+        "probe": "quiet_round_without_explicit_stand_down",
+        "statuses": [
+          "passed"
+        ]
+      },
+      {
+        "probe": "evidence_post_admission_swap",
+        "ok": true,
+        "returned_outside_bytes": true
+      },
+      {
+        "probe": "contradictory_verdict_contract",
+        "structured_claim_instruction": true,
+        "last_instruction_requires_legacy_boolean": true
+      },
+      {
+        "probe": "missing_check_executable_exit_contract",
+        "exit_code": 1,
+        "expected_cannot_verify": 2
+      },
+      {
+        "probe": "summary_metadata_injection",
+        "actual_positions": 1,
+        "lint": {
+          "errors": [],
+          "claims": [
+            "independent-positions"
+          ],
+          "status": "open",
+          "decision": ""
+        }
+      },
+      {
+        "probe": "audit_unanchored_tail",
+        "edited_tail_accepted": true,
+        "truncated_tail_accepted": true
+      }
+    ]
+  },
+  "transport.py": {
+    "exit_code": 0,
+    "observations": {
+      "blocked_status": {
+        "AnthropicModel": {
+          "blocked_provider_result_becomes_tool_use": true,
+          "task_complete_retained": true
+        },
+        "OpenAICompatModel": {
+          "blocked_provider_result_becomes_tool_use": true,
+          "task_complete_retained": true
+        },
+        "OpenAIResponsesModel": {
+          "blocked_provider_result_becomes_tool_use": true,
+          "task_complete_retained": true
+        }
+      },
+      "cross_origin_redirect": {
+        "changes_origin": true,
+        "retains_authorization": true,
+        "retains_x_api_key": true
+      },
+      "network_calls": 0,
+      "provider_calls": 0,
+      "schema": "harnessie-offline-transport-audit/1",
+      "unbounded_read": {
+        "AnthropicModel": {
+          "unbounded_success_read": true
+        },
+        "OpenAICompatModel": {
+          "unbounded_success_read": true
+        },
+        "OpenAIResponsesModel": {
+          "unbounded_success_read": true
+        }
+      },
+      "unknown_usage": {
+        "AnthropicModel": {
+          "missing_usage_accepted": true,
+          "missing_usage_counted_as_zero": true
+        },
+        "OpenAICompatModel": {
+          "missing_usage_accepted": true,
+          "missing_usage_counted_as_zero": true
+        },
+        "OpenAIResponsesModel": {
+          "missing_usage_accepted": true,
+          "missing_usage_counted_as_zero": true
+        }
+      },
+      "uses_real_credentials": false
+    }
+  },
+  "responses-race.py": {
+    "exit_code": 0,
+    "observations": {
+      "b_followup_contains_a_private_input": true,
+      "b_followup_omits_b_original_input": true,
+      "b_followup_present": true,
+      "instructions_still_b": false,
+      "network_calls": 0,
+      "parallel_calls": 2,
+      "provider_calls": 0,
+      "schema": "harnessie-responses-race-audit/1"
+    }
+  },
+  "assurance.py": {
+    "exit_code": 0,
+    "observations": [
+      {
+        "probe": "unknown_eval_assertion",
+        "silently_passed": true
+      },
+      {
+        "probe": "nonfinite_budget",
+        "schema_accepted": true,
+        "budget_not_exhausted": true
+      },
+      {
+        "probe": "xml_double_decode",
+        "nested_escape_decoded_twice": true
+      },
+      {
+        "probe": "directory_accounting_scope",
+        "empty_directory_change_allowed_at_zero_limits": true,
+        "edits_accounted": 0
+      }
+    ]
+  }
+}

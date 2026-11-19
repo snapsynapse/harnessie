@@ -12,7 +12,7 @@ FILES = {
     "agents/workers/implementer.md": "# Role: Implementer\n\nExecute one scoped task and report evidence.\n",
     "agents/verifiers/code-verifier.md": (
         "# Role: Code verifier\n\n"
-        "Verify artifacts against criteria. End with a JSON verdict object.\n"
+        "Verify artifacts against criteria. The harness appends the output contract.\n"
     ),
     "config/models.yaml": """schema_version: 1
 tiers:

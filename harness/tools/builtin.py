@@ -19,15 +19,30 @@ Design rules encoded here:
     read-only overlay at the OS sandbox. Operator lanes, other-agent lanes,
     and other agents' first-writer claims stay protected even when a write
     target is hidden inside code executed by the child process.
+  - Direct writes replace only the authorized directory entry: anchored
+    no-follow traversal, an exclusive same-directory temp file, then an
+    atomic rename. A hardlink alias never mutates another name's inode, and
+    an existing file the agent cannot write is refused, not replaced.
+  - File reads and child output stream under byte ceilings with an overflow
+    sentinel; run_shell has a whole-call deadline and kills its process group.
   - task_complete is how a loop ends deliberately. Requiring an explicit final
     report beats inferring completion from silence.
 """
 
 from __future__ import annotations
 
+import codecs
+import errno
 import os
+import re
+import secrets as _secrets
+import selectors
 import shlex
+import signal
+import stat
 import subprocess
+import time
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..blast_radius import BlastRadiusExceeded, PhaseBlastRadius
@@ -53,6 +68,299 @@ def scrubbed_env() -> dict[str, str]:
     env["GIT_CONFIG_NOSYSTEM"] = "1"
     env["GIT_CONFIG_GLOBAL"] = os.devnull
     return env
+
+# Byte ceilings and the whole-call deadline. Output is streamed under these
+# limits; nothing reads a file or a child pipe wholly before truncating.
+READ_FILE_MAX_BYTES = 100_000
+SHELL_STREAM_MAX_BYTES = 20_000          # per stream: stdout and stderr each
+SHELL_OUTPUT_MAX_CHARS = 20_000          # combined observation
+SHELL_DEADLINE_S = 300.0                 # whole call, not per read
+SHELL_DRAIN_GRACE_S = 1.0                # after the direct child exits
+_READ_CHUNK = 64 * 1024
+
+# Direct writes replace only the authorized directory entry. New files and
+# detached hardlink aliases get WRITE_FILE_MODE minus the process umask; an
+# existing singly linked regular file keeps its permission bits (never
+# setuid, setgid or sticky). An existing file without write permission is
+# refused, never replaced.
+WRITE_FILE_MODE = 0o666
+WRITE_DIR_MODE = 0o755
+_WRITE_TMP_PREFIX = ".harnessie-write-"
+_DIR_FLAGS = (os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
+              | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_CLOEXEC", 0))
+
+
+def _overflow_sentinel(source: str, limit: int, stream: str = "") -> str:
+    where = f" stream={stream}" if stream else ""
+    return f"\n[harnessie:truncated source={source}{where} limit_bytes={limit}]"
+
+
+def _decode_prefix(data: bytes, complete: bool) -> str:
+    """UTF-8 decode; a cut stream drops its trailing partial sequence."""
+    decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
+    return decoder.decode(data, final=complete)
+
+
+def _safe_truncated_prefix(text: str) -> str:
+    """Withhold an unfinished final token when its remaining bytes are unknown.
+
+    A byte or character ceiling can split a credential before it satisfies a
+    full-secret pattern. Removing the entire trailing non-whitespace token is
+    conservative, but keeps an unmatched credential prefix out of the next
+    model turn and event log. Complete tokens before the cut remain visible.
+    """
+    match = re.search(r"\S+$", text)
+    return text[:match.start()] if match else text
+
+
+def _path_changed(rel: str, op: str) -> ToolRefusal:
+    return ToolRefusal(
+        f"{op}_target_changed", "jail",
+        f"Path {rel!r} changed between authorization and {op}; nothing was "
+        f"{'written' if op == 'write' else 'read'}.",
+        "Filesystem tools act only on the directory entry that was "
+        "authorized; a symlink swapped in afterwards is refused.")
+
+
+def _is_symlink(name: str, dir_fd: int) -> bool:
+    try:
+        return stat.S_ISLNK(os.stat(name, dir_fd=dir_fd,
+                                    follow_symlinks=False).st_mode)
+    except OSError:
+        return False
+
+
+def _anchored_dir(ws: Path, parts: list[str], rel: str, op: str,
+                  create: bool) -> int:
+    """Open the parent directory of rel from the workspace root one
+    component at a time, never following a symlink. Returns an fd."""
+    if not {os.open, os.stat, os.rename, os.mkdir, os.access} <= os.supports_dir_fd \
+            or not getattr(os, "O_NOFOLLOW", 0):
+        raise ToolRefusal(
+            f"{op}_unsupported_platform", "jail",
+            "This platform cannot anchor filesystem access to the workspace.",
+            "Direct file access fails closed where traversal cannot be anchored.")
+    fd = os.open(ws, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
+                 | getattr(os, "O_CLOEXEC", 0))
+    try:
+        for part in parts:
+            if create:
+                try:
+                    os.mkdir(part, WRITE_DIR_MODE, dir_fd=fd)
+                except FileExistsError:
+                    pass
+            try:
+                child = os.open(part, _DIR_FLAGS, dir_fd=fd)
+            except OSError as e:
+                # A symlink now sits where a directory was authorized (ELOOP,
+                # or ENOTDIR where O_DIRECTORY is checked first), or the
+                # directory vanished after our own mkdir.
+                if e.errno == errno.ELOOP or (create and e.errno == errno.ENOENT):
+                    raise _path_changed(rel, op) from e
+                if e.errno == errno.ENOTDIR and _is_symlink(part, fd):
+                    raise _path_changed(rel, op) from e
+                raise
+            os.close(fd)
+            fd = child
+        return fd
+    except BaseException:
+        os.close(fd)
+        raise
+
+
+def _replace_entry(ws: Path, rel: str, data: bytes) -> int:
+    """Write data to a same-directory exclusive temp file, then atomically
+    rename it over rel's directory entry. The previous inode (a hardlink
+    alias, possibly shared with a protected name) is never opened for
+    writing. Returns the replaced entry's link count (0 when new)."""
+    *parents, name = rel.split("/")
+    dfd = _anchored_dir(ws, parents, rel, "write", create=True)
+    try:
+        try:
+            st = os.stat(name, dir_fd=dfd, follow_symlinks=False)
+        except FileNotFoundError:
+            st = None
+        if st is not None and stat.S_ISLNK(st.st_mode):
+            raise _path_changed(rel, "write")
+        if st is not None and not stat.S_ISREG(st.st_mode):
+            raise _unsupported_target(rel)
+        if st is not None and not os.access(
+                name, os.W_OK, dir_fd=dfd,
+                follow_symlinks=os.access not in os.supports_follow_symlinks):
+            # Replacing the entry needs only directory write permission;
+            # refuse anyway, as an in-place open for writing would have.
+            raise ToolRefusal(
+                "write_target_readonly", "permissions",
+                f"Path {rel!r} exists and is not writable; nothing was written.",
+                "write_file never replaces a file the agent could not open "
+                "for writing.")
+        # An existing singly linked file keeps its permission bits; a new file
+        # or detached alias takes WRITE_FILE_MODE minus the process umask,
+        # applied by the kernel at creation (never os.umask, which races).
+        keep = (stat.S_IMODE(st.st_mode) & 0o777
+                if st is not None and st.st_nlink == 1 else None)
+        flags = (os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW
+                 | getattr(os, "O_CLOEXEC", 0))
+        while True:
+            tmp = _WRITE_TMP_PREFIX + _secrets.token_hex(8)
+            try:
+                tfd = os.open(tmp, flags,
+                              0o600 if keep is not None else WRITE_FILE_MODE,
+                              dir_fd=dfd)
+                break
+            except FileExistsError:
+                continue
+        try:
+            with os.fdopen(tfd, "wb") as fh:
+                fh.write(data)
+                if keep is not None:
+                    os.fchmod(fh.fileno(), keep)
+            try:
+                os.rename(tmp, name, src_dir_fd=dfd, dst_dir_fd=dfd)
+            except (IsADirectoryError, NotADirectoryError) as e:
+                raise _unsupported_target(rel) from e
+        except BaseException:
+            try:
+                os.unlink(tmp, dir_fd=dfd)
+            except FileNotFoundError:
+                pass
+            raise
+        return st.st_nlink if st is not None else 0
+    finally:
+        os.close(dfd)
+
+
+def _unsupported_target(rel: str) -> ToolRefusal:
+    return ToolRefusal(
+        "write_target_unsupported", "jail",
+        f"Path {rel!r} is not a regular file.",
+        "write_file replaces regular files only.")
+
+
+def _read_entry(ws: Path, rel: str, limit: int) -> tuple[bytes, bool]:
+    """Read at most limit bytes of rel's regular file through an anchored,
+    no-follow, non-blocking open. Returns (data, truncated)."""
+    *parents, name = rel.split("/")
+    dfd = _anchored_dir(ws, parents, rel, "read", create=False)
+    try:
+        try:
+            fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK
+                         | getattr(os, "O_CLOEXEC", 0), dir_fd=dfd)
+        except OSError as e:
+            if e.errno == errno.ELOOP:
+                raise _path_changed(rel, "read") from e
+            raise
+    finally:
+        os.close(dfd)
+    with os.fdopen(fd, "rb") as fh:
+        if not stat.S_ISREG(os.fstat(fh.fileno()).st_mode):
+            raise ToolRefusal(
+                "read_target_unsupported", "jail",
+                f"Path {rel!r} is not a regular file.",
+                "read_file reads regular files only; devices, pipes and "
+                "directories could block or stream without end.")
+        chunks: list[bytes] = []
+        remaining = limit + 1
+        while remaining > 0:
+            chunk = fh.read(min(_READ_CHUNK, remaining))
+            if not chunk:
+                break
+            chunks.append(chunk)
+            remaining -= len(chunk)
+    data = b"".join(chunks)
+    return data[:limit], len(data) > limit
+
+
+@dataclass
+class _ShellOutcome:
+    returncode: int | None
+    stdout: bytes = b""
+    stderr: bytes = b""
+    overflow: dict[str, bool] = field(default_factory=dict)
+    timed_out: bool = False
+    # A descendant outside the killed process group (setsid) still held the
+    # output pipes when the drain grace ran out. One that closed its pipes
+    # first is not observable here and is not reported.
+    escaped: bool = False
+
+
+def _kill_group(pgid: int) -> None:
+    try:
+        os.killpg(pgid, signal.SIGKILL)
+    except (ProcessLookupError, PermissionError):
+        pass
+
+
+def _leader_exited(proc: subprocess.Popen) -> bool:
+    # WNOWAIT leaves the exited child unreaped, so its pid (the process
+    # group id) cannot be recycled before the group is killed.
+    if hasattr(os, "waitid") and hasattr(os, "WNOWAIT"):
+        try:
+            return os.waitid(os.P_PID, proc.pid,
+                             os.WEXITED | os.WNOHANG | os.WNOWAIT) is not None
+        except ChildProcessError:
+            return True
+    return proc.poll() is not None
+
+
+def _run_bounded(argv: list[str], cwd: Path, env: dict[str, str]) -> _ShellOutcome:
+    """Run argv in its own process group with both pipes streamed under
+    SHELL_STREAM_MAX_BYTES and the whole call under SHELL_DEADLINE_S. When
+    the direct child exits, any group member still holding the pipes is
+    killed and draining stops after SHELL_DRAIN_GRACE_S."""
+    limit = SHELL_STREAM_MAX_BYTES
+    proc = subprocess.Popen(argv, cwd=cwd, env=env, stdin=subprocess.DEVNULL,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            start_new_session=True)
+    out = _ShellOutcome(returncode=None,
+                        overflow={"stdout": False, "stderr": False})
+    bufs = {"stdout": bytearray(), "stderr": bytearray()}
+    sel = selectors.DefaultSelector()
+    sel.register(proc.stdout, selectors.EVENT_READ, "stdout")
+    sel.register(proc.stderr, selectors.EVENT_READ, "stderr")
+    deadline = time.monotonic() + SHELL_DEADLINE_S
+    exited_at: float | None = None
+    try:
+        while True:
+            now = time.monotonic()
+            if now >= deadline:
+                out.timed_out = True
+                break
+            if exited_at is None and _leader_exited(proc):
+                exited_at = now
+                _kill_group(proc.pid)
+            if exited_at is not None and (
+                    not sel.get_map() or now - exited_at >= SHELL_DRAIN_GRACE_S):
+                out.escaped = bool(sel.get_map())
+                break
+            wait = min(deadline - now, 0.05)
+            if not sel.get_map():
+                time.sleep(wait)
+                continue
+            for key, _ in sel.select(wait):
+                chunk = os.read(key.fd, _READ_CHUNK)
+                if not chunk:
+                    sel.unregister(key.fileobj)
+                    continue
+                buf = bufs[key.data]
+                room = limit - len(buf)
+                if room > 0:
+                    buf += chunk[:room]
+                if len(chunk) > room:
+                    out.overflow[key.data] = True
+    finally:
+        _kill_group(proc.pid)
+        sel.close()
+        proc.stdout.close()
+        proc.stderr.close()
+        try:
+            proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            pass
+    out.returncode = proc.returncode
+    out.stdout, out.stderr = bytes(bufs["stdout"]), bytes(bufs["stderr"])
+    return out
+
 
 READ_ROLES = frozenset({"orchestrator", "worker", "verifier"})
 WRITE_ROLES = frozenset({"worker"})
@@ -91,8 +399,12 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
 
     def read_file(path: str) -> str:
         target = _jail(ws, path)
-        text = target.read_text(encoding="utf-8", errors="replace")
-        return text[:100_000]
+        limit = READ_FILE_MAX_BYTES
+        data, truncated = _read_entry(ws, target.relative_to(ws).as_posix(), limit)
+        text = _decode_prefix(data, complete=not truncated)
+        if truncated:
+            text = _safe_truncated_prefix(text)
+        return text + (_overflow_sentinel("read_file", limit) if truncated else "")
 
     def write_file(path: str, content: str, _role: str = "worker",
                    _agent: str = "", _allow_network: bool = False) -> str:
@@ -118,20 +430,24 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
                     error, "ownership",
                     reason,
                     "Ownership lanes keep agents from mutating files outside their authority.")
-        def apply_write() -> None:
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(content, encoding="utf-8")
+        data = content.encode("utf-8")
+
+        def apply_write() -> int:
+            return _replace_entry(ws, rel, data)
         try:
             meter = blast_radius or reg.blast_radius
-            if meter is not None:
-                meter.apply("write_file", apply_write)
-            else:
-                apply_write()
+            links = (meter.apply("write_file", apply_write)
+                     if meter is not None else apply_write())
         except BlastRadiusExceeded as e:
             raise ToolRefusal(
                 "blast_radius_exceeded", "blast_radius", e.detail,
                 "Artifact-volume ceilings stop a phase before workspace damage "
                 "can exceed the operator's declared bound.") from e
+        if links > 1:
+            # The written name was a hardlink alias; it now has its own inode
+            # and every other name keeps the previous content.
+            _emit("hardlink_detached", agent=_agent or _role, path=rel,
+                  links=links)
         if ledger is not None and ledger.claim(_agent or _role, rel):
             _emit(getattr(ledger, "claim_event", "ownership_claimed"),
                   agent=_agent or _role, path=rel)
@@ -173,10 +489,8 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
                 "sandbox_unavailable", "sandbox",
                 f"Sandbox unavailable; shell blocked fail-closed: {e}",
                 "Shell commands require OS confinement before execution.")
-        def apply_shell():
-            return subprocess.run(
-                sandboxed, cwd=ws, capture_output=True, text=True,
-                timeout=300, env=scrubbed_env())
+        def apply_shell() -> _ShellOutcome:
+            return _run_bounded(sandboxed, ws, scrubbed_env())
         try:
             meter = blast_radius or reg.blast_radius
             proc = (meter.apply("run_shell", apply_shell)
@@ -186,13 +500,49 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
                 "blast_radius_exceeded", "blast_radius", e.detail,
                 "Artifact-volume ceilings stop a phase before workspace damage "
                 "can exceed the operator's declared bound.") from e
-        out, n_redacted = redact_secrets((proc.stdout + proc.stderr)[:20_000])
+        except OSError as e:
+            if e.errno not in (errno.ENOENT, errno.EACCES, errno.ENOEXEC):
+                raise
+            return Refusal(
+                "command_unavailable", "environment",
+                f"Command {argv[0]!r} is allowlisted but could not be started "
+                f"({errno.errorcode.get(e.errno, e.errno)}).",
+                "An allowlisted command must exist and be executable; a missing "
+                "tool is an environment fault, not a failed command.")
+        if proc.timed_out:
+            return Refusal(
+                "shell_deadline_exceeded", "deadline",
+                f"Command exceeded the {SHELL_DEADLINE_S:g}s whole-call deadline; "
+                "its process group was killed.",
+                "Shell calls run under a whole-call deadline so slow or endless "
+                "output cannot monopolize a run.")
+        streams = []
+        for stream, data in (("stdout", proc.stdout), ("stderr", proc.stderr)):
+            text = _decode_prefix(data, not proc.overflow[stream])
+            streams.append(_safe_truncated_prefix(text)
+                           if proc.overflow[stream] else text)
+        combined = "".join(streams)
+        redacted, n_redacted = redact_secrets(combined)
+        out = redacted[:SHELL_OUTPUT_MAX_CHARS]
+        if len(redacted) > SHELL_OUTPUT_MAX_CHARS:
+            out = _safe_truncated_prefix(out)
+        for stream in ("stdout", "stderr"):
+            if proc.overflow[stream]:
+                out += _overflow_sentinel("run_shell", SHELL_STREAM_MAX_BYTES,
+                                          stream)
+        if len(combined) > SHELL_OUTPUT_MAX_CHARS:
+            out += _overflow_sentinel("run_shell", SHELL_OUTPUT_MAX_CHARS)
         if proc.returncode == 71 and "sandbox_apply" in out:
             return Refusal(
                 "sandbox_unavailable", "sandbox",
                 f"Sandbox unavailable; shell blocked fail-closed: {out.strip()}",
                 "Shell commands require a sandbox profile that can actually apply.")
         suffix = f"\n[{n_redacted} credential-shaped string(s) redacted]" if n_redacted else ""
+        if proc.escaped:
+            # Informational only: the exit status stays the direct child's.
+            _emit("shell_escaped_descendant", agent=_agent or _role,
+                  command=argv[0])
+            suffix += "\n[harnessie:escaped_descendant held_output_open=true]"
         return f"exit={proc.returncode}\n{out}{suffix}"
 
     def task_complete(report: str) -> str:

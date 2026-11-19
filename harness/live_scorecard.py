@@ -118,6 +118,7 @@ class LiveCaseResult:
     notes: str = ""
     tokens: int = 0
     cost_usd: float | None = None
+    usage_known: bool = True
 
 
 def discover_live_targets(
@@ -187,7 +188,9 @@ def format_live_scorecard(scorecard: dict) -> str:
             f"{mark} {result.provider}:{result.id}: expected={result.expected} "
             f"observed={result.observed}"
         )
-        if result.tokens:
+        if not result.usage_known:
+            lines[-1] += " usage=unknown"
+        elif result.tokens:
             lines[-1] += f" tokens={result.tokens}"
         if result.cost_usd is not None:
             lines[-1] += f" cost=${result.cost_usd:.6f}"
@@ -387,8 +390,7 @@ def _direct_smoke(target: LiveTarget) -> LiveCaseResult:
         passed=passed,
         expected="non-empty completion",
         observed=f"{turn.stop_reason}: {turn.content[:120]}",
-        tokens=turn.input_tokens + turn.output_tokens,
-        cost_usd=_cost(target.spec, turn.input_tokens, turn.output_tokens),
+        **_turn_accounting(target.spec, turn),
     )
 
 
@@ -410,8 +412,7 @@ def _verdict_smoke(target: LiveTarget) -> LiveCaseResult:
         expected='parseable {"passed": true}',
         observed=f"{turn.stop_reason}: {turn.content[:120]}",
         notes=verdict.reasons,
-        tokens=turn.input_tokens + turn.output_tokens,
-        cost_usd=_cost(target.spec, turn.input_tokens, turn.output_tokens),
+        **_turn_accounting(target.spec, turn),
     )
 
 
@@ -438,8 +439,7 @@ def _structured_verdict_smoke(target: LiveTarget) -> LiveCaseResult:
         expected="parseable structured claim verdict",
         observed=f"{turn.stop_reason}: {turn.content[:160]}",
         notes=verdict.reasons,
-        tokens=turn.input_tokens + turn.output_tokens,
-        cost_usd=_cost(target.spec, turn.input_tokens, turn.output_tokens),
+        **_turn_accounting(target.spec, turn),
     )
 
 
@@ -572,6 +572,15 @@ def _event_kinds(run_dir: Path) -> list[str]:
 
             kinds.append(json.loads(line).get("kind", ""))
     return kinds
+
+
+def _turn_accounting(spec: ModelSpec | None, turn) -> dict:
+    # A provider that omitted usage must not read as a measured zero.
+    if not turn.usage_known:
+        return {"tokens": 0, "cost_usd": None, "usage_known": False}
+    return {"tokens": turn.input_tokens + turn.output_tokens,
+            "cost_usd": _cost(spec, turn.input_tokens, turn.output_tokens),
+            "usage_known": True}
 
 
 def _cost(spec: ModelSpec | None, tokens_in: int,
