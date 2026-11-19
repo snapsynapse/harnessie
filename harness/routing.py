@@ -19,7 +19,10 @@ from __future__ import annotations
 
 import threading
 from dataclasses import dataclass, field
+from typing import Callable
 
+from .accounting import AccountingError, finite_amount as _finite_amount
+from .models._transport import MAX_USAGE_COUNT
 from .models.base import EFFORT_LEVELS, ModelSpec
 
 # tiers ordered cheap -> capable; the DEFAULT escalation ladder walks right
@@ -69,23 +72,54 @@ class Budget:
     max_tokens: int = 2_000_000
     spent_usd: float = 0.0
     spent_tokens: int = 0
+    # Latched when a metered turn's usage was not reported: spend is then
+    # unknowable, so the budget reads as exhausted for the rest of the run.
+    accounting_unknown: bool = False
     _lock: object = field(default_factory=threading.Lock, repr=False)
     _parent: "Budget | None" = field(default=None, repr=False)
+    # Root-budget accounting record; called under the lock so recorded
+    # cumulative totals follow the order of the updates they describe.
+    recorder: "Callable[..., None] | None" = field(default=None, repr=False)
 
-    def charge(self, spec: ModelSpec, tokens_in: int, tokens_out: int) -> None:
-        with self._lock:
-            self.spent_tokens += tokens_in + tokens_out
-            self.spent_usd += (tokens_in * spec.cost_per_mtok_in
-                               + tokens_out * spec.cost_per_mtok_out) / 1_000_000
-        if self._parent is not None:
-            self._parent.charge(spec, tokens_in, tokens_out)
+    def __post_init__(self) -> None:
+        _finite_amount(self.max_usd, "budget max_usd")
+        _finite_amount(self.max_tokens, "budget max_tokens", integer=True)
+        _finite_amount(self.spent_usd, "budget spent_usd")
+        _finite_amount(self.spent_tokens, "budget spent_tokens", integer=True)
+
+    def charge(self, spec: ModelSpec, tokens_in: int, tokens_out: int,
+               usage_known: bool = True) -> None:
+        _finite_amount(tokens_in, "input tokens", integer=True)
+        _finite_amount(tokens_out, "output tokens", integer=True)
+        if max(tokens_in, tokens_out) > MAX_USAGE_COUNT:
+            raise AccountingError(
+                f"token counter exceeds the usage ceiling {MAX_USAGE_COUNT}")
+        _finite_amount(spec.cost_per_mtok_in, "cost_per_mtok_in")
+        _finite_amount(spec.cost_per_mtok_out, "cost_per_mtok_out")
+        usd = (tokens_in * spec.cost_per_mtok_in
+               + tokens_out * spec.cost_per_mtok_out) / 1_000_000
+        _finite_amount(usd, "charge usd")
+        self._apply(usd, tokens_in + tokens_out, usage_known, bool(spec.unmetered),
+                    tokens_in=tokens_in, tokens_out=tokens_out, tier=spec.name)
 
     def add_spend(self, spent_usd: float, spent_tokens: int) -> None:
+        _finite_amount(spent_usd, "spend usd")
+        _finite_amount(spent_tokens, "spend tokens", integer=True)
+        self._apply(spent_usd, spent_tokens, True, False)
+
+    def _apply(self, usd: float, tokens: int, usage_known: bool, unmetered: bool,
+               **detail) -> None:
         with self._lock:
-            self.spent_usd += spent_usd
-            self.spent_tokens += spent_tokens
+            self.spent_usd += usd
+            self.spent_tokens += tokens
+            if not usage_known and not unmetered:
+                self.accounting_unknown = True
+            if self.recorder is not None:
+                self.recorder(usd=usd, tokens=tokens, usage_known=usage_known,
+                              unmetered=unmetered, spent_usd=self.spent_usd,
+                              spent_tokens=self.spent_tokens, **detail)
         if self._parent is not None:
-            self._parent.add_spend(spent_usd, spent_tokens)
+            self._parent._apply(usd, tokens, usage_known, unmetered, **detail)
 
     def child(self) -> "Budget":
         """Headroom-scoped view for one parallel phase.
@@ -105,7 +139,8 @@ class Budget:
     def exhausted(self) -> bool:
         if self._parent is not None and self._parent.exhausted:
             return True
-        return self.spent_usd >= self.max_usd or self.spent_tokens >= self.max_tokens
+        return (self.accounting_unknown or self.spent_usd >= self.max_usd
+                or self.spent_tokens >= self.max_tokens)
 
 
 @dataclass

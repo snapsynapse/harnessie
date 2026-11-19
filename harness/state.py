@@ -8,6 +8,7 @@ carry idempotency keys so a resumed run does not re-execute completed work.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import time
 from dataclasses import dataclass, field
@@ -21,10 +22,21 @@ def new_run_id() -> str:
     return time.strftime("%Y%m%d-%H%M%S") + "-" + generate(5, check_digit=True)
 
 
+def canonical_sha256(value: Any) -> str:
+    """Digest of a JSON-shaped value independent of key order and spacing,
+    so a reformatted but equivalent workflow binds identically."""
+    text = json.dumps(value, sort_keys=True, separators=(",", ":"),
+                      ensure_ascii=False, default=str)
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
 @dataclass
 class RunState:
     run_dir: Path
     completed: dict[str, Any] = field(default_factory=dict)  # step_key -> result
+    # Every step_done record in journal order, superseded ones included:
+    # completed keeps only the latest result per step key.
+    history: list[tuple[str, Any]] = field(default_factory=list)
 
     @property
     def journal_path(self) -> Path:
@@ -43,6 +55,7 @@ class RunState:
                 rec = json.loads(line)
                 if rec.get("kind") == "step_done":
                     state.completed[rec["step_key"]] = rec.get("result")
+                    state.history.append((rec["step_key"], rec.get("result")))
         return state
 
     def has(self, step_key: str) -> bool:
@@ -57,6 +70,7 @@ class RunState:
         with self.journal_path.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(rec, ensure_ascii=False, default=str) + "\n")
         self.completed[step_key] = result
+        self.history.append((step_key, result))
 
     def note(self, kind: str, **data: Any) -> None:
         rec = {"ts": time.time(), "kind": kind, **data}

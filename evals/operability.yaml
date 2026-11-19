@@ -31,6 +31,37 @@ scenarios:
     expect_statuses: [passed, passed]
     expect_fact_kept: stale-fact
 
+  # SEC-20261118-005: an explicit deny or invalid policy wins over a
+  # workflow preapproval (approve_expiry writes approve_tools).
+  - id: approval_policy_deny_overrides_workflow_preapproval
+    kind: triage
+    approve_expiry: true
+    approval_policy:
+      deny:
+        - tool: expire_fact
+          phase: triage
+    script:
+      - { tool: accept_task, args: { note: "memory status reviewed" } }
+      - { tool: expire_fact, args: { slug: stale-fact, reason: past verify_by } }
+      - { tool: task_complete, args: { report: "proposed expiry only" } }
+      - { tool: task_complete, args: { report: "summary" } }
+    expect_statuses: [passed, passed]
+    expect_fact_kept: stale-fact
+
+  - id: approval_invalid_policy_overrides_workflow_preapproval
+    kind: triage
+    approve_expiry: true
+    approval_policy:
+      allow:
+        - phase: triage
+    script:
+      - { tool: accept_task, args: { note: "memory status reviewed" } }
+      - { tool: expire_fact, args: { slug: stale-fact, reason: past verify_by } }
+      - { tool: task_complete, args: { report: "proposed expiry only" } }
+      - { tool: task_complete, args: { report: "summary" } }
+    expect_statuses: [passed, passed]
+    expect_fact_kept: stale-fact
+
   - id: approval_policy_phase_scope_denies_elsewhere
     kind: triage
     approve_expiry: false

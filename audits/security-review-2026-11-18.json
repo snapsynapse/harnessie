@@ -1,0 +1,935 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-18",
+  "repository": "snapsynapse/harnessie",
+  "commit": "6c053dd8409e109310a124685d11e29e1e8e7885",
+  "branch": "codex/security-release-audit",
+  "mode": "full audit and candidate readiness; no remediation or publication",
+  "standards": [
+    "Harnessie SECURITY.md and docs/threat-model.md",
+    "OWASP Top 10:2021 crosswalk, retained for prior-audit comparability"
+  ],
+  "summary": {
+    "high": 6,
+    "medium": 8,
+    "low": 7,
+    "critical": 0,
+    "total": 21
+  },
+  "findings": [
+    {
+      "id": "SEC-20261118-001",
+      "severity": "HIGH",
+      "priority": "P1",
+      "owasp": "A01",
+      "title": "Hardlink aliases bypass ownership and workspace write confinement",
+      "locations": [
+        {
+          "file": "harness/tools/builtin.py",
+          "line": 108
+        },
+        {
+          "file": "harness/tools/builtin.py",
+          "line": 123
+        }
+      ],
+      "description": "The direct write tool authorizes a resolved pathname, then truncates the existing inode. A hardlink inside an allowed lane can name an operator-owned inode or an inode outside the workspace. Path.resolve() does not distinguish hardlinks; the in-process write is outside the OS sandbox.",
+      "preconditions": "An admitted workspace contains a preexisting hardlink to a protected same-filesystem file. No control of environment variables or a real service is required.",
+      "evidence": "containment.py: both operator_lane_changed and outside_workspace_changed are true after successful write_file dispatch.",
+      "mitigation": "Use same-directory exclusive temporary files and atomic replacement so writes replace only the authorized directory entry; reject or explicitly handle multiply linked files and anchor directory traversal. Preserve permissions deliberately. Review shell-created hardlinks separately under native backends.",
+      "regression": "Hardlink to operator lane, another agent claim and outside-workspace file; symlink/parent replacement variants; ordinary edits and deliberate legitimate hardlinks as compatibility controls.",
+      "status": "new",
+      "kind": "security",
+      "previous_id": null,
+      "file": "harness/tools/builtin.py",
+      "line": 108
+    },
+    {
+      "id": "SEC-20261118-002",
+      "severity": "HIGH",
+      "priority": "P1",
+      "owasp": "A07",
+      "title": "Cross-origin redirects retain provider credentials",
+      "locations": [
+        {
+          "file": "harness/models/openai_compat.py",
+          "line": 54
+        },
+        {
+          "file": "harness/models/anthropic.py",
+          "line": 47
+        },
+        {
+          "file": "harness/models/openai_responses.py",
+          "line": 74
+        }
+      ],
+      "description": "All production adapters use the default urllib redirect handler. A 302 can move a credentialed POST to another origin while retaining Authorization or X-api-key headers.",
+      "preconditions": "The configured provider, proxy or endpoint redirects. This is conditional credential disclosure, not an arbitrary attacker-selected URL in a prompt.",
+      "evidence": "transport.py uses the actual HTTPRedirectHandler.redirect_request with synthetic headers: changes_origin, retains_authorization and retains_x_api_key are all true. No request was sent.",
+      "mitigation": "Reject redirects by default, reusing the pilot no-redirect design. Any supported redirect must use an explicit same-origin HTTPS policy and remove sensitive headers before crossing trust boundaries.",
+      "regression": "301/302/303/307/308, cross-origin and HTTPS downgrade, same-origin policy, custom credential headers, safe local positive controls.",
+      "status": "new",
+      "kind": "security",
+      "previous_id": null,
+      "file": "harness/models/openai_compat.py",
+      "line": 54
+    },
+    {
+      "id": "SEC-20261118-003",
+      "severity": "HIGH",
+      "priority": "P1",
+      "owasp": "A08",
+      "title": "Admitted evidence is not bound to the bytes later read",
+      "locations": [
+        {
+          "file": "harness/verify_evidence.py",
+          "line": 65
+        },
+        {
+          "file": "harness/verify_standalone.py",
+          "line": 253
+        },
+        {
+          "file": "harness/verify_standalone.py",
+          "line": 313
+        }
+      ],
+      "description": "Preflight verifies proof digests but stores paths. The evidence tool reopens those paths without a digest, no-follow or containment recheck. Checks execute after preflight, and evidence_root may be inside the mutable workspace. The final bundle digest is also reread from its path.",
+      "preconditions": "A check or another writer can modify an admitted proof or parent after admission. The direct repro swaps a proof for a symlink to a disposable outside-root file. A check can rewrite admitted evidence without a concurrent race.",
+      "evidence": "governance.py evidence_post_admission_swap returns ok=true and returned_outside_bytes=true.",
+      "mitigation": "Snapshot bounded immutable evidence and bundle bytes at admission, and serve/hash that snapshot. If reopening is unavoidable, use anchored no-follow descriptors and verify the exact consumed bytes and containment.",
+      "regression": "Post-admission content/file/parent replacement, check-modified proof, bundle replacement, outside-root symlink, unchanged-proof positive control.",
+      "status": "new",
+      "kind": "security",
+      "previous_id": null,
+      "file": "harness/verify_evidence.py",
+      "line": 65
+    },
+    {
+      "id": "SEC-20261118-004",
+      "severity": "HIGH",
+      "priority": "P1",
+      "owasp": "A04",
+      "title": "Parallel Responses conversations share mutable replay state",
+      "locations": [
+        {
+          "file": "harness/runner.py",
+          "line": 207
+        },
+        {
+          "file": "harness/runner.py",
+          "line": 701
+        },
+        {
+          "file": "harness/models/openai_responses.py",
+          "line": 32
+        },
+        {
+          "file": "harness/models/openai_responses.py",
+          "line": 165
+        }
+      ],
+      "description": "The runner caches one model object per spec while parallel loops share it. A delayed A response can overwrite B replay state after B has completed, while the object still identifies B as its current conversation. B follow-up then transmits A prompt/output and drops its own original context and instructions.",
+      "preconditions": "Two concurrent phases use the same openai-responses tier. No malformed provider response is needed.",
+      "evidence": "responses-race.py uses deterministic thread barriers and a fake opener: b_followup_contains_a_private_input=true, b_followup_omits_b_original_input=true, instructions_still_b=false.",
+      "mitigation": "Give each loop/conversation its own adapter and replay state. A lock around an individual complete() call alone does not preserve histories across interleaved conversations.",
+      "regression": "Barrier-driven same-tier concurrent loops, delayed responses, repeated tool turns, failures and sequential conversation reuse. Assert no cross-conversation input, output or instructions.",
+      "status": "new",
+      "kind": "security",
+      "previous_id": null,
+      "file": "harness/runner.py",
+      "line": 207
+    },
+    {
+      "id": "SEC-20261118-005",
+      "severity": "HIGH",
+      "priority": "P1",
+      "owasp": "A01",
+      "title": "Workflow preapproval overrides explicit or invalid approval policy",
+      "locations": [
+        {
+          "file": "harness/runner.py",
+          "line": 1007
+        },
+        {
+          "file": "harness/approval.py",
+          "line": 63
+        }
+      ],
+      "description": "The handler grants approve_tools before consulting the explicit approval policy. This contradicts the policy contract that explicit deny wins and bypasses malformed-policy denial as well.",
+      "preconditions": "An operator-supplied workflow includes a preapproval and a separately supplied policy denies that tool. This is a composition/precedence defect, not a claim that workflows are untrusted by default.",
+      "evidence": "governance.py supplies a deny for expire_fact plus workflow preapproval; the fact is actually archived.",
+      "mitigation": "Evaluate invalid-policy and explicit-deny results first. Consider workflow grants, policy allows and TTY only after mandatory denial checks.",
+      "regression": "Global/phase deny crossed with workflow grant, policy allow and TTY; malformed policy plus grant; valid allow positive control.",
+      "status": "new",
+      "kind": "security",
+      "previous_id": null,
+      "file": "harness/runner.py",
+      "line": 1007
+    },
+    {
+      "id": "SEC-20261118-006",
+      "severity": "HIGH",
+      "priority": "P1",
+      "owasp": "A08",
+      "title": "Resume reuses accepted results after task or goal changes",
+      "locations": [
+        {
+          "file": "harness/runner.py",
+          "line": 327
+        }
+      ],
+      "description": "Ordinary resume skips any passed phase with the same name. It does not bind the prior acceptance to workflow/goal/rendered task/criteria or current artifact bytes.",
+      "preconditions": "The same run ID is resumed after contract or artifact drift. This can happen accidentally; it does not require rewriting the hash chain.",
+      "evidence": "governance.py changes the task and goal, then resumes with an empty mock brain: skipped_resume, zero model calls, old report reused.",
+      "mitigation": "Persist a versioned run contract and relevant input/artifact digests, validate them before reusing completed phases, and refuse incompatible resumes with a new-run remedy. Do not silently rerun side effects.",
+      "regression": "Changed goal/task/check/criteria/upstream report/artifact, reordered phases, unchanged resume positive control.",
+      "status": "new",
+      "kind": "security",
+      "previous_id": null,
+      "file": "harness/runner.py",
+      "line": 327
+    },
+    {
+      "id": "SEC-20261118-007",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "owasp": "A09",
+      "title": "Raw tool secrets and PII enter the event log before containment",
+      "locations": [
+        {
+          "file": "harness/loop.py",
+          "line": 195
+        },
+        {
+          "file": "harness/loop.py",
+          "line": 220
+        },
+        {
+          "file": "harness/tools/builtin.py",
+          "line": 94
+        }
+      ],
+      "description": "tool_result logs the first 300 characters before the containment call. read_file returns raw content. A subsequent secret_egress halt prevents the next model call but does not remove the credential already in events.jsonl. Recognized PII is also logged before stripping.",
+      "preconditions": "An agent reads an in-workspace file containing a recognized credential or PII near the beginning. Local logs then carry sensitive material and may later be shared.",
+      "evidence": "containment.py: raw_value_in_events=true for both credential and email; credential stops at secret_egress after one mock call, PII completes after two.",
+      "mitigation": "Contain/redact before every event emission and model boundary; log only safe kind labels and metadata on refusal. Audit other exception/refusal/event paths for the same ordering.",
+      "regression": "Read-file, evidence-reader, plugin and shell results with canaries at multiple offsets; inspect every artifact and captured model request, not only final stop status.",
+      "status": "new",
+      "kind": "security",
+      "previous_id": null,
+      "file": "harness/loop.py",
+      "line": 195
+    },
+    {
+      "id": "SEC-20261118-008",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "owasp": "A02",
+      "title": "PII stripping can hide a recognized secret and retain it for rehydration",
+      "locations": [
+        {
+          "file": "harness/boundary.py",
+          "line": 182
+        }
+      ],
+      "description": "guard_egress strips PII before scanning secrets. A credential whose suffix matches the credit-card detector can lose its recognizable shape, enter the strip map and later be reconstructed.",
+      "preconditions": "A recognized credential overlaps a PII pattern. The repro uses a synthetic Anthropic-shaped prefix and a Luhn-valid numeric suffix.",
+      "evidence": "containment.py: recognized_before_strip=true, guard_returned_without_halt=true, mapping_entries=1, rehydration_reconstructs_secret=true.",
+      "mitigation": "Detect/refuse secret spans on the original text before PII replacement and validate mappings never contain secret material. Preserve PII-only behavior.",
+      "regression": "Every credential kind crossed with overlapping email/phone/card patterns and offsets, plus ordinary PII and nonsecret numeric positive controls.",
+      "status": "new",
+      "kind": "security",
+      "previous_id": null,
+      "file": "harness/boundary.py",
+      "line": 182
+    },
+    {
+      "id": "SEC-20261118-009",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "owasp": "A04",
+      "title": "Resume resets cumulative spend and token accounting",
+      "locations": [
+        {
+          "file": "harness/runner.py",
+          "line": 169
+        }
+      ],
+      "description": "Each runner constructs a fresh Budget without replaying historical usage. A resumed run therefore starts with full configured headroom despite prior usage.",
+      "preconditions": "A run with prior spend is resumed. This differs from the documented per-call overshoot residual: the entire earlier accumulated spend is lost.",
+      "evidence": "governance.py logs 100000 tokens and $5 for the prior run; the resumed counters are zero.",
+      "mitigation": "Reconstruct cumulative usage from validated history before dispatch, refuse unknown/malformed accounting, and bind budget changes to explicit recorded operator action.",
+      "regression": "Exhausted resume makes zero calls; exact partial headroom; repeated resumes; parallel usage counted once; missing usage handling.",
+      "status": "new",
+      "kind": "security",
+      "previous_id": null,
+      "file": "harness/runner.py",
+      "line": 169
+    },
+    {
+      "id": "SEC-20261118-010",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "owasp": "A08",
+      "title": "Provider failure or refusal envelopes become executable tool turns",
+      "locations": [
+        {
+          "file": "harness/models/openai_compat.py",
+          "line": 129
+        },
+        {
+          "file": "harness/models/anthropic.py",
+          "line": 117
+        },
+        {
+          "file": "harness/models/openai_responses.py",
+          "line": 142
+        }
+      ],
+      "description": "Tool presence overrides content_filter/refusal or is checked ahead of failed/cancelled/incomplete status. The normalized turn can reach tool dispatch or task_complete despite a blocked provider status.",
+      "preconditions": "A provider or compatibility server returns a contradictory tool-bearing error/refusal envelope. The adapters are responsible for rejecting malformed states.",
+      "evidence": "transport.py: all three blocked envelopes become tool_use and retain task_complete.",
+      "mitigation": "Give terminal refusal/failure precedence and reject contradictory envelopes while preserving available accounting separately. Validate response and individual tool item status.",
+      "regression": "Provider status x tool-presence x usage matrix, truncated and contradictory envelopes, valid tool-use positive controls; assert zero dispatch on refused/error turns.",
+      "status": "new",
+      "kind": "security",
+      "previous_id": null,
+      "file": "harness/models/openai_compat.py",
+      "line": 129
+    },
+    {
+      "id": "SEC-20261118-011",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "owasp": "A09",
+      "title": "Absent provider usage is silently counted as zero",
+      "locations": [
+        {
+          "file": "harness/models/openai_compat.py",
+          "line": 136
+        },
+        {
+          "file": "harness/models/anthropic.py",
+          "line": 124
+        },
+        {
+          "file": "harness/models/openai_responses.py",
+          "line": 199
+        }
+      ],
+      "description": "All production adapters accept absent usage as empty data and default absent counters to zero. Metered runs continue with unverifiable accounting.",
+      "preconditions": "A provider omits usage or one counter. Some local compatibility services legitimately lack accounting, which needs an explicit unmetered mode rather than an implicit zero.",
+      "evidence": "transport.py: missing_usage_accepted and missing_usage_counted_as_zero are true for all three adapters.",
+      "mitigation": "Represent unknown accounting explicitly; fail closed for metered runs or require an explicit unmetered policy. Preserve received counters even if unrelated parsing fails.",
+      "regression": "Missing/null/partial/negative/bool/string/nonfinite counters, known-zero positive control, malformed result with intact usage, no retry after accounting uncertainty.",
+      "status": "new",
+      "kind": "security",
+      "previous_id": null,
+      "file": "harness/models/openai_compat.py",
+      "line": 136
+    },
+    {
+      "id": "SEC-20261118-012",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "owasp": "A04",
+      "title": "Transport, file and child-output limits truncate only after unbounded reads",
+      "locations": [
+        {
+          "file": "harness/models/openai_compat.py",
+          "line": 57
+        },
+        {
+          "file": "harness/models/anthropic.py",
+          "line": 57
+        },
+        {
+          "file": "harness/models/openai_responses.py",
+          "line": 77
+        },
+        {
+          "file": "harness/verify.py",
+          "line": 111
+        },
+        {
+          "file": "harness/tools/builtin.py",
+          "line": 177
+        },
+        {
+          "file": "harness/tools/builtin.py",
+          "line": 94
+        },
+        {
+          "file": "harness/verify_evidence.py",
+          "line": 65
+        }
+      ],
+      "description": "Production HTTP success/error reads are unbounded, read_file/read_evidence read full files before slicing, and subprocess capture_output accumulates all output before truncation. Socket timeout is not a whole-call deadline. Large or slow data can exhaust memory or monopolize a run.",
+      "preconditions": "A provider, check or admitted file generates excessive or slow-trickling data. No live stress test was performed.",
+      "evidence": "transport.py records resp.read() invoked with no size. Remaining call sites were directly inspected; no exhaustion payload was run.",
+      "mitigation": "Stream with byte ceilings and overflow sentinel, use whole-call supervision, bound both stdout and stderr, and supervise/clean the process group. Reuse tested pilot concepts without copying unchecked assumptions.",
+      "regression": "Exact-limit/one-over success and error bodies/files, false Content-Length, slow trickle, large stdout/stderr and exited-parent live-pipe fixtures; check cleanup and bounded memory.",
+      "status": "new",
+      "kind": "security",
+      "previous_id": null,
+      "file": "harness/models/openai_compat.py",
+      "line": 57
+    },
+    {
+      "id": "SEC-20261118-013",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "owasp": "A04",
+      "title": "Adversarial convergence ignores explicit stand-down",
+      "locations": [
+        {
+          "file": "harness/adversarial.py",
+          "line": 57
+        },
+        {
+          "file": "harness/runner.py",
+          "line": 1199
+        }
+      ],
+      "description": "The parser coerces no_new_objection with bool(), while the runner ignores it. Empty objection lists count as quiet even when the participant explicitly says false or omits the marker.",
+      "preconditions": "Recommending positions are followed by empty objections with false/missing stand-down.",
+      "evidence": "governance.py: such a decision returns passed.",
+      "mitigation": "Require literal boolean true and an empty validated objection list from every participant for quiet convergence. Missing/false/malformed responses continue only within bounds or require arbitration.",
+      "regression": "False/missing/string/null stand-down, nonempty objections plus true, malformed objection items and unanimous literal-true positive control.",
+      "status": "new",
+      "kind": "security",
+      "previous_id": null,
+      "file": "harness/adversarial.py",
+      "line": 57
+    },
+    {
+      "id": "SEC-20261118-014",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "owasp": "A08",
+      "title": "Model summary fabricates decision metadata and independence claim",
+      "locations": [
+        {
+          "file": "harness/adversarial.py",
+          "line": 134
+        }
+      ],
+      "description": "Model-controlled summary text is interpolated as unfenced Markdown metadata. Newlines/headings can introduce invented positions/providers. The linter then derives independence from the rendered structure.",
+      "preconditions": "An adversarial participant places record syntax in its summary, rather than only in fenced prose.",
+      "evidence": "governance.py: one actual position yields no lint errors and an independent-positions claim after an injected heading/provider.",
+      "mitigation": "Render summaries as escaped single-line scalars; derive trusted claims from structured PositionRecord objects, and separately lint imported text. Validate all interpolated fields.",
+      "regression": "LF/CRLF headings, metadata lists, frontmatter and fence syntax; actual metadata cardinality equals structured input; invented providers cannot earn claims.",
+      "status": "new",
+      "kind": "security",
+      "previous_id": null,
+      "file": "harness/adversarial.py",
+      "line": 134
+    },
+    {
+      "id": "SEC-20261118-015",
+      "severity": "LOW",
+      "priority": "P3",
+      "owasp": "A04",
+      "title": "Final verifier boundary contradicts claim-level verdict instructions",
+      "locations": [
+        {
+          "file": "harness/roles.py",
+          "line": 81
+        },
+        {
+          "file": "harness/verify_standalone.py",
+          "line": 73
+        }
+      ],
+      "description": "The structured default verifier prompt is followed by a generic boundary demanding legacy passed/reasons JSON. Evidence bundles reject that legacy shape.",
+      "preconditions": "Model-backed evidence-bundle verification. This is a directly confirmed prompt composition conflict, not a measured live model failure rate.",
+      "evidence": "governance.py: the composed prompt contains claims instructions but ends by requiring legacy boolean JSON.",
+      "mitigation": "Separate behavior constraints from mode-specific serialization and compose a single explicit output contract.",
+      "regression": "Inspect the actual composed prompts for each mode; strict claim verdict and legacy-criteria fixtures; no live model call needed.",
+      "status": "new",
+      "kind": "correctness",
+      "previous_id": null,
+      "file": "harness/roles.py",
+      "line": 81
+    },
+    {
+      "id": "SEC-20261118-016",
+      "severity": "LOW",
+      "priority": "P3",
+      "owasp": "A04",
+      "title": "Unavailable check executable is classified as failed artifact",
+      "locations": [
+        {
+          "file": "harness/verify.py",
+          "line": 128
+        },
+        {
+          "file": "harness/verify_standalone.py",
+          "line": 317
+        }
+      ],
+      "description": "Missing executable is converted into a failed check and exit 1, although the standalone contract assigns blocked/infrastructure cases to cannot-verify exit 2.",
+      "preconditions": "A configured check program is not installed. The safe repro bypasses only the sandbox wrapper for a nonexistent executable; nothing executes.",
+      "evidence": "governance.py: missing check returns exit_code=1, expected_cannot_verify=2.",
+      "mitigation": "Introduce structured check outcomes for completed failure, blocked infrastructure, timeout and resource stop; avoid classifying via message prefixes.",
+      "regression": "Nonexistent binary, malformed command, permission error, timeout, sandbox refusal, genuine executable exit-1 positive control.",
+      "status": "new",
+      "kind": "correctness",
+      "previous_id": null,
+      "file": "harness/verify.py",
+      "line": 128
+    },
+    {
+      "id": "SEC-20261118-017",
+      "severity": "LOW",
+      "priority": "P3",
+      "owasp": "A08",
+      "title": "Search checker decodes XML entities more than once",
+      "locations": [
+        {
+          "file": "scripts/check-search.mjs",
+          "line": 54
+        }
+      ],
+      "description": "The chained decoder handles amp before lt/gt. Nested escapes therefore change meaning, and apostrophe/numeric references are incomplete.",
+      "preconditions": "A local sitemap or metadata contains nested or numeric XML references. This is a retained handoff defect, not a demonstrated runtime security compromise.",
+      "evidence": "assurance.py evaluates the current function: nested XML escape decodes twice.",
+      "mitigation": "Patch only the decoder using upstream asset v7 single-pass XML/numeric decoding, retain local adaptations, and route production canonical parsing through the same contract when changed.",
+      "regression": "Nested amp escape, apos, decimal/hex numeric references, invalid Unicode, whitespace around loc and encoded live canonical.",
+      "status": "still_open",
+      "kind": "correctness",
+      "previous_id": null,
+      "file": "scripts/check-search.mjs",
+      "line": 54
+    },
+    {
+      "id": "SEC-20261118-018",
+      "severity": "LOW",
+      "priority": "P3",
+      "owasp": "A08",
+      "title": "Eval runners silently ignore unknown assertion fields",
+      "locations": [
+        {
+          "file": "harness/evals.py",
+          "line": 267
+        }
+      ],
+      "description": "Most scenario kinds run only a fixed subset of expectations without rejecting unsupported expect_* keys. A misspelled or unsupported security assertion can produce green despite never being tested. Observer/AIDR cases already reject unknown assertions.",
+      "preconditions": "An eval author adds or misspells an expected security condition.",
+      "evidence": "assurance.py: a loop scenario with expect_impossible_security_property passes unchanged.",
+      "mitigation": "Validate a versioned per-kind scenario schema, reject unknown fields/duplicate IDs, require nonvacuous assertions, and add mutation checks proving every expectation can fail.",
+      "regression": "Unknown/misspelled assertion for every kind, wrong types, duplicate scenario IDs, inverted assertions on every shipped fixture.",
+      "status": "new",
+      "kind": "assurance",
+      "previous_id": null,
+      "file": "harness/evals.py",
+      "line": 267
+    },
+    {
+      "id": "SEC-20261118-019",
+      "severity": "LOW",
+      "priority": "P3",
+      "owasp": "A08",
+      "title": "Audit claims overstate detection without a trusted tail anchor",
+      "locations": [
+        {
+          "file": "harness/events.py",
+          "line": 9
+        },
+        {
+          "file": "harness/audit.py",
+          "line": 5
+        }
+      ],
+      "description": "A prev-linked chain cannot detect edits to its terminal event or suffix truncation without a separately trusted tail/count. Documentation says any edit/deletion is detected while disclosing only whole-file rewrite as a limit.",
+      "preconditions": "An actor can modify the event file. This is an inherent unanchored-chain residual and a claim/test gap, not a new privilege bypass.",
+      "evidence": "governance.py: edited_tail_accepted=true and truncated_tail_accepted=true.",
+      "mitigation": "Narrow claims to linked interior changes. Optionally verify an externally trusted terminal digest/count or signed completion receipt; do not store the only anchor beside the mutable log.",
+      "regression": "Interior edit, last-event edit, suffix truncation, empty log and trusted-tail mismatch; retain valid-resume positive control.",
+      "status": "new",
+      "kind": "assurance",
+      "previous_id": null,
+      "file": "harness/events.py",
+      "line": 9
+    },
+    {
+      "id": "SEC-20261118-020",
+      "severity": "LOW",
+      "priority": "P3",
+      "owasp": "A05",
+      "title": "Nonfinite numeric configuration passes validation",
+      "locations": [
+        {
+          "file": "harness/schema.py",
+          "line": 79
+        },
+        {
+          "file": "harness/runner.py",
+          "line": 138
+        }
+      ],
+      "description": "YAML NaN/infinity passes numeric schema comparisons and simple <=0 checks. Nonfinite dollar ceilings/rates invalidate dollar accounting comparisons.",
+      "preconditions": "Operator-authored config includes .nan/.inf. Token limits still apply; no unlimited-spend remote exploit is claimed.",
+      "evidence": "assurance.py: NaN budget validates and does not exhaust even with large spend.",
+      "mitigation": "Reject nonfinite numeric values recursively before schema use; enforce finite nonnegative accounting updates and explicit ceiling semantics.",
+      "regression": "NaN/+inf/-inf, negative/bool/string counters and rates, finite zero/positive controls.",
+      "status": "new",
+      "kind": "correctness",
+      "previous_id": null,
+      "file": "harness/schema.py",
+      "line": 79
+    },
+    {
+      "id": "DEP-20261118-001",
+      "severity": "LOW",
+      "priority": "P3",
+      "owasp": "A06",
+      "title": "Release tooling lock contains a setuptools advisory",
+      "locations": [
+        {
+          "file": "requirements/dev.txt",
+          "line": 748
+        },
+        {
+          "file": "requirements/release.txt",
+          "line": 982
+        }
+      ],
+      "description": "pip-audit flags setuptools 84.0.0 for GHSA-xmj3-9gf7-h52w; fixed in 84.1.0. Advisory describes Windows legacy wheel-install metadata path traversal creating fixed-content __init__.py outside the destination.",
+      "preconditions": "The vulnerable legacy installation path runs on Windows with a crafted wheel. Harnessie supports macOS/Linux shell workflows; this is a low-applicability build-tool maintenance finding, not runtime compromise on this host.",
+      "evidence": "Fresh pip-audit JSON retained. No exploit was run and no real credential accessed.",
+      "mitigation": "Refresh both hash-locked tooling profiles to 84.1.0 through the repo lock generator, review the lock delta and run installed-lock, build and fresh-install gates.",
+      "regression": "Lock manifest consistency, supported-platform resolution, zero-advisory rescan and package smoke.",
+      "status": "new",
+      "kind": "dependency",
+      "previous_id": null,
+      "file": "requirements/dev.txt",
+      "line": 748
+    }
+  ],
+  "scope": [
+    "runtime containment/ownership/tools/boundary",
+    "runner/approval/adversarial/resume/accounting",
+    "standalone/evidence verification",
+    "production model adapters/routing/schema",
+    "pilot transports and release/dependency/workflow tooling",
+    "deterministic eval machinery and handoff reconciliation"
+  ],
+  "limitations": [
+    "No production provider/model calls or real credentials; HTTP cases use synthetic responses/redirect handler.",
+    "No Linux backend execution or Mach IPC/real service socket probes.",
+    "Dependency advisory applicability assessed from scanner and primary advisory, no Windows exploitation.",
+    "Static findings and conditional preconditions are labeled; no assertion that every code path is proven safe."
+  ],
+  "release_readiness": "HOLD: remediate P1 findings, review P2 gates, rerun locked/native/package checks before selecting/publishing repair release.",
+  "tests": {
+    "existing_environment_suite": {
+      "passed": 1335,
+      "skipped": 43,
+      "xfailed": 28,
+      "python": "3.13.9",
+      "locked": false
+    },
+    "native_seatbelt": {
+      "passed": 50,
+      "skipped": 0
+    },
+    "evals": {
+      "passed": 70,
+      "total": 70
+    },
+    "configuration_documents": 9,
+    "outward_manifest_files": 21,
+    "inward_manifest_files": 16,
+    "ecosystem_components": 4,
+    "generated_pages": 9,
+    "search_sitemap_pages": 10,
+    "search_defects": 0,
+    "locked_environment_suite": {
+      "python": "3.12",
+      "initial_passed": 1372,
+      "initial_failed": 2,
+      "skipped": 4,
+      "xfailed": 28,
+      "initial_failure_cause": "New environment lacked editable Harnessie installation; both example subprocesses could not import harness.",
+      "after_install_focused_rerun": {
+        "passed": 2,
+        "failed": 0
+      },
+      "claim": "1372 baseline passes plus two corrected-environment rerun passes; not represented as a single clean full run."
+    },
+    "locked_package_gate": {
+      "passed": true,
+      "command": "python scripts/release_gate.py --skip-core --locked-build",
+      "includes": [
+        "installed release-lock validation",
+        "generated docs",
+        "whitespace",
+        "wheel/sdist build without isolation",
+        "Twine",
+        "artifact inspection",
+        "fresh installed CLI mock walkthrough"
+      ],
+      "version": "1.5.0 source rehearsal, no new release version selected",
+      "artifacts_retained": false,
+      "note": "Gate uses a temporary output directory and removes distributions on completion; this is validation, not a publishable release bundle."
+    },
+    "initial_environment_lock_drift": "Existing .venv does not match release lock. Isolated CPython 3.12 environment matched after installation. Existing environment was not changed."
+  },
+  "bandit": {
+    "version": "1.9.4",
+    "loc": 17006,
+    "raw_severity": {
+      "high": 1,
+      "medium": 4,
+      "low": 59
+    },
+    "interpretation": "B613 is intentional bidi detection; B108 is private /tmp binding. B310 sites require real transport review and are covered in SEC-002/012; raw scanner counts are not confirmed vulnerability counts. LOW B105 strings are labels; B110 is cleanup polling."
+  },
+  "pip_audit": {
+    "version": "2.10.0",
+    "profiles": [
+      "runtime",
+      "dev",
+      "release"
+    ],
+    "advisory": "GHSA-xmj3-9gf7-h52w",
+    "affected_package": "setuptools",
+    "locked_version": "84.0.0",
+    "fix_version": "84.1.0"
+  },
+  "secrets": {
+    "tracked_env_files": 0,
+    "env_key_pem_history_path_warnings": 0,
+    "note": "Named tracked source patterns and credential-file history paths only; not a proof that every possible credential format is absent.",
+    "source_files_scanned": 349,
+    "candidate_matches": 14,
+    "confirmed_secret_matches": 0,
+    "classification": "All candidate matches are intentional fake AWS-shaped canaries in eval/test files. No actual credentials printed."
+  },
+  "owasp": {
+    "A01": {
+      "findings": [
+        "SEC-20261118-001",
+        "SEC-20261118-005"
+      ]
+    },
+    "A02": {
+      "findings": [
+        "SEC-20261118-008"
+      ]
+    },
+    "A03": {
+      "findings": []
+    },
+    "A04": {
+      "findings": [
+        "SEC-20261118-004",
+        "SEC-20261118-009",
+        "SEC-20261118-012",
+        "SEC-20261118-013",
+        "SEC-20261118-015",
+        "SEC-20261118-016"
+      ]
+    },
+    "A05": {
+      "findings": [
+        "SEC-20261118-020"
+      ]
+    },
+    "A06": {
+      "findings": [
+        "DEP-20261118-001"
+      ]
+    },
+    "A07": {
+      "findings": [
+        "SEC-20261118-002"
+      ]
+    },
+    "A08": {
+      "findings": [
+        "SEC-20261118-003",
+        "SEC-20261118-006",
+        "SEC-20261118-010",
+        "SEC-20261118-014",
+        "SEC-20261118-017",
+        "SEC-20261118-018",
+        "SEC-20261118-019"
+      ]
+    },
+    "A09": {
+      "findings": [
+        "SEC-20261118-007",
+        "SEC-20261118-011"
+      ]
+    },
+    "A10": {
+      "findings": []
+    }
+  },
+  "previous_audit": {
+    "path": "audits/security-audit-2026-07-06.md",
+    "note": "Prior SEC-001 is resolved: runner.py:374 and :766 call guard_result for prior-model reports. tests/test_runner.py::test_prior_phase_report_is_quarantined_into_next_task passed in the full suite. No other historical security claims are assumed current."
+  },
+  "sources": [
+    "https://github.com/containers/bubblewrap/blob/main/README.md",
+    "https://github.com/OWASP/Top10/blob/master/2021/docs/en/index.md",
+    "https://github.com/advisories/GHSA-xmj3-9gf7-h52w"
+  ],
+  "proof_hashes": {
+    "assurance.py": "4d15f6ee7611461bbc009656c6644727c501369ebc3dc4b1fff394d2e8a39be6",
+    "bandit.json": "6dec6fb71b73bd863075cfea38c56cbffb9b99f6fee8906f0a65bdaa979a33ca",
+    "containment.py": "8468f705e8ff7e994bcb55e4bfda8e7d5046fac565fcea0e087dc7b8448bb063",
+    "governance.py": "12696b4bd7edf4c71eedddbd54a94ac8b688c1b739e3a738a2da7e5cc5a932e0",
+    "pip-audit-dev.json": "72369fb2d6950f34ccc5db0b98d8daad3147be847024a4a168d788deac3f9166",
+    "pip-audit-release.json": "21efe4f1927b4356e2fdfbda4f33764a84d5ce9e4feeaa8802a7f70a92dd969e",
+    "pip-audit-runtime.json": "03bf0e9df0fd408d081833f6833a87a1dfe952fc29b91810041807401b210138",
+    "reproduction-results.json": "2276c7b92e37785aba4fd496d0d452cd2fc91fc423d6cf563314f0a38b29d9a7",
+    "responses-race.py": "aa3b8752927cc638cedc118b6e95d6b67d61eb1eb3a17abc8d45cc338fe2162f",
+    "secret-scan.json": "612e614ae2f3a5c30c26be0cdfd4b92eb17f799dead4cd96ebbcc9d87f6648b1",
+    "transport.py": "23520d07047b09ea6c3996e84972a58d958ba2cce1f138dbaf195f1a963db11c"
+  },
+  "issues_created": 0,
+  "publication_performed": false,
+  "tool": "security-audit v3 plus three independent scoped code reviews",
+  "dependencies": {
+    "python_vulns": 1,
+    "python_packages_affected": [
+      {
+        "package": "setuptools",
+        "version": "84.0.0",
+        "vulns": [
+          {
+            "id": "GHSA-xmj3-9gf7-h52w",
+            "fix_version": "84.1.0",
+            "severity": "LOW applicability to this project; no scanner severity invented"
+          }
+        ],
+        "update_command": "Use scripts/dependency_locks.py generation workflow to refresh both tooling locks; do not hand-edit hashes."
+      }
+    ],
+    "runtime_vulns": 0,
+    "node_vulns": null,
+    "node_packages_affected": [],
+    "node_note": "No Node dependency manifest; scripts use builtins."
+  },
+  "config_review": {
+    "cors_production": "N/A CLI",
+    "cors_methods_headers": "N/A CLI",
+    "csp_script_src": "N/A CLI; static Pages surface not newly deployed",
+    "hsts": "Known hosting warning, not freshly tested",
+    "x_frame_options": "Not freshly tested",
+    "x_content_type_options": "Known hosting warning, not freshly tested",
+    "referrer_policy": "Not freshly tested",
+    "permissions_policy": "Not freshly tested",
+    "rate_limiting": "N/A inbound server; outbound resource bounds reviewed",
+    "env_gitignore": "PASS",
+    "placeholder_detection": "Fake canaries manually classified",
+    "workflow_actions": "SHA-pinned; dogfood version drift noted"
+  },
+  "privacy": {
+    "raw_event_containment": "FAIL SEC-20261118-007",
+    "secret_mapping_exclusion": "FAIL SEC-20261118-008",
+    "parallel_conversation_isolation": "FAIL SEC-20261118-004"
+  },
+  "delta": {
+    "previous_audit_date": "2026-07-06",
+    "previous_finding_count": 1,
+    "resolved": 1,
+    "still_open": 0,
+    "partially_remediated": 0,
+    "not_applicable": 0,
+    "new": 20,
+    "regressed": 0,
+    "resolved_ids": [
+      "2026-07-06 SEC-001 interphase-report quarantine"
+    ],
+    "partially_remediated_ids": [],
+    "not_applicable_ids": [],
+    "note": "New counts include current correctness/assurance/dependency findings. Search-decoder item is retained from a separate handoff. Earlier and current LOC/scope differ substantially."
+  },
+  "positive_controls": [
+    "Native Seatbelt boundary suite: 50 passes, no skips.",
+    "Default network denial and per-agent read-only overlays, with fail-closed backend admission.",
+    "Strict evidence-bundle required-claim coverage and malformed verdict refusal.",
+    "Explicit consent-aware dispatch and retained human arbitration state.",
+    "Pilot consume-once guards, bounded private captures, no-redirect transport and strict usage handling.",
+    "SHA-pinned GitHub Actions, hash-locked release dependencies and original-build provenance verification.",
+    "July interphase-report quarantine finding repaired and regression covered."
+  ],
+  "methodology": {
+    "date": "2026-11-18",
+    "tool": "security-audit v3",
+    "bandit_version": "1.9.4",
+    "pip_audit_version": "2.10.0",
+    "pnpm_version": null,
+    "backend_loc": 17006,
+    "files_analyzed": "Manual critical-path scope listed in scope; Bandit over all harness/ and scripts/ Python, 349 tracked source files screened for credential patterns.",
+    "previous_audit_path": "audits/security-audit-2026-07-06.md",
+    "output_mode": "markdown+json",
+    "independence": "Three scoped fresh review contexts plus parent reproduction; not an authenticated vendor-independent release signoff.",
+    "execution": "Synthetic offline proofs, no provider calls; isolated local builds and public package/advisory downloads only."
+  },
+  "additional_eval_opportunities": [
+    {
+      "id": "EVAL-LIFETIME",
+      "priority": "P2",
+      "recommendation": "Add a native backend process-lifetime fixture: an exited parent with detached child/pipe must not mutate workspace after the transaction returns or evade blast-radius accounting.",
+      "evidence": "Static subprocess.run lifecycle review and shim-only reviewer observation; native descendant-lifetime bypass was not established. Do not count as a confirmed sandbox escape."
+    },
+    {
+      "id": "EVAL-DIRECTORIES",
+      "priority": "P3",
+      "recommendation": "Define directory creation/deletion/mode accounting, then add cases. _delta compares entries but not directories; creating an empty directory passes zero file/edit/byte limits.",
+      "evidence": "assurance.py; present counters are files/bytes, so treat as contract precision and resource-bound extension rather than claiming existing file counter arithmetic is wrong."
+    },
+    {
+      "id": "EVAL-BLAST-RESOURCES",
+      "priority": "P2",
+      "recommendation": "Bound snapshot resource cost and exercise oversized preexisting trees/special files, rollback failure, metadata and hardlink semantics.",
+      "evidence": "Static _snapshot reads whole regular files; artifact-volume limits are post-operation net snapshots, not peak disk/memory limits."
+    },
+    {
+      "id": "EVAL-ATIF-PARALLEL",
+      "priority": "P2",
+      "recommendation": "Add real parallel-run ATIF acceptance to check interleaved role/step attribution and refusal behavior.",
+      "evidence": "Coverage gap from serial trajectory assumptions; no attribution exploit claimed."
+    },
+    {
+      "id": "CHECK-DOWNSTREAM-PINS",
+      "priority": "P3",
+      "recommendation": "A deterministic script should compare in-repo dogfood Action/core pins with the authoritative downstream receipt, while allowing deliberately documented version exceptions.",
+      "evidence": ".github/workflows/verify-pr-claims.yml:43 still references Action 0.2.2; current receipt says 0.2.3."
+    },
+    {
+      "id": "CHECK-NATIVE-COVERAGE",
+      "priority": "P1",
+      "recommendation": "Require an explicit native-backend coverage receipt for security release gates, and fail required suites if all native cases skip. Add controlled filesystem Unix-socket fixtures for Linux bwrap/firejail.",
+      "evidence": "Default outer-sandbox run skipped 43 tests; native elevated run executed 50 Seatbelt tests. Linux filesystem Unix-socket exposure is disclosed but unprobed."
+    },
+    {
+      "id": "CHECK-RELEASE-CLAIMS",
+      "priority": "P2",
+      "recommendation": "Require fresh-install checks that bind release version, outward/inward hashes, actual package bytes and release-critical claim/check configuration.",
+      "evidence": "Build, installed consumer, source delivery and human acceptance are distinct; existing candidate gates do not exercise the new adversarial findings."
+    }
+  ],
+  "handoffs": {
+    "processed": "handoffs/2026-11-13-repository-state-review.md",
+    "durable_destinations": [
+      "NEXT.md security release priority and audit queue",
+      "audits/security-review-2026-11-18.md",
+      "audits/security-review-2026-11-18.json"
+    ],
+    "remaining": [
+      "handoffs/2026-10-04-qwen-review-resume.md",
+      "handoffs/2026-10-11-readme-verifier-first.md",
+      "handoffs/2026-10-23-add-sponsors-md.md",
+      "handoffs/2026-11-08-search-audit-decode-fix.md"
+    ],
+    "note": "Remaining implementation queues are unresolved and retained. No pilot rerun, new preparation seal, README rewrite, sponsor listing or search remediation was performed."
+  }
+}

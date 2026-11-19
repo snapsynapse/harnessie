@@ -1,16 +1,19 @@
 """Tamper-evident audit: hash-chained events log + audit verb.
 
 Each event carries seq and prev (SHA-256 of the previous serialized line);
-any post-hoc edit, deletion, or reorder breaks every subsequent link.
-Tamper-evident, not tamper-proof: whole-file rewrites are out of scope and
-documented as such.
+an edit, deletion, or reorder of an interior line breaks the next link.
+Tamper-evident, not tamper-proof. The chain is unanchored: an edit to the
+final event and a truncated suffix leave a valid shorter chain, and whole-file
+rewrites are out of scope. Detecting those needs a terminal digest and count
+held somewhere the log writer cannot reach (SEC-20261118-019); the limit tests
+below pin that behavior so a claim cannot silently outgrow it.
 """
 
 import json
 
 from harness.audit import governance_timeline, verify_chain
 from harness.cli import main
-from harness.events import EventLog
+from harness.events import EventLog, line_hash
 
 
 def _emit_run(run_dir, kinds=("a", "b", "c")):
@@ -57,6 +60,83 @@ def test_deleted_line_breaks_chain(tmp_path):
     lines = path.read_text().splitlines()
     path.write_text("\n".join([lines[0]] + lines[2:]) + "\n")
     assert not verify_chain(tmp_path / "run")["ok"]
+
+
+def _lines(run_dir):
+    return (run_dir / "events.jsonl").read_text().splitlines()
+
+
+def test_interior_edit_is_detected_at_the_next_link(tmp_path):
+    _emit_run(tmp_path / "run", kinds=("a", "b", "c", "d"))
+    path = tmp_path / "run" / "events.jsonl"
+    lines = _lines(tmp_path / "run")
+    rec = json.loads(lines[1])
+    rec["detail"] = "history, tidied"
+    lines[1] = json.dumps(rec, ensure_ascii=False)
+    path.write_text("\n".join(lines) + "\n")
+    report = verify_chain(tmp_path / "run")
+    assert report["ok"] is False and report["breaks"] == [3]
+
+
+def test_edited_final_event_is_not_detected_by_the_chain_alone(tmp_path):
+    # Pinned limitation: no later line links to the final event's hash.
+    _emit_run(tmp_path / "run")
+    path = tmp_path / "run" / "events.jsonl"
+    lines = _lines(tmp_path / "run")
+    rec = json.loads(lines[-1])
+    rec["detail"] = "history, tidied"
+    lines[-1] = json.dumps(rec, ensure_ascii=False)
+    path.write_text("\n".join(lines) + "\n")
+    assert verify_chain(tmp_path / "run") == {"ok": True, "length": 3, "breaks": []}
+
+
+def test_suffix_truncation_is_not_detected_by_the_chain_alone(tmp_path):
+    # Pinned limitation: a prefix of a valid chain is itself a valid chain.
+    _emit_run(tmp_path / "run")
+    path = tmp_path / "run" / "events.jsonl"
+    lines = _lines(tmp_path / "run")
+    path.write_text("\n".join(lines[:2]) + "\n")
+    assert verify_chain(tmp_path / "run") == {"ok": True, "length": 2, "breaks": []}
+    path.write_text("")
+    assert verify_chain(tmp_path / "run") == {"ok": True, "length": 0, "breaks": []}
+
+
+def test_missing_log_is_not_a_clean_chain(tmp_path):
+    (tmp_path / "run").mkdir()
+    report = verify_chain(tmp_path / "run")
+    assert report["ok"] is False and report["length"] == 0
+
+
+def test_separately_held_terminal_digest_exposes_tail_changes(tmp_path):
+    # What closes the gap: a terminal count and digest recorded outside the
+    # log's trust boundary. The harness does not store one beside the log,
+    # because a writer who can edit the log could edit that copy too.
+    _emit_run(tmp_path / "run")
+    path = tmp_path / "run" / "events.jsonl"
+    original = _lines(tmp_path / "run")
+    trusted = (len(original), line_hash(original[-1]))
+
+    def terminal():
+        lines = _lines(tmp_path / "run")
+        return (len(lines), line_hash(lines[-1]) if lines else None)
+
+    assert terminal() == trusted
+    rec = json.loads(original[-1])
+    rec["detail"] = "history, tidied"
+    path.write_text("\n".join([*original[:-1], json.dumps(rec)]) + "\n")
+    assert verify_chain(tmp_path / "run")["ok"] and terminal() != trusted
+    path.write_text("\n".join(original[:2]) + "\n")
+    assert verify_chain(tmp_path / "run")["ok"] and terminal() != trusted
+
+
+def test_resume_extends_a_valid_chain_positive_control(tmp_path):
+    _emit_run(tmp_path / "run", kinds=("a", "b"))
+    log = EventLog(tmp_path / "run", echo=False)
+    log.emit("c", detail="after-resume")
+    log.close()
+    lines = _lines(tmp_path / "run")
+    assert json.loads(lines[-1])["prev"] == line_hash(lines[-2])
+    assert verify_chain(tmp_path / "run") == {"ok": True, "length": 3, "breaks": []}
 
 
 def test_governance_timeline_selects_governance_events(tmp_path):

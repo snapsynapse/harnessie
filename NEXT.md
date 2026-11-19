@@ -1,5 +1,44 @@
 # Current state and next work
 
+## Security repair priority and audit, 2026-11-18
+
+Sam's confirmed direction is active development with a verified security repair release before another pilot attempt. This security-only 1.5.1 candidate branch starts from fetched origin/main at 6c053dd8409e109310a124685d11e29e1e8e7885 and carries the audit, repairs, decoder fix, tests and release preparation from codex/security-release-audit. The original branch remains preserved. Installed 1.5.0 consumers still require a separately published repair release.
+
+The [November 18 code review and security audit](audits/security-review-2026-11-18.md), its [machine-readable findings](audits/security-review-2026-11-18.json), and [offline reproductions](audits/security-review-2026-11-18/) remain the finding evidence. Before remediation the audit recorded 6 high, 8 medium and 7 low findings and a HOLD publication recommendation.
+
+### Remediation state (source, unreleased)
+
+All 21 findings now have local source repairs with regressions, and the audit's synthetic reproductions no longer reproduce; CHANGELOG.md 1.5.1 lists each behavior change. Six new deterministic evals cover approval precedence, resume drift and adversarial stand-down (76 total). Two independent fresh-context reviews challenged the first repairs for bypasses and false positives; the confirmed gaps were repaired in a second round (resume false positives on crash recovery and fix-then-resume, whole-call transport deadline, unknown-usage remedy and per-tier `unmetered`, evidence truncation sentinel, launched-check exit contract, macOS `os.waitid` fallback, decision-record control characters and autolinks). A third independent review of the second round found that an artifact could still force cannot-verify (a mimicked Seatbelt `sandbox_apply` exit, or sabotage of a later check) and a resume false positive after a halted phase passed on retry; both were repaired test-first with a hardened resume binding (last-writer attribution, narrower noise filter, hardlink marker) and a Content-Length truncation check. A fresh independent pass found no reproducible bypass in those third-round repairs, including the native Seatbelt mimic/probe cases. A separate output-cap review tried 378 synthetic cut cases across seven credential shapes with zero leaked prefixes; an ordinary single long token can be fully withheld at a cap. The last dated full suite before these final changes was 2,310 passed, 4 skipped, 28 expected failures; one unattributed load-related flake was observed in one of five earlier full runs.
+
+The last audit finding, `DEP-20261118-001`, has a local source repair: the build backend floor is `setuptools>=84.1.0`, and the dev/release locks resolve 84.2.1 with pinned uv 0.13.4. The runtime lock and every other pin are unchanged. Lock validation, focused tests, pip-audit for all three profiles and the local release gate passed; exact-commit CI remains.
+
+Contract change for downstreams: a check that never launched (missing or non-executable program, malformed command, sandbox refusal) is now exit 2 instead of 1. Launched checks that fail, time out or escape cleanup remain exit 1. Verify Action, Ringer and Harbor consumers see this only after a published core repair.
+
+Residual risks recorded by the reviews, not repaired: a `setsid` descendant that closes its pipes is neither detected nor killed; raw `proofs/check-*.txt` keep unredacted check output as operator artifacts; a bad shebang or `/usr/bin/env missing-tool` check is classified FAILED; resume binding does not cover `config/models.yaml`, memory contents, ownership, approval or boundary configuration; a run stopped for unknown usage cannot be resumed (start a new run); a crash-time edit to an earlier phase's output refuses resume; an operator edit to a path a rerunning halted phase last touched can refuse one resume later; the transport watchdog does not bound an HTTPS proxy CONNECT handshake; a read-only parent directory surfaces as a raw PermissionError from `write_file`; Linux bubblewrap, firejail and docker backends were not exercised by these repairs. The `read_file` and `run_shell` cap-crossing prefix is now withheld, including ordinary long trailing tokens; verify proof output has a separate path.
+
+### Remaining release gates
+
+1. Preserve the independent review receipts for the third-round repairs and the output-cap repair. The third-round verify exit precedence and probe, resume last-writer binding, and transport Content-Length changes passed fresh review, including native Seatbelt mimic/probe cases. The output-cap repair survived 378 synthetic cut cases with zero leaked prefixes. DEP-20261118-001 has a local lock refresh and advisory scan.
+2. The 1.5.1 local hash-locked suite, evals, schemas, both manifests, docs generation, package build, artifact inspection, fresh install, advisory scan and native Seatbelt cases have passed on the candidate bytes in the release receipt. Exact-commit Linux bwrap CI remains; firejail and Docker need separate provisioned environments.
+3. SECURITY.md and docs/threat-model.md now state the confirmed behavior and residuals; the 1.5.1 candidate release note awaits exact-candidate evidence and publication receipts.
+4. Commit, push, tag, publication and downstream wrapper, Action and Homebrew follow-ups are separate authority steps, each in its own repo with its own git sync check.
+
+The [pre-candidate receipt](audits/security-repair-local-verification-2026-11-18.md) records the original source review. The [1.5.1 candidate receipt](audits/release-1.5.1-candidate-2026-11-18.md) records the versioned local gate, retained wheel and sdist digests, and guide status. The local source and [candidate notes](RELEASE_NOTES-1.5.1.md) say 1.5.1; exact-commit Linux bwrap CI and hosted GuideCheck acceptance remain before publication.
+
+### Additional assurance work (from the audit, not yet started)
+
+- Require a native sandbox coverage receipt so security jobs fail if every required native case skips; add controlled Linux bwrap/firejail filesystem Unix-socket tests.
+- Process-lifetime tests proving no child mutates a workspace after a transaction returns.
+- Define blast-radius accounting for directory creation, deletion and mode changes, and bound snapshot cost on large trees, special files and rollback failures.
+- Actual parallel-run ATIF acceptance for interleaved role and step attribution.
+- A deterministic checker comparing the dogfood workflow's Verify Action pin with the downstream receipt (the separate adoption branch carries the 0.2.3 pin update).
+- Bind release claims to the installed artifact, manifest digests, exact version and acceptance configuration.
+- Keep realistic legitimate inputs beside adversarial cases and report false-positive counts.
+
+### Other handoff queues
+
+The search decoder repair (SEC-20261118-017) is included here. Verifier-first README/example work, SPONSORS.md and the Verify Action 0.2.3 dogfood pin belong to the separate adoption branch. The Qwen pickup remains open: it requires fresh physical metadata, current implementation hashes, independent verification and a new explicit one-call decision after the security release. Do not repeat consumed pilot attempts or reuse old preparations or approvals.
+
 ## Release boundary
 
 Harnessie 1.5.0 is the stable core release on GitHub and PyPI. Its signed tag `v1.5.0` (tag object `bbf51b69cfd942af616ace2d752d26b33c337eac`) resolves to `4ccf3f304bca0c88c8997c0a0cf33a909145d3ef`; the GitHub Release was published at 2026-10-06T07:21:46Z and release workflow [37429182709](https://github.com/snapsynapse/harnessie/actions/runs/37429182709) passed its build, asset-attachment and PyPI jobs. Wheel, source distribution, CycloneDX SBOM and checksum record have [verified original-build provenance](audits/release-1.5.0/github-provenance.json). Both PyPI distributions, published at 2026-10-06T07:25:53Z, match the GitHub assets exactly and carry publisher provenance naming this repository's `release.yml` and `pypi` environment. A fresh Python 3.13.9 public-index installation resolved 1.5.0 with the matching wheel digest. [Release execution](audits/release-1.5.0.md) and its [machine-readable state](audits/release-1.5.0-state.json) retain the exact receipts.

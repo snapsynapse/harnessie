@@ -19,9 +19,11 @@ The supported case demonstrates:
 - The pinned reference linter passes; source record, event journal and other run files remain byte-for-byte unchanged through export and lint.
 - Resuming the original run still returns `needs_arbitration` and makes no further model calls. Resume appends normal runtime events to its journal; the original decision record remains unchanged.
 
-A second mock run includes an unclosed Markdown fence in its rendered task. Export intentionally refuses it with `invalid_record`, preserving its inputs and leaving no output or staging file. Unsupported formatting is refused, not silently rewritten.
+A second mock run puts an unclosed Markdown fence in its goal. When the runner writes a decision record it quotes fence, heading and rule lines and escapes raw HTML in prose, so this formerly unsupported goal now produces an in-subset record. The demo exports it as synthetic `AIDR-9998`, confirms the fence appears only as quoted prose, passes the pinned reference linter, and checks the run inputs are unchanged.
 
-A successful receipt reports `status: passed`, eight scripted mock calls across the two runs, zero live model calls, zero resume model calls, `export_preserved_inputs: true`, and `format_refusal_preserved_inputs: true`. Run IDs, fixture roles, assertions and reference bytes are reproducible; runtime timestamps and generated source reference values vary between invocations.
+The refusal case is an operator-edited copy of that second run: a raw HTML comment is added to the copied source record by hand. Raw HTML is outside the export subset because it can hide later sections when rendered, and the runner no longer writes it, so this source is labelled as hand-made. Export refuses it with `invalid_record`, preserving its inputs and leaving no output or staging file in `decisions/`. Content outside the subset is refused, not silently rewritten by the exporter.
+
+A successful receipt reports `status: passed`, eight scripted mock calls across the two runs, zero live model calls, zero resume model calls, `export_preserved_inputs: true`, `fenced_goal_export: exported`, `fenced_goal_preserved_inputs: true`, `format_refusal_source: operator-edited copy with raw HTML`, and `format_refusal_preserved_inputs: true`. Run IDs, fixture roles, assertions and reference bytes are reproducible; runtime timestamps and generated source reference values vary between invocations.
 
 The reference fixture is under `tests/fixtures/aidr-0.1.0/`, copied from revision `a67c41d339d3e70bc3baaf07e652f9cf9d13a5bb`. Its structural lint result does not establish human authorship or semantic adequacy. The complete exporter contract is in [AIDR_EXPORT.md](../../AIDR_EXPORT.md).
 

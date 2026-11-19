@@ -16,7 +16,7 @@ harness structure carries the quality floor, the model carries the ceiling.
 
 ## Stack
 
-- Python 3.11+ (packaged as `harnessie`, stable version 1.5.0, Apache-2.0).
+- Python 3.11+ (packaged as `harnessie`, published stable version 1.5.0, local 1.5.1 security repair candidate, Apache-2.0).
 - Runtime dependencies: PyYAML and jsonschema. Model adapters remain stdlib-only (no vendor SDK).
 - Dev dependency: pytest 8+. Console entry point: `harnessie = harness.cli:main`.
 - OS sandbox: macOS `sandbox-exec` (Seatbelt); Linux bubblewrap / firejail / docker.

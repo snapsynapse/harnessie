@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "repository": "snapsynapse/harnessie",
+  "profile": "package",
+  "authority": "R2",
+  "start_head": "6c053dd8409e109310a124685d11e29e1e8e7885",
+  "candidate_head": null,
+  "candidate_version": "1.5.1",
+  "updated_at": "2026-11-19T07:26:06.313225Z",
+  "steps": [
+    {
+      "id": "candidate_files",
+      "status": "completed",
+      "evidence": "Proxy review-fix candidate on worktree HEAD 72b75f99946d6ee3cec20e5fe31ac309a48590b2, after merging origin/main a400b9d; SHA-256 c8c12d35249541498db0cba0ff704ceb8086269f96415ede2921e2e4412149bd over canonical JSON of HEAD and 4 changed path-content digests, excluding this state file. See audits/release-1.5.1-candidate-2026-11-18.md."
+    },
+    {
+      "id": "local_gate",
+      "status": "completed",
+      "evidence": "Hash-locked CPython 3.12 release_gate.py --locked-build OK after proxy fix: 2319 passed, 4 skipped, 28 xfailed; 76/76 evals; manifests, docs, wheel, sdist, Twine, artifact check and fresh-install smoke. Retained wheel f2937605cb3d92ea57aaefe0a4a239e87b1bc924a3fd8f2f06454509a96586c7 and sdist fa9013c80b70d31935ba5da91a243683b8839d526a1f1c0ca45aa7e5e96aefff passed inspection and the wheel passed fresh install. Focused transport suite: 88 passed."
+    },
+    {
+      "id": "local_guide",
+      "status": "completed",
+      "evidence": "Byte-identical 8054-byte guide copies SHA-256 3afdb258f2f3feb1a32ba3bef615652a3d8314c5261fb89738806c68688aa8b4; local GuideCheck 2.0.0 Level 3 with one expected independent-anchor blocker and zero warnings."
+    },
+    {
+      "id": "commit_and_push",
+      "status": "ready",
+      "evidence": "Initial PR #46 head 1cec2af was committed and pushed. Sam authorized tending the entire merge sequence. The proxy review fix and refreshed candidate receipt require a new commit and push; this snapshot precedes them."
+    },
+    {
+      "id": "exact_commit_ci",
+      "status": "not_started",
+      "evidence": "PR #46 had eight green checks on 1cec2af, but that result is stale for this proxy fix. Linux bwrap, macOS, CodeQL, package and other required checks must pass on the new pushed head."
+    },
+    {
+      "id": "guide_anchor_and_hosted_acceptance",
+      "status": "not_started",
+      "evidence": "New 1.5.1 guide bytes have no independent DNS anchor or hosted GuideCheck receipt; the 1.5.0 receipt is historical."
+    },
+    {
+      "id": "signed_tag_and_github_release",
+      "status": "blocked",
+      "evidence": "Current R2 authorization covers commit and push only. Tag and GitHub Release publication need separate explicit scope after exact-commit gates and hosted guide acceptance."
+    },
+    {
+      "id": "pypi_and_downstream",
+      "status": "not_started",
+      "evidence": "Original-build provenance, PyPI verification, Verify Action, Homebrew and any wrapper changes require separate provider and repository receipts."
+    }
+  ]
+}

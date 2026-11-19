@@ -35,6 +35,9 @@ class ModelSpec:
     cost_per_mtok_in: float = 0.0    # USD, for budget accounting
     cost_per_mtok_out: float = 0.0
     extra: dict = field(default_factory=dict)  # provider-specific passthrough
+    # A provider that cannot report usage needs this explicit opt-out; without
+    # it, a turn with unknown usage stops a metered run (fail closed).
+    unmetered: bool = False
 
 
 @dataclass
@@ -63,6 +66,9 @@ class AssistantTurn:
     input_tokens: int = 0
     output_tokens: int = 0
     raw: Any = None
+    # False when the provider did not report a usable count for every counter.
+    # The counters then hold only what was reported; zero is not a receipt.
+    usage_known: bool = True
 
     @property
     def wants_tools(self) -> bool:
@@ -74,6 +80,13 @@ class ModelInterface(abc.ABC):
 
     def __init__(self, spec: ModelSpec) -> None:
         self.spec = spec
+
+    def for_conversation(self) -> "ModelInterface":
+        """The adapter one conversation (one AgentLoop) uses. Stateless
+        adapters share themselves; an adapter that carries per-conversation
+        replay state must return a fresh instance so concurrent loops on the
+        same tier never share history."""
+        return self
 
     @abc.abstractmethod
     def complete(

@@ -8,13 +8,20 @@
     "summary": "No changes recorded."
   },
   "current": {
-    "version": "1.5.0",
-    "released": "2026-10-06",
-    "status": "published",
-    "summary": "Harbor and OpenEnv interoperability: harness identity on every result, measured tool-contract breaks per brain, ATIF-v1.7 trajectory export, and Harnessie as a Harbor verifier and external agent.",
-    "release": "https://github.com/snapsynapse/harnessie/releases/tag/v1.5.0"
+    "version": "1.5.1",
+    "released": null,
+    "status": "pending-publication",
+    "summary": "Local security repair candidate: ownership, evidence, approval, resume, containment, transport and verifier hardening; setuptools lock advisory repaired. Published stable core remains 1.5.0.",
+    "release": null
   },
   "history": [
+    {
+      "version": "1.5.1",
+      "released": null,
+      "status": "pending-publication",
+      "summary": "Local security repair candidate; no tag, GitHub Release or PyPI distribution exists yet.",
+      "release": null
+    },
     {
       "version": "1.5.0",
       "released": "2026-10-06",
@@ -86,5 +93,5 @@
       "release": "https://github.com/snapsynapse/harnessie/releases/tag/v0.6.0"
     }
   ],
-  "last_updated": "2026-10-06"
+  "last_updated": "2026-11-18"
 }

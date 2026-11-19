@@ -7,11 +7,13 @@ tools, so this adapter owns that provider-specific wire contract.
 
 from __future__ import annotations
 
+import copy
 import json
 import os
-import urllib.error
+import threading
 import urllib.request
 
+from . import _transport
 from .base import AssistantTurn, Message, ModelInterface, ToolCall
 
 
@@ -24,19 +26,31 @@ class OpenAIResponsesModel(ModelInterface):
         self._messages_seen = 0
         self._instructions = ""
         self._conversation: list[Message] | None = None
+        self._state_lock = threading.Lock()
+
+    def for_conversation(self) -> "OpenAIResponsesModel":
+        fresh = copy.copy(self)
+        fresh._input_items = []
+        fresh._messages_seen = 0
+        fresh._instructions = ""
+        fresh._conversation = None
+        fresh._state_lock = threading.Lock()
+        return fresh
 
     def complete(self, messages, tools=None, effort="medium") -> AssistantTurn:
-        # Runner instances reuse one model object across phases. Each AgentLoop
-        # owns a distinct message list, so identity is the conversation boundary
-        # even when two phases happen to have the same message count.
-        if messages is not self._conversation:
-            self._input_items = []
-            self._messages_seen = 0
-            self._instructions = ""
-            self._conversation = messages
-
-        delta, instructions = self._new_input(messages)
-        input_items = [*self._input_items, *delta]
+        # The runner gives each AgentLoop its own instance (for_conversation).
+        # A directly shared instance still treats message-list identity as the
+        # conversation boundary, and only commits replay state below when this
+        # call's conversation still owns the instance, so an interleaved call
+        # can never install a foreign history.
+        with self._state_lock:
+            if messages is not self._conversation:
+                self._input_items = []
+                self._messages_seen = 0
+                self._instructions = ""
+                self._conversation = messages
+            delta, instructions = self._new_input(messages)
+            input_items = [*self._input_items, *delta]
         body: dict = {
             "model": self.spec.model_id,
             "input": input_items,
@@ -73,18 +87,16 @@ class OpenAIResponsesModel(ModelInterface):
             headers["authorization"] = f"Bearer {key}"
         req = urllib.request.Request(
             f"{base}/responses", data=json.dumps(body).encode(), headers=headers)
-        try:
-            with urllib.request.urlopen(req, timeout=600) as resp:
-                payload = resp.read()
-        except urllib.error.HTTPError as e:
-            detail = e.read().decode(errors="replace")[:500]
-            return AssistantTurn(content=f"provider_error {e.code}: {detail}",
-                                 stop_reason="error", raw=detail)
-        except (urllib.error.URLError, TimeoutError, OSError) as e:
-            return AssistantTurn(content=f"network_error: {e}", stop_reason="error")
+        reply = _transport.post(req)
+        if not reply.ok:
+            return reply.error_turn()
 
+        usage = _transport.Usage()
         try:
-            data = json.loads(payload)
+            data = json.loads(reply.body)
+            usage = _transport.parse_usage(data, "input_tokens", "output_tokens")
+            if usage.malformed:
+                raise ValueError("usage counters must be non-negative integers")
             if not isinstance(data, dict):
                 raise TypeError("top level must be an object")
             output = data.get("output")
@@ -108,6 +120,8 @@ class OpenAIResponsesModel(ModelInterface):
                         raise TypeError("function call name must be a non-empty string")
                     if not isinstance(call_id, str) or not call_id:
                         raise TypeError("function call call_id must be a non-empty string")
+                    if item.get("status", "completed") != "completed":
+                        raise ValueError("function call item is not completed")
                     tool_calls.append(ToolCall(
                         id=call_id,
                         name=name,
@@ -131,48 +145,59 @@ class OpenAIResponsesModel(ModelInterface):
                                 raise TypeError("refusal text must be a string")
                             refusals.append(refusal)
 
-            usage = data.get("usage")
-            if usage is None:
-                usage = {}
-            if not isinstance(usage, dict):
-                raise TypeError("usage must be an object")
-            input_tokens = self._usage_count(usage, "input_tokens")
-            output_tokens = self._usage_count(usage, "output_tokens")
-
-            if refusals:
-                stop = "refusal"
-            elif tool_calls:
-                stop = "tool_use"
-            elif status == "completed":
-                stop = "end_turn"
+            # Terminal response status takes precedence over everything in
+            # the output; only a completed response can carry callable tools,
+            # and a reported error object overrides even a completed status.
+            if data.get("error") is not None or status in {"failed", "cancelled"}:
+                stop = "error"
             elif status == "incomplete":
                 detail = data.get("incomplete_details") or {}
                 stop = ("max_tokens" if isinstance(detail, dict)
                         and detail.get("reason") == "max_output_tokens" else "error")
-            elif status in {"failed", "cancelled"}:
-                stop = "error"
-            else:
+            elif status != "completed":
                 raise ValueError("unsupported response status")
+            elif refusals:
+                stop = "refusal"
+            elif tool_calls:
+                stop = "tool_use"
+            else:
+                stop = "end_turn"
         except (json.JSONDecodeError, UnicodeDecodeError, KeyError, TypeError,
                 ValueError, AttributeError) as e:
+            return _transport.malformed_turn("OpenAI Responses", e, usage)
+
+        if stop not in {"end_turn", "tool_use"}:
+            # Not committed to replay state: the next request must not carry
+            # unanswered calls from a response that was never acted on.
             return AssistantTurn(
-                content=("provider_response_error: malformed OpenAI Responses "
-                         f"response ({type(e).__name__})"),
-                stop_reason="error")
+                content=("\n".join(refusals) if stop == "refusal"
+                         else f"provider_status: {status}"
+                         + (" with provider error" if data.get("error") is not None
+                            else "") if stop == "error"
+                         else "\n".join(text_parts)),
+                stop_reason=stop,
+                input_tokens=usage.input_tokens,
+                output_tokens=usage.output_tokens,
+                raw=data,
+                usage_known=usage.known,
+            )
 
         # Preserve every model output item, including encrypted reasoning, for
         # the next stateless turn. Commit state only after full validation.
-        self._input_items = [*input_items, *output]
-        self._messages_seen = len(messages)
-        self._instructions = instructions
+        with self._state_lock:
+            if messages is self._conversation:
+                self._input_items = [*input_items, *output]
+                self._messages_seen = len(messages)
+                self._instructions = instructions
         content = "\n".join(refusals or text_parts)
         return AssistantTurn(
             content=content,
             tool_calls=tool_calls,
             stop_reason=stop,
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
+            input_tokens=usage.input_tokens,
+            output_tokens=usage.output_tokens,
             raw=data,
+            usage_known=usage.known,
         )
 
     def _new_input(self, messages: list[Message]) -> tuple[list[dict], str]:
@@ -195,13 +220,6 @@ class OpenAIResponsesModel(ModelInterface):
             else:
                 raise ValueError(f"unsupported message role: {message.role}")
         return items, instructions
-
-    @staticmethod
-    def _usage_count(usage: dict, field: str) -> int:
-        value = usage.get(field, 0)
-        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
-            raise ValueError(f"usage.{field} must be a non-negative integer")
-        return value
 
     @staticmethod
     def _parse_args(raw) -> dict:

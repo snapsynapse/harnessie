@@ -8,9 +8,9 @@ files:
 - path: agents/orchestrator.md
   sha256: 8be0a9386470320364394baa18591b15795792d9c0b339b4eadeff7da2917322
 - path: agents/verifiers/claims-verifier.md
-  sha256: 3875641ed7df460428f6eb6cc0f1bd304798cf5616f3c57ab269be6e711c3ba6
+  sha256: 5d46bb432346735cc3cd7257d05f6f17961e33d338e9ddab22188c25f4826186
 - path: agents/verifiers/code-verifier.md
-  sha256: e347168bc486153a02b6126ff5771682a058ac5363c883cf008b49d375bfde0e
+  sha256: bbe141305523782fc65d2ee9ecc3c159e5f319bef3313811fe8b8562cd568516
 - path: agents/workers/implementer.md
   sha256: e3b9b9504835fdfa06000b350ef66a2e4b9df7dc22528a11e7b2044e3cfef9a1
 - path: agents/workers/researcher.md
@@ -28,7 +28,7 @@ files:
 - path: harness/schemas/v1/cascade.schema.json
   sha256: 55029ca611439f8d72881087d261a0071045f596cd7fd81483d220d7ddf68da2
 - path: harness/schemas/v1/models.schema.json
-  sha256: 61fa32c1b90414a4c0ab033f032009063c9685f85f6841886366e7e23b5cfcac
+  sha256: cdeed5e373f537204f6bb0dd835b6d50453fbc8843e7999e70efca2fa5c52a73
 - path: harness/schemas/v1/ownership.schema.json
   sha256: b0a7eedcec428585f4b7c9c62fcbd878dabd8aee6e12b8ea8de07b69616a7832
 - path: harness/schemas/v1/verify-evidence.schema.json

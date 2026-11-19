@@ -48,7 +48,7 @@ from .quarantine import SECRET_PATTERNS
 # Version of the boundary's detection contract. Part of a proven brain's
 # bundle identity story: pattern-set changes are change control, so bump on
 # ANY edit to PII_KINDS or the strip/rehydrate algorithm.
-BOUNDARY_VERSION = "1"
+BOUNDARY_VERSION = "2"
 
 # Placeholder shape: [KIND_N]. Same value, same placeholder, run-wide.
 _PLACEHOLDER = re.compile(r"\[[A-Z][A-Z0-9_]*_\d+\]")
@@ -99,6 +99,10 @@ COVERAGE: tuple[dict, ...] = (
 )
 
 
+def _secret_kinds(text: str) -> list[str]:
+    return [m.lastgroup for m in SECRET_PATTERNS.finditer(text) if m.lastgroup]
+
+
 class SecretEgressHalt(Exception):
     """A secret-shaped value reached an egress payload. Always a halt, never
     a warn. Carries kind labels only — never value fragments."""
@@ -144,7 +148,11 @@ class Boundary:
         reverse = {v: k for k, v in mapping.items()}
 
         spans: list[tuple[int, int, str, str]] = []   # start, end, kind, value
-        taken: list[tuple[int, int]] = []
+        # Recognized secret spans are claimed first, against the original
+        # text: no PII replacement may erase a credential's shape or carry
+        # any fragment of it into the rehydratable mapping.
+        taken: list[tuple[int, int]] = [
+            m.span() for m in SECRET_PATTERNS.finditer(text)]
         for kind, _risk, pattern in self._compiled:
             for m in pattern.finditer(text):
                 if m.lastindex:
@@ -181,12 +189,17 @@ class Boundary:
 
     def guard_egress(self, text: str,
                      mapping: dict[str, str] | None = None) -> StripResult:
-        """The egress gate: strip PII, then halt on any surviving secret.
-        Secrets are deliberately checked AFTER the strip so a secret is never
-        admitted to the mapping — there is nothing to rehydrate, ever."""
+        """The egress gate: halt on any secret in the ORIGINAL text, before
+        any PII replacement can disguise it; then strip PII; then refuse a
+        mapping that holds secret material (including one inherited from an
+        earlier map), so there is nothing secret to rehydrate, ever."""
+        kinds = _secret_kinds(text)
+        if kinds:
+            raise SecretEgressHalt(kinds)
         result = self.strip(text, mapping)
-        kinds = [m.lastgroup for m in SECRET_PATTERNS.finditer(result.stripped)
-                 if m.lastgroup]
+        kinds = _secret_kinds(result.stripped)
+        for value in result.mapping.values():
+            kinds.extend(_secret_kinds(value))
         if kinds:
             raise SecretEgressHalt(kinds)
         return result
@@ -198,6 +211,8 @@ class Boundary:
         if not text or not mapping:
             return text
         for placeholder, original in mapping.items():
+            if _secret_kinds(original):
+                continue        # secret material stays a placeholder
             text = text.replace(placeholder, original)
         return text
 
@@ -315,6 +330,6 @@ def scrub_tool_result(boundary: Boundary, text: str,
                       mapping: dict[str, str] | None = None) -> StripResult:
     """Tool results are scrubbed before they enter context, closing the loop
     where a worker reads a file whose PII would otherwise ride the next model
-    call out. Secrets in tool results are already redacted by the quarantine
-    layer at the tool boundary; this adds the PII strip on the same edge."""
+    call out. Secrets are never mapped here; a secret in a tool result halts
+    at the loop's egress gate (guard_egress) before any event or model call."""
     return boundary.strip(text, mapping)
