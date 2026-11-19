@@ -11,7 +11,7 @@
     "version": "1.5.1",
     "released": null,
     "status": "pending-publication",
-    "summary": "Local security repair candidate: ownership, evidence, approval, resume, containment, transport and verifier hardening; setuptools lock advisory repaired. Published stable core remains 1.5.0.",
+    "summary": "Harnessie 1.5.1 source contains security repairs for ownership, evidence, approval, resume, containment, transport and verification, plus the setuptools lock repair. Check release and registry evidence before attributing these changes to an installed package.",
     "release": null
   },
   "history": [
@@ -19,7 +19,7 @@
       "version": "1.5.1",
       "released": null,
       "status": "pending-publication",
-      "summary": "Local security repair candidate; no tag, GitHub Release or PyPI distribution exists yet.",
+      "summary": "Security repair source. GitHub Release and PyPI publication are verified separately.",
       "release": null
     },
     {
@@ -93,5 +93,5 @@
       "release": "https://github.com/snapsynapse/harnessie/releases/tag/v0.6.0"
     }
   ],
-  "last_updated": "2026-11-18"
+  "last_updated": "2026-11-19"
 }

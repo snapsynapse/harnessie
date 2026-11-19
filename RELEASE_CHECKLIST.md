@@ -1,8 +1,10 @@
 # Release checklist
 
-Current completed release: [Harnessie 1.5.0](audits/release-1.5.0.md). Core GitHub/PyPI publication and verification are complete: the GitHub Release from signed tag `v1.5.0` carries provenance-verified original-build assets, both PyPI distributions match them and pass publisher verification, and a fresh public-index consumer installed 1.5.0. Verify Action 0.2.3 and stable `v0` pin core 1.5.0 with seven exact-merge fixtures green and a signed tag/release; Homebrew 1.5.0 is merged and its installed consumer was verified. The [downstream receipt](audits/release-1.5.0/downstream-closeout-2026-10-11.json) records the exact identities. Engine wrappers remain independently released at 0.1.0. The source tree now has a local 1.5.1 security repair candidate; no 1.5.1 publication or downstream propagation is claimed.
+Current completed release: [Harnessie 1.5.0](audits/release-1.5.0.md). Core GitHub/PyPI publication and verification are complete: the GitHub Release from signed tag `v1.5.0` carries provenance-verified original-build assets, both PyPI distributions match them and pass publisher verification, and a fresh public-index consumer installed 1.5.0. Verify Action 0.2.3 and stable `v0` pin core 1.5.0 with seven exact-merge fixtures green and a signed tag/release; Homebrew 1.5.0 is merged and its installed consumer was verified. The [downstream receipt](audits/release-1.5.0/downstream-closeout-2026-10-11.json) records the exact identities. Engine wrappers remain independently released at 0.1.0. The 1.5.1 security source is merged and its [release execution record](audits/release-1.5.1.md) tracks publication and downstream propagation separately.
 
 The final 1.5.0 guide earned [hosted Level 4 under profile 2.0.0](audits/release-1.5.0/guidecheck-prepublication.json) on 2026-10-06 with zero blocking findings and a qualifying DNS anchor before the GitHub Release was published. Its frozen bytes remain unchanged. Sam retained the accessibility deferral for this release sequence; no fresh accessibility pass is claimed.
+
+GuideCheck's hosted verifier changed on 2026-11-12 at `1377fcc`: fetched anchors are now reported as unverified because their guide-declared locations are not independently bound to the checked host, and the verifier deliberately caps the achieved level at 3. The earlier 1.5.0 Level 4 receipt is historical, not an attainable result for new guide bytes under the current verifier. For 1.5.1 and later releases while this implementation is in use, the pre-publication gate is a dated hosted result under declared profile 2.0.0 with Level 3 and zero blocking findings, plus independent operator checks that the served guide, sidecar, single DNS TXT anchor, signed tag source and repository pins all name the same guide SHA-256 and byte count. Record the verifier's warnings and `anchor.hosted.unverified` limitation. Do not call this Level 4 or independently verified provenance. Sam approved this revised gate for the 1.5.1 release on 2026-11-19; revisit the rule if GuideCheck restores Level 4 with a binding proof. See [release execution](audits/release-1.5.1.md) and [GuideCheck's maintenance record](https://github.com/snapsynapse/guidecheck/blob/main/docs/security/maintenance.md).
 
 Historical completed executions: [Harnessie 1.4.1](audits/release-1.4.1.md), including core GitHub/PyPI, Verify Action 0.2.2 and Homebrew 1.4.1, whose guide earned [hosted Level 4](audits/release-1.4.1/guidecheck-prepublication.json) for its own bytes; and [Harnessie 1.3.1](audits/release-1.3.1.md), including core GitHub/PyPI, Verify Action 0.2.1 and Homebrew 1.3.1. The checklist below remains the reusable release procedure; current results live in the dated execution record.
 
@@ -77,21 +79,19 @@ are marked OPERATOR. Everything else is a working-tree change committed on
 
 ## 5. Tag and publish
 
-- [ ] For the 1.3 release scope, satisfy Sam's 2026-09-07 pre-publication GuideCheck gate:
-      final served guide, sidecar, repository pins and DNS TXT agree, and a
-      dated hosted result verifies those exact bytes under profile 2.0.0.
-      GuideCheck is now in scope; see the candidate and current-guide evidence
-      in audits/guidecheck/2026-09-08/README.md. Complete final acceptance before
+- [ ] Satisfy the current pre-publication GuideCheck gate above before
       publishing the GitHub Release, which triggers the package workflow,
-      and before PyPI, Verify Action or Homebrew publication. If immutable
-      tag identity is needed, create the approved tag first, then verify
-      the guide while the GitHub Release remains unpublished. Independently
-      check its immutable tag-source URL and tag-to-commit identity; require
-      profile 2.0.0 in the hosted request. Any guide
-      byte change invalidates the earlier result. The protected `pypi`
+      and before PyPI, Verify Action or Homebrew publication. The hosted
+      result must cover the final served guide under profile 2.0.0, achieve
+      Level 3 with zero blocking findings, and report its fetched anchors and
+      limitations. Independently confirm the served bytes, sidecar, single
+      DNS TXT value, repository pins and signed tag source agree on the exact
+      SHA-256 and byte count. If immutable tag identity is needed, create the
+      approved tag first while keeping the GitHub Release unpublished. Any
+      guide byte change invalidates the result. The protected `pypi`
       environment remains a second publication checkpoint; recovery must
-      respect this requirement as well. This is an operator checklist gate,
-      not a newly implemented workflow enforcement check.
+      respect this gate. This is an operator checklist gate, not a newly
+      implemented workflow enforcement check.
 - [ ] Commit steps 2-3 on `main` and push.
 - [ ] Record the release-signing decision for this version. If signed tags or
       commits are required, verify the signature from a clean clone before
@@ -136,11 +136,11 @@ are marked OPERATOR. Everything else is a working-tree change committed on
       It has an independent probe-gated train until Harnessie consumes a
       versioned verification seam. If that seam changed, run the wrapper's
       live platform probe and release checklist independently.
-- [ ] OPERATOR: update the DNS TXT anchor `_assistant-guide.harnessie.com`
-      to `v=1; sha256=<guide-sha256>`, single record, then confirm it
-      resolves (DoH) and run the hosted GuideCheck verifier for the Level 4
-      re-confirmation. For 1.3.0 this must be completed at the earlier
-      pre-publication checkpoint, not deferred to downstream closeout.
+- [ ] OPERATOR: update the single DNS TXT anchor `_assistant-guide.harnessie.com`
+      to `v=1; sha256=<guide-sha256>; url=https://harnessie.com/.well-known/assistant-guide.txt`,
+      confirm it resolves through independent DNS-over-HTTPS resolvers, and
+      record the hosted Level 3 result and independent matching-hash checks
+      before publication. Do not defer this to downstream closeout.
 
 ## 6. Close out
 

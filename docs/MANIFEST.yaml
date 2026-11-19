@@ -10,15 +10,15 @@ files:
   - path: docs/.well-known/security.txt
     sha256: 8987609c662c5b80d92843e8cb00489c281470a091e808bd7a1cee5aa0fe1387
   - path: docs/agents.json
-    sha256: afce8823231a138824ee2ced940553a400c5f2bc3a2a83201e6b074908411b0f
+    sha256: 4513d9af82af7bcddf63dc22f04b74ce17318025ccbd2233fd0684c7a9d60a95
   - path: docs/api/v1/index.json
-    sha256: 50b905f719214bfc79fbca71e6c7b96b217fa98893b394eb2c3abd99aaab2fee
+    sha256: bec297a3f7fd3121098d68cda800c7a7c0d889ff727c664b8b4947bc3a8b8a3a
   - path: docs/changelog.json
-    sha256: bbbff1a5f4294b6b2f82f348d2180da9e5a86644a7441704e856ce0baff82c14
+    sha256: 0753cbcaa0ceb5adeba07044a21202d53a705d53d8ac749ce588231530361dfd
   - path: docs/llms.txt
-    sha256: afbf194ad66ffac19e82a953582a78d5680f3eb52c52e44559383cf1a7a82fb8
+    sha256: f7a1c6a011251d1aa19b418f1632bb6e7f4ce1a9b63095a7fc0a4a54b92d65e7
   - path: docs/llm.txt
-    sha256: afbf194ad66ffac19e82a953582a78d5680f3eb52c52e44559383cf1a7a82fb8
+    sha256: f7a1c6a011251d1aa19b418f1632bb6e7f4ce1a9b63095a7fc0a4a54b92d65e7
   - path: docs/robots.txt
     sha256: 88588b10d194d3d62ad9a4463f05a80f645ed1e7b23c59b10087cb28dd5a57f6
   - path: docs/schemas/v1/approval-policy.schema.json
