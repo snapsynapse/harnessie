@@ -16,11 +16,12 @@ Contract change for downstreams: a check that never launched (missing or non-exe
 
 Residual risks recorded by the reviews, not repaired: a `setsid` descendant that closes its pipes is neither detected nor killed; raw `proofs/check-*.txt` keep unredacted check output as operator artifacts; a bad shebang or `/usr/bin/env missing-tool` check is classified FAILED; resume binding does not cover `config/models.yaml`, memory contents, ownership, approval or boundary configuration; a run stopped for unknown usage cannot be resumed (start a new run); a crash-time edit to an earlier phase's output refuses resume; an operator edit to a path a rerunning halted phase last touched can refuse one resume later; the transport watchdog does not bound an HTTPS proxy CONNECT handshake; a read-only parent directory surfaces as a raw PermissionError from `write_file`; Linux bubblewrap, firejail and docker backends were not exercised by these repairs. The `read_file` and `run_shell` cap-crossing prefix is now withheld, including ordinary long trailing tokens; verify proof output has a separate path.
 
-### Remaining assurance work
+### Assurance and downstream status
 
 1. Preserve the independent review receipts for the third-round repairs and the output-cap repair. The third-round verify exit precedence and probe, resume last-writer binding, and transport Content-Length changes passed fresh review, including native Seatbelt mimic/probe cases. The output-cap repair survived 378 synthetic cut cases with zero leaked prefixes. DEP-20261118-001 has a local lock refresh and advisory scan.
 2. The 1.5.1 local hash-locked suite, evals, schemas, both manifests, docs generation, package build, artifact inspection, fresh install, advisory scan and native Seatbelt cases passed. Exact-commit Linux bwrap CI passed on PR #46, the merged security commit and the merged adoption commit. Firejail and Docker need separate provisioned environments.
 3. SECURITY.md and docs/threat-model.md state the confirmed behavior and residuals. The signed tag, GuideCheck checkpoint, original-build asset provenance, GitHub Release and PyPI consumer receipts belong to the release execution record.
+4. Verify Action and Homebrew release separately and run their own consumer checks. Engine wrappers have an independent release train.
 
 The [pre-candidate receipt](audits/security-repair-local-verification-2026-11-18.md) records the original source review. The [1.5.1 candidate receipt](audits/release-1.5.1-candidate-2026-11-18.md) records the versioned local gate, retained test wheel and sdist digests, and guide status. The [release notes](RELEASE_NOTES-1.5.1.md) describe 1.5.1; the [release execution record](audits/release-1.5.1.md) identifies publication evidence separately.
 
@@ -36,7 +37,7 @@ The [pre-candidate receipt](audits/security-repair-local-verification-2026-11-18
 
 ### Other handoff queues
 
-The search decoder repair (SEC-20261118-017) and verifier-first README/example are merged. SPONSORS.md is merged. Harnessie's own claim-verification workflow still uses the Verify Action v0.2.3 pin from Dependabot PR #40. The Qwen pickup remains open: it requires fresh physical metadata, current implementation hashes, independent verification and a new explicit one-call decision after the security release. Do not repeat consumed pilot attempts or reuse old preparations or approvals.
+The search decoder repair (SEC-20261118-017) and verifier-first README/example are merged. SPONSORS.md is merged, and the Verify Action 0.2.3 dogfood pin came through Dependabot PR #40. The Qwen pickup remains open: it requires fresh physical metadata, current implementation hashes, independent verification and a new explicit one-call decision after the security release. Do not repeat consumed pilot attempts or reuse old preparations or approvals.
 
 ## Release boundary
 
