@@ -1,8 +1,70 @@
 # Harnessie
 
-Verify agent-produced changes before you merge them, then grow into a brain-agnostic multi-agent harness when the work needs stronger governance. `harnessie verify` runs deterministic checks before an independent fresh-context verifier and returns a fail-closed 0/1/2 exit contract. The full harness adds swappable workers, consent, kernel-enforced file ownership for child processes, human-arbitrated decisions, cost routing, memory provenance, and one tamper-evident operator-and-agent audit timeline.
+An AI agent says a change is ready. Harnessie checks what can be reproduced before we accept it.
 
-Harnessie is built to be the safest and easiest first AI harness for people. "Safest" is not a slogan here; it is a set of checkable properties: guarantees live in code, not prompts ([GOVERNANCE.md](GOVERNANCE.md)); every control that cannot be enforced fails closed instead of running unenforced; nothing ships on an agent's say-so (independent fresh-context verifiers gate every side-effecting phase); an OS sandbox confines shell work; an eight-layer prompt-injection defense with a written threat model ([SECURITY.md](SECURITY.md)) covers the rest; and a hash-chained audit log records every agent and operator action in one tamper-evident timeline. If you find a way to break any of these claims, that is a bug report we want. "Easiest" means the person running it does not need to be a developer: runs carry declared token and dollar ceilings, every halt is a named condition with one plain operator action, and disagreement between agents becomes a human decision, never a silent merge.
+Run our own checks against the finished workspace and keep the report. Add a separate verifier model when the remaining claims need artifact inspection. The result tells us whether to proceed, fix a failed check, or obtain evidence the verifier couldn't establish.
+
+Start with a change we already have. Keep the coding tool and workflow we already use.
+
+## A recorded result
+
+From the [first-trial example](examples/verify-first-trial/README.md), recorded with Harnessie 1.5.0 installed from PyPI. A `slugify` function was meant to lowercase titles and remove punctuation; the check exercises both claims:
+
+```
+# Verification report: FAILED
+- verifier model: (none — deterministic checks only)
+- harness: harnessie 1.5.0
+- checks network: denied
+- exit code: 1 (0 verified / 1 failed / 2 cannot verify, fail closed)
+
+### [FAIL] check-1
+AssertionError: 'ready,-set:-go!' != 'ready-set-go'
+```
+
+After the fix, the same criteria and the same check return `VERIFIED` with exit 0. With no check supplied, checks-only mode returns `CANNOT VERIFY` with exit 2. The example holds the files, the exact commands and the full recorded reports. It is a reproducible example, not an external adoption receipt or a model review.
+
+## Try it on your own change
+
+Requirements: Python 3.11+, released Harnessie, and a usable sandbox on macOS (Seatbelt) or Linux (bubblewrap, firejail or docker). WSL2 follows Linux support; bare Windows has no supported shell sandbox. Installation reaches PyPI and writes locally. The trial below makes no model calls and denies the check network access by default. No project scaffold, workflow file or model configuration is needed.
+
+```bash
+pipx install harnessie               # or: pip install harnessie / uv tool install harnessie
+```
+
+Write a short Markdown criteria file describing what the change is supposed to do, and pick one check that already exercises it: the project's test command, a linter or a build. Then:
+
+Replace: WORKSPACE_PATH -> absolute path to the existing workspace to inspect.
+Replace: CLAIMS_PATH -> absolute path to your reviewed Markdown criteria file.
+Replace: CHECK_COMMAND -> the check command, run from WORKSPACE_PATH, for example `python3 -m pytest -q` or `npm test`.
+Replace: REPORT_PATH -> a new directory for this trial's report, outside the inspected workspace.
+
+```bash
+harnessie verify --workspace "WORKSPACE_PATH" --criteria "CLAIMS_PATH" --check "CHECK_COMMAND" --report-dir "REPORT_PATH" --no-verifier
+```
+
+`--check` is repeatable. The report lands in REPORT_PATH as `report.md`, with `events.jsonl` and the captured check output under `proofs/`.
+
+Important limit: `--no-verifier` reads and fingerprints the criteria but does not interpret or verify each written claim. The verdict rests on the supplied checks alone, so a green check can coexist with claims nothing tested.
+
+## What the verdict means
+
+| Outcome | Checks-only behavior | Next step |
+|---|---|---|
+| VERIFIED, exit 0 | At least one check ran and every supplied check passed | Inspect the checks and report; assess remaining claims separately |
+| FAILED, exit 1 | A supplied check executed and failed | Inspect the proof and correct the artifact, keeping the original check |
+| CANNOT VERIFY, exit 2 | Checks were blocked, or no check was supplied | Fix the environment or supply evidence; never treat this as a pass |
+
+Model-backed runs and v1 evidence bundles add claim-level verdicts (reproduced, refuted, not verifiable) and aggregate them into the same exit codes; [docs/GUIDE.md](docs/GUIDE.md) defines that contract. Do not read claim-level meaning into a checks-only report.
+
+## Add a verifier model (optional)
+
+Drop `--no-verifier` and point `--models` at a models file to have an independent fresh-context verifier inspect the artifact against each claim after the checks pass. That sends the supplied artifacts to the endpoint you configure and may incur charges; the checks-only trial above did neither. See [docs/GUIDE.md](docs/GUIDE.md) for standalone configuration, [docs/ringer.md](docs/ringer.md) for the shared exit contract, and [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify) for the separately versioned GitHub Action, which needs its own endpoint and model settings.
+
+## The full harness
+
+When the work needs more than a verifier, Harnessie is a brain-agnostic multi-agent harness. It adds swappable workers, consent, kernel-enforced file ownership for child processes, human-arbitrated decisions, cost routing, memory provenance, and one hash-chained operator-and-agent audit timeline.
+
+Harnessie is built to be the safest and easiest first AI harness for people. "Safest" is not a slogan here; it is a set of checkable properties: guarantees live in code, not prompts ([GOVERNANCE.md](GOVERNANCE.md)); every control that cannot be enforced fails closed instead of running unenforced; nothing ships on an agent's say-so (independent fresh-context verifiers gate every side-effecting phase); an OS sandbox confines shell work; an eight-layer prompt-injection defense with a written threat model ([SECURITY.md](SECURITY.md)) covers the rest; and a hash-chained audit log records every agent and operator action in one timeline where an edited, deleted or reordered interior event breaks the chain (the final event and suffix truncation need an externally held digest; see [SECURITY.md](SECURITY.md)). If you find a way to break any of these claims, that is a bug report we want. "Easiest" means the person running it does not need to be a developer: runs carry declared token and dollar ceilings, every halt is a named condition with one plain operator action, and disagreement between agents becomes a human decision, never a silent merge.
 
 The operating thesis: the harness structure carries the quality floor, the model carries the ceiling. Run it with Claude Fable 5 as the orchestrator and it exploits effort dials, long autonomous turns, and verifier subagents. Swap the workers (or everything) for Haiku, GLM, Qwen, or any OpenAI-compatible local endpoint by editing one YAML file, and the gates, jails, budgets, and retry ladders keep output honest.
 
@@ -14,7 +76,7 @@ Shared context helps agents collaborate; shared write authority lets them silent
 
 Shipped in 1.1.0, `harnessie ownership PATH --agent AGENT [--json]` explains a write decision without mutating the ledger. The [executable ownership-collision proof](examples/ownership-collision/README.md) attempts a real cross-agent overwrite through the built-in tool registry and passes only when the denial preserves the original artifact.
 
-Beneath that thesis sit five engineering habits, each proven separately in the author's other tools and standards before it landed here as code: deterministic checks run before any model judgment (the gate order in [docs/GUIDE.md](docs/GUIDE.md)); evaluation comes before implementation — a governance mechanic without a red-then-green scenario pair does not merge ([EVALS.md](EVALS.md)); remembered facts carry verified and verify-by dates and expire visibly, never silently ([GOVERNANCE.md](GOVERNANCE.md)); every agent and operator action lands in one hash-chained, tamper-evident timeline ([docs/threat-model.md](docs/threat-model.md)); and any control that cannot be enforced fails closed rather than running unenforced ([SECURITY.md](SECURITY.md)). The same habits produced the standards Harnessie adopts — [Turnfile](https://turnfile.work/), [AIDR](https://aidr.work/), [Graceful Boundaries](https://gracefulboundaries.dev/) — which is why they fit together.
+Beneath that thesis sit five engineering habits, each proven separately in the author's other tools and standards before it landed here as code: deterministic checks run before any model judgment (the gate order in [docs/GUIDE.md](docs/GUIDE.md)); evaluation comes before implementation — a governance mechanic without a red-then-green scenario pair does not merge ([EVALS.md](EVALS.md)); remembered facts carry verified and verify-by dates and expire visibly, never silently ([GOVERNANCE.md](GOVERNANCE.md)); every agent and operator action lands in one hash-chained timeline that detects interior edits ([docs/threat-model.md](docs/threat-model.md) states the tail limit); and any control that cannot be enforced fails closed rather than running unenforced ([SECURITY.md](SECURITY.md)). The same habits produced the standards Harnessie adopts — [Turnfile](https://turnfile.work/), [AIDR](https://aidr.work/), [Graceful Boundaries](https://gracefulboundaries.dev/) — which is why they fit together.
 
 ## Quick start
 
@@ -23,7 +85,7 @@ pip install harnessie                # or: pipx install / uv tool install
 harnessie init my-project            # scaffold + guided readiness check + zero-dollar mock run
 ```
 
-Harnessie 1.5.0 is published on [GitHub](https://github.com/snapsynapse/harnessie/releases/tag/v1.5.0) from the signed tag `v1.5.0` and includes the harness identity, tool-contract metrics, ATIF export and Harbor examples described below. PyPI distributions, publisher attestations and a fresh public-index installed consumer are verified; see [audits/release-1.5.0.md](audits/release-1.5.0.md). Homebrew still serves 1.4.1 and Verify Action 0.2.2 and stable `v0` still pin core 1.4.1; their 1.5.0 bumps are in progress and [NEXT.md](NEXT.md) records downstream propagation and remaining work.
+Harnessie 1.5.0 is published on [GitHub](https://github.com/snapsynapse/harnessie/releases/tag/v1.5.0) from the signed tag `v1.5.0` and includes the harness identity, tool-contract metrics, ATIF export and Harbor examples described below. PyPI distributions, publisher attestations and a fresh public-index installed consumer are verified; see [audits/release-1.5.0.md](audits/release-1.5.0.md). Homebrew serves 1.5.0, and Verify Action 0.2.3 and stable `v0` pin core 1.5.0; see the [downstream closeout receipt](audits/release-1.5.0/downstream-closeout-2026-10-11.json). [NEXT.md](NEXT.md) records remaining work.
 
 To gate pull requests on claim-by-claim verification without installing anything locally, the standalone verifier also ships as a GitHub Action: [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify). Harnessie 1.2.0 accepts raw criteria or a v1 evidence bundle that binds stable claim IDs to an exact Git state, content-addressed proofs, and recorded deterministic checks. Its structured verdicts distinguish reproduced, refuted, and not-verifiable claims before the exit code gates the merge. The Action's separately released pin is reported in [NEXT.md](NEXT.md).
 

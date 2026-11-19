@@ -51,9 +51,16 @@ const today = new Date().toISOString().slice(0, 10);
 const sitemapUrls = new Set();
 const entries = [];
 
+const XML_ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+// One pass over the five XML entities and numeric references, so decoded text is never
+// decoded again (&amp;lt; stays &lt;). Invalid code points stay encoded. Surrounding
+// whitespace is trimmed so a pretty-printed <loc> compares equal to its URL.
 function decode(value) {
-    return String(value || '').replace(/&amp;/g, '&').replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+    return String(value || '').replace(/&(?:(amp|lt|gt|quot|apos)|#(\d+)|#[xX]([0-9a-fA-F]+));/g, (entity, name, decimal, hex) => {
+        if (name) return XML_ENTITIES[name];
+        const code = decimal ? Number(decimal) : parseInt(hex, 16);
+        return code > 0 && code <= 0x10ffff && (code < 0xd800 || code > 0xdfff) ? String.fromCodePoint(code) : entity;
+    }).trim();
 }
 
 function routeFile(pathname) {

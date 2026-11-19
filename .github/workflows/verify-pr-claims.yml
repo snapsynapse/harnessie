@@ -33,7 +33,7 @@ jobs:
         if: steps.cfg.outputs.configured == 'true'
         with:
           fetch-depth: 0
-      - uses: snapsynapse/harnessie-verify-action@9f18d70017f395ef4d15ac5746e30ac633f00f8e # v0.2.2
+      - uses: snapsynapse/harnessie-verify-action@80f61b4d47231aa08b1274375a982ddae5263d52 # v0.2.3
         if: steps.cfg.outputs.configured == 'true'
         with:
           criteria: auto
