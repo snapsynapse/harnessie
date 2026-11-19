@@ -6,7 +6,7 @@
   "start_head": "ab3333f6e8798b19d069ce103bae23ff47c6506a",
   "candidate_head": "2bb78f24ad029db7e1c1545fdc6ab3a39f808c92",
   "candidate_version": "1.5.1",
-  "updated_at": "2026-11-19T15:50:40.893489Z",
+  "updated_at": "2026-11-19T15:53:15.966210Z",
   "steps": [
     {
       "id": "source_merge",
@@ -26,7 +26,7 @@
     {
       "id": "guide_anchor_and_hosted_acceptance",
       "status": "completed",
-      "evidence": "Clean clone verified signed tag source and both 8054-byte guide copies SHA-256 3afdb258f2f3feb1a32ba3bef615652a3d8314c5261fb89738806c68688aa8b4; served guide, sidecar, repository pins, Cloudflare and Google DNS TXT match. Hosted GuideCheck 2.0.0 profile 2.0.0 final pre-publication result: Level 3, zero blockers, four warnings, two infos; anchor.hosted.unverified retained. Sam approved the revised Level 3 plus independent-check gate after GuideCheck removed Level 4."
+      "evidence": "Clean clone verified signed tag source and both 8054-byte guide copies SHA-256 3afdb258f2f3feb1a32ba3bef615652a3d8314c5261fb89738806c68688aa8b4; served guide, sidecar, repository pins, Cloudflare and Google DNS TXT match. Hosted GuideCheck 2.0.0 profile 2.0.0 final pre-publication result: Level 3, zero blockers, four warnings, two infos; anchor.hosted.unverified retained. Sam approved the revised Level 3 plus independent-check gate after GuideCheck removed Level 4. Post-PyPI hosted recheck retains Level 3 and zero blockers with three warnings; package-registry 404 warning cleared but registry channel is absent. See audits/release-1.5.1/guidecheck-postpublication.json."
     },
     {
       "id": "signed_tag",

@@ -34,6 +34,8 @@ Sam approved the protected `pypi` environment deployment. Release workflow 44485
 
 A [fresh Python 3.12.16 public-index consumer](release-1.5.1/pypi-consumer.json) installed 1.5.1 outside the checkout on the first attempt. The downloaded public wheel matched the GitHub wheel hash, the imported module came from `site-packages`, `pip check` passed, and the installed CLI reported 1.5.1. The verifier-first example produced exit codes 1, 0 and 2 with matching report identity. These are deterministic checks only; no model verdict was earned.
 
+A [post-publication hosted GuideCheck recheck](release-1.5.1/guidecheck-postpublication.json) still reports Level 3 and zero blockers for the unchanged guide hash. The package-registry 404 warning has cleared; the registry channel is reported `absent`, so it is not treated as a qualifying anchor. The remaining three warnings concern repository-file independence and the two response headers. The DNS TXT remains `present-matches`, and `anchor.hosted.unverified` remains explicit.
+
 ## Remaining downstream sequence
 
 Verify Action and Homebrew have separate versioned release trains and still pin core 1.5.0. Test each consumer against the published 1.5.1 core before changing its pin; engine wrappers remain independently released at 0.1.0. The current core release is complete without claiming these downstream updates.
