@@ -153,7 +153,11 @@ def test_machine_changelog_tracks_the_packaged_release():
     versions = [entry["version"] for entry in data["history"]]
     assert versions[0] == version
     assert len(versions) == len(set(versions))
-    assert data["current"]["release"].endswith(f"/v{version}")
+    if data["current"]["status"] == "pending-publication":
+        assert data["current"]["release"] is None
+        assert data["history"][0]["release"] is None
+    else:
+        assert data["current"]["release"].endswith(f"/v{version}")
     assert data["unreleased"]["status"] == "active"
     assert data["unreleased"]["summary"] == "No changes recorded."
     assert data["current"]["status"] in {"pending-publication", "published"}

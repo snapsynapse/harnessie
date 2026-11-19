@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "repository": "snapsynapse/harnessie",
+  "profile": "package",
+  "authority": "R2",
+  "start_head": "920f002b3780bec566aec1492fd783a44df21a1e",
+  "candidate_head": null,
+  "candidate_version": "1.5.1",
+  "updated_at": "2026-11-19T03:55:44Z",
+  "steps": [
+    {
+      "id": "candidate_files",
+      "status": "completed",
+      "evidence": "Uncommitted candidate on 920f002; SHA-256 f101e7d83040bd8af0f206466ed7f7c18a0bd0e6297c1078e69927499ef83bb0 over canonical JSON of base HEAD and 36 changed/untracked path-content digests, excluding this state file. See audits/release-1.5.1-candidate-2026-11-18.md."
+    },
+    {
+      "id": "local_gate",
+      "status": "completed",
+      "evidence": "Hash-locked CPython 3.12 release_gate.py --locked-build OK: 2318 passed, 4 skipped, 28 xfailed; 76/76 evals; manifests, docs, wheel, sdist, Twine, artifact check and fresh-install smoke. Retained wheel 8adf951e876328cc77fb50cda19530edaf71e216b1c42edeeb1ec5939fe3ccf5 and sdist 7098fe0e8cac03fe1af192710aee7233ff8e6e2e07f509c9d8d41bf6a1160d08 also passed inspection; wheel passed fresh install."
+    },
+    {
+      "id": "local_guide",
+      "status": "completed",
+      "evidence": "Byte-identical 8054-byte guide copies SHA-256 3afdb258f2f3feb1a32ba3bef615652a3d8314c5261fb89738806c68688aa8b4; local GuideCheck 2.0.0 Level 3 with one expected independent-anchor blocker and zero warnings."
+    },
+    {
+      "id": "commit_and_push",
+      "status": "ready",
+      "evidence": "Sam explicitly authorized commit and push of the prepared 1.5.1 candidate on 2026-11-18 America/Denver. This snapshot precedes the commit and push; later provider evidence must record their exact identities."
+    },
+    {
+      "id": "exact_commit_ci",
+      "status": "not_started",
+      "evidence": "Linux bwrap, core CI, CodeQL and package jobs require an exact pushed candidate commit."
+    },
+    {
+      "id": "guide_anchor_and_hosted_acceptance",
+      "status": "not_started",
+      "evidence": "New 1.5.1 guide bytes have no independent DNS anchor or hosted GuideCheck receipt; the 1.5.0 receipt is historical."
+    },
+    {
+      "id": "signed_tag_and_github_release",
+      "status": "blocked",
+      "evidence": "Current R2 authorization covers commit and push only. Tag and GitHub Release publication need separate explicit scope after exact-commit gates and hosted guide acceptance."
+    },
+    {
+      "id": "pypi_and_downstream",
+      "status": "not_started",
+      "evidence": "Original-build provenance, PyPI verification, Verify Action, Homebrew and any wrapper changes require separate provider and repository receipts."
+    }
+  ]
+}

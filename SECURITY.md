@@ -63,7 +63,7 @@ Run counters are shared under a lock across parallel phases and reconstructed fr
 ### 6. Secret-handling guards (mechanical, harness-enforced)
 
 - Child processes run under a scrubbed environment (`scrubbed_env`, PATH/HOME/LANG/TMPDIR/TERM only). The parent's API keys are not inherited, so an injected `print(os.environ)` finds nothing to steal, and even with network opted in there is nothing to exfiltrate.
-- `run_shell` output is passed through `redact_secrets` before returning: credential-shaped strings (pplx-, sk-ant-, sk-, ghp_, github_pat_, AKIA, xox[bpars]-) become `[REDACTED-SECRET]`, so a command that reads a key cannot surface it into the transcript.
+- `run_shell` output is passed through `redact_secrets` before returning: recognized credential-shaped strings (pplx-, sk-ant-, sk-, ghp_, github_pat_, AKIA, xox[bpars]-) become `[REDACTED-SECRET]`. At the byte ceilings for `read_file` and each shell stream, and at the combined shell character ceiling, the unfinished trailing non-whitespace token is withheld so a cut cannot expose a partial credential. An ordinary long token can be withheld too. This is pattern coverage, not a guarantee for every credential format or a hostile command that uses another channel.
 - `write_file` refuses content containing credential-shaped strings (fail closed): an injected worker cannot copy secrets into the workspace deliverable.
 
 These are defense in depth around the root cause of this project's one real session incident (a key inlined into transcripts by a research prompt): the structural fix is to reference secrets as environment variables and never read them into a command string in the first place; the guards catch what the structural fix misses.
@@ -89,7 +89,16 @@ The gate's verifier agent runs in a fresh context, sees only artifacts and crite
 | 7 verifier | behavior-level corruption of the deliverable | injection that satisfies the criteria maliciously |
 | 8 human | anything reasoning survives the above | reviewer attention |
 
-The honest residual: a well-crafted injection written as ordinary-looking advice, aimed at the deliverable rather than at tool calls, is caught only by layers 7 and 8. That is a deliberate design boundary, not an oversight. The tool-call and exfil paths (layers 1 through 6) are now mechanically confined when the relevant opt-in controls are declared; what remains is corruption expressed through legitimate-looking work, which is a reasoning problem, not a filtering one.
+The honest residual: a well-crafted injection written as ordinary-looking advice, aimed at the deliverable rather than at tool calls, is caught only by layers 7 and 8. That is a deliberate design boundary, not an oversight. The mechanical controls also have the operating limits below; declaring an opt-in control does not erase them.
+
+### Operating limits of the current source repairs
+
+- A descendant that starts a new session and closes inherited output pipes can outlive `run_shell` or a deterministic check without being detected or killed by the current process-group cleanup.
+- Raw `proofs/check-*.txt` retain check output as operator artifacts. Do not run checks that print credentials or sensitive source content into a proof directory that will be shared.
+- Resume binds reused phase outputs and selected contracts, but does not bind `config/models.yaml`, memory contents, ownership, approval, or boundary configuration. Review those inputs before resuming; a changed reused output refuses rather than silently reusing its verdict.
+- A provider call with unknown usage stops metered execution. The affected run cannot resume; start a new run after reconciling provider usage outside Harnessie.
+- The transport deadline does not bound an HTTPS proxy CONNECT handshake. Use a trusted proxy or a direct endpoint when the deadline is part of a hard operating bound.
+- Linux bubblewrap, firejail, and Docker backends have not yet had the same native security regression coverage as the macOS Seatbelt cases in this repair work. The CI Linux bubblewrap gate remains a separate release requirement.
 
 ## Governance controls (v0.2)
 

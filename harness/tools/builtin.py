@@ -34,6 +34,7 @@ from __future__ import annotations
 import codecs
 import errno
 import os
+import re
 import secrets as _secrets
 import selectors
 import shlex
@@ -98,6 +99,18 @@ def _decode_prefix(data: bytes, complete: bool) -> str:
     """UTF-8 decode; a cut stream drops its trailing partial sequence."""
     decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
     return decoder.decode(data, final=complete)
+
+
+def _safe_truncated_prefix(text: str) -> str:
+    """Withhold an unfinished final token when its remaining bytes are unknown.
+
+    A byte or character ceiling can split a credential before it satisfies a
+    full-secret pattern. Removing the entire trailing non-whitespace token is
+    conservative, but keeps an unmatched credential prefix out of the next
+    model turn and event log. Complete tokens before the cut remain visible.
+    """
+    match = re.search(r"\S+$", text)
+    return text[:match.start()] if match else text
 
 
 def _path_changed(rel: str, op: str) -> ToolRefusal:
@@ -389,6 +402,8 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
         limit = READ_FILE_MAX_BYTES
         data, truncated = _read_entry(ws, target.relative_to(ws).as_posix(), limit)
         text = _decode_prefix(data, complete=not truncated)
+        if truncated:
+            text = _safe_truncated_prefix(text)
         return text + (_overflow_sentinel("read_file", limit) if truncated else "")
 
     def write_file(path: str, content: str, _role: str = "worker",
@@ -501,9 +516,16 @@ def register_builtin(reg: ToolRegistry, workspace: Path,
                 "its process group was killed.",
                 "Shell calls run under a whole-call deadline so slow or endless "
                 "output cannot monopolize a run.")
-        combined = (_decode_prefix(proc.stdout, not proc.overflow["stdout"])
-                    + _decode_prefix(proc.stderr, not proc.overflow["stderr"]))
-        out, n_redacted = redact_secrets(combined[:SHELL_OUTPUT_MAX_CHARS])
+        streams = []
+        for stream, data in (("stdout", proc.stdout), ("stderr", proc.stderr)):
+            text = _decode_prefix(data, not proc.overflow[stream])
+            streams.append(_safe_truncated_prefix(text)
+                           if proc.overflow[stream] else text)
+        combined = "".join(streams)
+        redacted, n_redacted = redact_secrets(combined)
+        out = redacted[:SHELL_OUTPUT_MAX_CHARS]
+        if len(redacted) > SHELL_OUTPUT_MAX_CHARS:
+            out = _safe_truncated_prefix(out)
         for stream in ("stdout", "stderr"):
             if proc.overflow[stream]:
                 out += _overflow_sentinel("run_shell", SHELL_STREAM_MAX_BYTES,

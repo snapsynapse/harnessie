@@ -15,6 +15,10 @@ import tracemalloc
 import pytest
 
 from harness import sandbox
+from harness.boundary import Boundary, StripMap
+from harness.events import EventLog
+from harness.loop import AgentLoop
+from harness.models.base import AssistantTurn, MockModel, ModelSpec, ToolCall
 import harness.tools.builtin as builtin
 from harness.tools.builtin import register_builtin
 from harness.tools.registry import ToolRegistry
@@ -49,12 +53,23 @@ def test_read_file_exact_limit_has_no_sentinel(tmp_path, monkeypatch):
 def test_read_file_one_over_limit_is_cut_with_sentinel(tmp_path, monkeypatch):
     monkeypatch.setattr(builtin, "READ_FILE_MAX_BYTES", 1000)
     reg, ws = _registry(tmp_path)
-    (ws / "f.txt").write_bytes(b"a" * 1001)
+    (ws / "f.txt").write_bytes(b"a" * 999 + b" b")
     res = reg.dispatch("worker", "read_file", {"path": "f.txt"})
     assert res.ok
     body, _, marker = res.content.partition("\n" + SENTINEL_PREFIX)
-    assert body == "a" * 1000
+    assert body == "a" * 999 + " "
     assert "source=read_file" in marker and "limit_bytes=1000" in marker
+
+
+def test_read_file_cut_does_not_expose_partial_credential(tmp_path, monkeypatch):
+    monkeypatch.setattr(builtin, "READ_FILE_MAX_BYTES", 40)
+    reg, ws = _registry(tmp_path)
+    (ws / "f.txt").write_text("note " + "a" * 23 + " ghp_" + "A" * 30)
+    res = reg.dispatch("worker", "read_file", {"path": "f.txt"})
+    assert res.ok
+    assert "ghp_" not in res.content
+    assert "note " in res.content
+    assert SENTINEL_PREFIX in res.content
 
 
 def test_read_file_cut_inside_multibyte_char_drops_partial_sequence(tmp_path, monkeypatch):
@@ -63,7 +78,8 @@ def test_read_file_cut_inside_multibyte_char_drops_partial_sequence(tmp_path, mo
     (ws / "f.txt").write_text("abcdé and more", encoding="utf-8")   # é spans bytes 4-5
     res = reg.dispatch("worker", "read_file", {"path": "f.txt"})
     body = res.content.partition("\n" + SENTINEL_PREFIX)[0]
-    assert body == "abcd"
+    assert body == ""
+    assert "\ufffd" not in res.content
 
 
 def test_read_file_large_file_is_read_with_bounded_memory(tmp_path):
@@ -125,11 +141,76 @@ def test_shell_stream_one_over_limit_is_cut_with_sentinel(tmp_path, monkeypatch,
     monkeypatch.setattr(builtin, "SHELL_STREAM_MAX_BYTES", 1000)
     reg, _ = _registry(tmp_path)
     res = reg.dispatch("worker", "run_shell", {
-        "command": f"python3 -c \"import sys; sys.{stream}.write('a' * 1001)\""})
+        "command": f"python3 -c \"import sys; sys.{stream}.write('a' * 999 + ' b')\""})
     assert res.ok and res.refusal is None
     head, _, marker = res.content.partition("\n" + SENTINEL_PREFIX)
-    assert head == "exit=0\n" + "a" * 1000
+    assert head == "exit=0\n" + "a" * 999 + " "
     assert f"stream={stream}" in marker and "limit_bytes=1000" in marker
+
+
+@pytest.mark.parametrize("stream", ["stdout", "stderr"])
+def test_shell_stream_cut_does_not_expose_partial_credential(
+        tmp_path, monkeypatch, no_sandbox, stream):
+    monkeypatch.setattr(builtin, "SHELL_STREAM_MAX_BYTES", 40)
+    reg, ws = _registry(tmp_path)
+    (ws / "f.txt").write_text("note " + "a" * 23 + " ghp_" + "A" * 30)
+    command = ("cat f.txt" if stream == "stdout" else
+               "python3 -c \"import sys; sys.stderr.write(open('f.txt').read())\"")
+    res = reg.dispatch("worker", "run_shell", {"command": command})
+    assert res.ok
+    assert "ghp_" not in res.content
+    assert "note " in res.content
+    assert f"stream={stream}" in res.content
+
+
+def test_shell_combined_cut_does_not_expose_partial_credential(
+        tmp_path, monkeypatch, no_sandbox):
+    monkeypatch.setattr(builtin, "SHELL_OUTPUT_MAX_CHARS", 40)
+    reg, ws = _registry(tmp_path)
+    (ws / "f.txt").write_text("note " + "a" * 23 + " ghp_" + "A" * 30)
+    res = reg.dispatch("worker", "run_shell", {"command": "cat f.txt"})
+    assert res.ok
+    assert "ghp_" not in res.content
+    assert "note " in res.content
+    assert "source=run_shell limit_bytes=40" in res.content
+
+
+@pytest.mark.parametrize("tool,limit", [
+    ("read_file", "READ_FILE_MAX_BYTES"),
+    ("run_shell", "SHELL_STREAM_MAX_BYTES"),
+])
+@pytest.mark.parametrize("boundary", [False, True])
+def test_cut_credential_prefix_never_reaches_model_or_events(
+        tmp_path, monkeypatch, no_sandbox, tool, limit, boundary):
+    monkeypatch.setattr(builtin, limit, 40)
+    reg, ws = _registry(tmp_path)
+    (ws / "f.txt").write_text("note " + "a" * 23 + " ghp_" + "A" * 30)
+    args = ({"path": "f.txt"} if tool == "read_file" else
+            {"command": "cat f.txt"})
+    model = MockModel(ModelSpec("m", "mock", "m"), script=[
+        AssistantTurn(content="", stop_reason="tool_use",
+                      tool_calls=[ToolCall("c1", tool, args)]),
+        AssistantTurn(content="", stop_reason="tool_use",
+                      tool_calls=[ToolCall("c2", "task_complete",
+                                           {"report": "done"})]),
+    ])
+    run_dir = tmp_path / "run"
+    events = EventLog(run_dir, echo=False)
+    try:
+        result = AgentLoop(
+            role="worker", model=model, registry=reg, events=events,
+            boundary=Boundary() if boundary else None,
+            strip_map=StripMap.open(tmp_path / "operator", "run")
+            if boundary else None,
+        ).run("system", "inspect")
+    finally:
+        events.close()
+    assert result.stop == "complete"
+    model_inputs = "\n".join(m.content for call in model.calls
+                             for m in call["messages"])
+    event_text = (run_dir / "events.jsonl").read_text()
+    assert "ghp_" not in model_inputs + event_text
+    assert SENTINEL_PREFIX in model_inputs
 
 
 def test_shell_large_output_is_captured_with_bounded_memory(tmp_path, no_sandbox):
