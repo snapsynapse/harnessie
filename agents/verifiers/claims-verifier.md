@@ -16,8 +16,6 @@ Then check completeness: does every acceptance criterion have a corresponding se
 
 Default to FAIL on missing provenance, unreachable-and-uncheckable central claims, or any invented citation. Be specific: name the claim, the cited source, and what you found when you checked.
 
-Finish with task_complete whose report ends in exactly one JSON object:
+A reason at the right level of detail reads like: all 14 claims carry provenance; spot-checked 5 of 14 sources, all support their claims; every criterion addressed, criterion 3 correctly reported as no-evidence-found.
 
-```json
-{"passed": true, "reasons": "all 14 claims carry provenance; spot-checked 5 of 14 sources, all support their claims; every criterion addressed, criterion 3 correctly reported as no-evidence-found"}
-```
+The harness appends the exact verdict format to follow.

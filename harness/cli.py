@@ -316,7 +316,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.cmd == "audit":
-        from .adversarial import lint_record
+        from .adversarial import lint_record_file
         from .audit import format_audit, governance_timeline, verify_chain
 
         run_dir = root / "runs" / args.run_id
@@ -328,7 +328,7 @@ def main(argv: list[str] | None = None) -> int:
         ddir = run_dir / "decisions"
         if ddir.exists():
             for rec in sorted(ddir.glob("*.md")):
-                lint = lint_record(rec.read_text(encoding="utf-8"))
+                lint = lint_record_file(rec)
                 decisions.append({"path": rec.name, "status": lint["status"],
                                   "claims": lint["claims"]})
         print(format_audit(args.run_id, chain, governance_timeline(run_dir),
@@ -445,6 +445,7 @@ def main(argv: list[str] | None = None) -> int:
         print(preview.refuse_reason, file=sys.stderr)
         return 2
 
+    from .accounting import AccountingError
     from .plugins import PluginError, resolve_plugins
     try:
         plugins = resolve_plugins(getattr(args, "plugin", []))
@@ -465,6 +466,11 @@ def main(argv: list[str] | None = None) -> int:
         )
     except PluginError as exc:
         print(f"plugin admission refused: {exc}", file=sys.stderr)
+        return 2
+    except AccountingError as exc:
+        print(f"resume refused: {exc}", file=sys.stderr)
+        if exc.remedy:
+            print(f"remedy: {exc.remedy}", file=sys.stderr)
         return 2
     from .explain import HALT_STATUSES, format_run_summary
 

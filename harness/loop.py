@@ -32,9 +32,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from .accounting import AccountingError, unknown_usage_remedy
 from .boundary import Boundary, SecretEgressHalt, StripMap
 from .events import EventLog
 from .models.base import AssistantTurn, Message, ModelInterface
+from .quarantine import redact_secrets
 from .routing import Budget
 from .tools.registry import PermissionDenied, ToolRegistry, refusal_result
 
@@ -95,6 +97,19 @@ class AgentLoop:
                              count=len(result.found))
         return result.stripped
 
+    def _contain_tool_text(self, text: str, announce: bool = True) -> str:
+        """Tool output is contained before it reaches ANY event or model
+        input. Boundary on: the egress gate (PII strip, secret halt).
+        Boundary off: credential-shaped strings are still redacted; PII is
+        left as-is (the byte-identical off mode covers PII only)."""
+        if self.boundary is None or self.strip_map is None:
+            return redact_secrets(text)[0]
+        if announce:
+            return self._contain(text)
+        result = self.boundary.guard_egress(text, self.strip_map.mapping)
+        self.strip_map.mapping = result.mapping
+        return result.stripped
+
     def run(self, system_prompt: str, task: str, effort: str = "medium") -> LoopResult:
         try:
             task = self._contain(task)
@@ -120,7 +135,15 @@ class AgentLoop:
 
             turn = self.model.complete(messages, tools=tools, effort=effort)
             if self.budget:
-                self.budget.charge(self.model.spec, turn.input_tokens, turn.output_tokens)
+                try:
+                    self.budget.charge(self.model.spec, turn.input_tokens,
+                                       turn.output_tokens, usage_known=turn.usage_known)
+                except AccountingError:
+                    # Counters accounting cannot hold are no receipt at all:
+                    # journal the turn as usage-unknown instead of raising.
+                    turn.input_tokens = turn.output_tokens = 0
+                    turn.usage_known = False
+                    self.budget.charge(self.model.spec, 0, 0, usage_known=False)
             # Input and output tokens ride separately beside the total, and
             # call ids beside names, so the log can be exported as a
             # trajectory and reconciled call for call against an external
@@ -136,6 +159,16 @@ class AgentLoop:
                              provider=self.model.spec.provider,
                              effort=effort)
 
+            if self.budget and self.budget.accounting_unknown:
+                # Spend is unknowable: act on nothing from this turn and make
+                # no further call, retry included.
+                tier = self.model.spec.name
+                remedy = unknown_usage_remedy(tier)
+                return self._finish(
+                    "budget",
+                    f"provider usage unknown on a metered run; remedy: {remedy}",
+                    step, messages,
+                    detail={"accounting": "unknown", "tier": tier, "remedy": remedy})
             if turn.stop_reason == "refusal":
                 return self._finish("refusal",
                                     turn.content or "provider safety refusal",
@@ -191,24 +224,62 @@ class AgentLoop:
                         "declined", f"declined: {reason}", step, messages,
                         detail={"reason": reason, "counter_proposal": counter})
                 res = self._dispatch(tc.name, tc.arguments, consented=consented)
-                ok, content, flags = res.ok, res.content, res.flags
-                self.events.emit(
-                    "tool_result", role=self.role, tool=tc.name,
-                    call_id=tc.id,
-                    provenance=self.registry.provenance_for(tc.name),
-                    ok=ok, content=content[:300])
+                ok, flags = res.ok, res.flags
+                # Containment runs BEFORE any event: raw tool output never
+                # reaches events.jsonl, the transcript, or the next model call.
+                halt_kinds: list[str] = []
+                try:
+                    content = self._contain_tool_text(res.content)
+                except SecretEgressHalt as halt:
+                    halt_kinds = sorted(set(halt.kinds))
+                    content = ""
+                result_event: dict[str, Any] = {
+                    "role": self.role, "tool": tc.name, "call_id": tc.id,
+                    "provenance": self.registry.provenance_for(tc.name),
+                    "ok": ok, "content": content[:300]}
+                if halt_kinds:
+                    result_event.update(withheld="secret_egress",
+                                        kinds=halt_kinds)
+                self.events.emit("tool_result", **result_event)
+                refusal_detail = ""
                 if res.refusal is not None:
                     # detail/why ride here in full so audit consumers never
-                    # parse the truncated tool_result content.
-                    self.events.emit("refusal", role=self.role,
+                    # parse the truncated tool_result content. Both are
+                    # contained like the result; a field that would carry a
+                    # secret is withheld and only its kind labels remain.
+                    refusal_event: dict[str, Any] = {
+                        "role": self.role, "agent": self.agent_name,
+                        "tool": tc.name, "error": res.refusal.error,
+                        "boundary": res.refusal.boundary}
+                    if halt_kinds:
+                        refusal_event.update(withheld="secret_egress",
+                                             kinds=halt_kinds)
+                    else:
+                        try:
+                            refusal_detail = self._contain_tool_text(
+                                res.refusal.detail, announce=False)
+                            refusal_event.update(
+                                detail=refusal_detail[:300],
+                                why=self._contain_tool_text(
+                                    res.refusal.why, announce=False)[:300])
+                        except SecretEgressHalt as halt:
+                            halt_kinds = sorted(set(halt.kinds))
+                            refusal_event.update(withheld="secret_egress",
+                                                 kinds=halt_kinds)
+                    self.events.emit("refusal", **refusal_event)
+                if halt_kinds:
+                    # A tool surfaced a secret (env var, config value). It
+                    # never rides the next model call out: halt here.
+                    self.events.emit("secret_egress_halt", role=self.role,
                                      agent=self.agent_name, tool=tc.name,
-                                     error=res.refusal.error,
-                                     boundary=res.refusal.boundary,
-                                     detail=res.refusal.detail[:300],
-                                     why=res.refusal.why[:300])
-                    if res.refusal.error == "blast_radius_exceeded":
-                        return self._finish(
-                            "blast_radius", res.refusal.detail, step, messages)
+                                     kinds=halt_kinds)
+                    return self._finish(
+                        "secret_egress",
+                        str(SecretEgressHalt(halt_kinds)), step, messages)
+                if (res.refusal is not None
+                        and res.refusal.error == "blast_radius_exceeded"):
+                    return self._finish(
+                        "blast_radius", refusal_detail, step, messages)
                 # Refusals count toward the stuck streak regardless of the ok
                 # flag: run_shell denials stay ok=True observations, but a
                 # model repeating the same refused call is not making progress.
@@ -216,16 +287,6 @@ class AgentLoop:
                     failures_this_turn.append((tc.name, content[:120]))
                 else:
                     success_this_turn = True
-                try:
-                    content = self._contain(content)
-                except SecretEgressHalt as halt:
-                    # A tool surfaced a secret (env var, config value). It
-                    # never rides the next model call out: halt here.
-                    self.events.emit("secret_egress_halt", role=self.role,
-                                     agent=self.agent_name, tool=tc.name,
-                                     kinds=sorted(set(halt.kinds)))
-                    return self._finish("secret_egress", str(halt), step,
-                                        messages)
                 messages.append(Message(role="tool", content=content,
                                         tool_call_id=tc.id, name=tc.name))
                 if flags:

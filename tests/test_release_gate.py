@@ -99,6 +99,6 @@ def test_package_metadata_uses_current_spdx_fields():
     data = tomllib.loads(
         (ROOT / "pyproject.toml").read_text(encoding="utf-8"))
 
-    assert data["build-system"]["requires"] == ["setuptools>=77"]
+    assert data["build-system"]["requires"] == ["setuptools>=84.1.0"]
     assert data["project"]["license"] == "Apache-2.0"
     assert data["project"]["license-files"] == ["LICENSE", "NOTICE"]

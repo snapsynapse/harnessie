@@ -2,7 +2,10 @@
 
 The events log (events.py) chains each line to its predecessor by SHA-256.
 verify_chain() walks the file and reports every broken link; a clean report
-means the log was appended in order and never edited in place. The governance
+means every linked line is unchanged and in order. It does not show that the
+final event is unedited or that no suffix was truncated: the chain is
+unanchored, so that needs a terminal digest and event count held outside the
+log's trust boundary (SEC-20261118-019). The governance
 timeline filters the log down to the events a human auditor cares about:
 inward integrity, consent, ownership, structured refusals, change requests,
 injection flags, gate verdicts, decisions, arbitration, operator actions

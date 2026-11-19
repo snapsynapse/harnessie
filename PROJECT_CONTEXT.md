@@ -14,7 +14,7 @@ means the operator does not need to be a developer (declared token/dollar ceilin
 named halt conditions each with one plain operator action, disagreement surfaced as a
 human decision rather than a silent merge).
 
-Shipped as the `harnessie` Python package (Apache-2.0, stable 1.5.0). The verifier also
+Shipped as the `harnessie` Python package (Apache-2.0, published stable 1.5.0; local 1.5.1 security repair candidate). The verifier also
 ships standalone as a separately versioned GitHub Action (Harnessie Verify) for gating
 PRs. Core 1.2.0 includes evidence-bound intake and structured required-claim verdicts.
 
@@ -50,7 +50,7 @@ PRs. Core 1.2.0 includes evidence-bound intake and structured required-claim ver
 Copyright Snap Synapse LLC (author Sam Rogers, subscriptions@snapsynapse.com), with
 trademark and PAICE.work PBC spec/code carveouts recorded in NOTICE.
 
-## Current status (2026-10-11)
+## Current status (2026-11-18)
 
 Core 1.5.0 is published and verified on PyPI and GitHub from signed tag `v1.5.0` at
 `4ccf3f304bca0c88c8997c0a0cf33a909145d3ef`, with provenance-verified original assets and
@@ -62,6 +62,7 @@ stable `v0` now pin core 1.5.0; Homebrew 1.5.0 is merged and its installed consu
 is verified. The October 11 downstream receipt records exact merge, fixture,
 signed-tag, publication and consumer evidence. Engine wrappers remain independently
 released at 0.1.0. [Release execution](audits/release-1.5.0.md) records the evidence.
+The local source is a 1.5.1 security repair candidate. Its [candidate notes](RELEASE_NOTES-1.5.1.md) and [pre-candidate verification](audits/security-repair-local-verification-2026-11-18.md) are not publication evidence. The candidate guide has not earned hosted acceptance or a new DNS anchor.
 The docs site is live; the dated 2026-09-08 Siteline scan scored it A, 97/100 (not
 refreshed for 1.5.0). Public-facing doc pages under `docs/` are generated from markdown
 via `scripts/build_docs_html.py` (edit markdown, rebuild, commit both).

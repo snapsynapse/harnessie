@@ -38,6 +38,209 @@ class EvalCaseResult:
     notes: str = ""
 
 
+def _is_bool(value: Any) -> bool:
+    return isinstance(value, bool)
+
+
+def _is_str(value: Any) -> bool:
+    return isinstance(value, str)
+
+
+def _is_number(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _is_int(value: Any) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _is_str_list(value: Any) -> bool:
+    return isinstance(value, list) and all(isinstance(item, str) for item in value)
+
+
+def _is_dict(value: Any) -> bool:
+    return isinstance(value, dict)
+
+
+def _is_str_dict(value: Any) -> bool:
+    return isinstance(value, dict) and all(
+        isinstance(k, str) and isinstance(v, str) for k, v in value.items())
+
+
+def _is_owner_map(value: Any) -> bool:
+    return isinstance(value, dict) and all(
+        isinstance(k, str) and (v is None or isinstance(v, str))
+        for k, v in value.items())
+
+
+def _is_file_spec(value: Any) -> bool:
+    return (isinstance(value, dict) and isinstance(value.get("path"), str)
+            and set(value) <= {"path", "contains"}
+            and isinstance(value.get("contains", ""), str))
+
+
+def _is_refusal_spec(value: Any) -> bool:
+    return isinstance(value, dict) and _is_str_list(value.get("content_fields", []))
+
+
+def _kind(inputs: set[str], assertions: dict[str, Any], *,
+          required: frozenset[str] = frozenset(),
+          empty_ok: frozenset[str] = frozenset(),
+          builtin_invariants: bool = False) -> dict[str, Any]:
+    return {"inputs": frozenset(inputs), "assertions": assertions,
+            "required": required, "empty_ok": empty_ok,
+            "builtin_invariants": builtin_invariants}
+
+
+# Per-kind scenario contract (SEC-20261118-018). Every key a scenario may carry
+# is either an input the runner consumes or an assertion it checks; anything
+# else is an authoring error that fails the case. `assertions` maps each
+# supported assertion to its type check. A kind with `builtin_invariants`
+# always asserts a fixed property, so it may omit explicit assertions; every
+# other kind must carry at least one. Empty assertion values are vacuous
+# (their checks skip) unless the kind compares them for equality (`empty_ok`).
+_STATUSES = _is_str_list
+SCENARIO_KINDS: dict[str, dict[str, Any]] = {
+    "verdict": _kind({"report"}, {"expect_passed": _is_bool},
+                     required=frozenset({"expect_passed"})),
+    "loop": _kind(
+        {"script", "role", "max_steps", "agent", "consent", "task"},
+        {"expect_stop": _is_str, "expect_file": _is_file_spec,
+         "expect_file_absent": _is_str, "expect_refusal": _is_refusal_spec,
+         "expect_events_absent": _is_str_list, "expect_trace": _is_dict},
+        required=frozenset({"expect_stop"})),
+    "workflow": _kind(
+        {"max_attempts", "script", "goal"},
+        {"expect_statuses": _STATUSES, "expect_events_contain": _is_str_list,
+         "expect_events_absent": _is_str_list},
+        required=frozenset({"expect_statuses"}), empty_ok=frozenset({"expect_statuses"})),
+    "resume": _kind(
+        {"max_attempts", "first_script", "second_script", "goal", "second_goal"},
+        {"expect_first_statuses": _STATUSES, "expect_second_statuses": _STATUSES},
+        required=frozenset({"expect_first_statuses", "expect_second_statuses"}),
+        empty_ok=frozenset({"expect_first_statuses", "expect_second_statuses"})),
+    "ownership": _kind(
+        {"lanes", "steps", "max_steps", "confinement_agent"},
+        {"expect_owner": _is_owner_map, "expect_confinement_roots": _is_str_list,
+         "expect_file": _is_file_spec, "expect_file_absent": _is_str,
+         "expect_refusal": _is_refusal_spec},
+        empty_ok=frozenset({"expect_confinement_roots"})),
+    "plugin": _kind(
+        {"entry_point_name", "declaration_name", "version", "tool_name"},
+        {"expect_admitted": _is_bool}, required=frozenset({"expect_admitted"})),
+    "adversarial": _kind(
+        {"script", "goal", "arbitration_text"},
+        {"expect_statuses": _STATUSES, "expect_first_statuses": _STATUSES,
+         "expect_second_statuses": _STATUSES},
+        empty_ok=frozenset({"expect_statuses", "expect_first_statuses",
+                            "expect_second_statuses"})),
+    "audit": _kind(
+        {"tamper"},
+        {"expect_before": _is_bool, "expect_after": _is_bool,
+         "expect_timeline_kinds": _is_str_list}),
+    "observer": _kind(
+        {"events", "break_line", "workflow"},
+        {"expect_phase_statuses": _is_str_dict, "expect_outcome": _is_str,
+         "expect_observations": _is_str_list, "expect_phase_count": _is_int,
+         "expect_files": _is_str_list, "expect_workspace_empty": _is_bool,
+         "expect_markdown_absent": _is_str_list},
+        empty_ok=frozenset({"expect_phase_statuses", "expect_observations"})),
+    "aidr_export": _kind({"source_case"}, {"expect_status": _is_str},
+                         required=frozenset({"expect_status", "source_case"})),
+    "triage": _kind(
+        {"approve_expiry", "corrupt_index", "approval_policy", "script", "goal"},
+        {"expect_statuses": _STATUSES, "expect_fact": _is_str,
+         "expect_archived": _is_str, "expect_fact_kept": _is_str},
+        required=frozenset({"expect_statuses"}), empty_ok=frozenset({"expect_statuses"})),
+    "parallel": _kind(
+        {"declare_same_write", "fail_phase", "mock_delay_seconds", "goal"},
+        {"expect_statuses": _STATUSES, "expect_elapsed_lt": _is_number,
+         "expect_files": _is_str_dict, "expect_root_absent": _is_str_list,
+         "expect_audit_ok": _is_bool, "expect_parallel_workspace_absent": _is_bool,
+         "expect_event": _is_str},
+        required=frozenset({"expect_statuses"}), empty_ok=frozenset({"expect_statuses"})),
+    "blast_radius": _kind(
+        {"max_attempts", "limits", "check_command", "run_limits", "script", "goal"},
+        {"expect_statuses": _STATUSES, "expect_files": _is_str_dict,
+         "expect_absent": _is_str_list, "expect_event": _is_str},
+        required=frozenset({"expect_statuses", "limits"}),
+        empty_ok=frozenset({"expect_statuses"})),
+    "inward_manifest": _kind(
+        {"tamper_path", "script", "goal"},
+        {"expect_statuses": _STATUSES, "expect_event": _is_str},
+        empty_ok=frozenset({"expect_statuses"}), builtin_invariants=True),
+    "maiden_voyage": _kind(
+        {"script", "goal"},
+        {"expect_statuses": _STATUSES, "expect_event": _is_str},
+        empty_ok=frozenset({"expect_statuses"}), builtin_invariants=True),
+    "repo_hygiene": _kind(
+        {"paths"},
+        {"deny_contains": _is_str_list, "require_contains": _is_str_list},
+        required=frozenset({"paths"})),
+    "canary_leak": _kind(
+        {"max_attempts", "script", "goal"},
+        {"expect_statuses": _STATUSES, "expect_absent": _is_str_list,
+         "expect_stripmap_outside_run": _is_bool},
+        required=frozenset({"expect_absent"}), empty_ok=frozenset({"expect_statuses"})),
+}
+_COMMON_KEYS = frozenset({"id", "kind", "description"})
+_SUITE_KEYS = frozenset({"name", "description", "suite", "scenarios"})
+
+
+def _is_vacuous(value: Any) -> bool:
+    return value is None or (isinstance(value, (str, list, dict)) and not value)
+
+
+def validate_scenario(scenario: Any) -> list[str]:
+    """Return stable problem codes for a scenario; empty means well formed."""
+    if not isinstance(scenario, dict):
+        return ["wrong_type:scenario"]
+    problems: list[str] = []
+    if "id" not in scenario:
+        problems.append("missing_required:id")
+    elif not isinstance(scenario["id"], str) or not scenario["id"]:
+        problems.append("wrong_type:id")
+    spec = SCENARIO_KINDS.get(scenario.get("kind"))
+    if spec is None:
+        return problems + ["unknown_kind"]
+    assertions = spec["assertions"]
+    allowed = _COMMON_KEYS | spec["inputs"] | set(assertions)
+    problems += [f"unknown_key:{key}" for key in sorted(scenario) if key not in allowed]
+    problems += [f"missing_required:{key}" for key in sorted(spec["required"])
+                 if key not in scenario]
+    present = [key for key in sorted(scenario) if key in assertions]
+    for key in present:
+        value = scenario[key]
+        if _is_vacuous(value) and not (key in spec["empty_ok"] and value is not None):
+            problems.append(f"vacuous:{key}")
+        elif not assertions[key](value):
+            problems.append(f"wrong_type:{key}")
+    if not present and not spec["builtin_invariants"]:
+        problems.append("no_assertions")
+    kind = scenario["kind"]
+    if kind == "audit" and "expect_after" in scenario and scenario.get("tamper") is not True:
+        problems.append("conflict:expect_after")
+    if kind == "adversarial":
+        arbitrated = "arbitration_text" in scenario
+        needed = ({"expect_first_statuses", "expect_second_statuses"} if arbitrated
+                  else {"expect_statuses"})
+        forbidden = ({"expect_statuses"} if arbitrated
+                     else {"expect_first_statuses", "expect_second_statuses"})
+        problems += [f"missing_required:{key}" for key in sorted(needed) if key not in scenario]
+        problems += [f"conflict:{key}" for key in sorted(forbidden) if key in scenario]
+    return problems
+
+
+def _invalid_result(case_id: Any, problems: list[str]) -> EvalCaseResult:
+    return EvalCaseResult(
+        id=case_id if isinstance(case_id, str) and case_id else "(missing-id)",
+        passed=False,
+        expected="valid scenario",
+        observed={"invalid_scenario": problems},
+        notes="; ".join(problems),
+    )
+
+
 def load_eval_files(root: Path, suite_path: Path | None = None) -> list[Path]:
     if suite_path is not None:
         return [suite_path]
@@ -45,12 +248,37 @@ def load_eval_files(root: Path, suite_path: Path | None = None) -> list[Path]:
     return sorted(eval_dir.glob("*.yaml")) if eval_dir.exists() else []
 
 
+def _suite_scenarios(path: Path) -> tuple[list[Any], list[str]]:
+    suite = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(suite, dict):
+        return [], ["wrong_type:suite"]
+    problems = [f"unknown_suite_key:{key}" for key in sorted(suite, key=str)
+                if key not in _SUITE_KEYS]
+    scenarios = suite.get("scenarios")
+    if not isinstance(scenarios, list):
+        problems.append("missing_required:scenarios" if scenarios is None
+                        else "wrong_type:scenarios")
+        return [], problems
+    if not scenarios:
+        problems.append("vacuous:scenarios")
+    return scenarios, problems
+
+
 def run_eval_suite(root: Path, suite_path: Path | None = None) -> dict[str, Any]:
     files = load_eval_files(root, suite_path)
     results: list[EvalCaseResult] = []
+    seen: set[str] = set()
     for path in files:
-        suite = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-        for scenario in suite.get("scenarios", []):
+        scenarios, suite_problems = _suite_scenarios(path)
+        if suite_problems:
+            results.append(_invalid_result(f"{path.name}:(suite)", suite_problems))
+        for scenario in scenarios:
+            case_id = scenario.get("id") if isinstance(scenario, dict) else None
+            if isinstance(case_id, str) and case_id in seen:
+                results.append(_invalid_result(case_id, [f"duplicate_id:{case_id}"]))
+                continue
+            if isinstance(case_id, str):
+                seen.add(case_id)
             results.append(run_scenario(scenario, root=root))
     passed = sum(1 for r in results if r.passed)
     return {
@@ -61,6 +289,10 @@ def run_eval_suite(root: Path, suite_path: Path | None = None) -> dict[str, Any]
 
 
 def run_scenario(scenario: dict[str, Any], root: Path | None = None) -> EvalCaseResult:
+    problems = validate_scenario(scenario)
+    if problems and problems != ["unknown_kind"]:
+        case_id = scenario.get("id") if isinstance(scenario, dict) else None
+        return _invalid_result(case_id, problems)
     kind = scenario.get("kind")
     if kind == "verdict":
         verdict = parse_verdict(scenario.get("report", ""))
@@ -577,9 +809,10 @@ def _run_parallel_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
             ok = verify_chain(root / "runs" / "evalrun")["ok"]
             if ok != bool(scenario["expect_audit_ok"]):
                 problems.append(f"audit chain ok={ok}")
-        if scenario.get("expect_parallel_workspace_absent") and \
-                (root / "workspace" / ".phases").exists():
-            problems.append("parallel workspace exists; expected pre-dispatch refusal")
+        if "expect_parallel_workspace_absent" in scenario:
+            absent = not (root / "workspace" / ".phases").exists()
+            if absent != scenario["expect_parallel_workspace_absent"]:
+                problems.append(f"parallel workspace absent={absent}")
         expected_event = scenario.get("expect_event")
         if expected_event:
             events_path = root / "runs" / "evalrun" / "events.jsonl"
@@ -605,6 +838,8 @@ def _run_repo_hygiene_scenario(
     for pattern in scenario.get("paths", []):
         paths.extend(sorted(root.glob(pattern)))
     paths = [p for p in dict.fromkeys(paths) if p.is_file()]
+    if not paths:
+        problems.append("paths matched no files")
     for path in paths:
         rel = path.relative_to(root).as_posix()
         text = path.read_text(encoding="utf-8", errors="replace")
@@ -912,8 +1147,9 @@ def _run_resume_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
         _scaffold_eval_project(root, max_attempts=int(scenario.get("max_attempts", 2)))
         first = _run_scripted_workflow(root, "evalrun", scenario.get("first_script", []),
                                        scenario.get("goal", "eval goal"))
-        second = _run_scripted_workflow(root, "evalrun", scenario.get("second_script", []),
-                                        scenario.get("goal", "eval goal"))
+        second = _run_scripted_workflow(
+            root, "evalrun", scenario.get("second_script", []),
+            scenario.get("second_goal", scenario.get("goal", "eval goal")))
     expected = {
         "first": scenario["expect_first_statuses"],
         "second": scenario["expect_second_statuses"],
@@ -962,10 +1198,12 @@ def _run_canary_leak_scenario(scenario: dict[str, Any]) -> EvalCaseResult:
 
         # the strip map is the ONE place PII values legitimately live, and it
         # must be outside the run tree
-        boundary_dir = root / ".boundary"
-        if scenario.get("expect_stripmap_outside_run") and boundary_dir.exists():
-            if any(str(run_dir) in str(p) for p in boundary_dir.rglob("*")):
-                problems.append("strip map is inside the run tree")
+        if "expect_stripmap_outside_run" in scenario:
+            strip_map = root / ".boundary" / "evalrun.json"
+            outside = strip_map.is_file() and not any(
+                path.name == strip_map.name for path in run_dir.rglob("*"))
+            if outside != scenario["expect_stripmap_outside_run"]:
+                problems.append(f"strip map outside run tree={outside}")
 
     return EvalCaseResult(
         id=scenario["id"],

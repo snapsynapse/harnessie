@@ -33,7 +33,8 @@ def test_default_verifier_prompt_names_exact_shell_allowlist():
     for command in ("`ls`", "`cat`", "`grep`", "`pytest`"):
         assert command in DEFAULT_VERIFIER_PROMPT
     assert "Do not call `git`" in DEFAULT_VERIFIER_PROMPT
-    assert '"claims"' in DEFAULT_VERIFIER_PROMPT
+    # Serialization is the harness-appended output contract, not prompt text.
+    assert '"claims"' not in DEFAULT_VERIFIER_PROMPT
 
 
 def make_request(tmp_path, criteria="- out.txt exists", **kw):

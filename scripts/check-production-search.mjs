@@ -42,6 +42,18 @@ const base = new URL(BASE_ARG ? BASE_ARG.slice(7) : canonicalOrigin.href);
 if (!base.pathname.endsWith('/')) base.pathname += '/';
 const production = base.href === canonicalOrigin.href;
 
+const XML_ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+// One pass over the five XML entities and numeric references, so decoded text is never
+// decoded again (&amp;lt; stays &lt;). Invalid code points stay encoded. Surrounding
+// whitespace is trimmed so a pretty-printed <loc> compares equal to its URL.
+function decode(value) {
+    return String(value || '').replace(/&(?:(amp|lt|gt|quot|apos)|#(\d+)|#[xX]([0-9a-fA-F]+));/g, (entity, name, decimal, hex) => {
+        if (name) return XML_ENTITIES[name];
+        const code = decimal ? Number(decimal) : parseInt(hex, 16);
+        return code > 0 && code <= 0x10ffff && (code < 0xd800 || code > 0xdfff) ? String.fromCodePoint(code) : entity;
+    }).trim();
+}
+
 async function request(url) {
     let lastError;
     for (let attempt = 1; attempt <= 3; attempt++) {
@@ -102,7 +114,7 @@ async function fetchSitemap(canonical, seen = new Set()) {
     if (/<sitemapindex\b/i.test(result.body)) {
         for (const match of result.body.matchAll(/<sitemap>[\s\S]*?<loc>([^<]+)<\/loc>[\s\S]*?<\/sitemap>/gi)) {
             let child;
-            try { child = new URL(match[1].replace(/&amp;/g, '&')); }
+            try { child = new URL(decode(match[1])); }
             catch { report('defect', `${canonical}: invalid child sitemap URL ${match[1]}`); continue; }
             if (child.origin !== canonicalOrigin.origin) {
                 report('defect', `${canonical}: child sitemap uses noncanonical origin ${child.href}`);
@@ -124,7 +136,7 @@ for (const sitemap of config.sitemaps || []) {
 const canonicals = [];
 for (const [sitemap, body] of sitemapBodies) {
     for (const match of body.matchAll(/<url>[\s\S]*?<loc>([^<]+)<\/loc>[\s\S]*?<\/url>/gi)) {
-        const canonical = match[1].replace(/&amp;/g, '&');
+        const canonical = decode(match[1]);
         let url;
         try { url = new URL(canonical); }
         catch { report('defect', `${sitemap}: invalid page location ${canonical}`); continue; }
@@ -151,8 +163,8 @@ async function checkPage(canonical) {
     if (!result) return;
     if (result.response.url !== target) report('defect', `${target}: final URL is ${result.response.url}`);
     const html = result.body;
-    const pageCanonical = html.match(/<link\b[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["']/i)?.[1]
-        || html.match(/<link\b[^>]*href=["']([^"']+)["'][^>]*rel=["']canonical["']/i)?.[1];
+    const pageCanonical = decode(html.match(/<link\b[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["']/i)?.[1]
+        || html.match(/<link\b[^>]*href=["']([^"']+)["'][^>]*rel=["']canonical["']/i)?.[1]);
     if (pageCanonical !== canonical) report('defect', `${target}: canonical ${pageCanonical || '(missing)'} does not equal ${canonical}`);
     if (/<meta\b[^>]*name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html)) {
         report('defect', `${target}: sitemap page is noindex`);

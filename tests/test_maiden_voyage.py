@@ -114,6 +114,39 @@ def test_operator_approval_promotes_exact_stage_and_resume_skips_worker(
     assert len(brain.calls) == 1
 
 
+def test_approved_maiden_output_is_bound_on_resume(tmp_path, monkeypatch):
+    """The promoted files are the approved acceptance's outputs: an
+    unrelated operator file resumes, an edit to a promoted file refuses."""
+    monkeypatch.setattr(
+        sandbox, "wrap",
+        lambda argv, workspace, allow_network=False: argv)
+    scaffold_project(tmp_path)
+    workflow = _workflow(tmp_path)
+    runner, _ = _runner(tmp_path, "voyage", _proposal_script())
+    runner.run_workflow(workflow, goal="g")
+    assert main([
+        "--root", str(tmp_path), "approve-maiden", "voyage", "implement"]) == 0
+
+    (tmp_path / "workspace" / "operator-notes.txt").write_text("unrelated")
+    (tmp_path / "workspace" / "result.txt").write_text("edited after approval")
+    resumed, brain = _runner(tmp_path, "voyage", [])
+    outcomes = resumed.run_workflow(workflow, goal="g")
+    assert [outcome.status for outcome in outcomes] == ["needs_human"]
+    refusals = [event for event in _events(tmp_path, "voyage")
+                if event["kind"] == "resume_refused"]
+    assert [(r["phase"], r["reason"], r["path"]) for r in refusals] == [
+        ("implement", "reused_output_changed", "result.txt")]
+    assert brain.calls == []
+
+    (tmp_path / "workspace" / "result.txt").write_text("proposed")
+    resumed, brain = _runner(
+        tmp_path, "voyage",
+        [turn_tool("task_complete", {"report": "FINAL"})])
+    outcomes = resumed.run_workflow(workflow, goal="g")
+    assert [outcome.status for outcome in outcomes] == [
+        "skipped_resume", "passed"]
+
+
 def test_approved_auto_claim_preserves_inward_policy_integrity(
         tmp_path, monkeypatch):
     monkeypatch.setattr(
