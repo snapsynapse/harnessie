@@ -1,0 +1,23 @@
+{
+  "AD": false,
+  "Answer": [
+    {
+      "TTL": 1799,
+      "data": "v=1; sha256=3afdb258f2f3feb1a32ba3bef615652a3d8314c5261fb89738806c68688aa8b4; url=https://harnessie.com/.well-known/assistant-guide.txt",
+      "name": "_assistant-guide.harnessie.com.",
+      "type": 16
+    }
+  ],
+  "CD": false,
+  "Comment": "Response from 156.154.133.200.",
+  "Question": [
+    {
+      "name": "_assistant-guide.harnessie.com.",
+      "type": 16
+    }
+  ],
+  "RA": true,
+  "RD": true,
+  "Status": 0,
+  "TC": false
+}

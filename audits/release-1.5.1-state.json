@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "repository": "snapsynapse/harnessie",
+  "profile": "package",
+  "authority": "R2",
+  "start_head": "ab3333f6e8798b19d069ce103bae23ff47c6506a",
+  "candidate_head": null,
+  "candidate_version": "1.5.1",
+  "updated_at": "2026-11-19T07:59:34.439518Z",
+  "steps": [
+    {
+      "id": "source_merge",
+      "status": "completed",
+      "evidence": "Security PR #46 merged at 94d950fa700cad046d6ed78f865f1ff3b39e08f6 and adoption PR #47 merged at ab3333f6e8798b19d069ce103bae23ff47c6506a; both exact-head PR checks and final merged-main CI passed."
+    },
+    {
+      "id": "local_gate",
+      "status": "completed",
+      "evidence": "Candidate receipt audits/release-1.5.1-candidate-2026-11-18.md: hash-locked gate passed 2319 tests, 4 skipped, 28 xfailed, 76 evals, wheel/sdist, Twine and fresh-install smoke. Final release workflow must build its own tagged assets."
+    },
+    {
+      "id": "release_preparation",
+      "status": "ready",
+      "evidence": "Release notes, public version-facing docs, revised GuideCheck requirement and release audit are prepared in the working tree; exact merge commit and CI pending."
+    },
+    {
+      "id": "guide_anchor_and_hosted_acceptance",
+      "status": "ready",
+      "evidence": "On 2026-11-19 served guide and sidecar match SHA-256 3afdb258f2f3feb1a32ba3bef615652a3d8314c5261fb89738806c68688aa8b4, 8054 bytes; Cloudflare and Google DNS TXT match. Hosted GuideCheck 2.0.0 profile 2.0.0 returned Level 3, zero blockers, four warnings, two infos. Sam directed replacement of unattainable Level 4 gate; tagged-source independent check and final hosted receipt remain before GitHub Release."
+    },
+    {
+      "id": "signed_tag",
+      "status": "not_started",
+      "evidence": "Sam explicitly authorized tag, package and publication on 2026-11-19. Create signed annotated v1.5.1 only after release-preparation commit and exact-head CI; verify tag identity independently."
+    },
+    {
+      "id": "github_release_and_assets",
+      "status": "not_started",
+      "evidence": "GitHub Release has not been published. Publishing triggers exact-tag build, four original-build assets and provenance checks."
+    },
+    {
+      "id": "pypi",
+      "status": "not_started",
+      "evidence": "PyPI 1.5.1 returned 404 before release. The protected pypi environment must publish only after build and asset attachment; verify immutable files and attestations."
+    },
+    {
+      "id": "downstream",
+      "status": "not_started",
+      "evidence": "Verify Action and Homebrew remain at core 1.5.0 until separately tested and updated after PyPI 1.5.1 verification; engine wrappers have an independent train."
+    }
+  ]
+}

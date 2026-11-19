@@ -6,7 +6,7 @@ All notable changes to Harnessie are recorded here. Format loosely follows Keep 
 
 No changes recorded.
 
-## 1.5.1 (candidate, 2026-11-18)
+## 1.5.1 (2026-11-19)
 
 - Security repair of the 2026-11-18 audit (`audits/security-review-2026-11-18.md`). Each fix ships with red-then-green regressions; the synthetic repros no longer reproduce.
 - `write_file` replaces the directory entry instead of writing through it: anchored no-follow traversal, same-directory exclusive temp file and atomic rename. A hardlink alias can no longer change an inode in another lane or outside the workspace; writing through a multiply linked name detaches it and emits `hardlink_detached`. Swapped targets refuse with `write_target_changed`, non-regular targets with `write_target_unsupported`; `read_file` uses the same anchored walk (SEC-20261118-001).
