@@ -1,8 +1,72 @@
 # Harnessie
 
-Verify agent-produced changes before you merge them, then grow into a brain-agnostic multi-agent harness when the work needs stronger governance. `harnessie verify` runs deterministic checks before an independent fresh-context verifier and returns a fail-closed 0/1/2 exit contract. The full harness adds swappable workers, consent, kernel-enforced file ownership for child processes, human-arbitrated decisions, cost routing, memory provenance, and one hash-chained operator-and-agent audit timeline that detects linked interior edits (see SECURITY.md for the tail limit).
+An AI agent says a change is ready. Harnessie checks what can be reproduced before we accept it.
 
-Harnessie is built to be the safest and easiest first AI harness for people. "Safest" is not a slogan here; it is a set of checkable properties: guarantees live in code, not prompts ([GOVERNANCE.md](GOVERNANCE.md)); every control that cannot be enforced fails closed instead of running unenforced; nothing ships on an agent's say-so (independent fresh-context verifiers gate every side-effecting phase); an OS sandbox confines shell work; an eight-layer prompt-injection defense with a written threat model ([SECURITY.md](SECURITY.md)) covers the rest; and a hash-chained audit log records every agent and operator action in one hash-chained timeline that detects linked interior edits (see SECURITY.md for the tail limit). If you find a way to break any of these claims, that is a bug report we want. "Easiest" means the person running it does not need to be a developer: runs carry declared token and dollar ceilings, every halt is a named condition with one plain operator action, and disagreement between agents becomes a human decision, never a silent merge.
+Run our own checks against the finished workspace and keep the report. Add a separate verifier model when the remaining claims need artifact inspection. The result tells us whether to proceed, fix a failed check, or obtain evidence the verifier couldn't establish.
+
+Start with a change we already have. Keep the coding tool and workflow we already use.
+
+## A recorded result
+
+From the [first-trial example](examples/verify-first-trial/README.md), recorded with Harnessie 1.5.0 installed from PyPI. A `slugify` function was meant to lowercase titles and remove punctuation; the check exercises both claims:
+
+```
+# Verification report: FAILED
+- verifier model: (none — deterministic checks only)
+- harness: harnessie 1.5.0
+- checks network: denied
+- exit code: 1 (0 verified / 1 failed / 2 cannot verify, fail closed)
+
+### [FAIL] check-1
+AssertionError: 'ready,-set:-go!' != 'ready-set-go'
+```
+
+After the fix, the same criteria and the same check return `VERIFIED` with exit 0. With no check supplied, checks-only mode returns `CANNOT VERIFY` with exit 2. The example holds the files, the exact commands and the full recorded reports. It is a reproducible example, not an external adoption receipt or a model review.
+
+## Try it on your own change
+
+Requirements: Python 3.11+, released Harnessie, and a usable sandbox on macOS (Seatbelt) or Linux (bubblewrap, firejail or docker). WSL2 follows Linux support; bare Windows has no supported shell sandbox. Installation reaches PyPI and writes locally. The trial below makes no model calls and denies the check network access by default. No project scaffold, workflow file or model configuration is needed.
+
+Literal
+```bash
+pipx install harnessie               # or: pip install harnessie / uv tool install harnessie
+```
+
+Write a short Markdown criteria file describing what the change is supposed to do, and pick one check that already exercises it: the project's test command, a linter or a build. Then:
+
+Replace: WORKSPACE_PATH -> absolute path to the existing workspace to inspect.
+Replace: CLAIMS_PATH -> absolute path to your reviewed Markdown criteria file.
+Replace: CHECK_COMMAND -> the check command, run from WORKSPACE_PATH, for example `python3 -m pytest -q` or `npm test`.
+Replace: REPORT_PATH -> a new directory for this trial's report, outside the inspected workspace.
+
+Customize
+```bash
+harnessie verify --workspace "WORKSPACE_PATH" --criteria "CLAIMS_PATH" --check "CHECK_COMMAND" --report-dir "REPORT_PATH" --no-verifier
+```
+
+`--check` is repeatable. The report lands in REPORT_PATH as `report.md`, with `events.jsonl` and the captured check output under `proofs/`.
+
+Important limit: `--no-verifier` reads and fingerprints the criteria but does not interpret or verify each written claim. The verdict rests on the supplied checks alone, so a green check can coexist with claims nothing tested.
+
+## What the verdict means
+
+| Outcome | Checks-only behavior | Next step |
+|---|---|---|
+| VERIFIED, exit 0 | At least one check ran and every supplied check passed | Inspect the checks and report; assess remaining claims separately |
+| FAILED, exit 1 | A supplied check executed and failed | Inspect the proof and correct the artifact, keeping the original check |
+| CANNOT VERIFY, exit 2 | Checks were blocked, or no check was supplied | Fix the environment or supply evidence; never treat this as a pass |
+
+Model-backed runs and v1 evidence bundles add claim-level verdicts (reproduced, refuted, not verifiable) and aggregate them into the same exit codes; [docs/GUIDE.md](docs/GUIDE.md) defines that contract. Do not read claim-level meaning into a checks-only report.
+
+## Add a verifier model (optional)
+
+Drop `--no-verifier` and point `--models` at a models file to have an independent fresh-context verifier inspect the artifact against each claim after the checks pass. That sends the supplied artifacts to the endpoint you configure and may incur charges; the checks-only trial above did neither. See [docs/GUIDE.md](docs/GUIDE.md) for standalone configuration, [docs/ringer.md](docs/ringer.md) for the shared exit contract, and [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify) for the separately versioned GitHub Action, which needs its own endpoint and model settings.
+
+## The full harness
+
+When the work needs more than a verifier, Harnessie is a brain-agnostic multi-agent harness. It adds swappable workers, consent, kernel-enforced file ownership for child processes, human-arbitrated decisions, cost routing, memory provenance, and one hash-chained operator-and-agent audit timeline.
+
+Harnessie is built to be the safest and easiest first AI harness for people. "Safest" is not a slogan here; it is a set of checkable properties: guarantees live in code, not prompts ([GOVERNANCE.md](GOVERNANCE.md)); every control that cannot be enforced fails closed instead of running unenforced; nothing ships on an agent's say-so (independent fresh-context verifiers gate every side-effecting phase); an OS sandbox confines shell work; an eight-layer prompt-injection defense with a written threat model ([SECURITY.md](SECURITY.md)) covers the rest; and a hash-chained audit log records every agent and operator action in one timeline where an edited, deleted or reordered interior event breaks the chain (the final event and suffix truncation need an externally held digest; see [SECURITY.md](SECURITY.md)). If you find a way to break any of these claims, that is a bug report we want. "Easiest" means the person running it does not need to be a developer: runs carry declared token and dollar ceilings, every halt is a named condition with one plain operator action, and disagreement between agents becomes a human decision, never a silent merge.
 
 The operating thesis: the harness structure carries the quality floor, the model carries the ceiling. Run it with Claude Fable 5 as the orchestrator and it exploits effort dials, long autonomous turns, and verifier subagents. Swap the workers (or everything) for Haiku, GLM, Qwen, or any OpenAI-compatible local endpoint by editing one YAML file, and the gates, jails, budgets, and retry ladders keep output honest.
 
