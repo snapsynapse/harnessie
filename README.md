@@ -91,7 +91,7 @@ The previous core release, Harnessie 1.5.0, was published on [GitHub](https://gi
 
 Harnessie 1.5.1 is published on [GitHub](https://github.com/snapsynapse/harnessie/releases/tag/v1.5.1) and PyPI from the signed tag. Its wheel and source distribution match the original-build assets, carry verified publisher attestations, and passed a fresh public-index install. See the [release execution](audits/release-1.5.1.md) and [release notes](RELEASE_NOTES-1.5.1.md).
 
-Homebrew passed a fresh source install and CLI smoke test for 1.5.1 on arm64 macOS. Verify Action v0.2.4 defaults to core 1.5.1, and a fresh GitHub-hosted Ubuntu consumer verified the stable `@v0` alias. [Downstream verification receipt](audits/release-1.5.1.md#downstream-acceptance)
+Fresh consumer checks passed for Homebrew 1.5.1 and Verify Action v0.2.4. [Downstream verification receipt](audits/release-1.5.1.md#downstream-acceptance)
 
 To gate pull requests on claim-by-claim verification without installing anything locally, the standalone verifier also ships as a GitHub Action: [Harnessie Verify on the Marketplace](https://github.com/marketplace/actions/harnessie-verify). Harnessie 1.2.0 accepts raw criteria or a v1 evidence bundle that binds stable claim IDs to an exact Git state, content-addressed proofs, and recorded deterministic checks. Its structured verdicts distinguish reproduced, refuted, and not-verifiable claims before the exit code gates the merge. The Action's separately released pin is reported in [NEXT.md](NEXT.md).
 
