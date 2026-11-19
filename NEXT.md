@@ -2,7 +2,7 @@
 
 ## Security repair release, 2026-11-19
 
-Sam's confirmed direction is active development with a verified security repair release before another pilot attempt. Security PR #46, adoption PR #47 and release-preparation PR #48 are merged. Harnessie 1.5.1 is published on GitHub and PyPI with verified original-build assets and a fresh public-index consumer; installed 1.5.0 consumers must upgrade to receive the repairs. The [release execution record](audits/release-1.5.1.md) tracks the exact tag, package and remaining downstream work.
+Sam's confirmed direction is active development with a verified security repair release before another pilot attempt. Security PR #46, adoption PR #47 and release-preparation PR #48 are merged. Harnessie 1.5.1 is published on GitHub and PyPI with verified original-build assets and a fresh public-index consumer. Installed 1.5.0 consumers must upgrade to receive the repairs. The [release execution record](audits/release-1.5.1.md) tracks the exact tag, packages and downstream acceptance.
 
 The [November 18 code review and security audit](audits/security-review-2026-11-18.md), its [machine-readable findings](audits/security-review-2026-11-18.json), and [offline reproductions](audits/security-review-2026-11-18/) remain the finding evidence. Before remediation the audit recorded 6 high, 8 medium and 7 low findings and a HOLD publication recommendation.
 
@@ -16,12 +16,12 @@ Contract change for downstreams: a check that never launched (missing or non-exe
 
 Residual risks recorded by the reviews, not repaired: a `setsid` descendant that closes its pipes is neither detected nor killed; raw `proofs/check-*.txt` keep unredacted check output as operator artifacts; a bad shebang or `/usr/bin/env missing-tool` check is classified FAILED; resume binding does not cover `config/models.yaml`, memory contents, ownership, approval or boundary configuration; a run stopped for unknown usage cannot be resumed (start a new run); a crash-time edit to an earlier phase's output refuses resume; an operator edit to a path a rerunning halted phase last touched can refuse one resume later; the transport watchdog does not bound an HTTPS proxy CONNECT handshake; a read-only parent directory surfaces as a raw PermissionError from `write_file`; Linux bubblewrap, firejail and docker backends were not exercised by these repairs. The `read_file` and `run_shell` cap-crossing prefix is now withheld, including ordinary long trailing tokens; verify proof output has a separate path.
 
-### Remaining assurance and downstream work
+### Assurance and downstream status
 
 1. Preserve the independent review receipts for the third-round repairs and the output-cap repair. The third-round verify exit precedence and probe, resume last-writer binding, and transport Content-Length changes passed fresh review, including native Seatbelt mimic/probe cases. The output-cap repair survived 378 synthetic cut cases with zero leaked prefixes. DEP-20261118-001 has a local lock refresh and advisory scan.
 2. The 1.5.1 local hash-locked suite, evals, schemas, both manifests, docs generation, package build, artifact inspection, fresh install, advisory scan and native Seatbelt cases passed. Exact-commit Linux bwrap CI passed on PR #46, the merged security commit and the merged adoption commit. Firejail and Docker need separate provisioned environments.
 3. SECURITY.md and docs/threat-model.md state the confirmed behavior and residuals. The signed tag, GuideCheck checkpoint, original-build asset provenance, GitHub Release and PyPI consumer receipts belong to the release execution record.
-4. Downstream Verify Action and Homebrew changes are separate release steps in their own repositories with their own git sync and consumer checks. Engine wrappers have an independent release train.
+4. Verify Action and Homebrew release separately and run their own consumer checks. Engine wrappers have an independent release train.
 
 The [pre-candidate receipt](audits/security-repair-local-verification-2026-11-18.md) records the original source review. The [1.5.1 candidate receipt](audits/release-1.5.1-candidate-2026-11-18.md) records the versioned local gate, retained test wheel and sdist digests, and guide status. The [release notes](RELEASE_NOTES-1.5.1.md) describe 1.5.1; the [release execution record](audits/release-1.5.1.md) identifies publication evidence separately.
 
@@ -43,7 +43,7 @@ The search decoder repair (SEC-20261118-017) and verifier-first README/example a
 
 Harnessie 1.5.1 is the current stable core release on [GitHub](https://github.com/snapsynapse/harnessie/releases/tag/v1.5.1) and [PyPI](https://pypi.org/project/harnessie/1.5.1/). Its signed annotated tag `v1.5.1` (tag object `43956fb1120cc53430dcdfa4c16a1ba944b56788`) resolves to `2bb78f24ad029db7e1c1545fdc6ab3a39f808c92`; [release workflow 44485696953](https://github.com/snapsynapse/harnessie/actions/runs/44485696953) passed its build, attachment and protected PyPI jobs. The wheel, source distribution, CycloneDX SBOM and checksum record have [verified original-build provenance](audits/release-1.5.1/github-provenance.json). Both PyPI distributions match the GitHub assets and pass publisher-attestation verification; a [fresh Python 3.12.16 public-index consumer](audits/release-1.5.1/pypi-consumer.json) installed 1.5.1 with the matching wheel digest. The [release execution](audits/release-1.5.1.md) and [machine-readable state](audits/release-1.5.1-state.json) retain the exact receipts. The [1.5.0 release record](audits/release-1.5.0.md) remains historical.
 
-Homebrew and Verify Action are separately versioned downstreams. Verify Action 0.2.3 and stable `v0` now pin core 1.5.0 at `80f61b4d47231aa08b1274375a982ddae5263d52`; all seven fixtures passed on that exact merge commit, and signed tag `v0.2.3` and the GitHub Release are published. Homebrew 1.5.0 is merged at `4ae1944da5c603536af75a47761bd8dabea4648a`; audit, test, linkage and installed-package version were verified after merge. The [downstream closeout receipt](audits/release-1.5.0/downstream-closeout-2026-10-11.json) records the October 11 acceptance. Engine wrappers remain independently released at 0.1.0.
+Homebrew and Verify Action are separately versioned downstreams. Homebrew 1.5.1 passed a fresh install and CLI smoke test. Verify Action v0.2.4 defaults to core 1.5.1, and a fresh Ubuntu consumer verified that stable `@v0` installed 1.5.1. Engine wrappers remain independently released at 0.1.0. [Downstream verification receipt](audits/release-1.5.1.md#downstream-acceptance)
 
 ## Verified evidence
 
@@ -64,7 +64,7 @@ The 1.5.0 feature evidence is four dated acceptance records: [ATIF export](audit
 
 ## Remaining release order
 
-Core and downstream external closeout gates are complete. [Release execution](audits/release-1.5.0.md) and the [October 11 downstream receipt](audits/release-1.5.0/downstream-closeout-2026-10-11.json) distinguish core publication, exact-merge Action fixtures, signed Action release, stable alias and merged Homebrew consumer verification. Customer acceptance remains a separate claim.
+Core and downstream external closeout gates are complete for 1.5.1. The merged [release receipt](audits/release-1.5.1.md#downstream-acceptance) records Homebrew and Verify Action acceptance. Customer acceptance remains a separate claim.
 
 ## Remaining work
 
