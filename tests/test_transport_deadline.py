@@ -237,6 +237,22 @@ def test_connection_refused_before_send_is_known_zero():
     assert reply.usage_known is True
 
 
+def test_proxy_connect_failure_before_provider_request_is_known_zero(serve):
+    server = serve(lambda conn, stop: conn.sendall(
+        b"HTTP/1.1 502 Bad Gateway\r\nContent-Length: 0\r\n\r\n"))
+    proxy = f"http://127.0.0.1:{server.port}"
+    opener = _transport.build_opener(
+        urllib.request.ProxyHandler({"https": proxy}))
+    req = urllib.request.Request("https://127.0.0.1:9/v1/x", data=b"{}")
+
+    reply = _transport.post(req, opener=opener, deadline_s=5.0)
+
+    assert not reply.ok
+    assert reply.failure == "network_error"
+    assert reply.usage_known is True
+    assert server.connections == 1
+
+
 def _compat(base_url):
     return OpenAICompatModel(ModelSpec(
         name="mid", provider="openai-compat", model_id="t", base_url=base_url,

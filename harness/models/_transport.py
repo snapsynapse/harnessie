@@ -105,13 +105,20 @@ def _tracked(http_class, call: _Call):
     class _Tracked(http_class):
         def connect(self):
             call.tracked = True
-            super().connect()
+            # HTTPSConnection.connect() sends a proxy CONNECT through send().
+            # Those tunnel bytes cannot have reached the model provider.
+            self._harnessie_connecting = True
+            try:
+                super().connect()
+            finally:
+                self._harnessie_connecting = False
             call.register(self.sock)
 
         def send(self, data):
             if self.sock is None and self.auto_open:
                 self.connect()
-            call.sent = True
+            if not self._harnessie_connecting:
+                call.sent = True
             super().send(data)
 
     return _Tracked

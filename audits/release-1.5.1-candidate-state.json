@@ -6,17 +6,17 @@
   "start_head": "6c053dd8409e109310a124685d11e29e1e8e7885",
   "candidate_head": null,
   "candidate_version": "1.5.1",
-  "updated_at": "2026-11-19T05:52:59.853289Z",
+  "updated_at": "2026-11-19T07:26:06.313225Z",
   "steps": [
     {
       "id": "candidate_files",
       "status": "completed",
-      "evidence": "Uncommitted security-only candidate on 6c053dd8409e109310a124685d11e29e1e8e7885; SHA-256 ff8b94246e4cbdd8b63d4c28579ff12d7ce5e0ca9118eb8b7b69c472379c97a4 over canonical JSON of base HEAD and 113 changed/untracked path-content digests, excluding this state file. See audits/release-1.5.1-candidate-2026-11-18.md."
+      "evidence": "Proxy review-fix candidate on worktree HEAD 72b75f99946d6ee3cec20e5fe31ac309a48590b2, after merging origin/main a400b9d; SHA-256 c8c12d35249541498db0cba0ff704ceb8086269f96415ede2921e2e4412149bd over canonical JSON of HEAD and 4 changed path-content digests, excluding this state file. See audits/release-1.5.1-candidate-2026-11-18.md."
     },
     {
       "id": "local_gate",
       "status": "completed",
-      "evidence": "Hash-locked CPython 3.12 release_gate.py --locked-build OK: 2318 passed, 4 skipped, 28 xfailed; 76/76 evals; manifests, docs, wheel, sdist, Twine, artifact check and fresh-install smoke. Retained wheel 59f7f2ab842675e42f55daa65f67b62f99f4fe99e78cc9d7777a32b9b19fbdb2 and sdist 11f0059b2e7337f9a18d6a7121030033650d0142800f6cc8e48a900ce12845a5 also passed inspection; wheel passed fresh install."
+      "evidence": "Hash-locked CPython 3.12 release_gate.py --locked-build OK after proxy fix: 2319 passed, 4 skipped, 28 xfailed; 76/76 evals; manifests, docs, wheel, sdist, Twine, artifact check and fresh-install smoke. Retained wheel f2937605cb3d92ea57aaefe0a4a239e87b1bc924a3fd8f2f06454509a96586c7 and sdist fa9013c80b70d31935ba5da91a243683b8839d526a1f1c0ca45aa7e5e96aefff passed inspection and the wheel passed fresh install. Focused transport suite: 88 passed."
     },
     {
       "id": "local_guide",
@@ -26,12 +26,12 @@
     {
       "id": "commit_and_push",
       "status": "ready",
-      "evidence": "Sam explicitly authorized commit and push, then approved the security/adoption branch split on 2026-11-18 America/Denver. This snapshot precedes the new security branch commit and push; later provider evidence must record their exact identities."
+      "evidence": "Initial PR #46 head 1cec2af was committed and pushed. Sam authorized tending the entire merge sequence. The proxy review fix and refreshed candidate receipt require a new commit and push; this snapshot precedes them."
     },
     {
       "id": "exact_commit_ci",
       "status": "not_started",
-      "evidence": "Linux bwrap, core CI, CodeQL and package jobs require an exact pushed candidate commit."
+      "evidence": "PR #46 had eight green checks on 1cec2af, but that result is stale for this proxy fix. Linux bwrap, macOS, CodeQL, package and other required checks must pass on the new pushed head."
     },
     {
       "id": "guide_anchor_and_hosted_acceptance",
