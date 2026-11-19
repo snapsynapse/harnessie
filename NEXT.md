@@ -42,8 +42,8 @@ The search decoder repair (SEC-20261118-017) and verifier-first README/example a
 
 Harnessie 1.5.1 is the current stable core release on [GitHub](https://github.com/snapsynapse/harnessie/releases/tag/v1.5.1) and [PyPI](https://pypi.org/project/harnessie/1.5.1/). Its signed annotated tag `v1.5.1` (tag object `43956fb1120cc53430dcdfa4c16a1ba944b56788`) resolves to `2bb78f24ad029db7e1c1545fdc6ab3a39f808c92`; [release workflow 44485696953](https://github.com/snapsynapse/harnessie/actions/runs/44485696953) passed its build, attachment and protected PyPI jobs. The wheel, source distribution, CycloneDX SBOM and checksum record have [verified original-build provenance](audits/release-1.5.1/github-provenance.json). Both PyPI distributions match the GitHub assets and pass publisher-attestation verification; a [fresh Python 3.12.16 public-index consumer](audits/release-1.5.1/pypi-consumer.json) installed 1.5.1 with the matching wheel digest. The [release execution](audits/release-1.5.1.md) and [machine-readable state](audits/release-1.5.1-state.json) retain the exact receipts. The [1.5.0 release record](audits/release-1.5.0.md) remains historical.
 
-- Homebrew installed core 1.5.1 from merged tap `main` in a fresh keg on arm64 macOS. The test used an isolated prefix with the host's installed dependency versions. The source checksum, formula style and strict audit, `brew test`, and installed CLI smoke passed.
-- Verify Action v0.2.4 defaults to core 1.5.1. All nine offline fixtures passed on its merge commit. A fresh GitHub-hosted Ubuntu consumer resolved stable `@v0` to that commit, installed 1.5.1, and observed the expected exit 1 from a launched deterministic check.
+- Homebrew passed the formula and CLI checks after a fresh install of core 1.5.1 from merged tap `main`.
+- Verify Action v0.2.4 defaults to core 1.5.1. All nine offline fixtures passed, and a fresh Ubuntu consumer confirmed stable `@v0` installed 1.5.1.
 
 Engine wrappers remain independently released at 0.1.0. [Downstream verification receipt](audits/release-1.5.1.md#downstream-acceptance)
 
