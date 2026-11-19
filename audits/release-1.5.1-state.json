@@ -4,9 +4,9 @@
   "profile": "package",
   "authority": "R2",
   "start_head": "ab3333f6e8798b19d069ce103bae23ff47c6506a",
-  "candidate_head": null,
+  "candidate_head": "2bb78f24ad029db7e1c1545fdc6ab3a39f808c92",
   "candidate_version": "1.5.1",
-  "updated_at": "2026-11-19T07:59:34.439518Z",
+  "updated_at": "2026-11-19T08:23:06.101694Z",
   "steps": [
     {
       "id": "source_merge",
@@ -20,28 +20,28 @@
     },
     {
       "id": "release_preparation",
-      "status": "ready",
-      "evidence": "Release notes, public version-facing docs, revised GuideCheck requirement and release audit are prepared in the working tree; exact merge commit and CI pending."
+      "status": "completed",
+      "evidence": "PR #48 merged as 2bb78f24ad029db7e1c1545fdc6ab3a39f808c92; exact-main ci 44484764386, CodeQL 44484764508, Scorecard 44484764402 and Pages 44484764160 all passed. Public docs, final release notes and revised GuideCheck requirement are in the signed source tree."
     },
     {
       "id": "guide_anchor_and_hosted_acceptance",
-      "status": "ready",
-      "evidence": "On 2026-11-19 served guide and sidecar match SHA-256 3afdb258f2f3feb1a32ba3bef615652a3d8314c5261fb89738806c68688aa8b4, 8054 bytes; Cloudflare and Google DNS TXT match. Hosted GuideCheck 2.0.0 profile 2.0.0 returned Level 3, zero blockers, four warnings, two infos. Sam directed replacement of unattainable Level 4 gate; tagged-source independent check and final hosted receipt remain before GitHub Release."
+      "status": "completed",
+      "evidence": "Clean clone verified signed tag source and both 8054-byte guide copies SHA-256 3afdb258f2f3feb1a32ba3bef615652a3d8314c5261fb89738806c68688aa8b4; served guide, sidecar, repository pins, Cloudflare and Google DNS TXT match. Hosted GuideCheck 2.0.0 profile 2.0.0 final pre-publication result: Level 3, zero blockers, four warnings, two infos; anchor.hosted.unverified retained. Sam approved the revised Level 3 plus independent-check gate after GuideCheck removed Level 4."
     },
     {
       "id": "signed_tag",
-      "status": "not_started",
-      "evidence": "Sam explicitly authorized tag, package and publication on 2026-11-19. Create signed annotated v1.5.1 only after release-preparation commit and exact-head CI; verify tag identity independently."
+      "status": "completed",
+      "evidence": "Signed annotated v1.5.1 tag object 43956fb1120cc53430dcdfa4c16a1ba944b56788 resolves to 2bb78f24ad029db7e1c1545fdc6ab3a39f808c92; remote tag and clean-clone SSH signature verified under established signer."
     },
     {
       "id": "github_release_and_assets",
-      "status": "not_started",
-      "evidence": "GitHub Release has not been published. Publishing triggers exact-tag build, four original-build assets and provenance checks."
+      "status": "completed",
+      "evidence": "GitHub Release v1.5.1 published 2026-11-19T08:12:43Z; release workflow 44485696953 build and attach jobs passed. Four downloaded assets independently passed exact-tag original-build attestation verification: wheel 0c586af43e8585ac57abfbef94611c1993587dbf2ca038dba051a4edc3a93255; sdist b26dcaed78237219e5408229f88327c335688a3659330f397e0eeb9dc7375c6a; SBOM f192bc2a5f22d22b05ab6adbc697af37bab2ca28e59609ee0c680e65332a983b; checksum 5864537aa4afaf7984d1c1d7f6923fcef0cdf8e5032c14bb25dd4e55ca22f710."
     },
     {
       "id": "pypi",
-      "status": "not_started",
-      "evidence": "PyPI 1.5.1 returned 404 before release. The protected pypi environment must publish only after build and asset attachment; verify immutable files and attestations."
+      "status": "blocked",
+      "evidence": "publish-pypi job in release workflow 44485696953 is waiting for required human review of protected pypi environment. PyPI 1.5.1 returned 404 while waiting. No bypass or local upload attempted."
     },
     {
       "id": "downstream",

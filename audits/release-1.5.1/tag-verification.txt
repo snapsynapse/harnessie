@@ -1,0 +1,9 @@
+Good "git" signature for 57973674+snapsynapse@users.noreply.github.com with ED25519 key SHA256:e01ClOG6x4+h/LA0nobyQrQpCRrAYmFSIF2DmLR93pM
+object 2bb78f24ad029db7e1c1545fdc6ab3a39f808c92
+type commit
+tag v1.5.1
+tagger snapsynapse <57973674+snapsynapse@users.noreply.github.com> 1795075820 -0700
+
+Harnessie 1.5.1: security repair
+3afdb258f2f3feb1a32ba3bef615652a3d8314c5261fb89738806c68688aa8b4  /private/tmp/harnessie-v151-verify/assistant-guide.txt
+3afdb258f2f3feb1a32ba3bef615652a3d8314c5261fb89738806c68688aa8b4  /private/tmp/harnessie-v151-verify/docs/.well-known/assistant-guide.txt
