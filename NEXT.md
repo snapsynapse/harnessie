@@ -43,7 +43,7 @@ The search decoder repair (SEC-20261118-017) and verifier-first README/example a
 
 Harnessie 1.5.1 is the current stable core release on [GitHub](https://github.com/snapsynapse/harnessie/releases/tag/v1.5.1) and [PyPI](https://pypi.org/project/harnessie/1.5.1/). Its signed annotated tag `v1.5.1` (tag object `43956fb1120cc53430dcdfa4c16a1ba944b56788`) resolves to `2bb78f24ad029db7e1c1545fdc6ab3a39f808c92`; [release workflow 44485696953](https://github.com/snapsynapse/harnessie/actions/runs/44485696953) passed its build, attachment and protected PyPI jobs. The wheel, source distribution, CycloneDX SBOM and checksum record have [verified original-build provenance](audits/release-1.5.1/github-provenance.json). Both PyPI distributions match the GitHub assets and pass publisher-attestation verification; a [fresh Python 3.12.16 public-index consumer](audits/release-1.5.1/pypi-consumer.json) installed 1.5.1 with the matching wheel digest. The [release execution](audits/release-1.5.1.md) and [machine-readable state](audits/release-1.5.1-state.json) retain the exact receipts. The [1.5.0 release record](audits/release-1.5.0.md) remains historical.
 
-Homebrew passed formula and CLI checks after a fresh 1.5.1 install from merged tap `main`. Verify Action v0.2.4 defaults to core 1.5.1, and a fresh Ubuntu consumer verified that stable `@v0` installed 1.5.1. Engine wrappers remain independently released at 0.1.0. [Downstream verification receipt](audits/release-1.5.1.md#downstream-acceptance)
+Homebrew 1.5.1 passed a fresh install and CLI smoke test. Verify Action v0.2.4 defaults to core 1.5.1, and a fresh Ubuntu consumer verified that stable `@v0` installed 1.5.1. Engine wrappers remain independently released at 0.1.0. [Downstream verification receipt](audits/release-1.5.1.md#downstream-acceptance)
 
 ## Verified evidence
 
@@ -64,7 +64,7 @@ The 1.5.0 feature evidence is four dated acceptance records: [ATIF export](audit
 
 ## 1.5.0 release closeout
 
-The 1.5.0 release completed its core and downstream verification. The records cover core publication, exact-merge Action fixtures, the signed Action release, the stable alias and the merged Homebrew consumer. Customer acceptance remains a separate claim. [1.5.0 release execution](audits/release-1.5.0.md) · [October 11 downstream receipt](audits/release-1.5.0/downstream-closeout-2026-10-11.json)
+Core and downstream external closeout gates are complete. [Release execution](audits/release-1.5.0.md) and the [October 11 downstream receipt](audits/release-1.5.0/downstream-closeout-2026-10-11.json) distinguish core publication, exact-merge Action fixtures, signed Action release, stable alias and merged Homebrew consumer verification. Customer acceptance remains a separate claim.
 
 ## Remaining work
 
