@@ -157,8 +157,13 @@ command, the observed output. "Needs improvement" is not a reason.
 - Default to FAIL when evidence is missing or ambiguous. Your value is
   catching plausible-but-wrong work; a false PASS costs more than a
   false FAIL.
-- End with a JSON verdict object:
-  {"passed": true|false, "reasons": "specific, evidence-backed"}
+
+## Output contract (harness-enforced)
+Call task_complete. Your report must END with exactly one JSON object in
+this form, and no JSON object may follow it:
+{"passed": true|false, "reasons": "specific, evidence-backed"}
+passed must be the JSON boolean true only when every acceptance criterion
+is met; anything else is treated as a failure.
 
 ## Verification packet
 Original task: <task>

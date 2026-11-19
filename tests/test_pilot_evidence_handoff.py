@@ -154,11 +154,19 @@ def test_sealed_missing_source_also_refuses(packet, tmp_path):
 # (here, prepare_packet's `git rev-parse`) when any single environment
 # string exceeds 128 KiB; macOS has no such per-string limit.
 @pytest.mark.parametrize("data,reason", [(b"x" * 256001, "evidence_limit"),
-                                         (b"\\" * 80000, "input_limit"),
+                                         (None, "input_limit"),
                                          (b"\xff", "non_text_input")],
                          ids=["evidence_limit", "input_limit", "non_text_input"])
 def test_limits_and_utf8_fail_before_writes(packet, tmp_path, data, reason):
     root, _ = packet
+    if data is None:
+        # Fill the evidence budget exactly with bytes that JSON-escape to
+        # twice their size, so only the input limit can refuse. Derived from
+        # the packet, so source files growing cannot flip the refusal reason.
+        index = json.loads((root / "workspace/evidence-index.json").read_bytes())
+        others = sum(item["bytes"] for name, item in index["files"].items()
+                     if name != "evidence/INTENT.md")
+        data = b"\\" * (handoff.LIMITS["max_evidence_bytes"] - others)
     seal = change_source(root, "INTENT.md", data)
     with pytest.raises(PilotRefusal, match=reason):
         handoff.prepare(tmp_path / "handoff", root, seal)

@@ -49,7 +49,7 @@ Keep the source tree and destination directory under operator control during exp
 | Arbitrated/superseded status or decided metadata | Refuse; export never transfers or authors a human decision |
 | A used destination ID, including a different slug under that ID | Refuse with `destination_collision`; existing file remains unchanged |
 | An altered event hash chain | Refuse with `invalid_evidence` |
-| An unquoted code fence or nested heading that the runtime allowed in source prose | Refuse with `invalid_record`; unsupported input is not silently rewritten |
+| An unquoted code fence, nested heading or raw HTML in source prose (records written before the 2026-11-18 security repair, or edited by hand; current runner output quotes and escapes these) | Refuse with `invalid_record`; unsupported input is not silently rewritten |
 
 The [executable example](examples/aidr-export/README.md) and [demo.py](examples/aidr-export/demo.py) construct a real mock-run record, use the installed `harnessie` command to export it, run the pinned AIDR reference linter, and check that source bytes remain unchanged and the original run still halts for arbitration. The example also exercises refused inputs. Its linter step requires Node; the exporter itself does not. Follow the example's setup using a 1.4.1 or newer checkout or source distribution.
 

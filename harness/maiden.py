@@ -103,9 +103,7 @@ def workspace_sha256(root: Path) -> str:
             rel = path.relative_to(root).as_posix()
             info = path.lstat()
             if stat.S_ISREG(info.st_mode):
-                _digest_entry(
-                    digest, "file", rel, stat.S_IMODE(info.st_mode),
-                    path.read_bytes())
+                _digest_file(digest, rel, path, info)
             elif stat.S_ISLNK(info.st_mode):
                 _digest_entry(
                     digest, "symlink", rel, stat.S_IMODE(info.st_mode),
@@ -122,6 +120,186 @@ def _digest_entry(
             kind.encode("ascii"), rel.encode("utf-8"), str(mode).encode("ascii"),
             str(len(data)).encode("ascii"), data):
         digest.update(str(len(value)).encode("ascii") + b":" + value)
+
+
+HASH_CHUNK_BYTES = 1 << 20
+ABSENT = "absent"
+# Regenerable OS and interpreter caches: never a phase product, so they are
+# neither attributed to a phase nor bound on resume. Deliberately narrow:
+# only regular files named .DS_Store and regular *.pyc / *.pyo files directly
+# inside a __pycache__ directory. Anything else there is manifested.
+_NOISE_FILES = frozenset({".DS_Store"})
+_NOISE_CACHE_DIR = "__pycache__"
+_NOISE_CACHE_SUFFIXES = (".pyc", ".pyo")
+_NOFOLLOW_FLAGS = (os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+                   | getattr(os, "O_NONBLOCK", 0))
+
+
+def _stream_fd(fd: int, digest: Any) -> int:
+    total = 0
+    while True:
+        chunk = os.read(fd, HASH_CHUNK_BYTES)
+        if not chunk:
+            return total
+        digest.update(chunk)
+        total += len(chunk)
+
+
+def _digest_file(digest: Any, rel: str, path: Path, info: os.stat_result) -> None:
+    """Frame a regular file exactly as _digest_entry would, streaming its
+    bytes so memory stays bounded whatever the file size."""
+    fd = os.open(path, _NOFOLLOW_FLAGS)
+    try:
+        opened = os.fstat(fd)
+        if (not stat.S_ISREG(opened.st_mode)
+                or (opened.st_dev, opened.st_ino)
+                != (info.st_dev, info.st_ino)):
+            raise ValueError(f"workspace entry {rel!r} changed while hashing")
+        for value in (b"file", rel.encode("utf-8"),
+                      str(stat.S_IMODE(opened.st_mode)).encode("ascii"),
+                      str(opened.st_size).encode("ascii")):
+            digest.update(str(len(value)).encode("ascii") + b":" + value)
+        digest.update(str(opened.st_size).encode("ascii") + b":")
+        if _stream_fd(fd, digest) != opened.st_size:
+            raise ValueError(f"workspace entry {rel!r} changed while hashing")
+    finally:
+        os.close(fd)
+
+
+def _is_noise(rel: str, info: os.stat_result) -> bool:
+    if not stat.S_ISREG(info.st_mode):
+        return False
+    parts = rel.split("/")
+    if parts[-1] in _NOISE_FILES:
+        return True
+    return (len(parts) > 1 and parts[-2] == _NOISE_CACHE_DIR
+            and parts[-1].endswith(_NOISE_CACHE_SUFFIXES))
+
+
+def _special_entry(mode: int) -> str:
+    for test, kind in ((stat.S_ISFIFO, "fifo"), (stat.S_ISSOCK, "socket"),
+                       (stat.S_ISCHR, "char"), (stat.S_ISBLK, "block"),
+                       (stat.S_ISDIR, "directory")):
+        if test(mode):
+            return f"special:{kind}"
+    return "special:other"
+
+
+def _entry_for(path: Path, info: os.stat_result) -> str:
+    """One manifest entry. Non-regular files get a marker and are never
+    opened, so a FIFO or socket cannot block or fail the snapshot."""
+    if stat.S_ISLNK(info.st_mode):
+        target = os.readlink(path).encode("utf-8", errors="surrogateescape")
+        return "symlink:" + hashlib.sha256(target).hexdigest()
+    if not stat.S_ISREG(info.st_mode):
+        return _special_entry(info.st_mode)
+    try:
+        fd = os.open(path, _NOFOLLOW_FLAGS)
+    except FileNotFoundError:
+        return ABSENT
+    except OSError:
+        return "unreadable"
+    try:
+        opened = os.fstat(fd)
+        if not stat.S_ISREG(opened.st_mode):
+            return _special_entry(opened.st_mode)
+        digest = hashlib.sha256()
+        _stream_fd(fd, digest)
+    finally:
+        os.close(fd)
+    # A multiply linked file shares its inode with a path that may lie
+    # outside the workspace, so the marker is part of the entry: swapping
+    # an output for a hardlink with identical bytes and mode still differs.
+    links = "links>1:" if opened.st_nlink > 1 else ""
+    return f"file:{stat.S_IMODE(opened.st_mode):o}:{links}{digest.hexdigest()}"
+
+
+def _raise(error: OSError) -> None:
+    raise error
+
+
+def workspace_manifest(root: Path,
+                       cache: dict[str, tuple[tuple, str]] | None = None
+                       ) -> dict[str, str]:
+    """Map every workspace file (relative POSIX path) to a content entry.
+
+    ``cache`` reuses a digest while a file's inode, size, mode and change
+    times are unchanged, so snapshots around every phase cost one stat per
+    unchanged file. Directories are structure, not content, and are omitted.
+    """
+    manifest: dict[str, str] = {}
+    seen: set[str] = set()
+    for current, dirnames, filenames in os.walk(
+            root, followlinks=False, onerror=_raise):
+        current_path = Path(current)
+        for name in sorted(dirnames):
+            path = current_path / name
+            info = path.lstat()
+            if not stat.S_ISDIR(info.st_mode):
+                manifest[path.relative_to(root).as_posix()] = _entry_for(
+                    path, info)
+                dirnames.remove(name)
+        for name in filenames:
+            path = current_path / name
+            rel = path.relative_to(root).as_posix()
+            try:
+                info = path.lstat()
+            except FileNotFoundError:
+                continue
+            if _is_noise(rel, info):
+                continue
+            signature = (info.st_dev, info.st_ino, info.st_size,
+                         info.st_mtime_ns, info.st_ctime_ns, info.st_mode,
+                         info.st_nlink)
+            cached = cache.get(rel) if cache is not None else None
+            if (cached is not None and cached[0] == signature
+                    and stat.S_ISREG(info.st_mode)):
+                entry = cached[1]
+            else:
+                entry = _entry_for(path, info)
+                if cache is not None and stat.S_ISREG(info.st_mode):
+                    cache[rel] = (signature, entry)
+            if entry != ABSENT:
+                manifest[rel] = entry
+            seen.add(rel)
+    if cache is not None:
+        for stale in set(cache) - seen:
+            del cache[stale]
+    return manifest
+
+
+def path_entry(root: Path, rel: str) -> str:
+    """The current manifest entry for one path, without walking the tree.
+    A parent that is not a real directory (a swapped-in symlink) never
+    yields the recorded entry, so the bytes behind it are not trusted."""
+    parts = rel.split("/")
+    if not rel or rel.startswith("/") or any(
+            part in ("", ".", "..") for part in parts):
+        return "special:invalid-path"
+    current = root
+    for part in parts[:-1]:
+        current = current / part
+        try:
+            info = current.lstat()
+        except FileNotFoundError:
+            return ABSENT
+        if not stat.S_ISDIR(info.st_mode):
+            return "special:parent-not-directory"
+    path = current / parts[-1]
+    try:
+        info = path.lstat()
+    except FileNotFoundError:
+        return ABSENT
+    return _entry_for(path, info)
+
+
+def manifest_changes(before: dict[str, str],
+                     after: dict[str, str]) -> dict[str, str]:
+    """Paths whose entry differs, mapped to the after entry (ABSENT when
+    the path was removed)."""
+    return {rel: after.get(rel, ABSENT)
+            for rel in sorted(set(before) | set(after))
+            if before.get(rel) != after.get(rel)}
 
 
 def clone_workspace(source: Path, destination: Path) -> None:
@@ -288,6 +466,11 @@ def approve_maiden(
     before_ledger = OwnershipLedger.load(ownership_path)
     after_ledger = OwnershipLedger.load(proposed_ownership)
     try:
+        before_manifest = workspace_manifest(target)
+    except OSError as exc:
+        return MaidenApprovalResult(
+            False, f"workspace could not be inventoried; promotion refused: {exc}")
+    try:
         clone_workspace(staged, target)
         ownership_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(proposed_ownership, ownership_path)
@@ -324,9 +507,21 @@ def approve_maiden(
                 "ownership_claimed", agent=owner, path=path,
                 source="maiden-approval")
     events.close()
-    RunState.open(run_dir).record(
+    # The acceptance keeps the binding the runner journaled with the staged
+    # proposal and records the files promotion produced, so a resume reuses
+    # it only under the same contract and over exactly those bytes.
+    try:
+        outputs = manifest_changes(before_manifest, workspace_manifest(target))
+    except OSError:
+        outputs = None
+    state = RunState.open(run_dir)
+    staged_record = state.completed.get(f"phase:{phase_name}")
+    state.record(
         f"phase:{phase_name}",
-        {"status": "passed", "report": proposal.get("report", "")})
+        {"status": "passed", "report": proposal.get("report", ""),
+         "binding": (staged_record.get("binding")
+                     if isinstance(staged_record, dict) else None),
+         "outputs": outputs})
     return MaidenApprovalResult(
         True,
         f"approved maiden output for {phase_name}; promoted staged artifacts")
@@ -338,9 +533,12 @@ __all__ = [
     "approve_maiden",
     "approved_fingerprints",
     "clone_workspace",
+    "manifest_changes",
+    "path_entry",
     "phase_fingerprint",
     "proposal_paths",
     "text_sha256",
+    "workspace_manifest",
     "workspace_sha256",
     "write_proposal",
 ]

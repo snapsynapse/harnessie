@@ -14,9 +14,9 @@ from __future__ import annotations
 
 import json
 import os
-import urllib.error
 import urllib.request
 
+from . import _transport
 from .base import AssistantTurn, Message, ModelInterface, ToolCall
 
 
@@ -53,18 +53,16 @@ class OpenAICompatModel(ModelInterface):
             headers["authorization"] = f"Bearer {key}"
         req = urllib.request.Request(f"{base}/chat/completions",
                                      data=json.dumps(body).encode(), headers=headers)
-        try:
-            with urllib.request.urlopen(req, timeout=600) as resp:
-                payload = resp.read()
-        except urllib.error.HTTPError as e:
-            detail = e.read().decode(errors="replace")[:500]
-            return AssistantTurn(content=f"provider_error {e.code}: {detail}",
-                                 stop_reason="error", raw=detail)
-        except (urllib.error.URLError, TimeoutError, OSError) as e:
-            return AssistantTurn(content=f"network_error: {e}", stop_reason="error")
+        reply = _transport.post(req)
+        if not reply.ok:
+            return reply.error_turn()
 
+        usage = _transport.Usage()
         try:
-            data = json.loads(payload)
+            data = json.loads(reply.body)
+            usage = _transport.parse_usage(data, "prompt_tokens", "completion_tokens")
+            if usage.malformed:
+                raise ValueError("usage counters must be non-negative integers")
             if not isinstance(data, dict):
                 raise TypeError("top level must be an object")
             choices = data.get("choices")
@@ -81,6 +79,9 @@ class OpenAICompatModel(ModelInterface):
                 content = ""
             if not isinstance(content, str):
                 raise TypeError("message.content must be a string or null")
+            refusal = msg.get("refusal")
+            if refusal is not None and not isinstance(refusal, str):
+                raise TypeError("message.refusal must be a string or null")
             raw_tool_calls = msg.get("tool_calls")
             if raw_tool_calls is None:
                 raw_tool_calls = []
@@ -102,42 +103,37 @@ class OpenAICompatModel(ModelInterface):
                     name=name,
                     arguments=self._parse_args(function.get("arguments")),
                 ))
-            usage = data.get("usage")
-            if usage is None:
-                usage = {}
-            if not isinstance(usage, dict):
-                raise TypeError("usage must be an object")
-            input_tokens = self._usage_count(usage, "prompt_tokens")
-            output_tokens = self._usage_count(usage, "completion_tokens")
             finish = choice.get("finish_reason") or "stop"
             if not isinstance(finish, str):
                 raise TypeError("finish_reason must be a string or null")
-            stop = {"stop": "end_turn", "tool_calls": "tool_use",
-                    "length": "max_tokens", "content_filter": "refusal"}.get(
-                        finish, finish)
-            if stop not in {"end_turn", "max_tokens", "tool_use", "refusal"}:
+            # A terminal provider status wins over any tool calls in the same
+            # envelope: refused or truncated calls are never dispatched.
+            if finish == "content_filter" or refusal:
+                stop, tool_calls = "refusal", []
+                content = refusal or content
+            elif finish == "length":
+                stop, tool_calls = "max_tokens", []
+            elif finish == "tool_calls":
+                if not tool_calls:
+                    raise ValueError("finish_reason tool_calls without tool calls")
+                stop = "tool_use"
+            elif finish == "stop":
+                # Compatibility servers report "stop" beside tool calls.
+                stop = "tool_use" if tool_calls else "end_turn"
+            else:
                 raise ValueError("unsupported finish_reason")
         except (json.JSONDecodeError, UnicodeDecodeError, KeyError, TypeError,
                 ValueError, AttributeError) as e:
-            return AssistantTurn(
-                content=("provider_response_error: malformed OpenAI-compatible "
-                         f"response ({type(e).__name__})"),
-                stop_reason="error")
+            return _transport.malformed_turn("OpenAI-compatible", e, usage)
         return AssistantTurn(
             content=content,
             tool_calls=tool_calls,
-            stop_reason="tool_use" if tool_calls else stop,
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
+            stop_reason=stop,
+            input_tokens=usage.input_tokens,
+            output_tokens=usage.output_tokens,
             raw=data,
+            usage_known=usage.known,
         )
-
-    @staticmethod
-    def _usage_count(usage: dict, field: str) -> int:
-        value = usage.get(field, 0)
-        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
-            raise ValueError(f"usage.{field} must be a non-negative integer")
-        return value
 
     @staticmethod
     def _parse_args(raw) -> dict:

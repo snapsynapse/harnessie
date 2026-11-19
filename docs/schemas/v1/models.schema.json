@@ -24,11 +24,15 @@
       "model_id": {"type": "string", "minLength": 1},
       "base_url": {"type": "string", "default": ""},
       "api_key_env": {"type": "string", "default": ""},
-      "max_tokens": {"type": "integer", "minimum": 1, "default": 8192},
+      "max_tokens": {"type": "integer", "minimum": 1, "maximum": 1000000000000, "default": 8192},
       "supports_effort": {"type": "boolean", "default": true},
       "cost_per_mtok_in": {"type": "number", "minimum": 0, "default": 0},
       "cost_per_mtok_out": {"type": "number", "minimum": 0, "default": 0},
-      "extra": {"type": "object", "default": {}}
+      "extra": {"type": "object", "default": {}},
+      "unmetered": {
+        "type": "boolean", "default": false,
+        "description": "Explicit opt-out for an unbilled tier whose provider may omit token usage. Default false: a turn with unknown usage stops a metered run. Requires zero cost rates on the tier and its fallbacks; fallbacks inherit it."
+      }
     },
     "fallback": {
       "type": "object", "additionalProperties": false,
@@ -57,7 +61,19 @@
         "cost_per_mtok_in": {"$ref": "#/$defs/baseModelFields/cost_per_mtok_in"},
         "cost_per_mtok_out": {"$ref": "#/$defs/baseModelFields/cost_per_mtok_out"},
         "extra": {"$ref": "#/$defs/baseModelFields/extra"},
+        "unmetered": {"$ref": "#/$defs/baseModelFields/unmetered"},
         "fallbacks": {"type": "array", "items": {"$ref": "#/$defs/fallback"}}
+      },
+      "if": {"required": ["unmetered"], "properties": {"unmetered": {"const": true}}},
+      "then": {
+        "properties": {
+          "cost_per_mtok_in": {"const": 0},
+          "cost_per_mtok_out": {"const": 0},
+          "fallbacks": {"items": {"properties": {
+            "cost_per_mtok_in": {"const": 0},
+            "cost_per_mtok_out": {"const": 0}
+          }}}
+        }
       }
     },
     "route": {
@@ -73,7 +89,7 @@
       "required": ["max_usd", "max_tokens"],
       "properties": {
         "max_usd": {"type": "number", "exclusiveMinimum": 0},
-        "max_tokens": {"type": "integer", "minimum": 1}
+        "max_tokens": {"type": "integer", "minimum": 1, "maximum": 1000000000000}
       }
     }
   }

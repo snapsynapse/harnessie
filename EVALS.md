@@ -32,6 +32,8 @@ Standalone verification also emits `proofs/trace-metrics.json`. `harness/trace_e
 
 ## Scenario kinds
 
+Every scenario is validated against its kind before it runs (`harness/evals.py` `SCENARIO_KINDS`). Unknown keys, wrong value types, missing required expectations, vacuous assertions, conflicting expectations and duplicate scenario IDs (within or across files) fail the case or suite explicitly instead of being ignored. `tests/test_eval_scenario_schema.py` mutates each supported expectation to prove it can fail.
+
 The bounded property pilot in `tests/test_parser_properties.py` runs 200 deterministic examples per property, without a database or network/model calls. Generated JSON has at most three nested container levels, strings up to 80 characters, collections up to three entries, and file payloads up to 512 bytes. Each example has a 500 ms deadline; target suite runtime is below 60 seconds. It covers evidence digests, path refusal before model/check dispatch, arbitrary claim shapes and complete required-claim coverage. Minimized crashes are retained in `tests/fixtures/parser-regressions/` and ordinary deterministic tests. This is a scoped property suite, not evidence of comprehensive fuzzing or live-provider acceptance.
 
 ### observer

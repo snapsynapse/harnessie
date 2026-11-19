@@ -28,6 +28,9 @@ def test_mock_walkthrough_from_outside_repository(tmp_path):
     assert receipt['resume_model_calls'] == 0
     assert receipt['initial_status'] == receipt['resume_status'] == 'needs_arbitration'
     assert receipt['export_preserved_inputs'] is True
+    assert receipt['fenced_goal_export'] == 'exported'
+    assert receipt['fenced_goal_preserved_inputs'] is True
+    assert receipt['format_refusal_source'] == 'operator-edited copy with raw HTML'
     assert receipt['format_refusal'] == {'status': 'refused', 'code': 'invalid_record'}
     assert receipt['format_refusal_preserved_inputs'] is True
     assert receipt['participant_labels'] == ['implementer', 'implementer-2']

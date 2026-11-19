@@ -11,13 +11,18 @@ from __future__ import annotations
 
 import json
 import os
-import urllib.error
 import urllib.request
 
+from . import _transport
 from .base import AssistantTurn, Message, ModelInterface, ToolCall
 
 API_URL = "https://api.anthropic.com/v1/messages"
 API_VERSION = "2023-06-01"
+
+
+def _error_kind(error) -> str:
+    kind = error.get("type") if isinstance(error, dict) else None
+    return kind[:100] if isinstance(kind, str) and kind else "error envelope"
 
 
 class AnthropicModel(ModelInterface):
@@ -53,20 +58,29 @@ class AnthropicModel(ModelInterface):
                 "anthropic-version": API_VERSION,
             },
         )
-        try:
-            with urllib.request.urlopen(req, timeout=600) as resp:
-                payload = resp.read()
-        except urllib.error.HTTPError as e:
-            detail = e.read().decode(errors="replace")[:500]
-            return AssistantTurn(content=f"provider_error {e.code}: {detail}",
-                                 stop_reason="error", raw=detail)
-        except (urllib.error.URLError, TimeoutError, OSError) as e:
-            return AssistantTurn(content=f"network_error: {e}", stop_reason="error")
+        reply = _transport.post(req)
+        if not reply.ok:
+            return reply.error_turn()
 
+        usage = _transport.Usage()
         try:
-            data = json.loads(payload)
+            data = json.loads(reply.body)
+            usage = _transport.parse_usage(data, "input_tokens", "output_tokens")
+            if usage.malformed:
+                raise ValueError("usage counters must be non-negative integers")
             if not isinstance(data, dict):
                 raise TypeError("top level must be an object")
+            envelope = data.get("type", "message")
+            if envelope == "error":
+                # An error envelope on a 2xx status is a failed call, whatever
+                # else it carries: nothing in it is dispatched.
+                return AssistantTurn(
+                    content=f"provider_error: {_error_kind(data.get('error'))}",
+                    stop_reason="error", input_tokens=usage.input_tokens,
+                    output_tokens=usage.output_tokens, raw=data,
+                    usage_known=usage.known)
+            if envelope != "message":
+                raise ValueError("unsupported response type")
 
             blocks = data.get("content", [])
             if not isinstance(blocks, list):
@@ -92,40 +106,30 @@ class AnthropicModel(ModelInterface):
                         raise TypeError("tool_use input must be an object")
                     tool_calls.append(ToolCall(id=block["id"], name=block["name"],
                                                arguments=arguments))
-            usage = data.get("usage")
-            if usage is None:
-                usage = {}
-            if not isinstance(usage, dict):
-                raise TypeError("usage must be an object")
-            input_tokens = self._usage_count(usage, "input_tokens")
-            output_tokens = self._usage_count(usage, "output_tokens")
             stop = data.get("stop_reason") or "end_turn"
             if not isinstance(stop, str):
                 raise TypeError("stop_reason must be a string")
             stop = {"stop_sequence": "end_turn"}.get(stop, stop)
             if stop not in {"end_turn", "max_tokens", "tool_use", "refusal"}:
                 raise ValueError("unsupported stop_reason")
+            # The stop reason is authoritative: refused or truncated tool_use
+            # blocks are never dispatched, and tool_use must carry a call.
+            if stop in {"refusal", "max_tokens"}:
+                tool_calls = []
+            elif (stop == "tool_use") != bool(tool_calls):
+                raise ValueError("stop_reason contradicts tool_use blocks")
         except (json.JSONDecodeError, UnicodeDecodeError, KeyError, TypeError,
                 ValueError, AttributeError) as e:
-            return AssistantTurn(
-                content=("provider_response_error: malformed Anthropic response "
-                         f"({type(e).__name__})"),
-                stop_reason="error")
+            return _transport.malformed_turn("Anthropic", e, usage)
         return AssistantTurn(
             content="\n".join(text_parts),
             tool_calls=tool_calls,
-            stop_reason="tool_use" if tool_calls else stop,
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
+            stop_reason=stop,
+            input_tokens=usage.input_tokens,
+            output_tokens=usage.output_tokens,
             raw=data,
+            usage_known=usage.known,
         )
-
-    @staticmethod
-    def _usage_count(usage: dict, field: str) -> int:
-        value = usage.get(field, 0)
-        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
-            raise ValueError(f"usage.{field} must be a non-negative integer")
-        return value
 
     @staticmethod
     def _to_wire(messages: list[Message]) -> tuple[str, list[dict]]:

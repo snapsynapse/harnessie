@@ -10,8 +10,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from importlib.resources import files
 import json
+import math
 from pathlib import Path
 import re
+import sys
 from typing import Any, Iterable
 
 import yaml
@@ -22,6 +24,7 @@ SCHEMA_VERSION = 1
 KINDS = frozenset({
     "models", "cascade", "boundary", "approval-policy", "ownership", "workflow",
 })
+_FLOAT_MAX_INT = int(sys.float_info.max)
 _PLACEHOLDER = re.compile(r"\{([A-Za-z][A-Za-z0-9_-]*)\}")
 
 
@@ -79,6 +82,15 @@ def validate_data(data: Any, kind: str, source: str = "<memory>") -> list[Valida
         if version != SCHEMA_VERSION:
             return [ValidationProblem(source, "$.schema_version", "schema.version_unsupported",
                                       f"unsupported schema_version {version}; supported: 1")]
+    # NaN compares false against every bound and infinity satisfies minimums,
+    # so nonfinite numbers are refused before any schema comparison runs.
+    nonfinite = [
+        ValidationProblem(source, _path(parts), "schema.nonfinite",
+                          "number must be finite (NaN and infinity are not allowed)")
+        for parts in _nonfinite_paths(data, ())
+    ]
+    if nonfinite:
+        return sorted(nonfinite)
     validator = Draft202012Validator(_schema(kind))
     return sorted(
         ValidationProblem(
@@ -89,6 +101,21 @@ def validate_data(data: Any, kind: str, source: str = "<memory>") -> list[Valida
         )
         for error in validator.iter_errors(data)
     )
+
+
+def _nonfinite_paths(value: Any, parts: tuple) -> Iterable[tuple]:
+    # An integer beyond the float range has no finite float value: accounting
+    # arithmetic on it would raise OverflowError instead of refusing cleanly.
+    if (isinstance(value, float) and not math.isfinite(value)) or (
+            isinstance(value, int) and not isinstance(value, bool)
+            and abs(value) > _FLOAT_MAX_INT):
+        yield parts
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            yield from _nonfinite_paths(item, (*parts, key))
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            yield from _nonfinite_paths(item, (*parts, index))
 
 
 def read_document(path: Path, kind: str) -> dict[str, Any]:

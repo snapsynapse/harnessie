@@ -234,6 +234,19 @@ budget:
   max_tokens: 2000000
 ```
 
+Every model turn must carry a usage receipt. If a provider omits token usage, or reports a counter that is not a non-negative integer up to 10^12, the run's spend is unknowable, so a metered run stops at that turn instead of retrying, and its journal refuses resume. Both refusals name the remedy. When a tier is genuinely unbilled, typically a local or self-hosted endpoint that omits usage, mark it explicitly:
+
+```yaml
+tiers:
+  local:
+    provider: openai-compat
+    model_id: qwen3.8:latest
+    base_url: http://localhost:11434/v1
+    unmetered: true          # default false; cost rates must stay 0
+```
+
+`unmetered: true` lets a turn with unknown usage continue, and the journal's `budget_charge` record says it was unmetered. Reported tokens still count against `max_tokens`. The schema refuses `unmetered` with a nonzero cost rate on the tier or any of its fallbacks, and fallbacks inherit the flag from their tier. A run stopped for unknown usage cannot be resumed; set the flag and start a new run.
+
 Use `openai-responses` for OpenAI reasoning models that combine reasoning effort with function tools. Use `openai-compat` for Chat Completions endpoints such as Ollama and vLLM. To run everything on a local open-source model, point the task classes you use at the `local` tier and leave the external-provider keys unset. To swap one provider for another, change the tier's `provider`, `model_id`, and `base_url`. Nothing else in the harness changes.
 
 The escalation ladder walks the tier order. When a phase fails its gate, the harness first reformulates the task with the verifier's evidence, then raises effort, then raises tier, before halting for a human. That ladder is why a cheap worker can carry bulk execution safely: a capable verifier and an automatic escalation stand behind it.

@@ -1,5 +1,6 @@
 """Provider adapters fail closed on malformed response envelopes."""
 
+import io
 import json
 
 import pytest
@@ -11,23 +12,17 @@ from harness.models.openai_compat import OpenAICompatModel
 from harness.models.openai_responses import OpenAIResponsesModel
 
 
-class _Response:
-    def __init__(self, payload: bytes):
-        self.payload = payload
-
+class _Response(io.BytesIO):
     def __enter__(self):
         return self
 
     def __exit__(self, *_args):
         return False
 
-    def read(self):
-        return self.payload
-
 
 def _stub_response(monkeypatch, payload):
     wire = payload if isinstance(payload, bytes) else json.dumps(payload).encode()
-    monkeypatch.setattr("urllib.request.urlopen",
+    monkeypatch.setattr("harness.models._transport._open",
                         lambda *_args, **_kwargs: _Response(wire))
 
 
@@ -153,7 +148,7 @@ def test_openai_compat_max_completion_tokens_extra_replaces_max_tokens(monkeypat
             "usage": {"prompt_tokens": 1, "completion_tokens": 1},
         }).encode())
 
-    monkeypatch.setattr("urllib.request.urlopen", _capture)
+    monkeypatch.setattr("harness.models._transport._open", _capture)
     model = OpenAICompatModel(ModelSpec(
         name="mid", provider="openai-compat", model_id="test",
         base_url="https://example.invalid/v1", supports_effort=False,
@@ -192,7 +187,7 @@ def test_openai_responses_preserves_reasoning_and_function_outputs(monkeypatch):
         captured.append(json.loads(req.data.decode()))
         return _Response(json.dumps(next(replies)).encode())
 
-    monkeypatch.setattr("urllib.request.urlopen", _capture)
+    monkeypatch.setattr("harness.models._transport._open", _capture)
     model = _openai_responses()
     tools = [{"name": "read_file", "description": "Read one file",
               "parameters": {"type": "object"}}]
@@ -238,7 +233,7 @@ def test_openai_responses_resets_state_for_a_new_conversation(monkeypatch):
             "usage": {"input_tokens": 1, "output_tokens": 1},
         }).encode())
 
-    monkeypatch.setattr("urllib.request.urlopen", _capture)
+    monkeypatch.setattr("harness.models._transport._open", _capture)
     model = _openai_responses()
     model.complete([Message(role="system", content="one"),
                     Message(role="user", content="first")])

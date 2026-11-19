@@ -50,7 +50,16 @@ from .roles import RoleDef
 from .routing import Budget, Route, Router
 from .tools.builtin import register_builtin
 from .tools.registry import ToolRegistry
-from .verify import Check, CheckResult, parse_verdict, run_checks
+from .verify import (
+    CHECK_FAILED,
+    CHECK_FAILED_OUTCOMES,
+    CHECK_NOT_EXECUTED,
+    CHECK_PASSED,
+    Check,
+    CheckResult,
+    parse_verdict,
+    run_checks,
+)
 from .verify_evidence import (
     EvidenceBundle,
     EvidenceValidationError,
@@ -62,14 +71,10 @@ EXIT_VERIFIED = 0
 EXIT_FAILED = 1
 EXIT_CANNOT_VERIFY = 2
 
-# Marker run_checks prefixes onto a check blocked by a missing sandbox (see
-# verify.run_checks). Standalone, that is "cannot verify", not "failed":
-# nothing was observed about the artifact.
-_SANDBOX_BLOCKED = "sandbox unavailable, check blocked"
-
 # Built-in verifier prompt, so no agents/ scaffold is required. A project may
-# override it with --verifier-prompt. Boundaries are appended by RoleDef and
-# cannot be removed by the override.
+# override it with --verifier-prompt. Boundaries and the single "claims"
+# output contract are appended by RoleDef and cannot be removed by the
+# override, so this text carries behavior only, never serialization.
 DEFAULT_VERIFIER_PROMPT = """\
 # Verifier
 
@@ -87,16 +92,7 @@ whether the evidence supports it: reproduced, refuted, or not verifiable in
 this environment (say exactly why). A claim you could not check is NOT a
 passing claim.
 
-Then call task_complete. Your report must contain the claim-by-claim findings
-and END with one JSON object in this exact structural form:
-{"claims":[{"id":"C1","status":"reproduced|refuted|not_verifiable",
-"required":true,"reason":"concise basis","evidence":["path or command"]}],
-"reasons":"overall summary"}
-
-Use the criterion's own stable identifier when it has one; otherwise assign
-`C1`, `C2`, and so on in source order. Include every acceptance claim exactly
-once. Do not emit the legacy boolean-only verdict unless an operator-supplied
-prompt explicitly requires that compatibility format.
+Then report your verdict in the output contract that follows.
 """
 
 
@@ -213,7 +209,8 @@ def _render_report(*, workspace: Path, criteria_path: Path,
               "", "## Deterministic checks", ""]
     if check_results:
         for c in check_results:
-            status = "PASS" if c.passed else "FAIL"
+            status = {CHECK_PASSED: "PASS", CHECK_FAILED: "FAIL"}.get(
+                c.outcome, c.outcome.upper())
             lines.append(f"### [{status}] {c.name}")
             lines.append("")
             lines.append("```")
@@ -312,16 +309,13 @@ def run_standalone_verify(req: VerifyRequest) -> VerifyOutcome:
     # -- layer 1: deterministic checks (sandboxed, fail closed)
     check_results = run_checks(req.checks, workspace, proofs, events,
                                attempt=1, allow_network=req.allow_network)
-    blocked = [c for c in check_results
-               if not c.passed and c.output.startswith(_SANDBOX_BLOCKED)]
-    failed = [c for c in check_results
-              if not c.passed and not c.output.startswith(_SANDBOX_BLOCKED)]
+    blocked = [c for c in check_results if c.outcome in CHECK_NOT_EXECUTED]
+    failed = [c for c in check_results if c.outcome in CHECK_FAILED_OUTCOMES]
 
     def finish(exit_code: int, verifier_section: str) -> VerifyOutcome:
         fingerprint = _input_fingerprint(workspace, criteria)
         if evidence_bundle is not None:
-            fingerprint["evidence_bundle_sha256"] = hashlib.sha256(
-                evidence_bundle.source.read_bytes()).hexdigest()
+            fingerprint["evidence_bundle_sha256"] = evidence_bundle.source_sha256
         identity = harness_identity(_project_root(req), registry)
         events.emit("harness_identity", **identity)
         report = _render_report(
@@ -346,15 +340,17 @@ def run_standalone_verify(req: VerifyRequest) -> VerifyOutcome:
         word = {0: "VERIFIED", 1: "FAILED", 2: "CANNOT VERIFY"}[exit_code]
         return VerifyOutcome(exit_code, path, f"{word}: {path}")
 
-    if blocked:
-        names = ", ".join(c.name for c in blocked)
-        return finish(EXIT_CANNOT_VERIFY,
-                      f"(not consulted: sandbox unavailable for checks: {names}; "
-                      "nothing was observed, so no verdict is earned)")
+    # An observed failure is evidence about the artifact and outranks a
+    # blocked sibling, which only means some evidence is missing.
     if failed:
         names = ", ".join(c.name for c in failed)
         return finish(EXIT_FAILED,
                       f"(not consulted: deterministic checks already failed: {names})")
+    if blocked:
+        names = ", ".join(f"{c.name} ({c.outcome})" for c in blocked)
+        return finish(EXIT_CANNOT_VERIFY,
+                      f"(not consulted: checks could not complete: {names}; "
+                      "nothing was observed, so no verdict is earned)")
     if req.no_verifier:
         return finish(EXIT_VERIFIED if check_results else EXIT_CANNOT_VERIFY,
                       "(skipped by --no-verifier; verdict rests on the checks above)"
@@ -365,7 +361,8 @@ def run_standalone_verify(req: VerifyRequest) -> VerifyOutcome:
     # -- layer 2: verifier agent, single pass, read-only + test execution
     prompt = (req.verifier_prompt_path.read_text(encoding="utf-8")
               if req.verifier_prompt_path else DEFAULT_VERIFIER_PROMPT)
-    role = RoleDef(name="verifier", kind="verifier", prompt=prompt)
+    role = RoleDef(name="verifier", kind="verifier", prompt=prompt,
+                   output_contract="claims")
     loop = AgentLoop(role="verifier", model=model, registry=registry,
                      events=events, budget=budget, max_steps=req.max_steps,
                      agent_name="verifier")

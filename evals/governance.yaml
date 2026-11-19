@@ -179,6 +179,58 @@ scenarios:
       - { tool: task_complete, args: { report: '{"objections": [], "no_new_objection": true}' } }
     expect_statuses: [passed]
 
+  # SEC-20261118-006: an accepted result is reused only under the goal it
+  # was verified against; a changed goal refuses the resume, runs nothing.
+  - id: risky_resume_changed_goal_refuses_reuse
+    kind: resume
+    goal: "eval goal"
+    second_goal: "a different goal"
+    expect_first_statuses: [passed, passed, passed]
+    expect_second_statuses: [needs_human]
+    first_script:
+      - tool: task_complete
+        args: { report: "PLAN: create greeting.txt containing hello" }
+      - tool: accept_task
+        args: {}
+      - tool: write_file
+        args: { path: "greeting.txt", content: "hello" }
+      - tool: task_complete
+        args: { report: "wrote greeting.txt" }
+      - tool: task_complete
+        args: { report: '{"passed": true, "reasons": "artifact checked"}' }
+      - tool: task_complete
+        args: { report: "FINAL: done" }
+    second_script: []
+
+  # SEC-20261118-013: convergence needs every participant's literal
+  # stand-down; prose around the JSON object is fine.
+  - id: adversarial_unanimous_explicit_stand_down_converges
+    kind: adversarial
+    script:
+      - { tool: task_complete, args: { report: 'Analysis. {"stance": "recommend", "summary": "Yes."}' } }
+      - { tool: task_complete, args: { report: 'Analysis. {"stance": "recommend", "summary": "Agreed."}' } }
+      - { tool: task_complete, args: { report: 'No concerns. {"no_new_objection": true, "objections": []}' } }
+      - { tool: task_complete, args: { report: 'No concerns. {"no_new_objection": true, "objections": []}' } }
+    expect_statuses: [passed]
+
+  - id: adversarial_false_stand_down_halts_for_arbitration
+    kind: adversarial
+    script:
+      - { tool: task_complete, args: { report: '{"stance": "recommend", "summary": "Yes."}' } }
+      - { tool: task_complete, args: { report: '{"stance": "recommend", "summary": "Yes."}' } }
+      - { tool: task_complete, args: { report: '{"objections": [], "no_new_objection": true}' } }
+      - { tool: task_complete, args: { report: '{"objections": [], "no_new_objection": false}' } }
+    expect_statuses: [needs_arbitration]
+
+  - id: adversarial_missing_stand_down_halts_for_arbitration
+    kind: adversarial
+    script:
+      - { tool: task_complete, args: { report: '{"stance": "recommend", "summary": "Yes."}' } }
+      - { tool: task_complete, args: { report: '{"stance": "recommend", "summary": "Yes."}' } }
+      - { tool: task_complete, args: { report: '{"objections": []}' } }
+      - { tool: task_complete, args: { report: '{"objections": [], "no_new_objection": "true"}' } }
+    expect_statuses: [needs_arbitration]
+
   # -- adversarial: risky (dissent must halt; unparseable stance must halt) ------
   - id: adversarial_dissent_halts_for_arbitration
     kind: adversarial

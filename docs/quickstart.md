@@ -120,7 +120,7 @@ Terms in the order a newcomer meets them, each in one plain sentence.
 - Ownership lane: a rule about which agent (or you) owns which files, so agents cannot overwrite each other's work or yours.
 - Arbitration: when agents disagree, a human (you) makes the call. The tool never averages a disagreement into a fake consensus.
 - Refusal: a structured "no" from the harness that always says what was refused, which boundary applied, and why.
-- Audit: the tamper-evident log of every action in a run, which `harnessie audit` re-verifies end to end.
+- Audit: the tamper-evident log of every action in a run, which `harnessie audit` re-verifies link by link. It catches edits to earlier events; an edited last event or a cut-off tail needs a separately kept copy of the final entry to notice.
 
 ## Where to next
 

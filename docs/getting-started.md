@@ -82,7 +82,7 @@ python3 -m harness.cli report <run_id>   # phases, results, proofs
 python3 -m harness.cli audit  <run_id>   # verify the hash chain + governance timeline
 ```
 
-`report` shows what each phase did and where its proofs are. `audit` re-verifies the event log end to end (exit 0 clean, exit 1 if the chain was tampered with) and renders one composite timeline of agent and operator actions: consents, ownership claims and denials, structured refusals, gate verdicts, and any decision records.
+`report` shows what each phase did and where its proofs are. `audit` re-verifies the event log link by link (exit 0 clean, exit 1 if a linked earlier event was edited, removed, or reordered; an edited final event or a truncated tail still verifies unless you kept the final digest elsewhere) and renders one composite timeline of agent and operator actions: consents, ownership claims and denials, structured refusals, gate verdicts, and any decision records.
 
 ## 6. When a run stops
 
