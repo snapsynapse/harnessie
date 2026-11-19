@@ -16,7 +16,7 @@ harnessie init my-project      # scaffold + guided readiness check + zero-dollar
 cd my-project
 ```
 
-This documentation covers Harnessie 1.5.1 source. Check the installed package version before relying on the security repairs (`atif` needs 1.5.0 or newer); GitHub, PyPI, Homebrew and Verify Action publication are verified separately in NEXT.md and RELEASE_CHECKLIST.md.
+This documentation covers published Harnessie 1.5.1 on GitHub and PyPI. Check the installed package version before relying on the security repairs (`atif` needs 1.5.0 or newer). Homebrew and Verify Action still pin core 1.5.0; their separate release status is tracked in NEXT.md. The 1.5.1 core publication evidence is in audits/release-1.5.1.md.
 
 Working on Harnessie itself (or wanting the test suite)? Install from source instead:
 

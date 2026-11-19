@@ -1,0 +1,23 @@
+{
+  "version": "1.5.1",
+  "status": "verified",
+  "checked_at": "2026-11-19T15:49:19.937725Z",
+  "index": "https://pypi.org/simple",
+  "python": "3.12.16",
+  "venv": "/private/tmp/harnessie-1.5.1-public-consumer",
+  "installed_module": "/private/tmp/harnessie-1.5.1-public-consumer/lib/python3.12/site-packages/harness/__init__.py",
+  "installed_wheel_sha256": "0c586af43e8585ac57abfbef94611c1993587dbf2ca038dba051a4edc3a93255",
+  "runtime_matches_original_github_wheel": true,
+  "install_attempts": 1,
+  "pip_check": "No broken requirements found.",
+  "checks": {
+    "cli_help": true,
+    "verifier_first_trial_exit_codes": [
+      1,
+      0,
+      2
+    ],
+    "report_version": "harnessie 1.5.1"
+  },
+  "note": "Fresh public-index install outside the checkout; deterministic checks-only trial made no model calls."
+}

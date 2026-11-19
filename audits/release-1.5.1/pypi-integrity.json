@@ -1,0 +1,45 @@
+{
+  "version": "1.5.1",
+  "status": "verified",
+  "checked_at": "2026-11-19T15:48:21.211622Z",
+  "workflow_run": 44485696953,
+  "workflow_status": "completed",
+  "workflow_conclusion": "success",
+  "source_commit": "2bb78f24ad029db7e1c1545fdc6ab3a39f808c92",
+  "attestation_verifier": "pypi-attestations 0.0.30",
+  "attestation_method": "verify pypi --repository https://github.com/snapsynapse/harnessie <direct PyPI file URL>",
+  "files": [
+    {
+      "filename": "harnessie-1.5.1-py3-none-any.whl",
+      "sha256": "0c586af43e8585ac57abfbef94611c1993587dbf2ca038dba051a4edc3a93255",
+      "matches_github_asset": true,
+      "size": 219121,
+      "upload_time": "2026-11-19T15:45:06.807927Z",
+      "url": "https://files.pythonhosted.org/packages/eb/25/514b17ec80374cc5d9626de69cd899ad98e7aeb420b92b4595951171fb0a/harnessie-1.5.1-py3-none-any.whl",
+      "publisher": {
+        "environment": "pypi",
+        "kind": "GitHub",
+        "repository": "snapsynapse/harnessie",
+        "workflow": "release.yml"
+      },
+      "attestation_bundles": 1,
+      "attestation_verified": true
+    },
+    {
+      "filename": "harnessie-1.5.1.tar.gz",
+      "sha256": "b26dcaed78237219e5408229f88327c335688a3659330f397e0eeb9dc7375c6a",
+      "matches_github_asset": true,
+      "size": 378385,
+      "upload_time": "2026-11-19T15:45:08.294566Z",
+      "url": "https://files.pythonhosted.org/packages/e8/fa/5320ade9b34bfd2ae0fdb6a2f5d82715b9092f6bf9cfb4e9fa7489a89178/harnessie-1.5.1.tar.gz",
+      "publisher": {
+        "environment": "pypi",
+        "kind": "GitHub",
+        "repository": "snapsynapse/harnessie",
+        "workflow": "release.yml"
+      },
+      "attestation_bundles": 1,
+      "attestation_verified": true
+    }
+  ]
+}
